@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="raptor" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Win(32 Bit) Debug">
+				<Option platforms="Windows;" />
+				<Option output="bin/Debug/raptor" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Debug" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/include/SDL2" />
+				</Compiler>
+				<Linker>
+					<Add option="-lmingw32 -lwinmm -lSDL2main -lSDL2" />
+					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/lib" />
+				</Linker>
+			</Target>
+			<Target title="Win (32 Bit) Release">
+				<Option platforms="Windows;" />
+				<Option output="bin/Release/raptor" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/include/SDL2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lmingw32 -lwinmm -lSDL2main -lSDL2" />
+					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/lib" />
+				</Linker>
+			</Target>
+			<Target title="Linux (32 Bit) Debug">
+				<Option platforms="Unix;" />
+				<Option output="bin/Debug/raptor" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Debug" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-g" />
+					<Add directory="/usr/include/SDL2" />
+				</Compiler>
+				<Linker>
+					<Add option="-m32" />
+					<Add option="-lSDL2main -lSDL2" />
+					<Add directory="/usr/lib32" />
+				</Linker>
+			</Target>
+			<Target title="Linux (32 Bit) Release">
+				<Option platforms="Unix;" />
+				<Option output="bin/Release/raptor" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="/usr/include/SDL2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lSDL2main -lSDL2" />
+					<Add directory="/usr/lib32" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-m32" />
+			<Add option="-g" />
+		</Compiler>
+		<Linker>
+			<Add option="-m32" />
+		</Linker>
+		<Unit filename="../src/anims.cpp" />
+		<Unit filename="../src/anims.h" />
+		<Unit filename="../src/bonus.cpp" />
+		<Unit filename="../src/bonus.h" />
+		<Unit filename="../src/cards.h" />
+		<Unit filename="../src/common.h" />
+		<Unit filename="../src/demo.cpp" />
+		<Unit filename="../src/demo.h" />
+		<Unit filename="../src/dspapi.cpp" />
+		<Unit filename="../src/dspapi.h" />
+		<Unit filename="../src/enemy.cpp" />
+		<Unit filename="../src/enemy.h" />
+		<Unit filename="../src/eshot.cpp" />
+		<Unit filename="../src/eshot.h" />
+		<Unit filename="../src/flame.cpp" />
+		<Unit filename="../src/flame.h" />
+		<Unit filename="../src/fx.cpp" />
+		<Unit filename="../src/fx.h" />
+		<Unit filename="../src/gfxapi.cpp" />
+		<Unit filename="../src/gfxapi.h" />
+		<Unit filename="../src/gfxapi_a.cpp" />
+		<Unit filename="../src/glbapi.cpp" />
+		<Unit filename="../src/glbapi.h" />
+		<Unit filename="../src/gssapi.cpp" />
+		<Unit filename="../src/gssapi.h" />
+		<Unit filename="../src/help.cpp" />
+		<Unit filename="../src/help.h" />
+		<Unit filename="../src/i_oplmusic.cpp" />
+		<Unit filename="../src/i_oplmusic.h" />
+		<Unit filename="../src/i_video.cpp" />
+		<Unit filename="../src/i_video.h" />
+		<Unit filename="../src/imsapi.cpp" />
+		<Unit filename="../src/imsapi.h" />
+		<Unit filename="../src/input.cpp" />
+		<Unit filename="../src/input.h" />
+		<Unit filename="../src/intro.cpp" />
+		<Unit filename="../src/intro.h" />
+		<Unit filename="../src/kbdapi.cpp" />
+		<Unit filename="../src/kbdapi.h" />
+		<Unit filename="../src/loadsave.cpp" />
+		<Unit filename="../src/loadsave.h" />
+		<Unit filename="../src/m_misc.cpp" />
+		<Unit filename="../src/m_misc.h" />
+		<Unit filename="../src/movia_a.cpp" />
+		<Unit filename="../src/movie.cpp" />
+		<Unit filename="../src/movie.h" />
+		<Unit filename="../src/mpuapi.cpp" />
+		<Unit filename="../src/mpuapi.h" />
+		<Unit filename="../src/musapi.cpp" />
+		<Unit filename="../src/musapi.h" />
+		<Unit filename="../src/objects.cpp" />
+		<Unit filename="../src/objects.h" />
+		<Unit filename="../src/opl3.cpp" />
+		<Unit filename="../src/opl3.h" />
+		<Unit filename="../src/prefapi.cpp" />
+		<Unit filename="../src/prefapi.h" />
+		<Unit filename="../src/ptrapi.cpp" />
+		<Unit filename="../src/ptrapi.h" />
+		<Unit filename="../src/ptrapi_a.cpp" />
+		<Unit filename="../src/rap.cpp" />
+		<Unit filename="../src/rap.h" />
+		<Unit filename="../src/shadow.cpp" />
+		<Unit filename="../src/shadow.h" />
+		<Unit filename="../src/shots.cpp" />
+		<Unit filename="../src/shots.h" />
+		<Unit filename="../src/store.cpp" />
+		<Unit filename="../src/store.h" />
+		<Unit filename="../src/swdapi.cpp" />
+		<Unit filename="../src/swdapi.h" />
+		<Unit filename="../src/tile.cpp" />
+		<Unit filename="../src/tile.h" />
+		<Unit filename="../src/tile_a.cpp" />
+		<Unit filename="../src/vmemapi.cpp" />
+		<Unit filename="../src/vmemapi.h" />
+		<Unit filename="../src/windows.cpp" />
+		<Unit filename="../src/windows.h" />
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>

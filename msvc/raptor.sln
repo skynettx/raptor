@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "raptor", "raptor.vcxproj", "{1BD97F3A-736A-4E17-B84D-8CD200ECA0F5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1BD97F3A-736A-4E17-B84D-8CD200ECA0F5}.Debug|x86.ActiveCfg = Debug|Win32
+		{1BD97F3A-736A-4E17-B84D-8CD200ECA0F5}.Debug|x86.Build.0 = Debug|Win32
+		{1BD97F3A-736A-4E17-B84D-8CD200ECA0F5}.Release|x86.ActiveCfg = Release|Win32
+		{1BD97F3A-736A-4E17-B84D-8CD200ECA0F5}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {044BA9EB-672C-486C-AF39-51CE825E8CE0}
+	EndGlobalSection
+EndGlobal

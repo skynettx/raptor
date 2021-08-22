@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\anims.h" />
+    <ClInclude Include="..\src\bonus.h" />
+    <ClInclude Include="..\src\cards.h" />
+    <ClInclude Include="..\src\common.h" />
+    <ClInclude Include="..\src\demo.h" />
+    <ClInclude Include="..\src\dspapi.h" />
+    <ClInclude Include="..\src\enemy.h" />
+    <ClInclude Include="..\src\eshot.h" />
+    <ClInclude Include="..\src\flame.h" />
+    <ClInclude Include="..\src\fx.h" />
+    <ClInclude Include="..\src\gfxapi.h" />
+    <ClInclude Include="..\src\glbapi.h" />
+    <ClInclude Include="..\src\gssapi.h" />
+    <ClInclude Include="..\src\help.h" />
+    <ClInclude Include="..\src\imsapi.h" />
+    <ClInclude Include="..\src\input.h" />
+    <ClInclude Include="..\src\intro.h" />
+    <ClInclude Include="..\src\i_oplmusic.h" />
+    <ClInclude Include="..\src\i_video.h" />
+    <ClInclude Include="..\src\kbdapi.h" />
+    <ClInclude Include="..\src\loadsave.h" />
+    <ClInclude Include="..\src\movie.h" />
+    <ClInclude Include="..\src\mpuapi.h" />
+    <ClInclude Include="..\src\musapi.h" />
+    <ClInclude Include="..\src\m_misc.h" />
+    <ClInclude Include="..\src\objects.h" />
+    <ClInclude Include="..\src\opl3.h" />
+    <ClInclude Include="..\src\prefapi.h" />
+    <ClInclude Include="..\src\ptrapi.h" />
+    <ClInclude Include="..\src\rap.h" />
+    <ClInclude Include="..\src\shadow.h" />
+    <ClInclude Include="..\src\shots.h" />
+    <ClInclude Include="..\src\store.h" />
+    <ClInclude Include="..\src\swdapi.h" />
+    <ClInclude Include="..\src\tile.h" />
+    <ClInclude Include="..\src\vmemapi.h" />
+    <ClInclude Include="..\src\windows.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\anims.cpp" />
+    <ClCompile Include="..\src\bonus.cpp" />
+    <ClCompile Include="..\src\demo.cpp" />
+    <ClCompile Include="..\src\dspapi.cpp" />
+    <ClCompile Include="..\src\enemy.cpp" />
+    <ClCompile Include="..\src\eshot.cpp" />
+    <ClCompile Include="..\src\flame.cpp" />
+    <ClCompile Include="..\src\fx.cpp" />
+    <ClCompile Include="..\src\gfxapi.cpp" />
+    <ClCompile Include="..\src\gfxapi_a.cpp" />
+    <ClCompile Include="..\src\glbapi.cpp" />
+    <ClCompile Include="..\src\gssapi.cpp" />
+    <ClCompile Include="..\src\help.cpp" />
+    <ClCompile Include="..\src\imsapi.cpp" />
+    <ClCompile Include="..\src\input.cpp" />
+    <ClCompile Include="..\src\intro.cpp" />
+    <ClCompile Include="..\src\i_oplmusic.cpp" />
+    <ClCompile Include="..\src\i_video.cpp" />
+    <ClCompile Include="..\src\kbdapi.cpp" />
+    <ClCompile Include="..\src\loadsave.cpp" />
+    <ClCompile Include="..\src\movia_a.cpp" />
+    <ClCompile Include="..\src\movie.cpp" />
+    <ClCompile Include="..\src\mpuapi.cpp" />
+    <ClCompile Include="..\src\musapi.cpp" />
+    <ClCompile Include="..\src\m_misc.cpp" />
+    <ClCompile Include="..\src\objects.cpp" />
+    <ClCompile Include="..\src\opl3.cpp" />
+    <ClCompile Include="..\src\prefapi.cpp" />
+    <ClCompile Include="..\src\ptrapi.cpp" />
+    <ClCompile Include="..\src\ptrapi_a.cpp" />
+    <ClCompile Include="..\src\rap.cpp" />
+    <ClCompile Include="..\src\shadow.cpp" />
+    <ClCompile Include="..\src\shots.cpp" />
+    <ClCompile Include="..\src\store.cpp" />
+    <ClCompile Include="..\src\swdapi.cpp" />
+    <ClCompile Include="..\src\tile.cpp" />
+    <ClCompile Include="..\src\tile_a.cpp" />
+    <ClCompile Include="..\src\vmemapi.cpp" />
+    <ClCompile Include="..\src\windows.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{1bd97f3a-736a-4e17-b84d-8cd200eca0f5}</ProjectGuid>
+    <RootNamespace>raptor</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>raptor</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;winmm.lib;shell32.lib</AdditionalDependencies>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;C:\Users\Skynet\source\libs\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64;C:\Users\Skynet\source\libs\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;winmm.lib;shell32.lib</AdditionalDependencies>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
