@@ -179,7 +179,7 @@ void ESHOT_Shoot(enemy_t *a1, int a2)
     eshot_t *v18;
     v1c = a1->f_18 + a1->f_c->f_138[a2];
     v20 = a1->f_1c + a1->f_c->f_168[a2];
-    //if ((v1c >= 0 || v1c < 320) && (v20 >= 0 || v20 < 200))
+    
     if (((v1c >= 0) && (v1c < 320)) && ((v20 >= 0) && (v20 < 200)))
     {
         v18 = ESHOT_Get();
@@ -301,7 +301,7 @@ void ESHOT_Think(void)
     plib_t *v20;
     int v24, v28;
 
-    for (v1c = first_eshot.f_4; &last_eshot != v1c; v1c = v1c->f_4)
+    for (v1c = first_eshot.f_4; v1c!=&last_eshot; v1c = v1c->f_4)
     {
         v20 = v1c->f_48;
         v1c->f_8 = v20->f_4[v1c->f_c];
@@ -309,11 +309,11 @@ void ESHOT_Think(void)
         switch (v1c->f_58)
         {
         case 5:
-            if (v1c->f_c < v20->f_2c)
+            if (v1c->f_5c && v1c->f_5c->f_c && v1c->f_c < v20->f_2c)
             {
-                v1c->f_10 = v1c->f_5c->f_c->f_138[v1c->f_60] + v1c->f_5c->f_18 - 4;
-                v1c->f_14 = v1c->f_5c->f_c->f_168[v1c->f_60] + v1c->f_5c->f_1c;
-                v1c->f_18.f_c = 200; //fix from me 
+                v1c->f_10 = v1c->f_5c->f_18 + v1c->f_5c->f_c->f_138[v1c->f_60] - 4;
+                v1c->f_14 = v1c->f_5c->f_1c + v1c->f_5c->f_c->f_168[v1c->f_60];
+                v1c->f_18.f_c = 200;  
                 v24 = abs(v1c->f_10 - player_cx);
                 if (v24 < 16 && v1c->f_14 < player_cy)
                 {
@@ -387,7 +387,7 @@ void ESHOT_Display(void)
     eshot_t *v1c;
     int v20, v28;
     texture_t *v24;
-    for (v1c = first_eshot.f_4; &last_eshot != v1c; v1c = v1c->f_4)
+    for (v1c = first_eshot.f_4; v1c !=&last_eshot; v1c = v1c->f_4)
     {
         if (v1c->f_58 == 5)
         {
