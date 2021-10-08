@@ -338,23 +338,21 @@ void ENEMY_Add(csprite_t *a1)
         InitMobj(&v20->f_5c);
         MoveMobj(&v20->f_5c);
         break;
-    case 3:
+    case 3:                                           //Ground
         v20->f_54 = 1;
         v20->f_5c.f_8 = v20->f_18;
         v20->f_5c.f_c = 211;
         break;
-    case 5:
-        v20->f_18 = v20->f_28;
-        v20->f_10 = v20->f_18;
-        v20->f_5c.f_0 = v20->f_10;
+    case 5:                                           //Groundright
+        v20->f_18 -= v20->f_28;
+        v20->f_5c.f_0 = v20->f_10 = v20->f_18;
         v20->f_54 = 1;
         v20->f_5c.f_8 = 335;
         v20->f_5c.f_c = 211;
         break;
-    case 4:
-        v20->f_18 = v20->f_28;
-        v20->f_10 = v20->f_18;
-        v20->f_5c.f_0 = v20->f_10;
+    case 4:                                           //Groundleft
+        v20->f_18 += v20->f_28;
+        v20->f_5c.f_0 = v20->f_10 = v20->f_18;
         v20->f_54 = 1;
         v20->f_5c.f_8 = -v20->f_30;
         v20->f_5c.f_c = 211;
