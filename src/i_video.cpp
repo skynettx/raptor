@@ -1176,8 +1176,10 @@ static void SetVideoMode(void)
     // Set the highdpi flag - this makes a big difference on Macs with
     // retina displays, especially when using small window sizes.
     window_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
-
-    if (fullscreen = INI_GetPreferenceLong("Video", "fullscreen", 0))
+    
+    fullscreen = INI_GetPreferenceLong("Video", "fullscreen", 0);
+    
+    if (fullscreen)
     {
         if (fullscreen_width == 0 && fullscreen_height == 0)
         {
@@ -1405,7 +1407,9 @@ void I_InitGraphics(uint8_t *pal)
         fullscreen = true;
     }
 
-    if (aspect_ratio_correct = INI_GetPreferenceLong("Video", "aspect_ratio_correct", 1))
+    aspect_ratio_correct = INI_GetPreferenceLong("Video", "aspect_ratio_correct", 1); 
+    
+    if (aspect_ratio_correct == 1)
     {
         actualheight = SCREENHEIGHT_4_3;
     }
