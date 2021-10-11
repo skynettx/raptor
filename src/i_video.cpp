@@ -36,6 +36,7 @@
 #include "ptrapi.h"
 #include "input.h"
 #include "musapi.h"
+#include "prefapi.h"
 
 // These are (1) the window (or the full screen) that our game is rendered to
 // and (2) the renderer that scales the texture (see below) into this window.
@@ -114,11 +115,11 @@ static int max_scaling_buffer_pixels = 16000000;
 // Run in full screen mode?  (int type for config code)
 
 // int fullscreen = true;
-int fullscreen = false;
+int fullscreen;
 
 // Aspect ratio correction mode
 
-int aspect_ratio_correct = true;
+int aspect_ratio_correct;
 static int actualheight;
 
 // Force integer scales for resolution-independent rendering
@@ -1176,7 +1177,7 @@ static void SetVideoMode(void)
     // retina displays, especially when using small window sizes.
     window_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 
-    if (fullscreen)
+    if (fullscreen = INI_GetPreferenceLong("Video", "fullscreen", 0))
     {
         if (fullscreen_width == 0 && fullscreen_height == 0)
         {
@@ -1404,7 +1405,7 @@ void I_InitGraphics(uint8_t *pal)
         fullscreen = true;
     }
 
-    if (aspect_ratio_correct == 1)
+    if (aspect_ratio_correct = INI_GetPreferenceLong("Video", "aspect_ratio_correct", 1))
     {
         actualheight = SCREENHEIGHT_4_3;
     }

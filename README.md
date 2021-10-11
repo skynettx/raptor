@@ -62,11 +62,11 @@ You can use the projectfile for CodeBlocks under `gcc\`.
 Otherwise you can use the makefile by simply type in `make` in `makefilelinux\` folder in the repository.
 
 ## FAQ
-1. No audio under Linux:
+1. No audio under Linux:  
 Make sure you get all the necessary 32 Bit Alsa and or PulseAudio dependencies from the packagemanager of your distro (remember 32 Bit not 64 Bit). 
-2. Where can i change the video settings:
-The video settings are hardcoded at the moment. You can change the i_video.cpp to config fullscreen or aspect ratio etc.
-For example fullscreen in line 117 i_video.cpp from `int fullscreen = false` to `int fullscreen = true` etc.
+2. Where can i change the video settings:  
+The video settings can be set in the config file `setup.ini`. To toggle fullscreen mode on edit under the [Video] section `fullscreen=0`
+to `fullscreen=1`. Or aspect ratio mode off `aspect_ratio_correct=1` to `aspect_ratio_correct=0`. 
 
 ## Thanks
 Special thanks to nukeykt for his great work on the reconstructed source code.  
