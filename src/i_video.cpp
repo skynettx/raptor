@@ -115,11 +115,11 @@ static int max_scaling_buffer_pixels = 16000000;
 // Run in full screen mode?  (int type for config code)
 
 // int fullscreen = true;
-int fullscreen;
+int fullscreen; //Defined in VIDEO_LoadPrefs to read config from setup.ini
 
 // Aspect ratio correction mode
 
-int aspect_ratio_correct;
+int aspect_ratio_correct; //Defined in VIDEO_LoadPrefs to read config from setup.ini
 static int actualheight;
 
 // Force integer scales for resolution-independent rendering
@@ -190,6 +190,12 @@ int usegamma = 0;
 
 // Joystick/gamepad hysteresis
 unsigned int joywait = 0;
+
+void VIDEO_LoadPrefs(void)
+{
+    fullscreen = INI_GetPreferenceLong("Video", "fullscreen", 0);
+    aspect_ratio_correct = INI_GetPreferenceLong("Video", "aspect_ratio_correct", 1);
+}
 
 static bool MouseShouldBeGrabbed()
 {
@@ -1177,7 +1183,7 @@ static void SetVideoMode(void)
     // retina displays, especially when using small window sizes.
     window_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
     
-    fullscreen = INI_GetPreferenceLong("Video", "fullscreen", 0);
+    VIDEO_LoadPrefs();
     
     if (fullscreen)
     {
@@ -1407,7 +1413,7 @@ void I_InitGraphics(uint8_t *pal)
         fullscreen = true;
     }
 
-    aspect_ratio_correct = INI_GetPreferenceLong("Video", "aspect_ratio_correct", 1); 
+    VIDEO_LoadPrefs(); 
     
     if (aspect_ratio_correct == 1)
     {
