@@ -46,6 +46,10 @@ You have to take care of these files yourself.
 
 ### Configuration
 Rename the `setup(Gravis).ini` or `setup(Adlib).ini` or the `setup(Midi).ini` file to `setup.ini` in Raptor directory.
+To play with one of the following input devices set `Control=0` under the [Setup] section in the `setup.ini` file to:  
+`Control=0` Keyboard  
+`Control=1` Mouse  
+`Control=2` Joystick (Game Controller)
 
 ## Build
 The project supports the compilers msvc and gcc. Only 32 bit build is supported in current codebase. 
