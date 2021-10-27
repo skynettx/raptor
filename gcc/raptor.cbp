@@ -119,6 +119,8 @@
 		<Unit filename="../src/input.h" />
 		<Unit filename="../src/intro.cpp" />
 		<Unit filename="../src/intro.h" />
+		<Unit filename="../src/joyapi.cpp" />
+		<Unit filename="../src/joyapi.h" />
 		<Unit filename="../src/kbdapi.cpp" />
 		<Unit filename="../src/kbdapi.h" />
 		<Unit filename="../src/loadsave.cpp" />

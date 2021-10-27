@@ -1,4 +1,3 @@
-
 WORKDIR = `pwd`
 
 CC = gcc
@@ -36,9 +35,9 @@ OBJDIR_LINUX__32_BIT__RELEASE = obj/Release
 DEP_LINUX__32_BIT__RELEASE = 
 OUT_LINUX__32_BIT__RELEASE = bin/Release/raptor
 
-OBJ_LINUX__32_BIT__DEBUG = $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/ptrapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/prefapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/opl3.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/objects.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/musapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/mpuapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/movie.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/movia_a.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/m_misc.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/loadsave.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/windows.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/vmemapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/tile_a.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/tile.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/swdapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/store.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/shots.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/shadow.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/rap.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/ptrapi_a.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gfxapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/fx.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/flame.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/eshot.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/enemy.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/dspapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/demo.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/bonus.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/kbdapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/intro.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/input.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/imsapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/i_video.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/anims.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/i_oplmusic.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/help.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gssapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/glbapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gfxapi_a.o
+OBJ_LINUX__32_BIT__DEBUG = $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/ptrapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/prefapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/opl3.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/objects.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/musapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/mpuapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/movie.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/movia_a.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/m_misc.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/loadsave.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/windows.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/vmemapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/tile_a.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/tile.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/swdapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/kbdapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/store.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/shots.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/shadow.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/rap.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/ptrapi_a.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/enemy.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gfxapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/fx.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/flame.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/eshot.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gfxapi_a.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/dspapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/demo.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/bonus.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/i_video.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/joyapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/intro.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/input.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/imsapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/anims.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/i_oplmusic.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/help.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gssapi.o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/glbapi.o
 
-OBJ_LINUX__32_BIT__RELEASE = $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/ptrapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/prefapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/opl3.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/objects.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/musapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/mpuapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/movie.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/movia_a.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/m_misc.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/loadsave.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/windows.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/vmemapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/tile_a.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/tile.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/swdapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/store.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/shots.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/shadow.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/rap.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/ptrapi_a.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gfxapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/fx.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/flame.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/eshot.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/enemy.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/dspapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/demo.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/bonus.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/kbdapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/intro.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/input.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/imsapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/i_video.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/anims.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/i_oplmusic.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/help.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gssapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/glbapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gfxapi_a.o
+OBJ_LINUX__32_BIT__RELEASE = $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/ptrapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/prefapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/opl3.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/objects.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/musapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/mpuapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/movie.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/movia_a.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/m_misc.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/loadsave.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/windows.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/vmemapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/tile_a.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/tile.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/swdapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/kbdapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/store.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/shots.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/shadow.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/rap.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/ptrapi_a.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/enemy.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gfxapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/fx.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/flame.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/eshot.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gfxapi_a.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/dspapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/demo.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/bonus.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/i_video.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/joyapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/intro.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/input.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/imsapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/anims.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/i_oplmusic.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/help.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gssapi.o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/glbapi.o
 
 all: linux__32_bit__debug linux__32_bit__release
 
@@ -100,6 +99,9 @@ $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/tile.o: ../src/tile.cpp
 $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/swdapi.o: ../src/swdapi.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/swdapi.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/swdapi.o
 
+$(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/kbdapi.o: ../src/kbdapi.cpp
+	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/kbdapi.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/kbdapi.o
+
 $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/store.o: ../src/store.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/store.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/store.o
 
@@ -115,6 +117,9 @@ $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/rap.o: ../src/rap.cpp
 $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/ptrapi_a.o: ../src/ptrapi_a.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/ptrapi_a.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/ptrapi_a.o
 
+$(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/enemy.o: ../src/enemy.cpp
+	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/enemy.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/enemy.o
+
 $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gfxapi.o: ../src/gfxapi.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/gfxapi.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gfxapi.o
 
@@ -127,8 +132,8 @@ $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/flame.o: ../src/flame.cpp
 $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/eshot.o: ../src/eshot.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/eshot.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/eshot.o
 
-$(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/enemy.o: ../src/enemy.cpp
-	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/enemy.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/enemy.o
+$(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gfxapi_a.o: ../src/gfxapi_a.cpp
+	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/gfxapi_a.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gfxapi_a.o
 
 $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/dspapi.o: ../src/dspapi.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/dspapi.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/dspapi.o
@@ -139,8 +144,11 @@ $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/demo.o: ../src/demo.cpp
 $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/bonus.o: ../src/bonus.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/bonus.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/bonus.o
 
-$(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/kbdapi.o: ../src/kbdapi.cpp
-	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/kbdapi.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/kbdapi.o
+$(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/i_video.o: ../src/i_video.cpp
+	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/i_video.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/i_video.o
+
+$(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/joyapi.o: ../src/joyapi.cpp
+	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/joyapi.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/joyapi.o
 
 $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/intro.o: ../src/intro.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/intro.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/intro.o
@@ -150,9 +158,6 @@ $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/input.o: ../src/input.cpp
 
 $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/imsapi.o: ../src/imsapi.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/imsapi.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/imsapi.o
-
-$(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/i_video.o: ../src/i_video.cpp
-	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/i_video.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/i_video.o
 
 $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/anims.o: ../src/anims.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/anims.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/anims.o
@@ -168,9 +173,6 @@ $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gssapi.o: ../src/gssapi.cpp
 
 $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/glbapi.o: ../src/glbapi.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/glbapi.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/glbapi.o
-
-$(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gfxapi_a.o: ../src/gfxapi_a.cpp
-	$(CXX) $(CFLAGS_LINUX__32_BIT__DEBUG) $(INC_LINUX__32_BIT__DEBUG) -c ../src/gfxapi_a.cpp -o $(OBJDIR_LINUX__32_BIT__DEBUG)/__/src/gfxapi_a.o
 
 clean_linux__32_bit__debug: 
 	rm -f $(OBJ_LINUX__32_BIT__DEBUG) $(OUT_LINUX__32_BIT__DEBUG)
@@ -233,6 +235,9 @@ $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/tile.o: ../src/tile.cpp
 $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/swdapi.o: ../src/swdapi.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/swdapi.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/swdapi.o
 
+$(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/kbdapi.o: ../src/kbdapi.cpp
+	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/kbdapi.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/kbdapi.o
+
 $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/store.o: ../src/store.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/store.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/store.o
 
@@ -248,6 +253,9 @@ $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/rap.o: ../src/rap.cpp
 $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/ptrapi_a.o: ../src/ptrapi_a.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/ptrapi_a.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/ptrapi_a.o
 
+$(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/enemy.o: ../src/enemy.cpp
+	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/enemy.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/enemy.o
+
 $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gfxapi.o: ../src/gfxapi.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/gfxapi.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gfxapi.o
 
@@ -260,8 +268,8 @@ $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/flame.o: ../src/flame.cpp
 $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/eshot.o: ../src/eshot.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/eshot.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/eshot.o
 
-$(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/enemy.o: ../src/enemy.cpp
-	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/enemy.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/enemy.o
+$(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gfxapi_a.o: ../src/gfxapi_a.cpp
+	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/gfxapi_a.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gfxapi_a.o
 
 $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/dspapi.o: ../src/dspapi.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/dspapi.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/dspapi.o
@@ -272,8 +280,11 @@ $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/demo.o: ../src/demo.cpp
 $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/bonus.o: ../src/bonus.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/bonus.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/bonus.o
 
-$(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/kbdapi.o: ../src/kbdapi.cpp
-	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/kbdapi.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/kbdapi.o
+$(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/i_video.o: ../src/i_video.cpp
+	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/i_video.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/i_video.o
+
+$(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/joyapi.o: ../src/joyapi.cpp
+	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/joyapi.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/joyapi.o
 
 $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/intro.o: ../src/intro.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/intro.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/intro.o
@@ -283,9 +294,6 @@ $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/input.o: ../src/input.cpp
 
 $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/imsapi.o: ../src/imsapi.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/imsapi.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/imsapi.o
-
-$(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/i_video.o: ../src/i_video.cpp
-	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/i_video.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/i_video.o
 
 $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/anims.o: ../src/anims.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/anims.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/anims.o
@@ -301,9 +309,6 @@ $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gssapi.o: ../src/gssapi.cpp
 
 $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/glbapi.o: ../src/glbapi.cpp
 	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/glbapi.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/glbapi.o
-
-$(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gfxapi_a.o: ../src/gfxapi_a.cpp
-	$(CXX) $(CFLAGS_LINUX__32_BIT__RELEASE) $(INC_LINUX__32_BIT__RELEASE) -c ../src/gfxapi_a.cpp -o $(OBJDIR_LINUX__32_BIT__RELEASE)/__/src/gfxapi_a.o
 
 clean_linux__32_bit__release: 
 	rm -f $(OBJ_LINUX__32_BIT__RELEASE) $(OUT_LINUX__32_BIT__RELEASE)

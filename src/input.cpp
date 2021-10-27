@@ -1,4 +1,5 @@
 #include "SDL.h"
+#include "stdio.h"
 #include "common.h"
 #include "prefapi.h"
 #include "windows.h"
@@ -8,11 +9,9 @@
 #include "demo.h"
 #include "input.h"
 #include "i_video.h"
-
-
+#include "joyapi.h"
 
 int control = 1;
-
 
 int k_Up;
 int k_Down;
@@ -43,6 +42,7 @@ void IPT_GetButtons(void)
     lasttick += 1000 / 26;
     if (!ipt_start)
         return;
+
 #if 0
     int v1c;
     if (control == 2)
@@ -60,13 +60,6 @@ void IPT_GetButtons(void)
     }
 #endif
     
-   
-    
-    
-    
-    
-    
-    
     if (keyboard[k_Fire])
         buttons[0] = 1;
     if (keyboard[k_FireSp])
@@ -79,14 +72,89 @@ void IPT_GetButtons(void)
 
 void IPT_GetJoyStick(void)
 {
+    IPT_GetJoyInput();
     
-   
-   //To Do
+    //Get Button
     
-  
-    
-}
+    if (AButton || TriggerRight > 0)            //Fire
+        buttons[0] = 1;
+    if (XButton || TriggerLeft > 0)             //Fire Special
+        buttons[1] = 1;
+    if (BButton || LeftShoulder)                //Change Special
+        buttons[2] = 1;
+    if (YButton || RightShoulder)               //Mega
+        buttons[3] = 1;
 
+    //Move Player DPad
+           
+    if (Left)
+    {
+        if (g_addx >= 0)
+            g_addx = -1;
+        g_addx--;
+        if (-g_addx > 10)
+            g_addx = -10;
+    }
+    else if (Right)
+    {
+             if (g_addx <= 0)
+                 g_addx = 1;
+             g_addx++;
+             if (g_addx > 10)
+                 g_addx = 10;
+    }
+    else
+    {
+        if (g_addx)
+            g_addx /= 2;
+    }
+    if (Up)
+    {
+        if (g_addy >= 0)
+            g_addy = -1;
+        g_addy--;
+        if (-g_addy > 8)
+            g_addy = -8;
+    }
+    else if (Down)
+    {
+             if (g_addy <= 0)
+                 g_addy = 1;
+             g_addy++;
+             if (g_addy > 8)
+                 g_addy = 8;
+    }
+    else
+    {
+        if (g_addy)
+            g_addy /= 2;
+    }
+
+    //Move Player Analog Stick
+
+    if (StickX != 0)
+    {
+        StickX >>= 3;
+        if (!StickX)
+            StickX = 1;
+        if (StickX > 0)
+            StickX = 8;
+        if (StickX < 0)
+            StickX = -8;
+        g_addx = StickX;
+    }
+    if (StickY != 0)
+    {
+        StickY >>= 3;
+        if (!StickY)
+            StickY = 1;
+        if (StickY > 0)
+            StickY = 8;
+        if (StickY < 0)
+            StickY = -8;
+        g_addy = StickY;
+    }
+}
 
 void IPT_GetKeyBoard(void)
 {
@@ -186,9 +254,10 @@ bool IPT_MouseGrab(void)
 
 void IPT_Init(void)
 {
+    
     I_SetGrabMouseCallback(IPT_MouseGrab);
     // ipt_tsm = TSM_NewService(IPT_GetButtons, 26, 254, 1);
-    // IPT_CalJoy();
+    IPT_CalJoy();
 }
 
 void IPT_DeInit(void)

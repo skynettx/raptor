@@ -38,6 +38,7 @@
     <ClInclude Include="..\src\intro.h" />
     <ClInclude Include="..\src\i_oplmusic.h" />
     <ClInclude Include="..\src\i_video.h" />
+    <ClInclude Include="..\src\joyapi.h" />
     <ClInclude Include="..\src\kbdapi.h" />
     <ClInclude Include="..\src\loadsave.h" />
     <ClInclude Include="..\src\movie.h" />
@@ -76,6 +77,7 @@
     <ClCompile Include="..\src\intro.cpp" />
     <ClCompile Include="..\src\i_oplmusic.cpp" />
     <ClCompile Include="..\src\i_video.cpp" />
+    <ClCompile Include="..\src\joyapi.cpp" />
     <ClCompile Include="..\src\kbdapi.cpp" />
     <ClCompile Include="..\src\loadsave.cpp" />
     <ClCompile Include="..\src\movia_a.cpp" />

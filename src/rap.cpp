@@ -29,6 +29,8 @@
 #include "shadow.h"
 #include "flame.h"
 #include "input.h"
+#include "joyapi.h"
+
 #ifdef _WIN32
 #include <io.h>
 #endif // _WIN32
@@ -471,6 +473,7 @@ void RAP_DisplayStats(void)
             {
                 if (damage)
                     damage--;
+                IPT_CalJoyRumbleHigh();                      //Rumble when shield is low
             }
         }
         if (v20 < g_oldshield && v24 < 1)

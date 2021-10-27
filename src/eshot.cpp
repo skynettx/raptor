@@ -9,6 +9,7 @@
 #include "shots.h"
 #include "objects.h"
 #include "anims.h"
+#include "joyapi.h"
 
 int eshotnum, eshothigh;
 eshot_t first_eshot, last_eshot;
@@ -366,6 +367,7 @@ void ESHOT_Think(void)
                 ANIMS_StartAnim(6, v1c->f_10, v1c->f_14);
                 v1c->f_44 = 1;
                 OBJS_SubEnergy(v20->f_40);
+                IPT_CalJoyRumbleLow();                                        //Rumble when eshot hit
             }
             break;
         }

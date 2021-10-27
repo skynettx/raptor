@@ -126,6 +126,9 @@
     <ClInclude Include="..\src\windows.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\joyapi.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\anims.cpp">
@@ -243,6 +246,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\src\windows.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\joyapi.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
