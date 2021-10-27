@@ -19,6 +19,7 @@
 #include "intro.h"
 #include "store.h"
 #include "demo.h"
+#include "joyapi.h"
 
 int d_count;
 int hangto;
@@ -443,6 +444,7 @@ void WIN_AskExit(void)
         retraceflag = 1;
         GFX_FadeOut(60, 15, 2, 32);
         GFX_FadeOut(0, 0, 0, 6);
+        IPT_CloJoy();                            //Close Controller
         EXIT_Clean();
     }
 }
