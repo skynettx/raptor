@@ -4,6 +4,7 @@
 #include "ptrapi.h"
 #include "imsapi.h"
 #include "kbdapi.h"
+#include "joyapi.h"
 
 void IMS_StartAck(void)
 {
@@ -12,9 +13,10 @@ void IMS_StartAck(void)
     mouse_b2_ack = 0;
     mouse_b3_ack = 0;
     kbd_ack = 0;
+    joy_ack = 0;
 }
 
-int IMS_CheckAck(void)
+int IMS_CheckAck(void)                                 //Check Input Activity
 {
     I_GetEvent();
     int va;
@@ -25,12 +27,18 @@ int IMS_CheckAck(void)
         va = 1;
     if (kbd_ack)
         va = 1;
+    if (joy_ack)
+        va = 1;
     return va;
 }
 
 int IMS_IsAck(void)
 {
     I_GetEvent();
+    if (Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
+    {
+        return 1;
+    }
     if (lastscan)
     {
         lastscan = 0;

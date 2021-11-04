@@ -1,5 +1,8 @@
 #include "SDL.h"
+#include "i_video.h"
 #include "joyapi.h"
+
+int joy_ack;
 
 bool Up, Down, Left, Right;
 bool Start, Back, LeftShoulder, RightShoulder;
@@ -17,7 +20,7 @@ int MaxJoysticks;
 int ControllerIndex;
 int JoystickIndex;
 
-void  IPT_CalJoy(void)
+void IPT_CalJoy(void)
 {
 	SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC);
 	
@@ -59,9 +62,9 @@ void  IPT_CloJoy(void)
 	}
 }
 
-void IPT_GetJoyInput(void)
+void I_HandleJoystickEvent(SDL_Event* sdlevent)
 {
-    for (ControllerIndex = 0;
+	for (ControllerIndex = 0;
 		ControllerIndex < MAX_CONTROLLERS;
 		++ControllerIndex)
 	{
@@ -84,7 +87,11 @@ void IPT_GetJoyInput(void)
 			StickY = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY) / 8000;
 			TriggerLeft = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERLEFT) / 8000;
 			TriggerRight = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / 8000;
-        }
+		}
+		if (Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
+		{
+			joy_ack = 1;
+		}
 		if (SDL_IsGameController(cIdx))
 		{
 		    ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(cIdx);
@@ -134,3 +141,51 @@ void IPT_CalJoyRumbleHigh(void)
     }
 }
 
+void JOY_Wait(int a1)
+{
+	while (StickX || StickY || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton)
+	{
+		I_GetEvent();
+	}
+}
+
+int JOY_IsKey(int a1)
+{
+	if (StickX || StickY || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton)
+	{
+		JOY_Wait(a1);
+		return 1;
+	}
+    return 0;
+}
+
+int JOY_IsKeyInGameStart(int a1)
+{
+	if (Start)
+	{
+		JOY_Wait(a1);
+		return 1;
+	}
+	return 0;
+}
+
+int JOY_IsKeyInGameBack(int a1)
+{
+
+	if (Back)
+	{
+		JOY_Wait(a1);
+		return 1;
+	}
+	return 0;
+}
+
+int JOY_IsKeyHelp(int a1)
+{
+	if (RightShoulder)
+	{
+		JOY_Wait(a1);
+		return 1;
+	}
+	return 0;
+}

@@ -472,8 +472,10 @@ void RAP_DisplayStats(void)
             if (blinkflag)
             {
                 if (damage)
+                {
                     damage--;
-                IPT_CalJoyRumbleHigh();                      //Rumble when shield is low
+                    IPT_CalJoyRumbleHigh();                                                                   //Rumble when Shield is low
+                }
             }
         }
         if (v20 < g_oldshield && v24 < 1)
@@ -672,7 +674,7 @@ int Do_Game(void)
     {
         num_shadows = num_gshadows = 0;
         IPT_MovePlayer();
-        if (KBD_IsKey(0x3b))
+        if (KBD_IsKey(0x3b))                                                                   //Input Help Screen GamePad not implemented
         {
             SWD_SetClearFlag(0);
             IPT_End();
@@ -692,7 +694,7 @@ int Do_Game(void)
             v20 = 0;
             v24 = 0;
         }
-        if (KBD_IsKey(0x19))
+        if (KBD_IsKey(0x19) || JOY_IsKeyInGameStart(Start))                                                                  //Input Pause Screen
         {
             while (IMS_IsAck())
             {
@@ -730,6 +732,7 @@ int Do_Game(void)
                 break;
             }
         }
+       
         switch (lastscan)
         {
         case 0:
@@ -922,7 +925,7 @@ int Do_Game(void)
             v20 = 0;
             v24 = 0;
         }
-        if (KBD_IsKey(1))
+        if (KBD_IsKey(1) || JOY_IsKeyInGameBack(Back))                                                                      //Fixed Line GamePad Abort Mission Screen 
         {
             if (godmode)
                 end_wave = 1;

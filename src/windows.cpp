@@ -118,10 +118,89 @@ void WIN_Opts(void)
     SWD_ShowAllWindows();
     SND_Patch(20, 127);
     GFX_DisplayUpdate();
+    
     while (1)
     {
         v38 = 0;
         SWD_Dialog(&vb0);
+        
+        switch (StickY > 0)                                                   //Controller Input WIN_Opts
+        {
+        case 1:
+            JOY_IsKey(StickY);
+            vb0.f_10 = 80;
+            break;
+        }
+        switch (StickY < 0)
+        {
+        case 1:
+            JOY_IsKey(StickY);
+            vb0.f_10 = 72;
+            break;
+        }
+        switch (StickX > 0)
+        {
+        case 1:
+            JOY_IsKey(StickX);
+            vb0.f_10 = 77;
+            break;
+        }
+        switch (StickX < 0)
+        {
+        case 1:
+            JOY_IsKey(StickX);
+            vb0.f_10 = 75;
+            break;
+        }
+        switch (Down)
+        {
+        case 1:
+            vb0.f_10 = 80;
+            JOY_IsKey(Down);
+            break;
+        }
+        switch (Up)
+        {
+        case 1:
+            vb0.f_10 = 72;
+            JOY_IsKey(Up);
+            break;
+        }
+        switch (Left)
+        {
+        case 1:
+            vb0.f_10 = 75;
+            JOY_IsKey(Left);
+            break;
+        }
+        switch (Right)
+        {
+        case 1:
+            vb0.f_10 = 77;
+            JOY_IsKey(Right);
+            break;
+        }
+        switch (Back)
+        {
+        case 1:
+            vb0.f_10 = 1;
+            JOY_IsKey(Back);
+            break;
+        }
+        switch (BButton)
+        {
+        case 1:
+            vb0.f_10 = 1;
+            JOY_IsKey(BButton);
+            break;
+        }
+        switch (AButton)
+        {
+        case 1:
+            vb0.f_10 = 28;
+            JOY_IsKey(AButton);
+            break;
+        }
         switch (vb0.f_10)
         {
         case 1:
@@ -281,8 +360,21 @@ void WIN_Pause(void)
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
     SND_Patch(20, 127);
-    while (!IMS_CheckAck())
+    while (IMS_CheckAck())                                         //Fixed Line Pause Screen
+    //while (!IMS_CheckAck())                                      //Orginal Line All in while loop added
     {
+        if (JOY_IsKeyInGameStart(Start))
+        {
+            break;
+        }
+        if (KBD_IsKey(0x19))
+        {
+            break;
+        }
+        if (mouseb1 || mouseb2 || mouseb3)
+        {
+            break;
+        }
     }
     SWD_DestroyWindow(v1c);
     GFX_DisplayUpdate();
@@ -366,10 +458,11 @@ int WIN_AskBool(const char *a1)
     SWD_GetFieldXYL(v24, 6, &v30, &v34, &v20, &v3c);
     PTR_SetPos(v30 + (v20 >> 1), v34 + (v3c >> 1));
     SWD_SetActiveField(v24, 6);
+    
     while (1)
     {
         SWD_Dialog(&v8c);
-        if (KBD_IsKey(1))
+        if (KBD_IsKey(1) || JOY_IsKeyInGameBack(Back))                                                   //Fixed Line Gamepad Abort Mission Screen
         {
             v8c.f_8 = 1;
             v8c.f_c = 10;
@@ -444,7 +537,7 @@ void WIN_AskExit(void)
         retraceflag = 1;
         GFX_FadeOut(60, 15, 2, 32);
         GFX_FadeOut(0, 0, 0, 6);
-        IPT_CloJoy();                            //Close Controller
+        IPT_CloJoy();                                                                     //Close Joystick
         EXIT_Clean();
     }
 }
@@ -466,7 +559,7 @@ int WIN_AskDiff(void)
     while (1)
     {
         SWD_Dialog(&v7c);
-        if (KBD_IsKey(1))
+        if (KBD_IsKey(1) || Back || BButton)                                                      //Fixed Line Gamepad Difficulty Menü
         {
             v1c = -1;
             goto LAB_00024094;
@@ -540,13 +633,30 @@ int WIN_Register(void)
     while (1)
     {
         SWD_Dialog(&v80);
-        if (keyboard[1])
+        
+        switch (LeftShoulder)                                           //Controller Input WIN_Register
+        {
+        case 1:    
+            JOY_IsKey(LeftShoulder);
+            v80.f_10 = 29;
+            break;
+        }
+        switch (RightShoulder)
+        {
+        case 1:    
+            JOY_IsKey(RightShoulder);
+            v80.f_10 = 59;
+            break;
+        }
+        if (keyboard[1] || Back || BButton)
         {
             v20 = 0;
             goto LAB_000244ea;
         }
         if (keyboard[45] && keyboard[56])
             WIN_AskExit();
+        
+
         switch (v80.f_10)
         {
         case 0x3b:
@@ -819,7 +929,78 @@ int WIN_Hangar(void)
                 }
             }
             SWD_Dialog(&vd0);
-            if (keyboard[1])
+            
+            switch (StickY > 0)                                                   //Controller Input WIN_Hangar
+            {
+            case 1:
+                JOY_IsKey(StickY);
+                vd0.f_10 = 80;
+                break;
+            }
+            switch (StickY < 0)
+            {
+            case 1:
+                JOY_IsKey(StickY);
+                vd0.f_10 = 72;
+                break;
+            }
+            switch (StickX > 0)
+            {
+            case 1:
+                JOY_IsKey(StickX);
+                vd0.f_10 = 77;
+                break;
+            }
+            switch (StickX < 0)
+            {
+            case 1:
+                JOY_IsKey(StickX);
+                vd0.f_10 = 75;
+                break;
+            }
+            switch (Down)                           
+            {
+            case 1:
+                JOY_IsKey(Down);
+                vd0.f_10 = 80;
+                break;
+            }
+            switch (Up)
+            {
+            case 1:   
+                JOY_IsKey(Up);
+                vd0.f_10 = 72;
+                break;
+            }
+            switch (Left)
+            {
+            case 1:
+                JOY_IsKey(Left);
+                vd0.f_10 = 75;
+                break;
+            }
+            switch (Right)
+            {
+            case 1:   
+                JOY_IsKey(Right);
+                vd0.f_10 = 77;
+                break;
+            }
+            switch (AButton)
+            {
+            case 1:   
+                JOY_IsKey(AButton);
+                vd0.f_10 = 28;
+                break;
+            }
+            switch (RightShoulder)
+            {
+            case 1:   
+                JOY_IsKey(RightShoulder);
+                vd0.f_10 = 59;
+                break;
+            }
+            if (keyboard[1] || Back || BButton)
             {
                 v2c = -99;
                 goto LAB_00024d9c;
@@ -1087,6 +1268,28 @@ int WIN_ShipComp(void)
     while (1)
     {
         SWD_Dialog(&v94);
+        
+        switch (Back)                                                         //Input Controller WIN_ShipComp
+        {
+        case 1: 
+            JOY_IsKey(Back);
+            v94.f_10 = 1;
+            break;
+        }
+        switch (BButton)                                                         
+        {
+        case 1:
+            JOY_IsKey(BButton);
+            v94.f_10 = 1;
+            break;
+        }
+        switch (RightShoulder)
+        {
+        case 1:
+            JOY_IsKey(RightShoulder);
+            v94.f_10 = 59;
+            break;
+        }
         if (keyboard[45] && keyboard[56])
             WIN_AskExit();
         switch (v94.f_10)
@@ -1495,7 +1698,7 @@ void WIN_MainMenu(void)
     int v24;
     char v1c;
     wdlg_t v6c;
-
+    
     v1c = ltable[0];
     v24 = 0;
     KBD_Clear();
@@ -1532,7 +1735,7 @@ void WIN_MainMenu(void)
     do
     {
         SWD_Dialog(&v6c);
-        if (v6c.f_10 == 0x20)
+        if (v6c.f_10 == 0x20 || YButton)                                    //Get Button to start Demo Mode
         {
             v24 = 2;
             d_count = 4002;
@@ -1562,10 +1765,10 @@ void WIN_MainMenu(void)
             PTR_DrawCursor(1);
         }
         if (keyboard[45] && keyboard[56])
-             WIN_AskExit();
-        if (keyboard[1] && ingameflag)
+            WIN_AskExit();
+        if (keyboard[1] && ingameflag || Back && ingameflag || BButton && ingameflag)                                     //Go back to Hangar when mission before started
             goto LAB_000260df;
-        if (v6c.f_10 == 0x3b)
+        if (v6c.f_10 == 0x3b || JOY_IsKeyHelp(RightShoulder))                                                             //Input Help Screen
             HELP_Win("HELP1_TXT");
         if (mouseb1 || mouseb2 || v6c.f_10)
             FUN_00025c70(1);

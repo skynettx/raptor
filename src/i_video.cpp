@@ -37,6 +37,7 @@
 #include "input.h"
 #include "musapi.h"
 #include "prefapi.h"
+#include "joyapi.h"
 
 // These are (1) the window (or the full screen) that our game is rendered to
 // and (2) the renderer that scales the texture (see below) into this window.
@@ -403,6 +404,8 @@ void I_GetEvent(void)
 {
     extern void I_HandleKeyboardEvent(SDL_Event *sdlevent);
     extern void I_HandleMouseEvent(SDL_Event *sdlevent);
+    extern void I_HandleJoystickEvent(SDL_Event * sdlevent);
+
     SDL_Event sdlevent;
 
     SDL_PumpEvents();
@@ -422,7 +425,12 @@ void I_GetEvent(void)
             case SDL_KEYUP:
 		        I_HandleKeyboardEvent(&sdlevent);
                 break;
-
+            case SDL_CONTROLLERDEVICEADDED:
+            case SDL_CONTROLLERBUTTONUP:
+            case SDL_CONTROLLERBUTTONDOWN:
+            case SDL_CONTROLLERAXISMOTION:
+                I_HandleJoystickEvent(&sdlevent);
+                break;
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
             case SDL_MOUSEWHEEL:
@@ -460,7 +468,7 @@ void I_GetEvent(void)
                 break;
         }
     }
-
+    
     PTR_MouseHandler();
     PTR_UpdateCursor();
     IPT_GetButtons();
@@ -1524,5 +1532,4 @@ void I_SetMousePos(int x, int y)
     y = (int)(((y * actualheight) / (float)SCREENHEIGHT + viewport.y) * sy);
     SDL_WarpMouseInWindow(screen, x, y);
 }
-
 

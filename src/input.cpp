@@ -72,8 +72,6 @@ void IPT_GetButtons(void)
 
 void IPT_GetJoyStick(void)
 {
-    IPT_GetJoyInput();
-    
     //Get Button
     
     if (AButton || TriggerRight > 0)            //Fire

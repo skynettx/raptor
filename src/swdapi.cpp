@@ -9,6 +9,7 @@
 #include "imsapi.h"
 #include "ptrapi.h"
 #include "kbdapi.h"
+#include "joyapi.h"
 
 int kbactive;
 int g_button_flag = 1;
@@ -436,9 +437,71 @@ LAB_0002c422:
         GFX_Print(v20, v28, v24, v50, a2->f_58);
     }
 
-
 void SWD_DoButton(swd_t *a1, swdfield_t *a2)
 {
+    switch (StickY > 0)                                                   //Controller Input DoButton
+    {
+    case 1:
+        JOY_IsKey(StickY);
+        g_key = 80;
+        break;
+    }
+    switch (StickY < 0)
+    {
+    case 1:
+        JOY_IsKey(StickY);
+        g_key = 72;
+        break;
+    }
+    switch (StickX > 0)
+    {
+    case 1:
+        JOY_IsKey(StickX);
+        g_key = 77;
+        break;
+    }
+    switch (StickX < 0)
+    {
+    case 1:
+        JOY_IsKey(StickX);
+        g_key = 75;
+        break;
+    }
+    switch (Down)
+    {       
+    case 1: 
+        JOY_IsKey(Down);
+        g_key = 80;
+        break;
+    }
+    switch (Up)
+    {        
+    case 1: 
+        JOY_IsKey(Up);
+        g_key = 72;
+        break;
+    }
+    switch (Left)
+    {
+    case 1: 
+        JOY_IsKey(Left);
+        g_key = 75;
+        break;
+    }
+    switch (Right)
+    {
+    case 1: 
+        JOY_IsKey(Right);
+        g_key = 77;
+        break;
+    }
+    switch (AButton)
+    {
+    case 1: 
+        JOY_IsKey(AButton);
+        g_key = 28;
+        break;
+    }
     if (!g_button_flag)
         return;
     switch (g_key)
@@ -461,17 +524,17 @@ void SWD_DoButton(swd_t *a1, swdfield_t *a2)
         }
         break;
     case 28:
-        cur_act = 1;
+        cur_act = 1;                                                         //Enter
         cur_cmd = 10;
         break;
     case 80:
-        if (a1->f_8)
+        if (a1->f_8)                                                         //Cursor Down
         {
             cur_act = 1;
             cur_cmd = 1;
         }
         break;
-    case 72:
+    case 72:                                                                //Cursor Up
         if (a1->f_8)
         {
             cur_act = 1;
@@ -479,14 +542,14 @@ void SWD_DoButton(swd_t *a1, swdfield_t *a2)
         }
         break;
     case 77:
-        if (a1->f_8)
+        if (a1->f_8)                                                        //Cursor Right
         {
             cur_act = 1;
             cur_cmd = 5;
         }
         break;
     case 75:
-        if (a1->f_8)
+        if (a1->f_8)                                                        //Cursor Left
         {
             cur_act = 1;
             cur_cmd = 6;
@@ -505,6 +568,70 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
     vbx = (font_t*)GLB_GetItem(a2->f_54);
     vs = (char*)a2 + a2->f_8c;
     curpos = strlen(vs);
+    
+    switch (StickY > 0)                                                   //Controller Input FieldInput
+    {
+    case 1:
+        JOY_IsKey(StickY);
+        g_key = 80;
+        break;
+    }
+    switch (StickY < 0)
+    {
+    case 1:
+        JOY_IsKey(StickY);
+        g_key = 72;
+        break;
+    }
+    switch (StickX > 0)
+    {
+    case 1:
+        JOY_IsKey(StickX);
+        g_key = 77;
+        break;
+    }
+    switch (StickX < 0)
+    {
+    case 1:
+        JOY_IsKey(StickX);
+        g_key = 75;
+        break;
+    }
+    switch (Down)
+    {
+    case 1:
+        JOY_IsKey(Down);
+        g_key = 80;
+        break;
+    }
+    switch (Up)
+    {
+    case 1:
+        JOY_IsKey(Up);
+        g_key = 72;
+        break;
+    }
+    switch (Left)
+    {
+    case 1:
+        JOY_IsKey(Left);
+        g_key = 75;
+        break;
+    }
+    switch (Right)
+    {
+    case 1:
+        JOY_IsKey(Right);
+        g_key = 77;
+        break;
+    }
+    switch (AButton)
+    {
+    case 1:
+        JOY_IsKey(AButton);
+        g_key = 28;
+        break;
+    }
     switch (g_key)
     {
     case 15:

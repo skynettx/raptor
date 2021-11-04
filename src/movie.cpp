@@ -1,5 +1,4 @@
 #include <string.h>
-
 #include "common.h"
 #include "movie.h"
 #include "fx.h"
@@ -8,6 +7,7 @@
 #include "glbapi.h"
 #include "i_video.h"
 #include "kbdapi.h"
+#include "joyapi.h"
 
 int back_patch = -1;
 

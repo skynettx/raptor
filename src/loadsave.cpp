@@ -16,6 +16,8 @@
 #include "bonus.h"
 #include "tile.h"
 #include "anims.h"
+#include "joyapi.h"
+
 #ifdef _WIN32
 #include <io.h>
 #endif // _WIN32
@@ -346,7 +348,14 @@ int RAP_LoadWin(void)
     while (1)
     {
         SWD_Dialog(&vb0);
-        if (KBD_IsKey(1))
+        switch (XButton)                                                                                //Input Erase Savestate
+        {
+        case 1:
+            JOY_IsKey(XButton);
+            vb0.f_10 = 0x53;
+            break;
+        }
+        if (KBD_IsKey(1) || JOY_IsKey(Back) || JOY_IsKey(BButton))                                      //Abort Load Window
         {
             v38 = 0;
             goto LAB_00022ecd;
@@ -401,7 +410,7 @@ int RAP_LoadWin(void)
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
             SND_Patch(20, 127);
-        }
+            }
         switch (vb0.f_10)
         {
         case 0x50:
