@@ -124,33 +124,25 @@ void WIN_Opts(void)
         v38 = 0;
         SWD_Dialog(&vb0);
         
-        switch (StickY > 0)                                                   //Controller Input WIN_Opts
+        if (StickY > 0)                                                   //Controller Input WIN_Opts
         {
-        case 1:
             JOY_IsKey(StickY);
             vb0.f_10 = 80;
-            break;
         }
-        switch (StickY < 0)
+        if (StickY < 0)
         {
-        case 1:
             JOY_IsKey(StickY);
             vb0.f_10 = 72;
-            break;
         }
-        switch (StickX > 0)
+        if (StickX > 0)
         {
-        case 1:
             JOY_IsKey(StickX);
             vb0.f_10 = 77;
-            break;
         }
-        switch (StickX < 0)
+        if (StickX < 0)
         {
-        case 1:
             JOY_IsKey(StickX);
             vb0.f_10 = 75;
-            break;
         }
         switch (Down)
         {
@@ -930,33 +922,25 @@ int WIN_Hangar(void)
             }
             SWD_Dialog(&vd0);
             
-            switch (StickY > 0)                                                   //Controller Input WIN_Hangar
+            if (StickY > 0)                                                   //Controller Input WIN_Hangar
             {
-            case 1:
                 JOY_IsKey(StickY);
                 vd0.f_10 = 80;
-                break;
             }
-            switch (StickY < 0)
+            if (StickY < 0)
             {
-            case 1:
                 JOY_IsKey(StickY);
                 vd0.f_10 = 72;
-                break;
             }
-            switch (StickX > 0)
+            if (StickX > 0)
             {
-            case 1:
                 JOY_IsKey(StickX);
                 vd0.f_10 = 77;
-                break;
             }
-            switch (StickX < 0)
+            if (StickX < 0)
             {
-            case 1:
                 JOY_IsKey(StickX);
                 vd0.f_10 = 75;
-                break;
             }
             switch (Down)                           
             {

@@ -369,33 +369,25 @@ void STORE_Enter(void)
                 v1c = v28;
             }
         }
-        switch (StickY > 0)                                                   //Controller Input Store
+        if (StickY > 0)                                                   //Controller Input Store
         {
-        case 1:
             JOY_IsKey(StickY);
             vec.f_10 = 80;
-            break;
         }
-        switch (StickY < 0)
+        if (StickY < 0)
         {
-        case 1:
             JOY_IsKey(StickY);
             vec.f_10 = 72;
-            break;
         }
-        switch (StickX > 0)
+        if (StickX > 0)
         {
-        case 1:
             JOY_IsKey(StickX);
             vec.f_10 = 77;
-            break;
         }
-        switch (StickX < 0)
+        if (StickX < 0)
         {
-        case 1:
             JOY_IsKey(StickX);
             vec.f_10 = 75;
-            break;
         }
         switch (Down)
         {

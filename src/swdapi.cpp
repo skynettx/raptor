@@ -439,33 +439,25 @@ LAB_0002c422:
 
 void SWD_DoButton(swd_t *a1, swdfield_t *a2)
 {
-    switch (StickY > 0)                                                   //Controller Input DoButton
+    if (StickY > 0)                                                   //Controller Input DoButton
     {
-    case 1:
         JOY_IsKey(StickY);
         g_key = 80;
-        break;
     }
-    switch (StickY < 0)
+    if (StickY < 0)
     {
-    case 1:
         JOY_IsKey(StickY);
         g_key = 72;
-        break;
     }
-    switch (StickX > 0)
+    if (StickX > 0)
     {
-    case 1:
         JOY_IsKey(StickX);
         g_key = 77;
-        break;
     }
-    switch (StickX < 0)
+    if (StickX < 0)
     {
-    case 1:
         JOY_IsKey(StickX);
         g_key = 75;
-        break;
     }
     switch (Down)
     {       
@@ -569,33 +561,25 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
     vs = (char*)a2 + a2->f_8c;
     curpos = strlen(vs);
     
-    switch (StickY > 0)                                                   //Controller Input FieldInput
+    if (StickY > 0)                                                   //Controller Input FieldInput
     {
-    case 1:
         JOY_IsKey(StickY);
         g_key = 80;
-        break;
     }
-    switch (StickY < 0)
+    if (StickY < 0)
     {
-    case 1:
         JOY_IsKey(StickY);
         g_key = 72;
-        break;
     }
-    switch (StickX > 0)
+    if (StickX > 0)
     {
-    case 1:
         JOY_IsKey(StickX);
         g_key = 77;
-        break;
     }
-    switch (StickX < 0)
+    if (StickX < 0)
     {
-    case 1:
         JOY_IsKey(StickX);
         g_key = 75;
-        break;
     }
     switch (Down)
     {
