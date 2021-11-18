@@ -1191,8 +1191,6 @@ static void SetVideoMode(void)
     // retina displays, especially when using small window sizes.
     window_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
     
-    VIDEO_LoadPrefs();
-    
     if (fullscreen)
     {
         if (fullscreen_width == 0 && fullscreen_height == 0)
@@ -1421,8 +1419,6 @@ void I_InitGraphics(uint8_t *pal)
         fullscreen = true;
     }
 
-    VIDEO_LoadPrefs(); 
-    
     if (aspect_ratio_correct == 1)
     {
         actualheight = SCREENHEIGHT_4_3;

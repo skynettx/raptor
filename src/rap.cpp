@@ -1103,6 +1103,7 @@ int main(int argc, char *argv[])
     KBD_Install();
     GFX_InitSystem();
     SWD_Install(0);
+    VIDEO_LoadPrefs();
     IPT_LoadPrefs();
     switch (control)
     {
