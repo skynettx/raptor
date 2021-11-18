@@ -7,7 +7,6 @@
 #include "glbapi.h"
 #include "i_video.h"
 #include "kbdapi.h"
-#include "joyapi.h"
 
 int back_patch = -1;
 

@@ -62,7 +62,7 @@ void  IPT_CloJoy(void)
 	}
 }
 
-void I_HandleJoystickEvent(SDL_Event* sdlevent)
+void I_HandleJoystickEvent(SDL_Event *sdlevent)
 {
 	for (ControllerIndex = 0;
 		ControllerIndex < MAX_CONTROLLERS;

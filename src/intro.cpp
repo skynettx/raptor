@@ -9,7 +9,6 @@
 #include "movie.h"
 #include "kbdapi.h"
 #include "windows.h"
-#include "joyapi.h"
 
 movie_t frm[90];
 
