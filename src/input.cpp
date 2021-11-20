@@ -12,6 +12,7 @@
 #include "joyapi.h"
 
 int control = 1;
+int haptic;
 
 int k_Up;
 int k_Down;
@@ -368,6 +369,7 @@ void IPT_LoadPrefs(void)
 {
     opt_detail = INI_GetPreferenceLong("Setup", "Detail", 1);
     control = INI_GetPreferenceLong("Setup", "Control", 0);
+    haptic = INI_GetPreferenceLong("Setup", "Haptic", 1);
     k_Up = INI_GetPreferenceLong("Keyboard", "MoveUp", 0x48);
     k_Down = INI_GetPreferenceLong("Keyboard", "MoveDn", 0x50);
     k_Left = INI_GetPreferenceLong("Keyboard", "MoveLeft", 0x4b);

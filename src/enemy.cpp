@@ -15,6 +15,7 @@
 #include "bonus.h"
 #include "flame.h"
 #include "joyapi.h"
+#include "input.h"
 
 int spriteflag[4];
 int spriteitm[4] = {
@@ -788,7 +789,10 @@ void ENEMY_Think(void)
             {
                 if (player_cy > v1c->f_1c && player_cy < v1c->f_24)
                 {
-                    IPT_CalJoyRumbleMedium();                                                            //Rumble when enemy hit
+                    if (haptic)
+                    {
+                        IPT_CalJoyRumbleMedium();                                                            //Rumble when enemy hit
+                    }
                     v1c->f_50 -= 16;
                     if (v1c->f_28 > v1c->f_2c)
                         v3c = v1c->f_28;

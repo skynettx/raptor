@@ -10,6 +10,7 @@
 #include "objects.h"
 #include "anims.h"
 #include "joyapi.h"
+#include "input.h"
 
 int eshotnum, eshothigh;
 eshot_t first_eshot, last_eshot;
@@ -320,7 +321,10 @@ void ESHOT_Think(void)
                 {
                     v1c->f_18.f_c = player_cy + (wrand() % 4) - 2;
                     OBJS_SubEnergy(v20->f_40);
-                    IPT_CalJoyRumbleLow();                                            //Rumble when Laser eshot is hit
+                    if (haptic)
+                    {
+                        IPT_CalJoyRumbleLow();                                            //Rumble when Laser eshot is hit
+                    }
                 }
             }
             else
@@ -368,7 +372,10 @@ void ESHOT_Think(void)
                 ANIMS_StartAnim(6, v1c->f_10, v1c->f_14);
                 v1c->f_44 = 1;
                 OBJS_SubEnergy(v20->f_40);
-                IPT_CalJoyRumbleLow();                                                                 //Rumble when eshot is hit
+                if (haptic)
+                {
+                    IPT_CalJoyRumbleLow();                                                                 //Rumble when eshot is hit
+                }
             }
             break;
         }

@@ -2,6 +2,7 @@
 
 extern int buttons[4];
 extern int control;
+extern int haptic;
 
 void IPT_LoadPrefs(void);
 void IPT_GetButtons(void);

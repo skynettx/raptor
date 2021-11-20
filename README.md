@@ -50,6 +50,9 @@ To play with one of the following input devices set `Control=0` under the [Setup
 `Control=0` Keyboard  
 `Control=1` Mouse  
 `Control=2` Joystick (Game Controller)
+Haptic (Game Controller rumble support) can be switched off or on under the [Setup] section in the `setup.ini` file:  
+`Haptic=0`  
+`Haptic=1`
 
 ## Build
 The project supports the compilers msvc and gcc. Only 32 bit build is supported in current codebase. 

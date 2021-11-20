@@ -474,7 +474,10 @@ void RAP_DisplayStats(void)
                 if (damage)
                 {
                     damage--;
-                    IPT_CalJoyRumbleHigh();                                                                   //Rumble when Shield is low
+                    if (haptic)
+                    {
+                        IPT_CalJoyRumbleHigh();                                                                   //Rumble when Shield is low
+                    }
                 }
             }
         }
