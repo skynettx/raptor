@@ -121,7 +121,7 @@ char *M_StringJoin(const char *s, ...)
 // Safe, portable vsnprintf().
 int M_vsnprintf(char *buf, size_t buf_len, const char *s, va_list args)
 {
-    int result;
+    unsigned int result;
 
     if (buf_len < 1)
     {

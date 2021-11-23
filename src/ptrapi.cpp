@@ -275,13 +275,10 @@ void PTR_DrawCursor(int draw)
 void PTR_SetPic(texture_t *a1)
 {
     int i;
-    char *dat, *vs;
     cursoroffsetx = 0;
     cursoroffsety = 0;
     if (ptractive)
     {
-        dat = a1->f_14;
-        vs = cursorpic;
         for (i = 0; i < 256; i++)
         {
             cursorpic[i] = a1->f_14[i];
@@ -361,7 +358,7 @@ int PTR_Init(int control)
     joypresent = 0;
     if (control == 2)
         joypresent = 1;
-    if (control == 0 || control == 1 || control == 2)        // || Control == 2 Added while Hangar menu broken without 
+    if (control == 0 || control == 1 || control == 2)        // || Control == 2 Added while Hangar menu broken without
         mousepresent = 1;
     if (control == 2 && joypresent)
         joyactive = 1;

@@ -26,7 +26,6 @@ static int FUN_0002f210(const char *a1, const char *a2, const char *a3, char *a4
 {
     char *va;
     char v9c[128];
-    int l;
     short v10, i;
     FILE *vs;
 
@@ -34,7 +33,6 @@ static int FUN_0002f210(const char *a1, const char *a2, const char *a3, char *a4
     vs = fopen(a6, "r");
     if (vs)
     {
-        l = strlen(a1);
 
         while (!v10 && fgets(v9c, 128, vs) != 0)
         {
@@ -224,12 +222,12 @@ static int FUN_0002f3b4(const char *a1, const char *a2, const char *a3, const ch
         fseek(vs, v1c, SEEK_END);
         #ifdef _MSC_VER
         _chsize(fileno(vs), ftell(vs));
-        #endif     
+        #endif
         #ifdef __GNUC__
         ftruncate(fileno(vs), ftell(vs));
         #endif
-    
-    
+
+
     }
     else if (v1c > 0)
     {
@@ -306,7 +304,6 @@ int INI_GetPreferenceHex(const char* a1, const char* a2, int a3)
 int INI_GetPreferenceBool(const char *a1, const char *a2, short a3)
 {
     char s2[10];
-    char *d;
     if (a3)
         INI_GetPreference(a1, a2, s2, 10, "TRUE");
     else

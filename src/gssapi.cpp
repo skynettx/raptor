@@ -152,8 +152,7 @@ void GSS_Service(void)
 
 void GSS_Mix(int16_t *stream, int len)
 {
-    int i, l, r;
-    int16_t smp[2];
+    int i;
     if (!gss_init)
         return;
 

@@ -220,14 +220,13 @@ void SWD_PutField(swd_t *a1, swdfield_t *a2)
     int vbp;
     int v38;
     int v1c;
-    int vdi;
     int vc1;
     int v20;
     int v28;
     int vd;
     int i;
     texture_t *tex;
-    
+
     v50 = (font_t*)GLB_GetItem(a2->f_54);
     v24 = (char*)a2 + a2->f_8c;
     v4c = v50->f_0;
@@ -370,7 +369,7 @@ void SWD_PutField(swd_t *a1, swdfield_t *a2)
             break;
         case 5:
             if (a2->f_60 == 4) goto LAB_0002c422;
-            
+
             GFX_ColorBox(vbp, v1c, a2->f_84, a2->f_88, a2->f_68);
             GFX_LightBox(1, vbp, v1c, a2->f_84, a2->f_88);
             GFX_ColorBox(vbp + 2, v1c + 2, a2->f_84 - 4, a2->f_88 - 4, a2->f_68);
@@ -460,36 +459,36 @@ void SWD_DoButton(swd_t *a1, swdfield_t *a2)
         g_key = 75;
     }
     switch (Down)
-    {       
-    case 1: 
+    {
+    case 1:
         JOY_IsKey(Down);
         g_key = 80;
         break;
     }
     switch (Up)
-    {        
-    case 1: 
+    {
+    case 1:
         JOY_IsKey(Up);
         g_key = 72;
         break;
     }
     switch (Left)
     {
-    case 1: 
+    case 1:
         JOY_IsKey(Left);
         g_key = 75;
         break;
     }
     switch (Right)
     {
-    case 1: 
+    case 1:
         JOY_IsKey(Right);
         g_key = 77;
         break;
     }
     switch (AButton)
     {
-    case 1: 
+    case 1:
         JOY_IsKey(AButton);
         g_key = 28;
         break;
@@ -560,7 +559,7 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
     vbx = (font_t*)GLB_GetItem(a2->f_54);
     vs = (char*)a2 + a2->f_8c;
     curpos = strlen(vs);
-    
+
     if (StickY > 0)                                                   //Controller Input FieldInput
     {
         JOY_IsKey(StickY);
@@ -1004,10 +1003,9 @@ int FUN_0002cdbc(swdfield_t *a1, int a2)
 
 int SWD_ShowAllFields(swd_t *a1)
 {
-    int v1c, i, v20, vbp;
+    int i, v20, vbp;
     texture_t *tex;
     swdfield_t *vs = (swdfield_t*)((char*)a1 + a1->f_4c);
-    v1c = 0;
     for (i = 0; i < a1->f_60; i++)
     {
         if (vs[i].f_0)

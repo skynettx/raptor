@@ -251,8 +251,7 @@ void Rot_Color(char *a1, int a2, int a3)
     short v14;
     short v18;
     char v1c[3];
-    char buf[768];
-
+    
     v14 = a2 * 3;
     v18 = a3 * 3;
 

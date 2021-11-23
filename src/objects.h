@@ -41,7 +41,7 @@ int OBJS_GetNum(void);
 int OBJS_IsOnly(int a1);
 int OBJS_GetTotal(int a1);
 int OBJS_GetResale(int a1);
-int OBJS_Buy(int a1);
+int OBJS_Buy(unsigned int a1);
 int OBJS_Sell(int a1);
 void OBJS_Clear(void);
 int OBJS_Load(object_t *a1);

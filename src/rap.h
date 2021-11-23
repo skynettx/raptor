@@ -31,7 +31,7 @@ struct player_t {
     char f_0[20];
     char f_14[12];
     int f_20;
-    int f_24;
+    unsigned int f_24;
     int f_28;
     int f_2c;
     int f_30[3];

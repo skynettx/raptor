@@ -718,7 +718,7 @@ int OBJS_Sell(int a1)
     return v24;
 }
 
-int OBJS_Buy(int a1)
+int OBJS_Buy(unsigned int a1)
 {
     int v1c, v20;
 

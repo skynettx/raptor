@@ -62,7 +62,6 @@ char cards[10][23] = {
 
 static void FX_Fill(void *userdata, Uint8 *stream, int len)
 {
-    int i;
     memset(stream, 0, len);
     int16_t *stream16 = (int16_t*)stream;
     len /= 4;

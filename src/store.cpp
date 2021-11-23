@@ -165,7 +165,7 @@ void Harrold(int a1)
 
 void STORE_Enter(void)
 {
-    int v24, v28, v1c, v30, v20, v2c, v34, v38, v3c;
+    int v24, v28, v1c, v30, v2c, v34, v38, v3c;
     wdlg_t vec;
     char v70[50], va4[50];
 
@@ -190,7 +190,7 @@ void STORE_Enter(void)
     GFX_FadeIn(palette, 0x10);
     SWD_SetFieldPtr(window, 0x14);
     PTR_DrawCursor(1);
-    v20 = OBJS_GetNum();
+    OBJS_GetNum();
     Harrold(0x4c);
     cur_item = 0;
     mode = 0;
@@ -391,63 +391,63 @@ void STORE_Enter(void)
         }
         switch (Down)
         {
-        case 1:    
+        case 1:
             JOY_IsKey(Down);
             vec.f_10 = 80;
             break;
         }
         switch (Up)
         {
-        case 1:    
+        case 1:
             JOY_IsKey(Up);
             vec.f_10 = 72;
             break;
         }
         switch (Left)
         {
-        case 1:    
+        case 1:
             JOY_IsKey(Left);
             vec.f_10 = 75;
             break;
         }
         switch (Right)
         {
-        case 1:   
+        case 1:
             JOY_IsKey(Right);
             vec.f_10 = 77;
             break;
         }
         switch (AButton)
         {
-        case 1:   
+        case 1:
             JOY_IsKey(AButton);
             vec.f_10 = 28;
             break;
         }
         switch (Back)
         {
-        case 1:   
+        case 1:
             JOY_IsKey(Back);
             vec.f_10 = 1;
             break;
         }
         switch (BButton)
         {
-        case 1:    
+        case 1:
             JOY_IsKey(BButton);
             vec.f_10 = 1;
             break;
         }
         switch (LeftShoulder)
         {
-        case 1:   
+        case 1:
             JOY_IsKey(LeftShoulder);
             vec.f_10 = 57;
             break;
         }
         switch (RightShoulder)
         {
-        case 1:   
+        case 1:
             JOY_IsKey(RightShoulder);
             vec.f_10 = 59;
             break;
@@ -528,7 +528,6 @@ void STORE_Enter(void)
             case 5:
                 if (mode == 0)
                 {
-                    int vf8;
                     v2c = b_items[cur_item];
                     switch (OBJS_Buy(v2c))
                     {

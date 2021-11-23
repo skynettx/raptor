@@ -323,7 +323,7 @@ int DSP_StartPatch(dsp_t *dsp, int sep, int pitch, int volume, int priority)
 
 void DSP_StopPatch(int handle)
 {
-    int i, stat;
+    int i;
     handle &= FXHAND_MASK;
     SND_Lock();
     for (i = 0; i < dsp_channelnum; i++)

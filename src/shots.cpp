@@ -897,7 +897,6 @@ void SHOTS_Think(void)
     shot_lib_t *v1c;
     shot_t *v20;
     enemy_t *v24;
-    int v2c;
     int i;
 
     v1c = shot_lib;

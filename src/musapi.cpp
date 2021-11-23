@@ -444,7 +444,6 @@ void MUS_Mix(int16_t *stream, int len)
 
 void MUS_SetVolume(int volume)
 {
-    int i, vol;
     if (music_currentvol == volume)
         return;
 

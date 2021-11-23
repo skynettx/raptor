@@ -23,10 +23,10 @@ int JoystickIndex;
 void IPT_CalJoy(void)
 {
 	SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC);
-	
+
 	MaxJoysticks = SDL_NumJoysticks();
 	ControllerIndex = 0;
-	
+
 	for (JoystickIndex = 0; JoystickIndex < MaxJoysticks; ++JoystickIndex)
 	{
 		if (!SDL_IsGameController(JoystickIndex))
@@ -38,7 +38,6 @@ void IPT_CalJoy(void)
 			break;
 		}
 		ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(JoystickIndex);
-		SDL_Joystick* JoystickHandle = SDL_GameControllerGetJoystick(ControllerHandles[ControllerIndex]);
 		RumbleHandles[ControllerIndex] = SDL_HapticOpen(JoystickIndex);
 		if (SDL_HapticRumbleInit(RumbleHandles[ControllerIndex]) != 0)
 		{
@@ -95,11 +94,9 @@ void I_HandleJoystickEvent(SDL_Event *sdlevent)
 		if (SDL_IsGameController(cIdx))
 		{
 		    ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(cIdx);
-		    SDL_Joystick* JoystickHandle = SDL_GameControllerGetJoystick(ControllerHandles[ControllerIndex]);
-		    SDL_JoystickID joyId = SDL_JoystickInstanceID(JoystickHandle);
-            ControllerIndex++;
+		    ControllerIndex++;
 		}
-	}	
+	}
 }
 
 void IPT_CalJoyRumbleLow(void)

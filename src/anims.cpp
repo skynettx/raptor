@@ -112,7 +112,7 @@ void ANIMS_Init(void)
 void ANIMS_CachePics(void)
 {
     int v1c;
-    int v24;
+    unsigned int v24;
     animlib_t *v20;
     v20 = animlib;
     for (v1c = 0; v1c < curlib; v1c++, v20++)
@@ -127,7 +127,7 @@ void ANIMS_CachePics(void)
 void ANIMS_FreePics(void)
 {
     int v1c;
-    int v24;
+    unsigned int v24;
     animlib_t *v20;
     v20 = animlib;
     for (v1c = 0; v1c < curlib; v1c++, v20++)

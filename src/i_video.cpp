@@ -468,7 +468,7 @@ void I_GetEvent(void)
                 break;
         }
     }
-    
+
     PTR_MouseHandler();
     PTR_UpdateCursor();
     IPT_GetButtons();
@@ -519,8 +519,6 @@ static void UpdateGrab(void)
     }
     else if (!grab && currently_grabbed)
     {
-        int screen_w, screen_h;
-
         SetShowCursor(true);
 
 #if 0
@@ -696,9 +694,6 @@ static void CreateUpscaledTexture(bool force)
 //
 void I_FinishUpdate (void)
 {
-    static int lasttic;
-    int tics;
-    int i;
 
     if (!initialized)
         return;
@@ -929,14 +924,14 @@ void I_InitWindowIcon(void)
 
 // Set video size to a particular scale factor (1x, 2x, 3x, etc.)
 
-static void SetScaleFactor(int factor)
+/*static void SetScaleFactor(int factor)
 {
     // Pick 320x200 or 320x240, depending on aspect ratio correct
 
     window_width = factor * SCREENWIDTH;
     window_height = factor * actualheight;
     fullscreen = false;
-}
+}*/
 
 void I_GraphicsCheckCommandLine(void)
 {
@@ -1190,7 +1185,7 @@ static void SetVideoMode(void)
     // Set the highdpi flag - this makes a big difference on Macs with
     // retina displays, especially when using small window sizes.
     window_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
-    
+
     if (fullscreen)
     {
         if (fullscreen_width == 0 && fullscreen_height == 0)

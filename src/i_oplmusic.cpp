@@ -410,7 +410,7 @@ static void ReleaseVoice(int index)
     voice->note = 0;
 
     double_voice = voice->current_instr_voice != 0;
-    
+
     // Remove from alloced list.
 
     voice_alloced_num--;
@@ -583,7 +583,7 @@ static void InitVoices(void)
     int i;
 
     // Start with an empty free list.
-    
+
     voice_free_num = num_opl_voices;
     voice_alloced_num = 0;
 
@@ -702,7 +702,7 @@ static void ReplaceExistingVoiceDoom2(opl_channel_data_t *channel)
 {
     int i;
     int result;
-    int priority;
+    unsigned int priority;
 
     result = 0;
 
@@ -884,7 +884,7 @@ static void KeyOnEvent(int chan, unsigned int key, unsigned int volume)
 {
     opl_channel_data_t *channel;
     genmidi_instr_t *instrument;
-    unsigned int note, voicenum;
+    int note, voicenum;
     bool double_voice;
 
 /*
@@ -998,7 +998,7 @@ static void ProgramChangeEvent(opl_channel_data_t *channel, unsigned int instrum
 
 static void SetChannelVolume(opl_channel_data_t *channel, unsigned int volume)
 {
-    unsigned int i;
+    int i;
 
     channel->volume = volume;
 
@@ -1015,8 +1015,8 @@ static void SetChannelVolume(opl_channel_data_t *channel, unsigned int volume)
 
 static void SetChannelPan(opl_channel_data_t *channel, unsigned int pan)
 {
-    unsigned int reg_pan;
-    unsigned int i;
+    int reg_pan;
+    int i;
 
     // The DMX library has the stereo channels backwards, maybe because
     // Paul Radek had a Soundblaster card with the channels reversed, or
@@ -1068,7 +1068,7 @@ static void AllNotesOff(opl_channel_data_t *channel, unsigned int param)
             // Finished with this voice now.
 
             ReleaseVoice(i);
-            
+
             i--;
         }
     }
@@ -1124,9 +1124,9 @@ static void PitchBendEvent(unsigned int chan, int bend)
     opl_channel_data_t *channel;
     int i;
     opl_voice_t *voice_updated_list[OPL_NUM_VOICES * 2];
-    unsigned int voice_updated_num = 0;
+    int voice_updated_num = 0;
     opl_voice_t *voice_not_updated_list[OPL_NUM_VOICES * 2];
-    unsigned int voice_not_updated_num = 0;
+    int voice_not_updated_num = 0;
 
     // Update the channel bend value.  Only the MSB of the pitch bend
     // value is considered: this is what Doom does.
@@ -1169,7 +1169,7 @@ void I_OPL_PlaySong(void)
 
 void I_OPL_PauseSong(void)
 {
-    unsigned int i;
+    int i;
 
     // Turn off all main instrument voices (not percussion).
     // This is what Vanilla does.
@@ -1288,14 +1288,14 @@ static void OPL_InitRegisters(int opl3)
 int I_OPL_InitMusic(int dummy)
 {
     int i;
-    const char *dmxoption;
+    //const char *dmxoption;
 
     if (music_initialized++ != 0)
         return 0;
 
     // The DMXOPTION variable must be set to enable OPL3 support.
     // As an extension, we also allow it to be set from the config file.
-    dmxoption = getenv("DMXOPTION");
+    //dmxoption = getenv("DMXOPTION");
     /*if (dmxoption == NULL)
     {
         dmxoption = snd_dmxoption != NULL ? snd_dmxoption : "";

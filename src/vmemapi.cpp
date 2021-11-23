@@ -70,7 +70,6 @@ poolitem_t *vm_DiscardMem(uint32_t a1)
     uint32_t vsi;
     uint32_t vdi;
     uint32_t vcx;
-    meminfo_t *mi;
     int v24;
     int nb;
     do
@@ -117,7 +116,6 @@ poolitem_t *vm_DiscardMem(uint32_t a1)
         vcx++;
         pi2 = NULL;
         pi = pool.last = pool.start[0];
-        mi = 0;
         do
         {
             vb = pi->size;
