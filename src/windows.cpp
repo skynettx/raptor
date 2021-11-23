@@ -875,6 +875,7 @@ int WIN_Hangar(void)
     {
         GFX_FadeOut(0, 0, 0, 2);
         v28 = SWD_InitMasterWindow(0x10034);
+        SWD_GetFieldItem(v28, 0);
         SND_PlaySong(88, 1, 1);
         SWD_ShowAllWindows();
         GFX_DisplayUpdate();
