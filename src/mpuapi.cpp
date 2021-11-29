@@ -27,7 +27,7 @@ int MPU_Init(int device)
     if (mpu_device > midiOutGetNumDevs() || midiOutGetDevCaps(mpu_device, &caps, sizeof(caps)))
         mpu_device = MIDI_MAPPER;
 
-    if (midiStreamOpen(&mpu_stream, &mpu_device, 1, NULL, NULL, NULL))
+    if (midiStreamOpen(&mpu_stream, &mpu_device, 1, 0, 0, 0))
     {
         return 0;
     }

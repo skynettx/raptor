@@ -11,16 +11,15 @@
 #endif // __linux__
 #ifdef __GNUC__
 #include <unistd.h>
+char* ltoa(long i, char* s, int dummy_radix) {
+    sprintf(s, "%ld", i);
+    return s;
+}
 #endif
 #ifdef _MSC_VER
 #include <windows.h>
 #define PATH_MAX MAX_PATH
 #endif
-
-char *ltoa(long i, char* s, int dummy_radix) {
-    sprintf(s, "%ld", i);
-    return s;
-}
 
 static int FUN_0002f210(const char *a1, const char *a2, const char *a3, char *a4, int a5, const char *a6)
 {
@@ -369,5 +368,5 @@ int INI_DeletePreference(const char *a1, const char *a2)
 {
     if (!a1)
         return 0;
-    FUN_0002f3b4(a1, a2, NULL, preference);
+    return FUN_0002f3b4(a1, a2, NULL, preference);
 }

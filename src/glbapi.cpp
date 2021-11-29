@@ -16,27 +16,21 @@
 #endif // __linux__
 #ifdef __GNUC__
 #include <unistd.h>
+char* strupr(char* s)
+{
+    char* tmp = s;
+
+    for (; *tmp; ++tmp) {
+        *tmp = toupper((unsigned char)*tmp);
+    }
+
+    return s;
+}
 #endif
 #ifdef _MSC_VER
 #include <windows.h>
 #define PATH_MAX MAX_PATH
 #endif
-
-char* strupr(char* s)
-{
-    char* tmp = s;
-
-    for (;*tmp;++tmp) {
-        *tmp = toupper((unsigned char) *tmp);
-    }
-
-    return s;
-}
-
-
-
-
-
 
 char prefix[] = "FILE";
 char exePath[PATH_MAX];

@@ -245,7 +245,7 @@ void SWD_PutField(swd_t *a1, swdfield_t *a2)
         v28++;
     }
     if (a2->f_70 && a2->f_90)
-        GFX_PutImage(a2->f_90, vbp, v1c, NULL);
+        GFX_PutImage(a2->f_90, vbp, v1c, 0);
     if (a2->f_60 && a2->f_60 != 4)
     {
         if (a2->f_40 == -1) goto LAB_0002c422;
