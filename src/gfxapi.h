@@ -11,7 +11,7 @@ struct texture_t {
 };
 
 struct font_t {
-    
+
     int f_0; // height
     short f_4[256]; // offset
     char f_204[256]; // width

@@ -41,10 +41,8 @@ int filepos = -1;
 int map_item = -1;
 int curplr_diff = 2;
 
-#define fmt "CHAR%04u.FIL"
-#define fmt2 "%s/CHAR%04u.FIL"
-//static const char *fmt = "CHAR%04u.FIL";
-//static const char *fmt2 = "CHAR%04u.FIL";
+static const char *fmt = "CHAR%04u.FIL";
+static const char *fmt2 = "CHAR%04u.FIL";
 
 map_t *mapmem;
 csprite_t *csprite;

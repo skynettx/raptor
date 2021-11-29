@@ -1023,7 +1023,7 @@ int GFX_StrPixelLen(font_t *a1, char *a2, int a3)
     return l;
 }
 
-int GFX_PutChar(int a1, int a2, char a3, font_t* a4, int a5)
+int GFX_PutChar(int a1, int a2, unsigned char a3, font_t* a4, int a5)
 {
     char *p;
     int w = a4->f_204[a3];
@@ -1041,7 +1041,7 @@ int GFX_PutChar(int a1, int a2, char a3, font_t* a4, int a5)
 
 int GFX_Print(int a1, int a2, char *a3, font_t* a4, int a5)
 {
-    char c;
+    unsigned char c;
     int l, v10, w;
     a5--;
     l = strlen(a3);
