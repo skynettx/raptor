@@ -352,24 +352,12 @@ void WIN_Pause(void)
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
     SND_Patch(20, 127);
-    while (IMS_CheckAck())                                         //Fixed Line Pause Screen
-    //while (!IMS_CheckAck())                                      //Orginal Line All in while loop added
+    while (!IMS_CheckAck())                                      //Pause Screen
     {
-        if (JOY_IsKeyInGameStart(Start))
-        {
-            break;
-        }
-        if (KBD_IsKey(0x19))
-        {
-            break;
-        }
-        if (mouseb1 || mouseb2 || mouseb3)
-        {
-            break;
-        }
     }
     SWD_DestroyWindow(v1c);
     GFX_DisplayUpdate();
+    JOY_IsKeyInGameStart(Start);
     KBD_Clear();
     IMS_StartAck();
 }

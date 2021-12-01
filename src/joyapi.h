@@ -17,7 +17,7 @@ void IPT_CloJoy(void);
 void IPT_CalJoyRumbleLow(void);
 void IPT_CalJoyRumbleMedium(void);
 void IPT_CalJoyRumbleHigh(void);
-//////////////////////////////////////////////////////////////////////////
+
 int JOY_IsKey(int a1);
 void JOY_Wait(int a1);
 

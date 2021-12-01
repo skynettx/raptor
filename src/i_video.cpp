@@ -426,6 +426,11 @@ void I_GetEvent(void)
 		        I_HandleKeyboardEvent(&sdlevent);
                 break;
             case SDL_CONTROLLERDEVICEADDED:
+                IPT_CalJoy();
+                break;
+            case SDL_CONTROLLERDEVICEREMOVED:          
+                IPT_CloJoy();
+                break;
             case SDL_CONTROLLERBUTTONUP:
             case SDL_CONTROLLERBUTTONDOWN:
             case SDL_CONTROLLERAXISMOTION:

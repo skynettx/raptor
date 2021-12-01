@@ -172,6 +172,7 @@ void I_HandleKeyboardEvent(SDL_Event *sdlevent)
 
     if (sdlevent->type == SDL_KEYUP)
     {
+        kbd_ack = 0;
         keyboard[key] = 0;
         if (key == 0x3a)
             capslock = 0;

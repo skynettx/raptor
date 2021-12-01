@@ -10,9 +10,6 @@ bool AButton, BButton, XButton, YButton;
 
 int16_t StickX, StickY, TriggerLeft, TriggerRight;
 
-SDL_Event event;
-int cIdx = event.cdevice.which;
-
 SDL_GameController* ControllerHandles[MAX_CONTROLLERS];
 SDL_Haptic* RumbleHandles[MAX_CONTROLLERS] ;
 
@@ -87,15 +84,10 @@ void I_HandleJoystickEvent(SDL_Event *sdlevent)
 			TriggerLeft = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERLEFT) / 8000;
 			TriggerRight = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / 8000;
 		}
-		if (Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
-		{
+		if (sdlevent->type == SDL_CONTROLLERBUTTONUP) 
+			joy_ack = 0;
+		if (sdlevent->type == SDL_CONTROLLERBUTTONDOWN) 
 			joy_ack = 1;
-		}
-		if (SDL_IsGameController(cIdx))
-		{
-		    ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(cIdx);
-		    ControllerIndex++;
-		}
 	}
 }
 
