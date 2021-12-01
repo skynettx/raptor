@@ -132,7 +132,7 @@ void IPT_CalJoyRumbleHigh(void)
 
 void JOY_Wait(int a1)
 {
-	while (StickX || StickY || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton)
+	while (StickX || StickY || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
 	{
 		I_GetEvent();
 	}
@@ -140,7 +140,7 @@ void JOY_Wait(int a1)
 
 int JOY_IsKey(int a1)
 {
-	if (StickX || StickY || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton)
+	if (StickX || StickY || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
 	{
 		JOY_Wait(a1);
 		return 1;
