@@ -357,7 +357,7 @@ void WIN_Pause(void)
     }
     SWD_DestroyWindow(v1c);
     GFX_DisplayUpdate();
-    JOY_IsKeyInGameStart(Start);
+    JOY_Wait(0);
     KBD_Clear();
     IMS_StartAck();
 }
