@@ -595,7 +595,7 @@ void INTRO_Taiwan(void)
 int INTRO_Credits(void)
 {
     texture_t *apogee, *cyg;
-    char *apogeepal;
+    char *apogeepal, *cygpal;
     int now, i;
     now = GFX_GetFrameCount();
     framecount = 0;
@@ -637,10 +637,10 @@ int INTRO_Credits(void)
     memset(displayscreen, 0, 64000);
     memset(displaybuffer, 0, 64000);
     cyg = (texture_t*)GLB_GetItem(0x1002d);
-    GLB_GetItem(0x1002e);
+    cygpal = GLB_GetItem(0x1002e);
     GFX_PutImage(cyg, 0, 0, 0);
     GFX_DisplayUpdate();
-    GFX_FadeIn(apogeepal, 64); //??
+    GFX_FadeIn(cygpal, 64); //??
     GLB_CacheItem(0x56);
     for (i = 0; i < 65; i++)
     {
