@@ -11,6 +11,10 @@
 #include "kbdapi.h"
 #include "joyapi.h"
 
+int g_joy_ascii;
+unsigned int fi_joy_count;
+bool fi_sec_field;
+
 int kbactive;
 int g_button_flag = 1;
 int g_key;
@@ -559,18 +563,69 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
     vbx = (font_t*)GLB_GetItem(a2->f_54);
     vs = (char*)a2 + a2->f_8c;
     curpos = strlen(vs);
-
-    if (StickY > 0)                                                   //Controller Input FieldInput
+    
+    ///////////////////////////////////Controller FieldInput///////////////////////////////////
+    if (StickY || Down || Up || AButton || YButton || Start)            //Input Joy Max FieldInput
+    {
+        if (curpos > 17)                                              
+        {
+            curpos--;
+            vs[curpos] = 0;
+        }
+        if (fi_sec_field)
+        {
+            if (curpos > 10)
+            {
+                curpos--;
+                vs[curpos] = 0;
+            }
+        }
+    }
+    if (StickY > 0)                                                    //Input Joy Analog Ascii Table Down
     {
         JOY_IsKey(StickY);
-        g_key = 80;
+        if (fi_joy_count > 0)
+        {
+            curpos--;
+            g_joy_ascii--;
+            vs[curpos] = g_joy_ascii;
+            if (g_joy_ascii < 0x30)
+            {
+                g_joy_ascii = 0x5a;
+                vs[curpos] = g_joy_ascii;
+            }
+        }
+        if (fi_joy_count == 0)
+        {
+            fi_joy_count++;
+            g_joy_ascii = 0x41;
+            vs[curpos] = g_joy_ascii;
+            vs[curpos + 1] = 0;
+        }
     }
-    if (StickY < 0)
+    if (StickY < 0)                                                    //Input Joy Analog Ascii Table Up
     {
         JOY_IsKey(StickY);
-        g_key = 72;
+        if (fi_joy_count > 0)
+        {
+            curpos--;
+            g_joy_ascii++;
+            vs[curpos] = g_joy_ascii;
+            if (g_joy_ascii > 0x5a)
+            {
+                g_joy_ascii = 0x30;
+                vs[curpos] = g_joy_ascii;
+            }
+        }
+        if (fi_joy_count == 0)
+        {
+            fi_joy_count++;
+            g_joy_ascii = 0x41;
+            vs[curpos] = g_joy_ascii;
+            vs[curpos + 1] = 0;
+        }
     }
-    if (StickX > 0)
+    if (StickX > 0)                                                     
     {
         JOY_IsKey(StickX);
         g_key = 77;
@@ -580,18 +635,52 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
         JOY_IsKey(StickX);
         g_key = 75;
     }
-    switch (Down)
+    switch (Down)                                                     //Input Joy DPad Ascii Table Down
     {
     case 1:
         JOY_IsKey(Down);
-        g_key = 80;
+        if (fi_joy_count > 0)
+        {
+            curpos--;
+            g_joy_ascii--;
+            vs[curpos] = g_joy_ascii;
+            if (g_joy_ascii < 0x30)
+            {
+                g_joy_ascii = 0x5a;
+                vs[curpos] = g_joy_ascii;
+            }
+        }
+        if (fi_joy_count == 0)
+        {
+            fi_joy_count++;
+            g_joy_ascii = 0x41;
+            vs[curpos] = g_joy_ascii;
+            vs[curpos + 1] = 0;
+        }
         break;
     }
-    switch (Up)
+    switch (Up)                                                        //Input Joy DPad Ascii Table Up 
     {
     case 1:
         JOY_IsKey(Up);
-        g_key = 72;
+        if (fi_joy_count > 0)
+        {
+            curpos--;
+            g_joy_ascii++;
+            vs[curpos] = g_joy_ascii;
+            if (g_joy_ascii > 0x5a)
+            {
+                g_joy_ascii = 0x30;
+                vs[curpos] = g_joy_ascii;
+            }
+        }
+        if (fi_joy_count == 0)
+        {
+            fi_joy_count++;
+            g_joy_ascii = 0x41;
+            vs[curpos] = g_joy_ascii;
+            vs[curpos + 1] = 0;
+        }
         break;
     }
     switch (Left)
@@ -608,13 +697,44 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
         g_key = 77;
         break;
     }
-    switch (AButton)
+    switch (AButton)                                                  //Input Joy next Input
     {
     case 1:
         JOY_IsKey(AButton);
-        g_key = 28;
+        curpos++;
+        fi_joy_count = 0;
         break;
     }
+    switch (XButton)                                                  //Input Joy for Delete
+    {
+    case 1:
+        JOY_IsKey(XButton);
+        vd = 1;
+        if (curpos > 0)
+            curpos--;
+        vs[curpos] = 0;
+        fi_joy_count = 0;
+        break;
+    }
+    switch (YButton)                                                  //Input Joy for Space
+    {
+    case 1:
+        JOY_IsKey(YButton);
+        vs[curpos + 1] = 0;
+        g_joy_ascii = 0x20;
+        vs[curpos] = g_joy_ascii;
+        fi_joy_count = 0;
+        break;
+    }
+    switch (Start)                                                   //Input Joy for confirm FieldInput
+    {
+    case 1:
+        JOY_IsKey(Start);
+        g_key = 28;
+        fi_joy_count = 0;
+        break;
+    }
+    ///////////////////////////////////g_key FieldInput///////////////////////////////////
     switch (g_key)
     {
     case 15:
@@ -633,6 +753,10 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
             else
                 cur_cmd = 3;
         }
+        if (fi_sec_field == false)
+            fi_sec_field = true;
+        else
+            fi_sec_field = false;
         break;
     case 28:
         cur_act = 1;

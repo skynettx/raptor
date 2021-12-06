@@ -628,6 +628,8 @@ int WIN_Register(void)
         if (keyboard[1] || Back || BButton)
         {
             v20 = 0;
+            fi_joy_count = 0;
+            fi_sec_field = false;
             goto LAB_000244ea;
         }
         if (keyboard[45] && keyboard[56])
@@ -723,7 +725,10 @@ int WIN_Register(void)
             case 1:
                 SWD_GetFieldText(v24, 1, vd8.f_0);
                 if (strlen(vd8.f_0) != 0 && v80.f_10 == 0x1c)
+                {
+                    fi_sec_field = true;
                     SWD_SetActiveField(v24, 2);
+                }
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
                 break;
@@ -732,6 +737,7 @@ int WIN_Register(void)
                 SWD_GetFieldText(v24, 2, vd8.f_0);
                 if (!strlen(vd8.f_0))
                 {
+                    fi_sec_field = false;
                     SWD_SetActiveField(v24, 1);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
@@ -748,6 +754,7 @@ int WIN_Register(void)
                         WIN_Msg("Pilot NAME and CALLSIGN Used !");
                     else
                     {
+                        fi_sec_field = false;
                         v20 = 1;
                         goto LAB_000244ea;
                     }

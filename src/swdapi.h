@@ -95,6 +95,8 @@ struct window_t {
 
 extern int usekb_flag;
 extern int g_button_flag;
+extern unsigned int fi_joy_count;
+extern bool fi_sec_field;
 
 void SWD_Install(int a1);
 void SWD_End(void);
