@@ -881,7 +881,7 @@ int OBJS_SubEnergy(int a1)
         return 0;
 
     v1c = p_objs[15];
-    if (curplr_diff == 0 && a1 > 0)
+    if (curplr_diff == 0 && a1 > 1)
         a1 >>= 1;
     if (v1c)
     {
