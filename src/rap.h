@@ -73,3 +73,4 @@ void RAP_FreeMap(void);
 void RAP_LoadMap(void);
 int Do_Game(void);
 int RAP_LoadWin(void);
+void ShutDown(int a1);

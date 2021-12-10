@@ -176,20 +176,19 @@ void InitScreen(void)
 
 void ShutDown(int a1)
 {
-#if 0
     if (!a1 && !godmode)
         WIN_Order();
 
     GLB_FreeAll();
-    IPT_DeInit();
-    DMX_DeInit();
-    GFX_EndSystem();
-    PTR_End();
-    KBD_End();
+    //IPT_DeInit();
+    //DMX_DeInit();
+    //GFX_EndSystem();
+    //PTR_End();
+    //KBD_End();
+    IPT_CloJoy();
     SWD_End();
     free(g_highmem);
     // TODO: ANSI screen
-#endif
 }
 
 void RAP_ClearSides(void)
@@ -1128,9 +1127,12 @@ int main(int argc, char *argv[])
         usekb_flag = 0;
         break;
     }
-
-    printf("Registered EXE!\n");
-    fflush(stdout);
+    
+    if (reg_flag)
+    {
+        printf("Registered EXE!\n");
+        fflush(stdout);
+    }
     GLB_InitSystem(argv[0], 6, 0);
     if (reg_flag)
     {

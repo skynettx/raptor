@@ -514,7 +514,7 @@ void WIN_AskExit(void)
         retraceflag = 1;
         GFX_FadeOut(60, 15, 2, 32);
         GFX_FadeOut(0, 0, 0, 6);
-        IPT_CloJoy();                                                                     //Close Joystick
+        ShutDown(0);
         EXIT_Clean();
     }
 }
