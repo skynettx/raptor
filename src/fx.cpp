@@ -123,8 +123,11 @@ int SND_InitSound(void)
     }
 
     printf("Music Enabled (%s)\n", cards[music_card]);
-    MUS_Init(music_card, 0);
-    MUS_SetVolume(music_volume);
+    if (music_card != CARD_NONE)                               
+    {
+        MUS_Init(music_card, 0);
+        MUS_SetVolume(music_volume);
+    }
 
     fx_volume = INI_GetPreferenceLong("SoundFX", "Volume", 127);
     fx_card = INI_GetPreferenceLong("SoundFX", "CardType", 0);
