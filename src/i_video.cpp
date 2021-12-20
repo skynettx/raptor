@@ -1529,3 +1529,7 @@ void I_SetMousePos(int x, int y)
     SDL_WarpMouseInWindow(screen, x, y);
 }
 
+void closewindow(void)
+{
+    SDL_DestroyWindow(screen);
+}

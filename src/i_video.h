@@ -48,3 +48,4 @@ void I_GetMousePos(int *x, int *y);
 void I_SetMousePos(int x, int y);
 void I_SetGrabMouseCallback(grabmouse_callback_t func);
 void VIDEO_LoadPrefs(void);
+void closewindow(void); 

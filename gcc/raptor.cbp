@@ -16,10 +16,13 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
 				</Compiler>
 				<Linker>
-					<Add option="-lmingw32 -lwinmm -lSDL2main -lSDL2" />
+					<Add option="-lmingw32 -ltextscreen -lwinmm -lSDL2main -lSDL2" />
+					<Add option="-lgdi32" />
 					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/lib" />
+					<Add directory="../include/textscreen/libwin/x86" />
 				</Linker>
 			</Target>
 			<Target title="Win (32 Bit) Release">
@@ -31,11 +34,14 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lmingw32 -lwinmm -lSDL2main -lSDL2" />
+					<Add option="-lmingw32 -ltextscreen -lwinmm -lSDL2main -lSDL2" />
+					<Add option="-lgdi32" />
 					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/lib" />
+					<Add directory="../include/textscreen/libwin/x86" />
 				</Linker>
 			</Target>
 			<Target title="Linux (32 Bit) Debug">
@@ -50,11 +56,13 @@
 					<Add option="-m32" />
 					<Add option="-g" />
 					<Add directory="/usr/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
-					<Add option="-lSDL2main -lSDL2" />
+					<Add option="-ltextscreen -lSDL2main -lSDL2" />
 					<Add directory="/usr/lib32" />
+					<Add directory="../include/textscreen/liblinux/x86" />
 				</Linker>
 			</Target>
 			<Target title="Linux (32 Bit) Release">
@@ -66,11 +74,13 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add directory="/usr/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-lSDL2main -lSDL2" />
+					<Add option="-ltextscreen -lSDL2main -lSDL2" />
 					<Add directory="/usr/lib32" />
+					<Add directory="../include/textscreen/liblinux/x86" />
 				</Linker>
 			</Target>
 		</Build>
@@ -109,6 +119,8 @@
 		<Unit filename="../src/gssapi.h" />
 		<Unit filename="../src/help.cpp" />
 		<Unit filename="../src/help.h" />
+		<Unit filename="../src/i_lastscr.cpp" />
+		<Unit filename="../src/i_lastscr.h" />
 		<Unit filename="../src/i_oplmusic.cpp" />
 		<Unit filename="../src/i_oplmusic.h" />
 		<Unit filename="../src/i_video.cpp" />

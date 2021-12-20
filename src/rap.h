@@ -25,7 +25,7 @@ extern int g_oldsuper, g_oldshield;
 extern int playerx, playery;
 extern char gdmodestr[];
 extern int playerbasepic;
-
+extern char* LASTSCR;
 
 struct player_t {
     char f_0[20];

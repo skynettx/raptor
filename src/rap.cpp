@@ -30,6 +30,7 @@
 #include "flame.h"
 #include "input.h"
 #include "joyapi.h"
+#include "i_lastscr.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -88,7 +89,8 @@ char gdmodestr[] = "CASTLE";
 
 player_t plr;
 
-char * g_highmem;
+char* g_highmem;
+char* LASTSCR;
 
 texture_t *ptrtex;
 int draw_player;
@@ -179,16 +181,23 @@ void ShutDown(int a1)
     if (!a1 && !godmode)
         WIN_Order();
 
-    GLB_FreeAll();
     //IPT_DeInit();
     //DMX_DeInit();
     //GFX_EndSystem();
     //PTR_End();
     //KBD_End();
-    IPT_CloJoy();
+    if (!reg_flag)
+        LASTSCR = GLB_GetItem(1);                    //Get ANSI Screen Shareware from GLB to char*
+
+    if (reg_flag)
+        LASTSCR = GLB_GetItem(2);                    //Get ANSI Screen Fullversion from GLB to char*
+    
+    GLB_FreeAll();
+    closewindow();                                   //Close Main Window
+    I_LASTSCR();                                     //Call to display ANSI Screen 
+    IPT_CloJoy();                                    //Close Joystick
     SWD_End();
     free(g_highmem);
-    // TODO: ANSI screen
 }
 
 void RAP_ClearSides(void)
