@@ -475,7 +475,7 @@ const char *RAP_DataPath(void)
 {
     memset(g_data_path, 0, sizeof(g_data_path));
     hasdatapath = 0;
-    strcpy(g_setup_path, "setup.ini");
+    strcpy(g_setup_path, "SETUP.INI");
     return g_data_path;
 }
 

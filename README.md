@@ -10,7 +10,7 @@ You have to take care of these files yourself.
 1. Copy the following files to Raptor directory:  
    FILE0000.GLB  
    FILE0001.GLB  
-2. Copy the `raptor.exe` and `setup(Gravis).ini or setup(Adlib).ini or setup(Midi).ini` files under Windows or the `raptor` and `setup(Adlib).ini` files under Linux
+2. Copy the `raptor.exe` and `SETUP(GRAVIS).INI or SETUP(ADLIB).INI or SETUP(MIDI).INI` files under Windows or the `raptor` and `SETUP(ADLIB).INI` files under Linux
    from build directory to Raptor directory. Under Windows copy the `SDL.dll` from `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x86\` 
    folder or from `include\SDL2-devel-2.0.14-mingw\SDL2-2.0.14\i686-w64-mingw32\bin\` folder (depending on which version you prefer) to Raptor directory.
    Under Linux install lib-sdl2 32 Bit from the packagemanager of your respective distro. 
@@ -18,7 +18,7 @@ You have to take care of these files yourself.
    FILE0000.GLB  
    FILE0001.GLB  
    SDL2.dll (only under Windows required)  
-   setup(Gravis).ini or setup(Adlib).ini or setup(Midi).ini (under Windows) or setup(Adlib).ini (under Linux)  
+   SETUP(GRAVIS).INI or SETUP(ADLIB).INI or SETUP(MIDI).INI (under Windows) or SETUP(ADLIB).INI (under Linux)  
    raptor.exe (under Windows) or raptor (under Linux)
 
 ### Fullversion
@@ -28,7 +28,7 @@ You have to take care of these files yourself.
    FILE0002.GLB  
    FILE0003.GLB  
    FILE0004.GLB  
-2. Copy the `raptor.exe` and `setup(Gravis).ini or setup(Adlib).ini or setup(Midi).ini` files under Windows or the `raptor` and `setup(Adlib).ini` files under Linux
+2. Copy the `raptor.exe` and `SETUP(GRAVIS).INI or SETUP(ADLIB).INI or SETUP(MIDI).INI` files under Windows or the `raptor` and `SETUP(ADLIB).INI` files under Linux
    from build directory to Raptor directory. Under Windows copy the `SDL.dll` from `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x86\` 
    folder or from `include\SDL2-devel-2.0.14-mingw\SDL2-2.0.14\i686-w64-mingw32\bin\` folder (depending on which version you prefer) to Raptor directory.
    Under Linux install lib-sdl2 32 Bit from the packagemanager of your respective distro.
@@ -39,16 +39,16 @@ You have to take care of these files yourself.
    FILE0003.GLB  
    FILE0004.GLB  
    SDL2.dll (only under Windows required)  
-   setup(Gravis).ini or setup(Adlib).ini or setup(Midi).ini (under Windows) or setup(Adlib).ini (under Linux)  
+   SETUP(GRAVIS).INI or SETUP(ADLIB).INI or SETUP(MIDI).INI (under Windows) or SETUP(ADLIB).INI (under Linux)  
    raptor.exe (under Windows) or raptor (under Linux)
 
 ### Configuration
-Rename the `setup(Gravis).ini` or `setup(Adlib).ini` or the `setup(Midi).ini` file to `setup.ini` in Raptor directory.
-To play with one of the following input devices set `Control=0` under the [Setup] section in the `setup.ini` file to:  
+Rename the `SETUP(GRAVIS).INI` or `SETUP(ADLIB).INI` or the `SETUP(MIDI).INI` file to `SETUP.INI` in Raptor directory.
+To play with one of the following input devices set `Control=0` under the [Setup] section in the `SETUP.INI` file to:  
 `Control=0` Keyboard  
 `Control=1` Mouse  
 `Control=2` Joystick (Game Controller)  
-Haptic (Game Controller rumble support) can be switched off or on under the [Setup] section in the `setup.ini` file:  
+Haptic (Game Controller rumble support) can be switched off or on under the [Setup] section in the `SETUP.INI` file:  
 `Haptic=0`  
 `Haptic=1`
 
@@ -70,7 +70,7 @@ Otherwise you can use the makefile by simply type in `make` in `makefilelinux\` 
 1. No audio under Linux:  
 Make sure you get all the necessary 32 Bit Alsa and or PulseAudio dependencies from the packagemanager of your distro (remember 32 Bit not 64 Bit). 
 2. Where can i change the video settings:  
-The video settings can be set in the config file `setup.ini`. To toggle fullscreen mode on edit under the [Video] section `fullscreen=0`
+The video settings can be set in the config file `SETUP.INI`. To toggle fullscreen mode on edit under the [Video] section `fullscreen=0`
 to `fullscreen=1`. Or aspect ratio mode off `aspect_ratio_correct=1` to `aspect_ratio_correct=0`. 
 
 ## Thanks
