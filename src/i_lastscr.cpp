@@ -22,6 +22,11 @@
 #include "rap.h"
 #include "i_lastscr.h"
 #include "textscreen.h"
+#include "i_video.h"
+#include "joyapi.h"
+#include "kbdapi.h"
+#include "ptrapi.h"
+#include "imsapi.h"
 
 #define LASTSCR_W 80
 #define LASTSCR_H 25
@@ -32,7 +37,6 @@
 //
 void I_LASTSCR(void)
 {
-    //char* endoom_data;
     unsigned char* screendata;
     int y;
     int indent;
@@ -60,14 +64,15 @@ void I_LASTSCR(void)
 
     // Wait for a keypress
 
+    IMS_StartAck();
+
     while (true)
     {
         TXT_UpdateScreen();
+        I_GetEvent();
 
-        if (TXT_GetChar() > 0)
-        {
+        if (joy_ack || kbd_ack || mouse_b1_ack || mouse_b2_ack || mouse_b3_ack)
             break;
-        }
 
         TXT_Sleep(0);
     }
