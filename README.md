@@ -1,6 +1,7 @@
 # Raptor
 Based on the reverse-engineered codebase from Raptor Call Of The Shadows by nukeykt
 
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Nt2HfchiudY/0.jpg)](https://www.youtube.com/watch?v=Nt2HfchiudY)
 ## Installing
 You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or fullversion.
 Important only the DOS version v1.2 is compatible!
