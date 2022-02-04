@@ -17,12 +17,18 @@ int MaxJoysticks;
 int ControllerIndex;
 int JoystickIndex;
 
+int AButtonconvert, BButtonconvert, XButtonconvert, YButtonconvert;
+
 void IPT_CalJoy(void)
 {
 	SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC);
 
 	MaxJoysticks = SDL_NumJoysticks();
 	ControllerIndex = 0;
+	AButtonconvert = 0;
+	BButtonconvert = 0;
+	XButtonconvert = 0;
+	YButtonconvert = 0;
 
 	for (JoystickIndex = 0; JoystickIndex < MaxJoysticks; ++JoystickIndex)
 	{
@@ -41,7 +47,8 @@ void IPT_CalJoy(void)
 			SDL_HapticClose(RumbleHandles[ControllerIndex]);
 			RumbleHandles[ControllerIndex] = 0;
 		}
-        ControllerIndex++;
+	    ControllerIndex++;
+		GetJoyButtonMapping();
 	}
 }
 
@@ -83,11 +90,47 @@ void I_HandleJoystickEvent(SDL_Event *sdlevent)
 			StickY = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY) / 8000;
 			TriggerLeft = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERLEFT) / 8000;
 			TriggerRight = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / 8000;
-		}
+	    }
 		if (sdlevent->type == SDL_CONTROLLERBUTTONUP) 
 			joy_ack = 0;
 		if (sdlevent->type == SDL_CONTROLLERBUTTONDOWN) 
 			joy_ack = 1;
+	}
+}
+
+void GetJoyButtonMapping(void)
+{
+	for (ControllerIndex = 0;
+		ControllerIndex < MAX_CONTROLLERS;
+		++ControllerIndex)
+	{
+		switch (SDL_GameControllerTypeForIndex(ControllerIndex))
+		{
+		case SDL_CONTROLLER_TYPE_PS3:
+		case SDL_CONTROLLER_TYPE_PS4:
+		case SDL_CONTROLLER_TYPE_PS5:
+			AButtonconvert = 0;
+			BButtonconvert = 1;
+			XButtonconvert = 3;
+			YButtonconvert = 2;
+			break;
+		case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO:
+		case SDL_CONTROLLER_TYPE_XBOX360:
+		case SDL_CONTROLLER_TYPE_XBOXONE:
+			AButtonconvert = 0;
+			BButtonconvert = 1;
+			XButtonconvert = 2;
+			YButtonconvert = 3;
+			break;
+		default:
+			if ((AButtonconvert == 0) && (BButtonconvert == 0) && (XButtonconvert == 0) && (YButtonconvert == 0))
+			{
+				AButtonconvert = 0;
+				BButtonconvert = 1;
+				XButtonconvert = 2;
+				YButtonconvert = 3;
+			}
+		}
 	}
 }
 

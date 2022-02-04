@@ -12,6 +12,8 @@ extern bool AButton, BButton, XButton, YButton;
 
 extern int16_t StickX, StickY, TriggerLeft, TriggerRight;
 
+extern int AButtonconvert, BButtonconvert, XButtonconvert, YButtonconvert;
+
 void IPT_CalJoy(void);
 void IPT_CloJoy(void);
 void IPT_CalJoyRumbleLow(void);
@@ -20,8 +22,10 @@ void IPT_CalJoyRumbleHigh(void);
 
 int JOY_IsKey(int a1);
 void JOY_Wait(int a1);
-
 int JOY_IsKeyInGameStart(int a1);
 int JOY_IsKeyInGameBack(int a1);
-
 int JOY_IsKeyHelp(int a1);
+
+void GetJoyButtonMapping(void);
+
+

@@ -75,15 +75,59 @@ void IPT_GetJoyStick(void)
 {
     //Get Button
     
-    if (AButton || TriggerRight > 0)            //Fire
+    if (AButton)
+    {
+        if (AButtonconvert == j_lookup[0])                        //Fire
+            buttons[0] = 1;
+        if (AButtonconvert == j_lookup[1])                        //Fire Special
+            buttons[1] = 1;
+        if (AButtonconvert == j_lookup[2])                        //Change Special
+            buttons[2] = 1;
+        if (AButtonconvert == j_lookup[3])                        //Mega
+            buttons[3] = 1;
+    }
+    if (BButton)
+    {
+        if (BButtonconvert == j_lookup[0])                        //Fire
+            buttons[0] = 1;
+        if (BButtonconvert == j_lookup[1])                        //Fire Special
+            buttons[1] = 1;
+        if (BButtonconvert == j_lookup[2])                        //Change Special
+            buttons[2] = 1;
+        if (BButtonconvert == j_lookup[3])                        //Mega
+            buttons[3] = 1;
+    }
+    if (XButton)
+    {
+        if (XButtonconvert == j_lookup[0])                        //Fire
+            buttons[0] = 1;
+        if (XButtonconvert == j_lookup[1])                        //Fire Special
+            buttons[1] = 1;
+        if (XButtonconvert == j_lookup[2])                        //Change Special
+            buttons[2] = 1;
+        if (XButtonconvert == j_lookup[3])                        //Mega
+            buttons[3] = 1;
+    }
+    if (YButton)
+    {
+        if (YButtonconvert == j_lookup[0])                        //Fire
+            buttons[0] = 1;
+        if (YButtonconvert == j_lookup[1])                        //Fire Special
+            buttons[1] = 1;
+        if (YButtonconvert == j_lookup[2])                        //Change Special
+            buttons[2] = 1;
+        if (YButtonconvert == j_lookup[3])                        //Mega
+            buttons[3] = 1;
+    }
+    if (TriggerRight > 0)                                         //Fire
         buttons[0] = 1;
-    if (XButton || TriggerLeft > 0)             //Fire Special
+    if (TriggerLeft > 0)                                          //Fire Special
         buttons[1] = 1;
-    if (BButton || LeftShoulder)                //Change Special
+    if (LeftShoulder)                                             //Change Special
         buttons[2] = 1;
-    if (YButton || RightShoulder)               //Mega
+    if (RightShoulder)                                            //Mega
         buttons[3] = 1;
-
+       
     //Move Player DPad
            
     if (Left)
