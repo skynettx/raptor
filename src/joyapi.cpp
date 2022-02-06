@@ -130,6 +130,7 @@ void GetJoyButtonMapping(void)
 				XButtonconvert = 2;
 				YButtonconvert = 3;
 			}
+			break;
 		}
 	}
 }
@@ -140,10 +141,7 @@ void IPT_CalJoyRumbleLow(void)
 		ControllerIndex < MAX_CONTROLLERS;
 		++ControllerIndex)
 	{
-		if (RumbleHandles[ControllerIndex])
-		{
-			SDL_HapticRumblePlay(RumbleHandles[ControllerIndex], 0.4f, 1000);
-		}
+		SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0x3fff, 0x3fff, 1000);
     }
 }
 
@@ -153,11 +151,8 @@ void IPT_CalJoyRumbleMedium(void)
 		ControllerIndex < MAX_CONTROLLERS;
 		++ControllerIndex)
 	{
-        if (RumbleHandles[ControllerIndex])
-		{
-			SDL_HapticRumblePlay(RumbleHandles[ControllerIndex], 0.6f, 1000);
-		}
-    }
+		SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0x7ffe, 0x7ffe, 1000);
+	}
 }
 
 void IPT_CalJoyRumbleHigh(void)
@@ -166,10 +161,7 @@ void IPT_CalJoyRumbleHigh(void)
 		ControllerIndex < MAX_CONTROLLERS;
 		++ControllerIndex)
 	{
-        if (RumbleHandles[ControllerIndex])
-		{
-			SDL_HapticRumblePlay(RumbleHandles[ControllerIndex], 0.8f, 1000);
-		}
+		SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0xbffd, 0xbffd, 1000);
     }
 }
 
