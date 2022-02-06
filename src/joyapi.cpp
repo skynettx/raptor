@@ -141,7 +141,8 @@ void IPT_CalJoyRumbleLow(void)
 		ControllerIndex < MAX_CONTROLLERS;
 		++ControllerIndex)
 	{
-		SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0x3fff, 0x3fff, 1000);
+		if (ControllerHandles[ControllerIndex])
+            SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0x3fff, 0x3fff, 1000);
     }
 }
 
@@ -151,7 +152,8 @@ void IPT_CalJoyRumbleMedium(void)
 		ControllerIndex < MAX_CONTROLLERS;
 		++ControllerIndex)
 	{
-		SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0x7ffe, 0x7ffe, 1000);
+		if (ControllerHandles[ControllerIndex])
+		    SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0x7ffe, 0x7ffe, 1000);
 	}
 }
 
@@ -161,7 +163,8 @@ void IPT_CalJoyRumbleHigh(void)
 		ControllerIndex < MAX_CONTROLLERS;
 		++ControllerIndex)
 	{
-		SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0xbffd, 0xbffd, 1000);
+		if (ControllerHandles[ControllerIndex])
+		    SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0xbffd, 0xbffd, 1000);
     }
 }
 
