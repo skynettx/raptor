@@ -44,6 +44,8 @@ You have to take care of these files yourself.
    raptor.exe (under Windows) or raptor (under Linux)
 
 ### Configuration
+You can build or download [Raptor Setup](https://github.com/skynettx/raptorsetup.git) to create and edit the
+`SETUP.INI`, or edit it manually as follows.
 Rename the `SETUP(GRAVIS).INI` or `SETUP(ADLIB).INI` or the `SETUP(MIDI).INI` file to `SETUP.INI` in Raptor directory.
 To play with one of the following input devices set `Control=0` under the [Setup] section in the `SETUP.INI` file to:  
 `Control=0` Keyboard  
