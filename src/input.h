@@ -3,6 +3,7 @@
 extern int buttons[4];
 extern int control;
 extern int haptic;
+extern int joy_ipt_MenuNew;
 
 void IPT_LoadPrefs(void);
 void IPT_GetButtons(void);

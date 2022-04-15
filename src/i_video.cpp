@@ -474,7 +474,10 @@ void I_GetEvent(void)
         }
     }
 
-    PTR_MouseHandler();
+    if ((control == 2) && (!joy_ipt_MenuNew))
+         PTR_JoyHandler();
+    if ((control != 2) || (control == 2 && joy_ipt_MenuNew))
+         PTR_MouseHandler();
     PTR_UpdateCursor();
     IPT_GetButtons();
 

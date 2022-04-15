@@ -53,7 +53,11 @@ To play with one of the following input devices set `Control=0` under the [Setup
 `Control=2` Joystick (Game Controller)  
 Haptic (Game Controller rumble support) can be switched off or on under the [Setup] section in the `SETUP.INI` file:  
 `Haptic=0`  
-`Haptic=1`
+`Haptic=1`  
+If you want to turn off the menu pointer control via the joystick in mode `Control=2` and enable the new joystick menu control in all 
+input modes, set under the [SETUP] section in the `SETUP.INI` file:  
+`joy_ipt_MenuNew=0`  
+`joy_ipt_MenuNew=1`  
 
 ## Build
 The project supports the compilers msvc and gcc. Only 32 bit build is supported in current codebase. 

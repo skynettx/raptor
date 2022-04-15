@@ -3,6 +3,8 @@
 #include "i_video.h"
 #include "ptrapi.h"
 #include "gfxapi.h"
+#include "joyapi.h"
+#include "input.h"
 
 int g_drawcursor;
 static int mousepresent;
@@ -27,6 +29,35 @@ int mouseb1, mouseb2, mouseb3;
 int mouse_b1_ack, mouse_b2_ack, mouse_b3_ack;
 
 int cur_mx, cur_my;
+
+void PTR_JoyHandler(void)
+{
+    static int lasttick;
+    int now = SDL_GetTicks();
+    if (now - lasttick < 1000 / 60)
+        return;
+    lasttick += 1000 / 60;
+
+    static int old_x = -1;
+    static int old_y;
+    cur_mx = StickX + old_x;
+    cur_my = StickY + old_y;
+    if (cur_mx < 0)
+        cur_mx = 0;
+    else if (cur_mx >= SCREENWIDTH)
+         cur_mx = SCREENWIDTH - 1;
+    if (cur_my < 0)
+        cur_my = 0;
+    else if (cur_my >= SCREENHEIGHT)
+        cur_my = SCREENHEIGHT - 1;
+
+    if (old_x != cur_mx || old_y != cur_my)
+    {
+        old_x = cur_mx;
+        old_y = cur_my;
+        ptrupdate = 1;
+    }
+}
 
 void PTR_MouseHandler(void)
 {
@@ -140,8 +171,8 @@ void PTR_UpdateCursor(void)
     lasttick += 1000 / 15;
     if (ptr_pause)
         return;
-    // if (joyactive)
-    //     PTR_JoyHandler();
+    if ((joyactive) && (!joy_ipt_MenuNew))
+        PTR_JoyHandler();
     if (ptrupdate)
     {
         ptrupdate = 0;

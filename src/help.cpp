@@ -9,6 +9,7 @@
 #include "i_video.h"
 #include "windows.h"
 #include "joyapi.h"
+#include "input.h"
 
 static int startitem;
 static int curpage;
@@ -86,7 +87,7 @@ void HELP_Win(const char *a1)
             curpage--;
             break;
         }
-        if (KBD_IsKey(1) || JOY_IsKey(Back) || JOY_IsKey(BButton))
+        if ((KBD_IsKey(1)) || (JOY_IsKey(Back) && joy_ipt_MenuNew) || (JOY_IsKey(BButton) && joy_ipt_MenuNew))    //Fixed ptr input
             break;
         if (keyboard[45] && keyboard[56])
             WIN_AskExit();

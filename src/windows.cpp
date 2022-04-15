@@ -124,74 +124,77 @@ void WIN_Opts(void)
         v38 = 0;
         SWD_Dialog(&vb0);
 
-        if (StickY > 0)                                                   //Controller Input WIN_Opts
+        if (joy_ipt_MenuNew)
         {
-            JOY_IsKey(StickY);
-            vb0.f_10 = 80;
-        }
-        if (StickY < 0)
-        {
-            JOY_IsKey(StickY);
-            vb0.f_10 = 72;
-        }
-        if (StickX > 0)
-        {
-            JOY_IsKey(StickX);
-            vb0.f_10 = 77;
-        }
-        if (StickX < 0)
-        {
-            JOY_IsKey(StickX);
-            vb0.f_10 = 75;
-        }
-        switch (Down)
-        {
-        case 1:
-            vb0.f_10 = 80;
-            JOY_IsKey(Down);
-            break;
-        }
-        switch (Up)
-        {
-        case 1:
-            vb0.f_10 = 72;
-            JOY_IsKey(Up);
-            break;
-        }
-        switch (Left)
-        {
-        case 1:
-            vb0.f_10 = 75;
-            JOY_IsKey(Left);
-            break;
-        }
-        switch (Right)
-        {
-        case 1:
-            vb0.f_10 = 77;
-            JOY_IsKey(Right);
-            break;
-        }
-        switch (Back)
-        {
-        case 1:
-            vb0.f_10 = 1;
-            JOY_IsKey(Back);
-            break;
-        }
-        switch (BButton)
-        {
-        case 1:
-            vb0.f_10 = 1;
-            JOY_IsKey(BButton);
-            break;
-        }
-        switch (AButton)
-        {
-        case 1:
-            vb0.f_10 = 28;
-            JOY_IsKey(AButton);
-            break;
+            if (StickY > 0)                                                   //Controller Input WIN_Opts
+            {
+                JOY_IsKey(StickY);
+                vb0.f_10 = 80;
+            }
+            if (StickY < 0)
+            {
+                JOY_IsKey(StickY);
+                vb0.f_10 = 72;
+            }
+            if (StickX > 0)
+            {
+                JOY_IsKey(StickX);
+                vb0.f_10 = 77;
+            }
+            if (StickX < 0)
+            {
+                JOY_IsKey(StickX);
+                vb0.f_10 = 75;
+            }
+            switch (Down)
+            {
+            case 1:
+                vb0.f_10 = 80;
+                JOY_IsKey(Down);
+                break;
+            }
+            switch (Up)
+            {
+            case 1:
+                vb0.f_10 = 72;
+                JOY_IsKey(Up);
+                break;
+            }
+            switch (Left)
+            {
+            case 1:
+                vb0.f_10 = 75;
+                JOY_IsKey(Left);
+                break;
+            }
+            switch (Right)
+            {
+            case 1:
+                vb0.f_10 = 77;
+                JOY_IsKey(Right);
+                break;
+            }
+            switch (Back)
+            {
+            case 1:
+                vb0.f_10 = 1;
+                JOY_IsKey(Back);
+                break;
+            }
+            switch (BButton)
+            {
+            case 1:
+                vb0.f_10 = 1;
+                JOY_IsKey(BButton);
+                break;
+            }
+            switch (AButton)
+            {
+            case 1:
+                vb0.f_10 = 28;
+                JOY_IsKey(AButton);
+                break;
+            }
         }
         switch (vb0.f_10)
         {
@@ -262,7 +265,7 @@ void WIN_Opts(void)
             switch (vb0.f_34)
             {
             case 11:
-                if (mouseb1)
+                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                  //Fixed ptr input
                 {
                     while (!IMS_IsAck())
                     {
@@ -279,7 +282,7 @@ void WIN_Opts(void)
                 }
                 break;
             case 12:
-                if (mouseb1)
+                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                 //Fixed ptr input
                 {
                     while (!IMS_IsAck())
                     {
@@ -611,19 +614,22 @@ int WIN_Register(void)
     {
         SWD_Dialog(&v80);
 
-        switch (LeftShoulder)                                           //Controller Input WIN_Register
+        if (joy_ipt_MenuNew)                                                               //Controller Input WIN_Register
         {
-        case 1:
-            JOY_IsKey(LeftShoulder);
-            v80.f_10 = 29;
-            break;
-        }
-        switch (RightShoulder)
-        {
-        case 1:
-            JOY_IsKey(RightShoulder);
-            v80.f_10 = 59;
-            break;
+            switch (LeftShoulder)                                           
+            {
+            case 1:
+                JOY_IsKey(LeftShoulder);
+                v80.f_10 = 29;
+                break;
+            }
+            switch (RightShoulder)
+            {
+            case 1:
+                JOY_IsKey(RightShoulder);
+                v80.f_10 = 59;
+                break;
+            }
         }
         if (keyboard[1] || Back || BButton)
         {
@@ -657,7 +663,7 @@ int WIN_Register(void)
             {
             case 4:
                 v2c = v80.f_34;
-                if (mouseb1)
+                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                       //Fixed ptr input
                 {
                     while (IMS_IsAck())
                     {
@@ -680,7 +686,7 @@ int WIN_Register(void)
                 break;
             case 5:
                 v2c = v80.f_34;
-                if (mouseb1)
+                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                     //Fixed ptr input
                 {
                     while (IMS_IsAck())
                     {
@@ -914,67 +920,70 @@ int WIN_Hangar(void)
             }
             SWD_Dialog(&vd0);
 
-            if (StickY > 0)                                                   //Controller Input WIN_Hangar
+            if (joy_ipt_MenuNew)
             {
-                JOY_IsKey(StickY);
-                vd0.f_10 = 80;
-            }
-            if (StickY < 0)
-            {
-                JOY_IsKey(StickY);
-                vd0.f_10 = 72;
-            }
-            if (StickX > 0)
-            {
-                JOY_IsKey(StickX);
-                vd0.f_10 = 77;
-            }
-            if (StickX < 0)
-            {
-                JOY_IsKey(StickX);
-                vd0.f_10 = 75;
-            }
-            switch (Down)
-            {
-            case 1:
-                JOY_IsKey(Down);
-                vd0.f_10 = 80;
-                break;
-            }
-            switch (Up)
-            {
-            case 1:
-                JOY_IsKey(Up);
-                vd0.f_10 = 72;
-                break;
-            }
-            switch (Left)
-            {
-            case 1:
-                JOY_IsKey(Left);
-                vd0.f_10 = 75;
-                break;
-            }
-            switch (Right)
-            {
-            case 1:
-                JOY_IsKey(Right);
-                vd0.f_10 = 77;
-                break;
-            }
-            switch (AButton)
-            {
-            case 1:
-                JOY_IsKey(AButton);
-                vd0.f_10 = 28;
-                break;
-            }
-            switch (RightShoulder)
-            {
-            case 1:
-                JOY_IsKey(RightShoulder);
-                vd0.f_10 = 59;
-                break;
+                if (StickY > 0)                                                   //Controller Input WIN_Hangar
+                {
+                    JOY_IsKey(StickY);
+                    vd0.f_10 = 80;
+                }
+                if (StickY < 0)
+                {
+                    JOY_IsKey(StickY);
+                    vd0.f_10 = 72;
+                }
+                if (StickX > 0)
+                {
+                    JOY_IsKey(StickX);
+                    vd0.f_10 = 77;
+                }
+                if (StickX < 0)
+                {
+                    JOY_IsKey(StickX);
+                    vd0.f_10 = 75;
+                }
+                switch (Down)
+                {
+                case 1:
+                    JOY_IsKey(Down);
+                    vd0.f_10 = 80;
+                    break;
+                }
+                switch (Up)
+                {
+                case 1:
+                    JOY_IsKey(Up);
+                    vd0.f_10 = 72;
+                    break;
+                }
+                switch (Left)
+                {
+                case 1:
+                    JOY_IsKey(Left);
+                    vd0.f_10 = 75;
+                    break;
+                }
+                switch (Right)
+                {
+                case 1:
+                    JOY_IsKey(Right);
+                    vd0.f_10 = 77;
+                    break;
+                }
+                switch (AButton)
+                {
+                case 1:
+                    JOY_IsKey(AButton);
+                    vd0.f_10 = 28;
+                    break;
+                }
+                switch (RightShoulder)
+                {
+                case 1:
+                    JOY_IsKey(RightShoulder);
+                    vd0.f_10 = 59;
+                    break;
+                }
             }
             if (keyboard[1] || Back || BButton)
             {
@@ -1054,7 +1063,7 @@ LAB_00024b33:
                 case 2:
                     v34 = 0;
                     v2c = vd0.f_34;
-                    if (mouseb1 || vd0.f_10 == 0x1c)
+                    if ((mouseb1) || (vd0.f_10 == 0x1c) || (AButton && !joy_ipt_MenuNew))                //Fixed ptr input
                     {
                         SND_Patch(12, 60);
                         while (IMS_IsAck())
@@ -1073,7 +1082,7 @@ LAB_00024b33:
                 case 3:
                     v34 = 1;
                     v2c = vd0.f_34;
-                    if (mouseb1 || vd0.f_10 == 0x1c)
+                    if ((mouseb1) || (vd0.f_10 == 0x1c) || (AButton && !joy_ipt_MenuNew))               //Fixed ptr input
                     {
                         SND_Patch(12, 127);
                         while (IMS_IsAck())
@@ -1092,7 +1101,7 @@ LAB_00024b33:
                 case 4:
                     v34 = 2;
                     v2c = vd0.f_34;
-                    if (mouseb1 || vd0.f_10 == 0x1c)
+                    if ((mouseb1) || (vd0.f_10 == 0x1c) || (AButton && !joy_ipt_MenuNew))             //Fixed ptr input
                     {
                         v2c = -99;
                         SND_Patch(12, 200);
@@ -1112,7 +1121,7 @@ LAB_00024b33:
                 case 5:
                     v34 = 3;
                     v2c = vd0.f_34;
-                    if (mouseb1 || vd0.f_10 == 0x1c)
+                    if ((mouseb1) || (vd0.f_10 == 0x1c) || (AButton && !joy_ipt_MenuNew))            //Fixed ptr input
                     {
                         while (IMS_IsAck())
                         {
@@ -1245,26 +1254,29 @@ int WIN_ShipComp(void)
     {
         SWD_Dialog(&v94);
 
-        switch (Back)                                                         //Input Controller WIN_ShipComp
+        if (joy_ipt_MenuNew)
         {
-        case 1:
-            JOY_IsKey(Back);
-            v94.f_10 = 1;
-            break;
-        }
-        switch (BButton)
-        {
-        case 1:
-            JOY_IsKey(BButton);
-            v94.f_10 = 1;
-            break;
-        }
-        switch (RightShoulder)
-        {
-        case 1:
-            JOY_IsKey(RightShoulder);
-            v94.f_10 = 59;
-            break;
+            switch (Back)                                                         //Input Controller WIN_ShipComp
+            {
+            case 1:
+                JOY_IsKey(Back);
+                v94.f_10 = 1;
+                break;
+            }
+            switch (BButton)
+            {
+            case 1:
+                JOY_IsKey(BButton);
+                v94.f_10 = 1;
+                break;
+            }
+            switch (RightShoulder)
+            {
+            case 1:
+                JOY_IsKey(RightShoulder);
+                v94.f_10 = 59;
+                break;
+            }
         }
         if (keyboard[45] && keyboard[56])
             WIN_AskExit();
@@ -1745,7 +1757,7 @@ void WIN_MainMenu(void)
             goto LAB_000260df;
         if ((v6c.f_10 == 0x3b) || (JOY_IsKeyHelp(RightShoulder)))                                                             //Input Help Screen
             HELP_Win("HELP1_TXT");
-        if (mouseb1 || mouseb2 || v6c.f_10)
+        if (mouseb1 || mouseb2 || v6c.f_10 || (AButton && !joy_ipt_MenuNew))                                                  //Fixed ptr input
             FUN_00025c70(1);
         if (v6c.f_8 == 1 && v6c.f_c == 10)
         {

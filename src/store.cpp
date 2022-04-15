@@ -14,6 +14,7 @@
 #include "help.h"
 #include "fx.h"
 #include "joyapi.h"
+#include "input.h"
 
 static int window;
 int buy_count, s_count;
@@ -283,7 +284,7 @@ void STORE_Enter(void)
             {
             case 20:
                 v28 = vec.f_34;
-                if (mouseb1)
+                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                  //Fixed ptr input
                     goto LAB_000209e5;
                 if (v28 != v1c)
                 {
@@ -369,88 +370,91 @@ void STORE_Enter(void)
                 v1c = v28;
             }
         }
-        if (StickY > 0)                                                   //Controller Input Store
+        if (joy_ipt_MenuNew)
         {
-            JOY_IsKey(StickY);
-            vec.f_10 = 80;
-        }
-        if (StickY < 0)
-        {
-            JOY_IsKey(StickY);
-            vec.f_10 = 72;
-        }
-        if (StickX > 0)
-        {
-            JOY_IsKey(StickX);
-            vec.f_10 = 77;
-        }
-        if (StickX < 0)
-        {
-            JOY_IsKey(StickX);
-            vec.f_10 = 75;
-        }
-        switch (Down)
-        {
-        case 1:
-            JOY_IsKey(Down);
-            vec.f_10 = 80;
-            break;
-        }
-        switch (Up)
-        {
-        case 1:
-            JOY_IsKey(Up);
-            vec.f_10 = 72;
-            break;
-        }
-        switch (Left)
-        {
-        case 1:
-            JOY_IsKey(Left);
-            vec.f_10 = 75;
-            break;
-        }
-        switch (Right)
-        {
-        case 1:
-            JOY_IsKey(Right);
-            vec.f_10 = 77;
-            break;
-        }
-        switch (AButton)
-        {
-        case 1:
-            JOY_IsKey(AButton);
-            vec.f_10 = 28;
-            break;
-        }
-        switch (Back)
-        {
-        case 1:
-            JOY_IsKey(Back);
-            vec.f_10 = 1;
-            break;
-        }
-        switch (BButton)
-        {
-        case 1:
-            JOY_IsKey(BButton);
-            vec.f_10 = 1;
-            break;
-        }
-        switch (LeftShoulder)
-        {
-        case 1:
-            JOY_IsKey(LeftShoulder);
-            vec.f_10 = 57;
-            break;
-        }
-        switch (RightShoulder)
-        {
-        case 1:
-            JOY_IsKey(RightShoulder);
-            vec.f_10 = 59;
-            break;
+            if (StickY > 0)                                                   //Controller Input Store
+            {
+                JOY_IsKey(StickY);
+                vec.f_10 = 80;
+            }
+            if (StickY < 0)
+            {
+                JOY_IsKey(StickY);
+                vec.f_10 = 72;
+            }
+            if (StickX > 0)
+            {
+                JOY_IsKey(StickX);
+                vec.f_10 = 77;
+            }
+            if (StickX < 0)
+            {
+                JOY_IsKey(StickX);
+                vec.f_10 = 75;
+            }
+            switch (Down)
+            {
+            case 1:
+                JOY_IsKey(Down);
+                vec.f_10 = 80;
+                break;
+            }
+            switch (Up)
+            {
+            case 1:
+                JOY_IsKey(Up);
+                vec.f_10 = 72;
+                break;
+            }
+            switch (Left)
+            {
+            case 1:
+                JOY_IsKey(Left);
+                vec.f_10 = 75;
+                break;
+            }
+            switch (Right)
+            {
+            case 1:
+                JOY_IsKey(Right);
+                vec.f_10 = 77;
+                break;
+            }
+            switch (AButton)
+            {
+            case 1:
+                JOY_IsKey(AButton);
+                vec.f_10 = 28;
+                break;
+            }
+            switch (Back)
+            {
+            case 1:
+                JOY_IsKey(Back);
+                vec.f_10 = 1;
+                break;
+            }
+            switch (BButton)
+            {
+            case 1:
+                JOY_IsKey(BButton);
+                vec.f_10 = 1;
+                break;
+            }
+            switch (LeftShoulder)
+            {
+            case 1:
+                JOY_IsKey(LeftShoulder);
+                vec.f_10 = 57;
+                break;
+            }
+            switch (RightShoulder)
+            {
+            case 1:
+                JOY_IsKey(RightShoulder);
+                vec.f_10 = 59;
+                break;
+            }
         }
         switch (vec.f_10)
         {

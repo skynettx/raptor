@@ -7,6 +7,7 @@ extern int cur_mx, cur_my;
 extern int ptractive;
 extern int mouse_b1_ack, mouse_b2_ack, mouse_b3_ack;
 extern int g_drawcursor;
+void PTR_JoyHandler(void);
 void PTR_MouseHandler(void);
 void PTR_ResetJoyStick(void);
 void PTR_SetPos(int a1, int a2);

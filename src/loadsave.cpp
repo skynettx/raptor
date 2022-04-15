@@ -17,6 +17,7 @@
 #include "tile.h"
 #include "anims.h"
 #include "joyapi.h"
+#include "input.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -346,14 +347,17 @@ int RAP_LoadWin(void)
     while (1)
     {
         SWD_Dialog(&vb0);
-        switch (XButton)                                                                                //Input Erase Savestate
+        if (joy_ipt_MenuNew)
         {
-        case 1:
-            JOY_IsKey(XButton);
-            vb0.f_10 = 0x53;
-            break;
+            switch (XButton)                                                                                                                        //Input Erase Savestate
+            {
+            case 1:
+                JOY_IsKey(XButton);
+                vb0.f_10 = 0x53;
+                break;
+            }
         }
-        if (KBD_IsKey(1) || JOY_IsKey(Back) || JOY_IsKey(BButton))                                      //Abort Load Window
+        if ((KBD_IsKey(1)) || (JOY_IsKey(Back) && joy_ipt_MenuNew) || (JOY_IsKey(BButton) && joy_ipt_MenuNew))                                      //Abort Load Window
         {
             v38 = 0;
             goto LAB_00022ecd;
