@@ -125,7 +125,7 @@ void TXT_SetLabel(txt_label_t *label, const char *value)
 
     // Set the new value
 
-    label->label = _strdup(value);
+    label->label = strdup(value);
 
     // Work out how many lines in this label
 

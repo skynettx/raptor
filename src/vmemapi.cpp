@@ -163,7 +163,7 @@ char *VM_Malloc(unsigned int a1, meminfo_t *a2, int a3)
     unsigned int sz;
     unsigned int df;
     poolitem_t *pi;
-    a1 = ((a1 + 3) & (~3)) + 8;
+    a1 = ((a1 + 9) & (~9)) + 24;
     pi = pool.last;
     vsi = 1;
     while (1)

@@ -91,7 +91,7 @@ static void FinishEditing(txt_inputbox_t *inputbox)
     if (inputbox->widget.widget_class == &txt_inputbox_class)
     {
         free(*((char **)inputbox->value));
-        *((char **) inputbox->value) = _strdup(inputbox->buffer);
+        *((char **) inputbox->value) = strdup(inputbox->buffer);
     }
     else if (inputbox->widget.widget_class == &txt_int_inputbox_class)
     {
@@ -227,7 +227,7 @@ static int TXT_InputBoxKeyPress(TXT_UNCAST_ARG(inputbox), int key)
          && inputbox->widget.widget_class == &txt_inputbox_class)
         {
             free(*((char **)inputbox->value));
-            *((char **) inputbox->value) = _strdup("");
+            *((char **) inputbox->value) = strdup("");
         }
 
         return 0;

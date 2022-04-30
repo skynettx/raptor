@@ -14,3 +14,5 @@ void GLB_EnCrypt(const char *key, void *buf, int size);
 void GLB_DeCrypt(const char *key, void *buf, int size);
 int GLB_ReadFile(const char *a1, char *a2);
 void GLB_SaveFile(char *a1, char *a2, int a3);
+void GLB_SetItemPointer(int a1, char* a2);
+void GLB_SetItemSize(int a1, int a2);

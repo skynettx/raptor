@@ -192,9 +192,9 @@ void ShutDown(int a1)
     if (reg_flag)
         LASTSCR = GLB_GetItem(2);                    //Get ANSI Screen Fullversion from GLB to char*
     
-    GLB_FreeAll();
     closewindow();                                   //Close Main Window
     I_LASTSCR();                                     //Call to display ANSI Screen 
+    GLB_FreeAll();
     IPT_CloJoy();                                    //Close Joystick
     SWD_End();
     free(g_highmem);
@@ -989,7 +989,7 @@ int Do_Game(void)
 
 void RAP_InitMem(void)
 {
-    unsigned int heapsize = 0x495FF0;
+    unsigned int heapsize = 0x495FF0;                       
     g_highmem = (char*)calloc(heapsize, 1);
     VM_InitMemory(g_highmem, heapsize);
     GLB_UseVM();

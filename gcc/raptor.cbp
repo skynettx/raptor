@@ -14,11 +14,13 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-m32" />
 					<Add option="-g" />
 					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/include/SDL2" />
 					<Add directory="../include/textscreen/include" />
 				</Compiler>
 				<Linker>
+					<Add option="-m32" />
 					<Add option="-lmingw32 -ltextscreen -lwinmm -lSDL2main -lSDL2" />
 					<Add option="-lgdi32" />
 					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/lib" />
@@ -33,11 +35,13 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-m32" />
 					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/include/SDL2" />
 					<Add directory="../include/textscreen/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-m32" />
 					<Add option="-lmingw32 -ltextscreen -lwinmm -lSDL2main -lSDL2" />
 					<Add option="-lgdi32" />
 					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/lib" />
@@ -73,25 +77,106 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-m32" />
 					<Add directory="/usr/include/SDL2" />
 					<Add directory="../include/textscreen/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-m32" />
 					<Add option="-ltextscreen -lSDL2main -lSDL2" />
 					<Add directory="/usr/lib32" />
 					<Add directory="../include/textscreen/liblinux/x86" />
 				</Linker>
 			</Target>
+			<Target title="Win(64 Bit) Debug">
+				<Option platforms="Windows;" />
+				<Option output="bin/x64/Debug/raptor" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/x64/Debug" />
+				<Option object_output="obj/x64/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-m64" />
+					<Add option="-g" />
+					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/x86_64-w64-mingw32/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-m64" />
+					<Add option="-lmingw32 -ltextscreen -lwinmm -lSDL2main -lSDL2" />
+					<Add option="-lgdi32" />
+					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/x86_64-w64-mingw32/lib" />
+					<Add directory="../include/textscreen/libwin/x64" />
+				</Linker>
+			</Target>
+			<Target title="Win (64 Bit) Release">
+				<Option platforms="Windows;" />
+				<Option output="bin/x64/Release/raptor" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/x64/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-m64" />
+					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/x86_64-w64-mingw32/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-m64" />
+					<Add option="-lmingw32 -ltextscreen -lwinmm -lSDL2main -lSDL2" />
+					<Add option="-lgdi32" />
+					<Add directory="../include/SDL2-devel-2.0.14-mingw/SDL2-2.0.14/x86_64-w64-mingw32/lib" />
+					<Add directory="../include/textscreen/libwin/x64" />
+				</Linker>
+			</Target>
+			<Target title="Linux (64 Bit) Debug">
+				<Option platforms="Unix;" />
+				<Option output="bin/x64/Debug/raptor" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/x64/Debug" />
+				<Option object_output="obj/x64/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-m64" />
+					<Add option="-g" />
+					<Add directory="/usr/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-m64" />
+					<Add option="-ltextscreen -lSDL2main -lSDL2" />
+					<Add directory="/usr/lib" />
+					<Add directory="../include/textscreen/liblinux/x64" />
+				</Linker>
+			</Target>
+			<Target title="Linux (64 Bit) Release">
+				<Option platforms="Unix;" />
+				<Option output="bin/x64/Release/raptor" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/x64/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-m64" />
+					<Add directory="/usr/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-m64" />
+					<Add option="-ltextscreen -lSDL2main -lSDL2" />
+					<Add directory="/usr/lib" />
+					<Add directory="../include/textscreen/liblinux/x64" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add option="-m32" />
 			<Add option="-g" />
 		</Compiler>
-		<Linker>
-			<Add option="-m32" />
-		</Linker>
 		<Unit filename="../src/anims.cpp" />
 		<Unit filename="../src/anims.h" />
 		<Unit filename="../src/bonus.cpp" />

@@ -79,7 +79,7 @@ void TXT_SetSeparatorLabel(txt_separator_t *separator, const char *label)
 
     if (label != NULL)
     {
-        separator->label = _strdup(label);
+        separator->label = strdup(label);
     }
     else
     {

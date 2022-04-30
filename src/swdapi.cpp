@@ -231,8 +231,10 @@ void SWD_PutField(swd_t *a1, swdfield_t *a2)
     int vd;
     int i;
     texture_t *tex;
-
+    
+    if (a2->f_54 == -1)return;
     v50 = (font_t*)GLB_GetItem(a2->f_54);
+    
     v24 = (char*)a2 + a2->f_8c;
     v4c = v50->f_0;
     v34 = 0;
@@ -1306,6 +1308,63 @@ void SWD_End(void)
     fldfuncs[14] = NULL;
 }
 
+swd_t* SWD_ReformatFieldData(swd_t* v1c, int a1)
+{
+    int fileLen = GLB_ItemSize(a1);
+    int len = sizeof(swd_t) + (v1c->f_60 * sizeof(swdfield_t));
+    int oldLen = sizeof(swd_t) + (v1c->f_60 * sizeof(swdfield_32_t));
+    int eof = fileLen - oldLen;
+
+    swd_t* swdNewData = (swd_t*)calloc(1, len + eof);
+
+    memcpy(swdNewData, v1c, sizeof(swd_t));
+    memcpy((char*)swdNewData + len, (char*)v1c + oldLen, eof);
+
+    swdfield_32_t* swdfield32 = (swdfield_32_t*)((char*)v1c + v1c->f_4c);
+    swdfield_t* swdfield = (swdfield_t*)((char*)swdNewData + swdNewData->f_4c);
+
+    for (size_t i = 0; i < v1c->f_60; i++)
+    {
+        swdfield[i].f_0 = swdfield32[i].f_0;
+        swdfield[i].f_4 = swdfield32[i].f_4;
+        swdfield[i].f_8 = swdfield32[i].f_8;
+        swdfield[i].f_c = swdfield32[i].f_c;
+        swdfield[i].f_10 = swdfield32[i].f_10;
+        swdfield[i].f_14 = swdfield32[i].f_14;
+        swdfield[i].f_18 = swdfield32[i].f_18;
+        swdfield[i].f_1c = swdfield32[i].f_1c;
+        for (size_t j = 0; j < 16; j++)
+        {
+            swdfield[i].Name[j] = swdfield32[i].Name[j];
+            swdfield[i].f_30[j] = swdfield32[i].f_30[j];
+            swdfield[i].f_44[j] = swdfield32[i].f_44[j];
+        }
+        swdfield[i].f_40 = swdfield32[i].f_40;
+        swdfield[i].f_54 = swdfield32[i].f_54;
+        swdfield[i].f_58 = swdfield32[i].f_58;
+        swdfield[i].f_5c = swdfield32[i].f_5c;
+        swdfield[i].f_60 = swdfield32[i].f_60;
+        swdfield[i].f_64 = swdfield32[i].f_64;
+        swdfield[i].f_68 = swdfield32[i].f_68;
+        swdfield[i].f_6c = swdfield32[i].f_6c;
+        swdfield[i].f_70 = swdfield32[i].f_70;
+        swdfield[i].f_74 = swdfield32[i].f_74;
+        swdfield[i].f_78 = swdfield32[i].f_78;
+        swdfield[i].f_7c = swdfield32[i].f_7c;
+        swdfield[i].f_80 = swdfield32[i].f_80;
+        swdfield[i].f_84 = swdfield32[i].f_84;
+        swdfield[i].f_88 = swdfield32[i].f_88;
+        swdfield[i].f_8c = swdfield32[i].f_8c;
+        if (swdfield32[i].f_0 == 1 || swdfield32[i].f_0 == 2) {
+            swdfield[i].f_8c += (v1c->f_60 - i) * 4;
+        }
+    }
+    //GLB_SetItemSize(a1, len + eof);
+    //GLB_SetItemPointer(a1, (char*)swdNewData);
+    //free(v1c);
+    return swdNewData;
+}
+
 int SWD_InitWindow(int a1)
 {
     swd_t *v1c;
@@ -1321,8 +1380,20 @@ int SWD_InitWindow(int a1)
         lastfld->f_1c = 0;
         lastfld = NULL;
     }
+    
     v1c = (swd_t*)GLB_LockItem(a1);
+#if _MSC_VER
+#if _WIN64
+    v1c = SWD_ReformatFieldData(v1c, a1);
+#endif
+#endif
+#if __GNUC__
+#if __x86_64__
+    v1c = SWD_ReformatFieldData(v1c, a1);
+#endif
+#endif
     vd = (swdfield_t*)((char*)v1c + v1c->f_4c);
+    
     for (i = 0; i < 12; i++)
     {
         if (!g_wins[i].f_4)

@@ -461,6 +461,20 @@ int GLB_ItemSize(int a1)
     return filedesc[f].items[n].length;
 }
 
+void GLB_SetItemSize(int a1, int a2)
+{
+    uint16_t f = (a1 >> 16) & 0xffff;
+    uint16_t n = (a1 >> 0) & 0xffff;
+    filedesc[f].items[n].length = a2;
+}
+
+void GLB_SetItemPointer(int a1, char* a2)
+{
+    uint16_t f = (a1 >> 16) & 0xffff;
+    uint16_t n = (a1 >> 0) & 0xffff;
+    filedesc[f].items[n].mem.ptr = a2;
+}
+
 int GLB_ReadFile(const char *a1, char *a2)
 {
     FILE *handle;

@@ -150,11 +150,11 @@ static void DrawDesktopBackground(const char *title)
     unsigned char *p;
 
     screendata = TXT_GetScreenData();
-    
+
     // Fill the screen with gradient characters
 
     p = screendata;
-    
+
     for (i=0; i<TXT_SCREEN_W * TXT_SCREEN_H; ++i)
     {
         *p++ = 0xb1;
@@ -223,7 +223,7 @@ static void DrawHelpIndicator(void)
 void TXT_SetDesktopTitle(const char *title)
 {
     free(desktop_title);
-    desktop_title = _strdup(title);
+    desktop_title = strdup(title);
     TXT_SetWindowTitle(title);
 }
 

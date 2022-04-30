@@ -215,14 +215,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include\textscreen\include;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2main.lib;SDL2.lib;winmm.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\include\textscreen\libwin\x64;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;winmm.lib;shell32.lib;gdi32.lib;user32.lib;textscreen.lib</AdditionalDependencies>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
   </ItemDefinitionGroup>
@@ -234,7 +234,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;C:\Users\Skynet\source\libs\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include\textscreen\include;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;C:\Users\Skynet\source\libs\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -242,9 +242,11 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64;C:\Users\Skynet\source\libs\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2main.lib;SDL2.lib;winmm.lib;shell32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\include\textscreen\libwin\x64;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64;C:\Users\Skynet\source\libs\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2main.lib;SDL2.lib;winmm.lib;shell32.lib;gdi32.lib;user32.lib;textscreen.lib</AdditionalDependencies>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+      <IgnoreSpecificDefaultLibraries>MSVCRTD;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

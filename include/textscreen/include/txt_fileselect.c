@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "doomkeys.h"
 
@@ -734,7 +735,7 @@ static int DoSelectFile(txt_fileselect_t *fileselect)
 
         if (path == NULL)
         {
-            path = _strdup("");
+            path = strdup("");
         }
 
         var = fileselect->inputbox->value;
