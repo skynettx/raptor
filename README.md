@@ -87,7 +87,7 @@ The video settings can be set in the config file `SETUP.INI`. To toggle fullscre
 to `fullscreen=1`. Or aspect ratio mode off `aspect_ratio_correct=1` to `aspect_ratio_correct=0`. 
 
 ## Thanks
-Special thanks to [nukeykt](https://github.com/nukeykt) and [wel97459](https://github.com/wel97459) for his great work on the reconstructed source code.  
+Special thanks to [nukeykt](https://github.com/nukeykt) and [wel97459](https://github.com/wel97459) for their great work on the reconstructed source code.  
 
 
  

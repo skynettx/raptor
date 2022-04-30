@@ -232,9 +232,7 @@ void SWD_PutField(swd_t *a1, swdfield_t *a2)
     int i;
     texture_t *tex;
     
-    if (a2->f_54 == -1)return;
     v50 = (font_t*)GLB_GetItem(a2->f_54);
-    
     v24 = (char*)a2 + a2->f_8c;
     v4c = v50->f_0;
     v34 = 0;
