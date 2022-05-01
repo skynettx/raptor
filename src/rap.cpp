@@ -360,9 +360,9 @@ int MoveSobj(mobj_t *m, int a2)
                 m->f_24 -= m->f_14;
             }
         }
-        if (m->f_20 < 1)
-            m->f_28 = 1;
     }
+    if (m->f_20 < 1)
+        m->f_28 = 1;
     return a2;
 }
 
