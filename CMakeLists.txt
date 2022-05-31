@@ -5,7 +5,6 @@ set(CMAKE_CXX_FLAGS "-O3")
 SET(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_FLAGS "-O3")
 SET(CMAKE_C_STANDARD 11)
-set(CMAKE_EXE_LINKER_FLAGS "-Xlinker -Map=output.map" )
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 project(raptor)

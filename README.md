@@ -12,16 +12,16 @@ You have to take care of these files yourself.
    FILE0000.GLB  
    FILE0001.GLB  
 2. Copy the `raptor.exe` and `SETUP(GRAVIS).INI or SETUP(ADLIB).INI or SETUP(MIDI).INI` files under Windows or the `raptor` and `SETUP(ADLIB).INI` files under Linux
-   from build directory to Raptor directory. Under Windows copy the `SDL.dll` from `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x86\`
+   and macOS from build directory to Raptor directory. Under Windows copy the `SDL.dll` from `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x86\`
    `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64\` folder or from `include\SDL2-devel-2.0.14-mingw\SDL2-2.0.14\i686-w64-mingw32\bin\` 
    `include\SDL2-devel-2.0.14-mingw\SDL2-2.0.14\x86_64-w64-mingw32\bin\`folder (depending on which version you prefer) to Raptor directory.
-   Under Linux install lib-sdl2 from the packagemanager of your respective distro. 
+   Under Linux install lib-sdl2 from the packagemanager of your respective distro. When you use macOS install lib-sdl2 from dmg or from a packagemanager like brew etc. 
 3. The final folder should look like this:  
    FILE0000.GLB  
    FILE0001.GLB  
    SDL2.dll (only under Windows required)  
-   SETUP(GRAVIS).INI or SETUP(ADLIB).INI or SETUP(MIDI).INI (under Windows) or SETUP(ADLIB).INI (under Linux)  
-   raptor.exe (under Windows) or raptor (under Linux)
+   SETUP(GRAVIS).INI or SETUP(ADLIB).INI or SETUP(MIDI).INI (under Windows) or SETUP(ADLIB).INI (under Linux or macOS)  
+   raptor.exe (under Windows) or raptor (under Linux or macOS)
 
 ### Fullversion
 1. Copy the following files to Raptor directory:  
@@ -31,10 +31,10 @@ You have to take care of these files yourself.
    FILE0003.GLB  
    FILE0004.GLB  
 2. Copy the `raptor.exe` and `SETUP(GRAVIS).INI or SETUP(ADLIB).INI or SETUP(MIDI).INI` files under Windows or the `raptor` and `SETUP(ADLIB).INI` files under Linux
-   from build directory to Raptor directory. Under Windows copy the `SDL.dll` from `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x86\`
+   and macOS from build directory to Raptor directory. Under Windows copy the `SDL.dll` from `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x86\`
    `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64\` folder or from `include\SDL2-devel-2.0.14-mingw\SDL2-2.0.14\i686-w64-mingw32\bin\` 
    `include\SDL2-devel-2.0.14-mingw\SDL2-2.0.14\x86_64-w64-mingw32\bin\`folder (depending on which version you prefer) to Raptor directory.
-   Under Linux install lib-sdl2 from the packagemanager of your respective distro.
+   Under Linux install lib-sdl2 from the packagemanager of your respective distro. When you use macOS install lib-sdl2 from dmg or from a packagemanager like brew etc.
 3. The final folder should look like this:  
    FILE0000.GLB  
    FILE0001.GLB  
@@ -42,8 +42,8 @@ You have to take care of these files yourself.
    FILE0003.GLB  
    FILE0004.GLB  
    SDL2.dll (only under Windows required)  
-   SETUP(GRAVIS).INI or SETUP(ADLIB).INI or SETUP(MIDI).INI (under Windows) or SETUP(ADLIB).INI (under Linux)  
-   raptor.exe (under Windows) or raptor (under Linux)
+   SETUP(GRAVIS).INI or SETUP(ADLIB).INI or SETUP(MIDI).INI (under Windows) or SETUP(ADLIB).INI (under Linux or macOS)  
+   raptor.exe (under Windows) or raptor (under Linux or macOS)
 
 ### Configuration
 You can build or download [Raptor Setup](https://github.com/skynettx/raptorsetup.git) to create and edit the
@@ -62,7 +62,7 @@ input modes, set under the [Setup] section in the `SETUP.INI` file:
 `joy_ipt_MenuNew=1`  
 
 ## Build
-The project supports the compilers msvc and gcc.  
+The project supports the compilers msvc, gcc and clang.  
 When you have installed git on your system you can clone the repository by type in `git clone https://github.com/skynettx/raptor.git`.
 
 ### Windows
@@ -72,6 +72,15 @@ You can use the projectfile for Visual Studio 2019 under `msvc\` or the projectf
 Please remember to install the required dependencies lib-sdl2. In some distros there is an extra libsdl2-dev package like Debian or Ubuntu.  
 You can use the projectfile for CodeBlocks under `gcc\`.
 Otherwise you can use cmake. To use cmake type in the root of the repository:   
+```
+mkdir build  
+cd build  
+cmake ..  
+make  
+```
+
+### macOS
+Install the required dependencies lib-sdl2. To build use cmake, type in the root of the repository:
 ```
 mkdir build  
 cd build  
