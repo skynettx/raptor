@@ -392,68 +392,50 @@ void STORE_Enter(void)
                 JOY_IsKey(StickX);
                 vec.f_10 = 75;
             }
-            switch (Down)
+            if (Down)
             {
-            case 1:
                 JOY_IsKey(Down);
                 vec.f_10 = 80;
-                break;
             }
-            switch (Up)
+            if (Up)
             {
-            case 1:
                 JOY_IsKey(Up);
                 vec.f_10 = 72;
-                break;
             }
-            switch (Left)
+            if (Left)
             {
-            case 1:
                 JOY_IsKey(Left);
                 vec.f_10 = 75;
-                break;
             }
-            switch (Right)
+            if (Right)
             {
-            case 1:
                 JOY_IsKey(Right);
                 vec.f_10 = 77;
-                break;
             }
-            switch (AButton)
+            if (AButton)
             {
-            case 1:
                 JOY_IsKey(AButton);
                 vec.f_10 = 28;
-                break;
             }
-            switch (Back)
+            if (Back)
             {
-            case 1:
                 JOY_IsKey(Back);
                 vec.f_10 = 1;
-                break;
             }
-            switch (BButton)
+            if (BButton)
             {
-            case 1:
                 JOY_IsKey(BButton);
                 vec.f_10 = 1;
-                break;
             }
-            switch (LeftShoulder)
+            if (LeftShoulder)
             {
-            case 1:
                 JOY_IsKey(LeftShoulder);
                 vec.f_10 = 57;
-                break;
             }
-            switch (RightShoulder)
+            if (RightShoulder)
             {
-            case 1:
                 JOY_IsKey(RightShoulder);
                 vec.f_10 = 59;
-                break;
             }
         }
         switch (vec.f_10)

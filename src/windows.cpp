@@ -146,54 +146,40 @@ void WIN_Opts(void)
                 JOY_IsKey(StickX);
                 vb0.f_10 = 75;
             }
-            switch (Down)
+            if (Down)
             {
-            case 1:
                 vb0.f_10 = 80;
                 JOY_IsKey(Down);
-                break;
             }
-            switch (Up)
+            if (Up)
             {
-            case 1:
                 vb0.f_10 = 72;
                 JOY_IsKey(Up);
-                break;
             }
-            switch (Left)
+            if (Left)
             {
-            case 1:
                 vb0.f_10 = 75;
                 JOY_IsKey(Left);
-                break;
             }
-            switch (Right)
+            if (Right)
             {
-            case 1:
                 vb0.f_10 = 77;
                 JOY_IsKey(Right);
-                break;
             }
-            switch (Back)
+            if (Back)
             {
-            case 1:
                 vb0.f_10 = 1;
                 JOY_IsKey(Back);
-                break;
             }
-            switch (BButton)
+            if (BButton)
             {
-            case 1:
                 vb0.f_10 = 1;
                 JOY_IsKey(BButton);
-                break;
             }
-            switch (AButton)
+            if (AButton)
             {
-            case 1:
                 vb0.f_10 = 28;
                 JOY_IsKey(AButton);
-                break;
             }
         }
         switch (vb0.f_10)
@@ -616,19 +602,15 @@ int WIN_Register(void)
 
         if (joy_ipt_MenuNew)                                                               //Controller Input WIN_Register
         {
-            switch (LeftShoulder)                                           
+            if (LeftShoulder)                                           
             {
-            case 1:
                 JOY_IsKey(LeftShoulder);
                 v80.f_10 = 29;
-                break;
             }
-            switch (RightShoulder)
+            if (RightShoulder)
             {
-            case 1:
                 JOY_IsKey(RightShoulder);
                 v80.f_10 = 59;
-                break;
             }
         }
         if (keyboard[1] || Back || BButton)
@@ -942,47 +924,35 @@ int WIN_Hangar(void)
                     JOY_IsKey(StickX);
                     vd0.f_10 = 75;
                 }
-                switch (Down)
+                if (Down)
                 {
-                case 1:
                     JOY_IsKey(Down);
                     vd0.f_10 = 80;
-                    break;
                 }
-                switch (Up)
+                if (Up)
                 {
-                case 1:
                     JOY_IsKey(Up);
                     vd0.f_10 = 72;
-                    break;
                 }
-                switch (Left)
+                if (Left)
                 {
-                case 1:
                     JOY_IsKey(Left);
                     vd0.f_10 = 75;
-                    break;
                 }
-                switch (Right)
+                if (Right)
                 {
-                case 1:
                     JOY_IsKey(Right);
                     vd0.f_10 = 77;
-                    break;
                 }
-                switch (AButton)
+                if (AButton)
                 {
-                case 1:
                     JOY_IsKey(AButton);
                     vd0.f_10 = 28;
-                    break;
                 }
-                switch (RightShoulder)
+                if (RightShoulder)
                 {
-                case 1:
                     JOY_IsKey(RightShoulder);
                     vd0.f_10 = 59;
-                    break;
                 }
             }
             if (keyboard[1] || Back || BButton)
@@ -1256,26 +1226,20 @@ int WIN_ShipComp(void)
 
         if (joy_ipt_MenuNew)
         {
-            switch (Back)                                                         //Input Controller WIN_ShipComp
+            if (Back)                                                         //Input Controller WIN_ShipComp
             {
-            case 1:
                 JOY_IsKey(Back);
                 v94.f_10 = 1;
-                break;
             }
-            switch (BButton)
+            if (BButton)
             {
-            case 1:
                 JOY_IsKey(BButton);
                 v94.f_10 = 1;
-                break;
             }
-            switch (RightShoulder)
+            if (RightShoulder)
             {
-            case 1:
                 JOY_IsKey(RightShoulder);
                 v94.f_10 = 59;
-                break;
             }
         }
         if (keyboard[45] && keyboard[56])

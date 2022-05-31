@@ -465,40 +465,30 @@ void SWD_DoButton(swd_t *a1, swdfield_t *a2)
             JOY_IsKey(StickX);
             g_key = 75;
         }
-        switch (Down)
+        if (Down)
         {
-        case 1:
             JOY_IsKey(Down);
             g_key = 80;
-            break;
         }
-        switch (Up)
+        if (Up)
         {
-        case 1:
             JOY_IsKey(Up);
             g_key = 72;
-            break;
         }
-        switch (Left)
+        if (Left)
         {
-        case 1:
             JOY_IsKey(Left);
             g_key = 75;
-            break;
         }
-        switch (Right)
+        if (Right)
         {
-        case 1:
             JOY_IsKey(Right);
             g_key = 77;
-            break;
         }
-        switch (AButton)
+        if (AButton)
         {
-        case 1:
             JOY_IsKey(AButton);
             g_key = 28;
-            break;
         }
     }
     if (!g_button_flag)
@@ -641,9 +631,8 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
             JOY_IsKey(StickX);
             g_key = 75;
         }
-        switch (Down)                                                     //Input Joy DPad Ascii Table Down
+        if (Down)                                                     //Input Joy DPad Ascii Table Down
         {
-        case 1:
             JOY_IsKey(Down);
             if (fi_joy_count > 0)
             {
@@ -663,11 +652,9 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
                 vs[curpos] = g_joy_ascii;
                 vs[curpos + 1] = 0;
             }
-            break;
         }
-        switch (Up)                                                        //Input Joy DPad Ascii Table Up 
+        if (Up)                                                        //Input Joy DPad Ascii Table Up 
         {
-        case 1:
             JOY_IsKey(Up);
             if (fi_joy_count > 0)
             {
@@ -687,58 +674,45 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
                 vs[curpos] = g_joy_ascii;
                 vs[curpos + 1] = 0;
             }
-            break;
         }
-        switch (Left)
+        if (Left)
         {
-        case 1:
             JOY_IsKey(Left);
             g_key = 75;
-            break;
         }
-        switch (Right)
+        if (Right)
         {
-        case 1:
             JOY_IsKey(Right);
             g_key = 77;
-            break;
         }
-        switch (AButton)                                                  //Input Joy next Input
+        if (AButton)                                                  //Input Joy next Input
         {
-        case 1:
             JOY_IsKey(AButton);
             curpos++;
             fi_joy_count = 0;
-            break;
         }
-        switch (XButton)                                                  //Input Joy for Delete
+        if (XButton)                                                  //Input Joy for Delete
         {
-        case 1:
             JOY_IsKey(XButton);
             vd = 1;
             if (curpos > 0)
                 curpos--;
             vs[curpos] = 0;
             fi_joy_count = 0;
-            break;
         }
-        switch (YButton)                                                  //Input Joy for Space
+        if (YButton)                                                  //Input Joy for Space
         {
-        case 1:
             JOY_IsKey(YButton);
             vs[curpos + 1] = 0;
             g_joy_ascii = 0x20;
             vs[curpos] = g_joy_ascii;
             fi_joy_count = 0;
-            break;
         }
-        switch (Start)                                                   //Input Joy for confirm FieldInput
+        if (Start)                                                   //Input Joy for confirm FieldInput
         {
-        case 1:
             JOY_IsKey(Start);
             g_key = 28;
             fi_joy_count = 0;
-            break;
         }
     }
     ///////////////////////////////////g_key FieldInput///////////////////////////////////

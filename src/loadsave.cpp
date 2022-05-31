@@ -349,12 +349,10 @@ int RAP_LoadWin(void)
         SWD_Dialog(&vb0);
         if (joy_ipt_MenuNew)
         {
-            switch (XButton)                                                                                                                        //Input Erase Savestate
+            if (XButton)                                                                                                                        //Input Erase Savestate
             {
-            case 1:
                 JOY_IsKey(XButton);
                 vb0.f_10 = 0x53;
-                break;
             }
         }
         if ((KBD_IsKey(1)) || (JOY_IsKey(Back) && joy_ipt_MenuNew) || (JOY_IsKey(BButton) && joy_ipt_MenuNew))                                      //Abort Load Window
