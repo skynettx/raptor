@@ -321,7 +321,7 @@ void ESHOT_Think(void)
                 {
                     v1c->f_18.f_c = player_cy + (wrand() % 4) - 2;
                     OBJS_SubEnergy(v20->f_40);
-                    if (haptic)
+                    if ((haptic) && (control == 2))
                     {
                         IPT_CalJoyRumbleLow();                                            //Rumble when Laser eshot is hit
                     }
@@ -372,7 +372,7 @@ void ESHOT_Think(void)
                 ANIMS_StartAnim(6, v1c->f_10, v1c->f_14);
                 v1c->f_44 = 1;
                 OBJS_SubEnergy(v20->f_40);
-                if (haptic)
+                if ((haptic) && (control == 2))
                 {
                     IPT_CalJoyRumbleLow();                                                                 //Rumble when eshot is hit
                 }

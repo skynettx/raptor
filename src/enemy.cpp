@@ -789,7 +789,7 @@ void ENEMY_Think(void)
             {
                 if (player_cy > v1c->f_1c && player_cy < v1c->f_24)
                 {
-                    if (haptic)
+                    if ((haptic) && (control == 2))
                     {
                         IPT_CalJoyRumbleMedium();                                                            //Rumble when enemy hit
                     }
