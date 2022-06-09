@@ -29,6 +29,7 @@ int mouseb1, mouseb2, mouseb3;
 int mouse_b1_ack, mouse_b2_ack, mouse_b3_ack;
 
 int cur_mx, cur_my;
+int old_joy_x, old_joy_y;
 
 void PTR_JoyHandler(void)
 {
@@ -38,10 +39,8 @@ void PTR_JoyHandler(void)
         return;
     lasttick += 1000 / 60;
 
-    static int old_x = -1;
-    static int old_y;
-    cur_mx = StickX + old_x;
-    cur_my = StickY + old_y;
+    cur_mx = StickX + old_joy_x;
+    cur_my = StickY + old_joy_y;
     if (cur_mx < 0)
         cur_mx = 0;
     else if (cur_mx >= SCREENWIDTH)
@@ -51,10 +50,10 @@ void PTR_JoyHandler(void)
     else if (cur_my >= SCREENHEIGHT)
         cur_my = SCREENHEIGHT - 1;
 
-    if (old_x != cur_mx || old_y != cur_my)
+    if (old_joy_x != cur_mx || old_joy_y != cur_my)
     {
-        old_x = cur_mx;
-        old_y = cur_my;
+        old_joy_x = cur_mx;
+        old_joy_y = cur_my;
         ptrupdate = 1;
     }
 }
@@ -351,6 +350,8 @@ void PTR_SetPos(int x, int y)
         I_SetMousePos(x, y);
     cur_mx = x;
     cur_my = y;
+    old_joy_x = x;
+    old_joy_y = y;
     if (ptractive)
         ptrupdate = 1;
 }
