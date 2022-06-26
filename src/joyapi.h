@@ -24,8 +24,7 @@ int JOY_IsKey(int a1);
 void JOY_Wait(int a1);
 int JOY_IsKeyInGameStart(int a1);
 int JOY_IsKeyInGameBack(int a1);
-int JOY_IsKeyHelp(int a1);
+int JOY_IsKeyMenu(int a1);
 
 void GetJoyButtonMapping(void);
-
-
+int JOY_IsScroll(int a1);

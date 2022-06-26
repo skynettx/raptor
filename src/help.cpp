@@ -41,7 +41,6 @@ void HELP_Win(const char *a1)
     curpage = v20 - startitem;
 
     KBD_Clear();
-
     v24 = SWD_InitWindow(0x10038);
     SND_Patch(12, 127);
     while (1)
@@ -87,7 +86,7 @@ void HELP_Win(const char *a1)
             curpage--;
             break;
         }
-        if ((KBD_IsKey(1)) || (JOY_IsKey(Back) && joy_ipt_MenuNew) || (JOY_IsKey(BButton) && joy_ipt_MenuNew))    //Fixed ptr input
+        if ((KBD_IsKey(1)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))    //Fixed ptr input
             break;
         if (keyboard[45] && keyboard[56])
             WIN_AskExit();

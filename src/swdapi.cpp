@@ -443,47 +443,50 @@ LAB_0002c422:
 
 void SWD_DoButton(swd_t *a1, swdfield_t *a2)
 {
+    unsigned int currentTime;
+    currentTime = SDL_GetTicks();
+
     if (joy_ipt_MenuNew)                                                 //Controller Input DoButton
     {
-        if (StickY > 0)                                                   
+        if (StickY > 1)                                                   
         {
-            JOY_IsKey(StickY);
-            g_key = 80;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 80;
         }
-        if (StickY < 0)
+        if (StickY < -1)
         {
-            JOY_IsKey(StickY);
-            g_key = 72;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 72;
         }
-        if (StickX > 0)
+        if (StickX > 1)
         {
-            JOY_IsKey(StickX);
-            g_key = 77;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 77;
         }
-        if (StickX < 0)
+        if (StickX < -1)
         {
-            JOY_IsKey(StickX);
-            g_key = 75;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 75;
         }
         if (Down)
         {
-            JOY_IsKey(Down);
-            g_key = 80;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 80;
         }
         if (Up)
         {
-            JOY_IsKey(Up);
-            g_key = 72;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 72;
         }
         if (Left)
         {
-            JOY_IsKey(Left);
-            g_key = 75;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 75;
         }
         if (Right)
         {
-            JOY_IsKey(Right);
-            g_key = 77;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 77;
         }
         if (AButton)
         {
@@ -491,6 +494,7 @@ void SWD_DoButton(swd_t *a1, swdfield_t *a2)
             g_key = 28;
         }
     }
+    
     if (!g_button_flag)
         return;
     switch (g_key)
@@ -577,113 +581,121 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
                 }
             }
         }
-        if (StickY > 0)                                                    //Input Joy Analog Ascii Table Down
+        if (StickY > 1)                                                    //Input Joy Analog Ascii Table Down
         {
-            JOY_IsKey(StickY);
-            if (fi_joy_count > 0)
+            if (JOY_IsScroll(0) == 1)
             {
-                curpos--;
-                g_joy_ascii--;
-                vs[curpos] = g_joy_ascii;
-                if (g_joy_ascii < 0x30)
+                if (fi_joy_count > 0)
                 {
-                    g_joy_ascii = 0x5a;
+                    curpos--;
+                    g_joy_ascii--;
                     vs[curpos] = g_joy_ascii;
+                    if (g_joy_ascii < 0x30)
+                    {
+                        g_joy_ascii = 0x5a;
+                        vs[curpos] = g_joy_ascii;
+                    }
+                }
+                if (fi_joy_count == 0)
+                {
+                    fi_joy_count++;
+                    g_joy_ascii = 0x41;
+                    vs[curpos] = g_joy_ascii;
+                    vs[curpos + 1] = 0;
                 }
             }
-            if (fi_joy_count == 0)
-            {
-                fi_joy_count++;
-                g_joy_ascii = 0x41;
-                vs[curpos] = g_joy_ascii;
-                vs[curpos + 1] = 0;
-            }
         }
-        if (StickY < 0)                                                    //Input Joy Analog Ascii Table Up
+        if (StickY < -1)                                                    //Input Joy Analog Ascii Table Up
         {
-            JOY_IsKey(StickY);
-            if (fi_joy_count > 0)
+            if (JOY_IsScroll(0) == 1)
             {
-                curpos--;
-                g_joy_ascii++;
-                vs[curpos] = g_joy_ascii;
-                if (g_joy_ascii > 0x5a)
+                if (fi_joy_count > 0)
                 {
-                    g_joy_ascii = 0x30;
+                    curpos--;
+                    g_joy_ascii++;
                     vs[curpos] = g_joy_ascii;
+                    if (g_joy_ascii > 0x5a)
+                    {
+                        g_joy_ascii = 0x30;
+                        vs[curpos] = g_joy_ascii;
+                    }
+                }
+                if (fi_joy_count == 0)
+                {
+                    fi_joy_count++;
+                    g_joy_ascii = 0x41;
+                    vs[curpos] = g_joy_ascii;
+                    vs[curpos + 1] = 0;
                 }
             }
-            if (fi_joy_count == 0)
-            {
-                fi_joy_count++;
-                g_joy_ascii = 0x41;
-                vs[curpos] = g_joy_ascii;
-                vs[curpos + 1] = 0;
-            }
         }
-        if (StickX > 0)
+        if (StickX > 1)
         {
-            JOY_IsKey(StickX);
-            g_key = 77;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 77;
         }
-        if (StickX < 0)
+        if (StickX < -1)
         {
-            JOY_IsKey(StickX);
-            g_key = 75;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 75;
         }
         if (Down)                                                     //Input Joy DPad Ascii Table Down
         {
-            JOY_IsKey(Down);
-            if (fi_joy_count > 0)
+            if (JOY_IsScroll(0) == 1)
             {
-                curpos--;
-                g_joy_ascii--;
-                vs[curpos] = g_joy_ascii;
-                if (g_joy_ascii < 0x30)
+                if (fi_joy_count > 0)
                 {
-                    g_joy_ascii = 0x5a;
+                    curpos--;
+                    g_joy_ascii--;
                     vs[curpos] = g_joy_ascii;
+                    if (g_joy_ascii < 0x30)
+                    {
+                        g_joy_ascii = 0x5a;
+                        vs[curpos] = g_joy_ascii;
+                    }
                 }
-            }
-            if (fi_joy_count == 0)
-            {
-                fi_joy_count++;
-                g_joy_ascii = 0x41;
-                vs[curpos] = g_joy_ascii;
-                vs[curpos + 1] = 0;
+                if (fi_joy_count == 0)
+                {
+                    fi_joy_count++;
+                    g_joy_ascii = 0x41;
+                    vs[curpos] = g_joy_ascii;
+                    vs[curpos + 1] = 0;
+                }
             }
         }
         if (Up)                                                        //Input Joy DPad Ascii Table Up 
         {
-            JOY_IsKey(Up);
-            if (fi_joy_count > 0)
+            if (JOY_IsScroll(0) == 1)
             {
-                curpos--;
-                g_joy_ascii++;
-                vs[curpos] = g_joy_ascii;
-                if (g_joy_ascii > 0x5a)
+                if (fi_joy_count > 0)
                 {
-                    g_joy_ascii = 0x30;
+                    curpos--;
+                    g_joy_ascii++;
                     vs[curpos] = g_joy_ascii;
+                    if (g_joy_ascii > 0x5a)
+                    {
+                        g_joy_ascii = 0x30;
+                        vs[curpos] = g_joy_ascii;
+                    }
                 }
-            }
-            if (fi_joy_count == 0)
-            {
-                fi_joy_count++;
-                g_joy_ascii = 0x41;
-                vs[curpos] = g_joy_ascii;
-                vs[curpos + 1] = 0;
+                if (fi_joy_count == 0)
+                {
+                    fi_joy_count++;
+                    g_joy_ascii = 0x41;
+                    vs[curpos] = g_joy_ascii;
+                    vs[curpos + 1] = 0;
+                }
             }
         }
         if (Left)
         {
-            JOY_IsKey(Left);
-            g_key = 75;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 75;
         }
         if (Right)
         {
-            JOY_IsKey(Right);
-            g_key = 77;
+            if (JOY_IsScroll(0) == 1)
+                g_key = 77;
         }
         if (AButton)                                                  //Input Joy next Input
         {
@@ -1768,7 +1780,7 @@ void SWD_Dialog(wdlg_t *a1)
     //__disable();
 
     I_GetEvent();
-
+    
     g_key = lastscan;
     lastscan = 0;
     g_ascii = lastascii;

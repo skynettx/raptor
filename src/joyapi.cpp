@@ -18,6 +18,7 @@ int ControllerIndex;
 int JoystickIndex;
 
 int AButtonconvert, BButtonconvert, XButtonconvert, YButtonconvert;
+static unsigned int lastTime = 0;
 
 void IPT_CalJoy(void)
 {
@@ -207,11 +208,24 @@ int JOY_IsKeyInGameBack(int a1)
 	return 0;
 }
 
-int JOY_IsKeyHelp(int a1)
+int JOY_IsKeyMenu(int a1)
 {
-	if (RightShoulder)
+	if (RightShoulder || Back || BButton)
 	{
 		JOY_Wait(a1);
+		return 1;
+	}
+	return 0;
+}
+
+int JOY_IsScroll(int a1)
+{
+	unsigned int currentTime;
+	currentTime = SDL_GetTicks();
+	
+	if (currentTime > lastTime + 200)
+	{
+		lastTime = currentTime;
 		return 1;
 	}
 	return 0;

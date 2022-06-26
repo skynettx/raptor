@@ -355,7 +355,7 @@ int RAP_LoadWin(void)
                 vb0.f_10 = 0x53;
             }
         }
-        if ((KBD_IsKey(1)) || (JOY_IsKey(Back) && joy_ipt_MenuNew) || (JOY_IsKey(BButton) && joy_ipt_MenuNew))                                      //Abort Load Window
+        if ((KBD_IsKey(1)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))                                      //Abort Load Window
         {
             v38 = 0;
             goto LAB_00022ecd;

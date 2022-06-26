@@ -126,45 +126,53 @@ void WIN_Opts(void)
 
         if (joy_ipt_MenuNew)
         {
-            if (StickY > 0)                                                   //Controller Input WIN_Opts
+            if (StickY > 1)                                                   //Controller Input WIN_Opts
             {
-                JOY_IsKey(StickY);
-                vb0.f_10 = 80;
+                //JOY_IsKey(StickY);
+                if (JOY_IsScroll(0) == 1)
+                    vb0.f_10 = 80;
             }
-            if (StickY < 0)
+            if (StickY < -1)
             {
-                JOY_IsKey(StickY);
-                vb0.f_10 = 72;
+                //JOY_IsKey(StickY);
+                if (JOY_IsScroll(0) == 1)
+                    vb0.f_10 = 72;
             }
-            if (StickX > 0)
+            if (StickX > 1)
             {
-                JOY_IsKey(StickX);
-                vb0.f_10 = 77;
+                //JOY_IsKey(StickX);
+                if (JOY_IsScroll(0) == 1)
+                    vb0.f_10 = 77;
             }
-            if (StickX < 0)
+            if (StickX < -1)
             {
-                JOY_IsKey(StickX);
-                vb0.f_10 = 75;
+                //JOY_IsKey(StickX);
+                if (JOY_IsScroll(0) == 1)
+                    vb0.f_10 = 75;
             }
             if (Down)
             {
-                vb0.f_10 = 80;
-                JOY_IsKey(Down);
+                if (JOY_IsScroll(0) == 1)
+                    vb0.f_10 = 80;
+                //JOY_IsKey(Down);
             }
             if (Up)
             {
-                vb0.f_10 = 72;
-                JOY_IsKey(Up);
+                if (JOY_IsScroll(0) == 1)
+                    vb0.f_10 = 72;
+                //JOY_IsKey(Up);
             }
             if (Left)
             {
-                vb0.f_10 = 75;
-                JOY_IsKey(Left);
+                if (JOY_IsScroll(0) == 1)
+                    vb0.f_10 = 75;
+                //JOY_IsKey(Left);
             }
             if (Right)
             {
-                vb0.f_10 = 77;
-                JOY_IsKey(Right);
+                if (JOY_IsScroll(0) == 1)
+                    vb0.f_10 = 77;
+                //JOY_IsKey(Right);
             }
             if (Back)
             {
@@ -1719,7 +1727,7 @@ void WIN_MainMenu(void)
             WIN_AskExit();
         if ((keyboard[1] && ingameflag) || (Back && ingameflag) || (BButton && ingameflag))                                   //Go back to Hangar when mission before started
             goto LAB_000260df;
-        if ((v6c.f_10 == 0x3b) || (JOY_IsKeyHelp(RightShoulder)))                                                             //Input Help Screen
+        if ((v6c.f_10 == 0x3b) || (JOY_IsKeyMenu(RightShoulder)))                                                             //Input Help Screen
             HELP_Win("HELP1_TXT");
         if (mouseb1 || mouseb2 || v6c.f_10 || (AButton && !joy_ipt_MenuNew))                                                  //Fixed ptr input
             FUN_00025c70(1);
