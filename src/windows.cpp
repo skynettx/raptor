@@ -128,25 +128,21 @@ void WIN_Opts(void)
         {
             if (StickY > 1)                                                   //Controller Input WIN_Opts
             {
-                //JOY_IsKey(StickY);
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 80;
             }
             if (StickY < -1)
             {
-                //JOY_IsKey(StickY);
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 72;
             }
             if (StickX > 1)
             {
-                //JOY_IsKey(StickX);
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 77;
             }
             if (StickX < -1)
             {
-                //JOY_IsKey(StickX);
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 75;
             }
@@ -154,25 +150,21 @@ void WIN_Opts(void)
             {
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 80;
-                //JOY_IsKey(Down);
             }
             if (Up)
             {
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 72;
-                //JOY_IsKey(Up);
             }
             if (Left)
             {
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 75;
-                //JOY_IsKey(Left);
             }
             if (Right)
             {
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 77;
-                //JOY_IsKey(Right);
             }
             if (Back)
             {

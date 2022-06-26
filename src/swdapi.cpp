@@ -443,9 +443,6 @@ LAB_0002c422:
 
 void SWD_DoButton(swd_t *a1, swdfield_t *a2)
 {
-    unsigned int currentTime;
-    currentTime = SDL_GetTicks();
-
     if (joy_ipt_MenuNew)                                                 //Controller Input DoButton
     {
         if (StickY > 1)                                                   
