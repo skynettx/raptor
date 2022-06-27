@@ -1336,7 +1336,7 @@ swd_t* SWD_ReformatFieldData(swd_t* v1c, int a1)
         swdfield[i].f_84 = swdfield32[i].f_84;
         swdfield[i].f_88 = swdfield32[i].f_88;
         swdfield[i].f_8c = swdfield32[i].f_8c;
-        if (swdfield32[i].f_0 == 1 || swdfield32[i].f_0 == 2) {
+        if (swdfield32[i].f_0 == 1 || swdfield32[i].f_0 == 2 || swdfield32[i].f_0 == 3) {
             swdfield[i].f_8c += (v1c->f_60 - i) * 4;
         }
     }
@@ -2094,10 +2094,8 @@ int SWD_SetFieldText(int a1, int a2, const char *a3)
     t = (char*)fld + fld->f_8c;
     if (a3)
     {
-        t[strlen(a3)] = 0;
-        memcpy(t, a3, strlen(a3));
-        //t[fld->f_5c - 1] = 0;
-        //memcpy(t, a3, fld->f_5c - 1);
+        t[fld->f_5c - 1] = 0;
+        memcpy(t, a3, fld->f_5c - 1);             
     }
     else
         *t = 0;
