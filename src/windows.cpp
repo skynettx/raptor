@@ -126,22 +126,22 @@ void WIN_Opts(void)
 
         if (joy_ipt_MenuNew)
         {
-            if (StickY > 1)                                                   //Controller Input WIN_Opts
+            if (StickY > 0)                                                   //Controller Input WIN_Opts
             {
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 80;
             }
-            if (StickY < -1)
+            if (StickY < 0)
             {
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 72;
             }
-            if (StickX > 1)
+            if (StickX > 0)
             {
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 77;
             }
-            if (StickX < -1)
+            if (StickX < 0)
             {
                 if (JOY_IsScroll(0) == 1)
                     vb0.f_10 = 75;

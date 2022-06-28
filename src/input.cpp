@@ -178,11 +178,11 @@ void IPT_GetJoyStick(void)
 
     if (StickX != 0)
     {
-        if (StickX > 2)
+        if (StickX > 0)
             StickX *= 2;
         if (StickX > 10)
             StickX = 10;
-        if (StickX < -2)
+        if (StickX < 0)
             StickX *= 2;
         if (StickX < -10)
             StickX = -10;
@@ -190,11 +190,11 @@ void IPT_GetJoyStick(void)
     }
     if (StickY != 0)
     {
-        if (StickY > 2)
+        if (StickY > 0)
             StickY *= 2;
         if (StickY > 8)
             StickY = 8;
-        if (StickY < -2)
+        if (StickY < 0)
             StickY *= 2;
         if (StickY < -8)
             StickY = -8;

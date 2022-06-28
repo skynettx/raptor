@@ -445,22 +445,22 @@ void SWD_DoButton(swd_t *a1, swdfield_t *a2)
 {
     if (joy_ipt_MenuNew)                                                 //Controller Input DoButton
     {
-        if (StickY > 1)                                                   
+        if (StickY > 0)                                                   
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = 80;
         }
-        if (StickY < -1)
+        if (StickY < 0)
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = 72;
         }
-        if (StickX > 1)
+        if (StickX > 0)
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = 77;
         }
-        if (StickX < -1)
+        if (StickX < 0)
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = 75;
@@ -578,7 +578,7 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
                 }
             }
         }
-        if (StickY > 1)                                                    //Input Joy Analog Ascii Table Down
+        if (StickY > 0)                                                    //Input Joy Analog Ascii Table Down
         {
             if (JOY_IsScroll(0) == 1)
             {
@@ -602,7 +602,7 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
                 }
             }
         }
-        if (StickY < -1)                                                    //Input Joy Analog Ascii Table Up
+        if (StickY < 0)                                                    //Input Joy Analog Ascii Table Up
         {
             if (JOY_IsScroll(0) == 1)
             {
@@ -626,12 +626,12 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
                 }
             }
         }
-        if (StickX > 1)
+        if (StickX > 0)
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = 77;
         }
-        if (StickX < -1)
+        if (StickX < 0)
         {
             if (JOY_IsScroll(0) == 1)
                 g_key = 75;
