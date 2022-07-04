@@ -18,6 +18,7 @@
 #include "anims.h"
 #include "joyapi.h"
 #include "input.h"
+#include "fileids.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -341,7 +342,7 @@ int RAP_LoadWin(void)
         return-1;
     RAP_ReadFile(v254[v20], &v108, sizeof(v108));
     KBD_Clear();
-    v2c = SWD_InitWindow(0x10039);
+    v2c = SWD_InitWindow(FILE139_LOAD_SWD);
     SWD_SetActiveField(v2c, 5);
     SND_Patch(20, 127);
     while (1)

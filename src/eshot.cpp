@@ -11,6 +11,7 @@
 #include "anims.h"
 #include "joyapi.h"
 #include "input.h"
+#include "fileids.h"
 
 int eshotnum, eshothigh;
 eshot_t first_eshot, last_eshot;
@@ -84,13 +85,13 @@ void ESHOT_Init(void)
     texture_t *v24;
     int v20;
     for (v20 = 0; v20 < 4; v20++)
-    elaspow[v20] = (texture_t*)GLB_LockItem(0x10245 + v20);
+    elaspow[v20] = (texture_t*)GLB_LockItem(FILE145_ELASEPOW_BLK + v20);
     
     ESHOT_Clear();
     memset(plib, 0, sizeof(plib));
     v1c = &plib[0];                          //Lib Normal
     v1c->f_40 = 2;
-    v1c->f_0 = 0x101d6;
+    v1c->f_0 = FILE1d6_ESHOT_BLK;
     v1c->f_2c = 2;
     v1c->f_30 = 0;
     v1c->f_34 = 6;
@@ -102,7 +103,7 @@ void ESHOT_Init(void)
 
     v1c = &plib[1];                          //Lib at play
     v1c->f_40 = 1;
-    v1c->f_0 = 0x101d6;
+    v1c->f_0 = FILE1d6_ESHOT_BLK;
     v1c->f_2c = 2;
     v1c->f_30 = 0;
     v1c->f_34 = 6;
@@ -114,7 +115,7 @@ void ESHOT_Init(void)
 
     v1c = &plib[2];                         //Lib Missle
     v1c->f_40 = 4;
-    v1c->f_0 = 0x101d4;
+    v1c->f_0 = FILE1d4_EMISLE_BLK;
     v1c->f_2c = 2;
     v1c->f_30 = 1;
     v1c->f_34 = 10;
@@ -126,7 +127,7 @@ void ESHOT_Init(void)
 
     v1c = &plib[4];                        //Lib Mines
     v1c->f_40 = 0x10;
-    v1c->f_0 = 0x101d1;
+    v1c->f_0 = FILE1d1_MINE_BLK;
     v1c->f_2c = 2;
     v1c->f_30 = 0;
     v1c->f_34 = 0;
@@ -138,7 +139,7 @@ void ESHOT_Init(void)
 
     v1c = &plib[3];                        //Lib Laser 
     v1c->f_40 = 0xc;
-    v1c->f_0 = 0x10241;
+    v1c->f_0 = FILE141_ELASER_BLK;
     v1c->f_2c = 4;
     v1c->f_30 = 0;
     v1c->f_34 = 6;
@@ -150,7 +151,7 @@ void ESHOT_Init(void)
 
     v1c = &plib[5];                       //Lib Plasma
     v1c->f_40 = 0xf;
-    v1c->f_0 = 0x10251;
+    v1c->f_0 = FILE151_EPLASMA_PIC;
     v1c->f_2c = 1;
     v1c->f_30 = 0;
     v1c->f_34 = 10;
@@ -162,7 +163,7 @@ void ESHOT_Init(void)
 
     v1c = &plib[6];                       //Lib Coco
     v1c->f_40 = 1;
-    v1c->f_0 = 0x1024d;
+    v1c->f_0 = FILE14d_COCONUT_PIC;
     v1c->f_2c = 4;
     v1c->f_30 = 0;
     v1c->f_34 = 6;

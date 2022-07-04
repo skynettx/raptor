@@ -15,24 +15,25 @@
 #include "fx.h"
 #include "joyapi.h"
 #include "input.h"
+#include "fileids.h"
 
 static int window;
 int buy_count, s_count;
 int b_items[24], s_items[24];
 int id_pics[4] = {
-    0x10111, 0x10114, 0x10112, 0x10113
+    FILE111_WMALE_PIC, FILE114_BMALE_PIC, FILE112_WFEMALE_PIC, FILE113_BFEMALE_PIC
 };
 
 int mainbut[2] = {
-    0x10124, 0x10135
+    FILE124_BUTTON4_PIC, FILE135_SELLITEM_PIC
 };
 
 int buybut[2] = {
-    0x10130, 0x10131
+    FILE130_BUYLGT_PIC, FILE131_BUYDRK_PIC
 };
 
 int sellbut[2] = {
-    0x10132, 0x10133
+    FILE132_SELLGT_PIC, FILE133_SELLDRK_PIC
 };
 
 char saying[2][9] = {
@@ -178,7 +179,7 @@ void STORE_Enter(void)
     KBD_Clear();
     GFX_FadeOut(0, 0, 0, 5);
     g_button_flag = 0;
-    window = SWD_InitMasterWindow(0x10031);
+    window = SWD_InitMasterWindow(FILE131_STORE_SWD);
     SWD_SetFieldItem(window, 0, id_pics[plr.f_20]);
     SWD_SetFieldItem(window, 5, mainbut[mode]);
     SWD_GetFieldText(window, 11, yh_hold);
@@ -269,7 +270,7 @@ void STORE_Enter(void)
             SWD_SetFieldText(window, 9, va4);
             sprintf(v70, "%07d", plr.f_24);
             SWD_SetFieldText(window, 10, v70);
-            SWD_SetFieldItem(window, 5, 0x10134);
+            SWD_SetFieldItem(window, 5, FILE134_BUYITEM_PIC);
             if (v2c < 24)
                 SWD_SetFieldItem(window, 7, items[v2c]);
             SWD_ShowAllWindows();

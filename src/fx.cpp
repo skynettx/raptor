@@ -12,6 +12,7 @@
 #include "dspapi.h"
 #include "rap.h"
 #include "gssapi.h"
+#include "fileids.h"
 
 int music_volume;
 int dig_flag;
@@ -113,7 +114,7 @@ int SND_InitSound(void)
     case CARD_ADLIB:
     case CARD_MV:
     case CARD_BLASTER:
-        genmidi = GLB_GetItem(14);
+        genmidi = GLB_GetItem(FILE00e_GENMIDI_OP2);
         if (genmidi)
         {
             LoadInstrumentTable(genmidi);
@@ -145,7 +146,7 @@ int SND_InitSound(void)
         fx_device = FXDEV_GSS1;
         if (!genmidi)
         {
-            genmidi = GLB_GetItem(14);
+            genmidi = GLB_GetItem(FILE00e_GENMIDI_OP2);
             if (genmidi)
             {
                 LoadInstrumentTable(genmidi);

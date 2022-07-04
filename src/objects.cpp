@@ -7,6 +7,7 @@
 #include "loadsave.h"
 #include "fx.h"
 #include "anims.h"
+#include "fileids.h"
 
 int obj_cnt;
 object_t first_objs, last_objs, objs[20];
@@ -77,8 +78,8 @@ void OBJS_CachePics(void)
             }
         }
     }
-    GLB_CacheItem(0x102e0);
-    GLB_CacheItem(0x102df);
+    GLB_CacheItem(FILE1e0_SMSHIELD_PIC);
+    GLB_CacheItem(FILE1df_SMBOMB_PIC);
 }
 
 void OBJS_FreePics(void)
@@ -96,8 +97,8 @@ void OBJS_FreePics(void)
             }
         }
     }
-    GLB_FreeItem(0x102e0);
-    GLB_FreeItem(0x102df);
+    GLB_FreeItem(FILE1e0_SMSHIELD_PIC);
+    GLB_FreeItem(FILE1df_SMBOMB_PIC);
 }
 
 void OBJS_Init(void)
@@ -107,7 +108,7 @@ void OBJS_Init(void)
     memset(obj_lib, 0, sizeof(obj_lib));
     memset(p_objs, 0, sizeof(p_objs));
     v1c = &obj_lib[0];
-    v1c->f_0 = 0x102b0;
+    v1c->f_0 = FILE1b0_BONUS00_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0x2ee0;
     v1c->f_c = 1;
@@ -123,7 +124,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[1];
-    v1c->f_0 = 0x102b1;
+    v1c->f_0 = FILE1b1_BONUS01_PIC;
     v1c->f_4 = 2;
     v1c->f_8 = 0x133d0;
     v1c->f_c = 1;
@@ -139,7 +140,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[2];
-    v1c->f_0 = 0x102b3;
+    v1c->f_0 = FILE1b3_BONUS02_PIC;
     v1c->f_4 = 2;
     v1c->f_8 = 0x2adf0;
     v1c->f_c = 1;
@@ -155,7 +156,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[3];
-    v1c->f_0 = 0x102b5;
+    v1c->f_0 = FILE1b5_BONUS03_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0x23730;
     v1c->f_c = 1;
@@ -171,7 +172,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[4];
-    v1c->f_0 = 0x102b6;
+    v1c->f_0 = FILE1b6_BONUS04_PIC;
     v1c->f_4 = 4;
     v1c->f_8 = 0x3d31a;
     v1c->f_c = 1;
@@ -187,7 +188,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[5];
-    v1c->f_0 = 0x102ba;
+    v1c->f_0 = FILE1ba_BONUS05_PIC;
     v1c->f_4 = 4;
     v1c->f_8 = 0x7d352;
     v1c->f_c = 1;
@@ -203,7 +204,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[6];
-    v1c->f_0 = 0x102be;
+    v1c->f_0 = FILE1be_BONUS06_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0x32096;
     v1c->f_c = 1;
@@ -219,7 +220,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[7];
-    v1c->f_0 = 0x102bf;
+    v1c->f_0 = FILE1bf_BONUS07_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0xf80c;
     v1c->f_c = 1;
@@ -235,7 +236,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[8];
-    v1c->f_0 = 0x102c0;
+    v1c->f_0 = FILE1c0_BONUS08_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 110000;
     v1c->f_c = 1;
@@ -251,7 +252,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[9];
-    v1c->f_0 = 0x102da;
+    v1c->f_0 = FILE1da_BONUS21_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0x17f98;
     v1c->f_c = 1;
@@ -267,7 +268,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[10];
-    v1c->f_0 = 0x102c1;
+    v1c->f_0 = FILE1c1_BONUS09_PIC;
     v1c->f_4 = 4;
     v1c->f_8 = 0x496ce;
     v1c->f_c = 1;
@@ -283,7 +284,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[11];
-    v1c->f_0 = 0x102c5;
+    v1c->f_0 = FILE1c5_BONUS10_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0x07dfa;
     v1c->f_c = 1;
@@ -299,7 +300,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[12];
-    v1c->f_0 = 0x102c6;
+    v1c->f_0 = FILE1c6_BONUS11_PIC;
     v1c->f_4 = 2;
     v1c->f_8 = 0xb1008;
     v1c->f_c = 1;
@@ -315,7 +316,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[13];
-    v1c->f_0 = 0x102c8;
+    v1c->f_0 = FILE1c8_BONUS12_PIC;
     v1c->f_4 = 4;
     v1c->f_8 = 0x1ab3f0;
     v1c->f_c = 1;
@@ -331,7 +332,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[14];
-    v1c->f_0 = 0x102cc;
+    v1c->f_0 = FILE1cc_BONUS13_PIC;
     v1c->f_4 = 4;
     v1c->f_8 = 950000;
     v1c->f_c = 1;
@@ -347,7 +348,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[15];
-    v1c->f_0 = 0x102d0;
+    v1c->f_0 = FILE1d0_BONUS14_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0x132a4;
     v1c->f_c = 100;
@@ -362,7 +363,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[16];
-    v1c->f_0 = 0x102d1;
+    v1c->f_0 = FILE1d1_BONUS15_PIC;
     v1c->f_4 = 4;
     v1c->f_8 = 400;
     v1c->f_c = 0x19;
@@ -377,7 +378,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[17];
-    v1c->f_0 = 0x102d5;
+    v1c->f_0 = FILE1d5_BONUS16_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0x02710;
     v1c->f_c = 1;
@@ -392,7 +393,7 @@ void OBJS_Init(void)
     v1c->f_34 = 0;
 
     v1c = &obj_lib[18];
-    v1c->f_0 = 0x102d5;
+    v1c->f_0 = FILE1d5_BONUS16_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0x16e68;
     v1c->f_c = 0x16e68;
@@ -407,7 +408,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[19];
-    v1c->f_0 = 0x102d6;
+    v1c->f_0 = FILE1d6_BONUS17_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 76000;
     v1c->f_c = 76000;
@@ -422,7 +423,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[20];
-    v1c->f_0 = 0x102d7;
+    v1c->f_0 = FILE1d7_BONUS18_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0xd994;
     v1c->f_c = 0xd994;
@@ -437,7 +438,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[21];
-    v1c->f_0 = 0x102d8;
+    v1c->f_0 = FILE1d8_BONUS19_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0x8980;
     v1c->f_c = 0x8980;
@@ -452,7 +453,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[22];
-    v1c->f_0 = 0x102d9;
+    v1c->f_0 = FILE1d9_BONUS20_PIC;
     v1c->f_4 = 1;
     v1c->f_8 = 0x1de84;
     v1c->f_c = 0x1de84;
@@ -467,7 +468,7 @@ void OBJS_Init(void)
     v1c->f_34 = 1;
 
     v1c = &obj_lib[23];
-    v1c->f_0 = 0x102db;
+    v1c->f_0 = FILE1db_BONUS22_PIC;
     v1c->f_4 = 4;
     v1c->f_8 = 0x32;
     v1c->f_c = 0x32;
@@ -515,7 +516,7 @@ void OBJS_DisplayStats(void)
         v28 = OBJS_GetTotal(15);
         for (v20 = 0; v20 < v28; v20++)
         {
-            GFX_PutSprite((texture_t*)GLB_GetItem(0x102e0), v24, 1);
+            GFX_PutSprite((texture_t*)GLB_GetItem(FILE1e0_SMSHIELD_PIC), v24, 1);
             v24 += 13;
         }
     }
@@ -524,7 +525,7 @@ void OBJS_DisplayStats(void)
         v24 = 18;
         for (v20 = 0; v20 < p_objs[11]->f_8; v20++)
         {
-            GFX_PutSprite((texture_t*)GLB_GetItem(0x102df), v24, 0xba);
+            GFX_PutSprite((texture_t*)GLB_GetItem(FILE1df_SMBOMB_PIC), v24, 0xba);
             v24 += 13;
         }
     }

@@ -12,6 +12,7 @@
 #include "windows.h"
 #include "intro.h"
 #include "input.h"
+#include "fileids.h"
 
 #ifdef _MSC_VER
 #include <windows.h>
@@ -92,7 +93,7 @@ void DEMO_DisplayStats(void)
     if (demo_mode == 1)
     {
         sprintf(buf, "REC %d", 0xaf0 - cur_play);
-        GFX_Print(21, 20, buf, (font_t*)GLB_GetItem(0x10004), 84);
+        GFX_Print(21, 20, buf, (font_t*)GLB_GetItem(FILE104_FONT2_FNT), 84);
     }
 }
 

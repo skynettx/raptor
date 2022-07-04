@@ -20,6 +20,7 @@
 #include "store.h"
 #include "demo.h"
 #include "joyapi.h"
+#include "fileids.h"
 
 int d_count;
 int hangto;
@@ -51,7 +52,7 @@ void WIN_WinGame(int a1)
         return;
 
     GFX_FadeOut(0, 0, 0, 2);
-    v1c = SWD_InitWindow(0x1003e);
+    v1c = SWD_InitWindow(FILE13e_WINGAME_SWD);
     SWD_SetFieldItem(v1c, 2, v30[a1]);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
@@ -65,7 +66,7 @@ void WIN_Msg(const char *a1)
 {
     int v1c;
 
-    v1c = SWD_InitWindow(0x1003a);
+    v1c = SWD_InitWindow(FILE13a_MSG_SWD);
     SWD_SetFieldText(v1c, 5, a1);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
@@ -82,9 +83,9 @@ void FUN_000233f8(wdlg_t *a1)
     if (!a1)
         return;
     SWD_GetFieldXYL(opt_window, 11, &v1c, &v20, &v24, &v38);
-    GFX_PutSprite((texture_t*)GLB_GetItem(0x10127), v1c + DAT_00061a78[0] - 2, v20);
+    GFX_PutSprite((texture_t*)GLB_GetItem(FILE127_SLIDE_PIC), v1c + DAT_00061a78[0] - 2, v20);
     SWD_GetFieldXYL(opt_window, 12, &v1c, &v20, &v24, &v38);
-    GFX_PutSprite((texture_t*)GLB_GetItem(0x10127), v1c + DAT_00061a78[1] - 2, v20);
+    GFX_PutSprite((texture_t*)GLB_GetItem(FILE127_SLIDE_PIC), v1c + DAT_00061a78[1] - 2, v20);
 }
 
 void WIN_Opts(void)
@@ -108,7 +109,7 @@ void WIN_Opts(void)
 
     DAT_00061a78[0] = music_volume;
     DAT_00061a78[1] = fx_volume;
-    opt_window = SWD_InitWindow(0x1003f);
+    opt_window = SWD_InitWindow(FILE13f_OPTS_SWD);
     SWD_SetWindowPtr(opt_window);
     SWD_SetFieldText(opt_window, 6, v68[v30]);
     SWD_SetWinDrawFunc(opt_window, FUN_000233f8);
@@ -221,7 +222,7 @@ void WIN_Opts(void)
             SWD_SetFieldItem(opt_window, 3, -1);
             SWD_SetFieldItem(opt_window, 4, -1);
             SWD_SetFieldItem(opt_window, 5, -1);
-            SWD_SetFieldItem(opt_window, v48[v2c], 0x10128);
+            SWD_SetFieldItem(opt_window, v48[v2c], FILE128_POINT_PIC);
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
             break;
@@ -233,7 +234,7 @@ void WIN_Opts(void)
             SWD_SetFieldItem(opt_window, 3, -1);
             SWD_SetFieldItem(opt_window, 4, -1);
             SWD_SetFieldItem(opt_window, 5, -1);
-            SWD_SetFieldItem(opt_window, v48[v2c], 0x10128);
+            SWD_SetFieldItem(opt_window, v48[v2c], FILE128_POINT_PIC);
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
             break;
@@ -336,7 +337,7 @@ void WIN_Pause(void)
 {
     int v1c;
 
-    v1c = SWD_InitWindow(0x1003a);
+    v1c = SWD_InitWindow(FILE13a_MSG_SWD);
     SWD_SetFieldText(v1c, 5, "GAME PAUSED");
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
@@ -361,7 +362,7 @@ void WIN_Order(void)
         PTR_DrawCursor(0);
         KBD_Clear();
         GFX_FadeOut(0, 0, 0, 2);
-        v1c = SWD_InitWindow(0x1003b);
+        v1c = SWD_InitWindow(FILE13b_ORDER_SWD);
         SWD_ShowAllWindows();
         GFX_DisplayUpdate();
         GFX_FadeIn(palette, 16);
@@ -389,7 +390,7 @@ int WIN_Credits(void)
     SND_PlaySong(songs[songid], 1, 1);
     KBD_Clear();
     GFX_FadeOut(0, 0, 0, 16);
-    v20 = SWD_InitWindow(0x1003c);
+    v20 = SWD_InitWindow(FILE13c_CREDIT_SWD);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
     GFX_FadeIn(palette, 16);
@@ -414,7 +415,7 @@ int WIN_AskBool(const char *a1)
     v1c = 0;
     v40 = g_drawcursor;
     KBD_Clear();
-    v24 = SWD_InitWindow(0x10035);
+    v24 = SWD_InitWindow(FILE135_ASK_SWD);
     SWD_SetFieldText(v24, 5, a1);
     SWD_SetActiveField(v24, 6);
     SWD_ShowAllWindows();
@@ -516,7 +517,7 @@ int WIN_AskDiff(void)
 
     v1c = -1;
     KBD_Clear();
-    v24 = SWD_InitWindow(0x1003d);
+    v24 = SWD_InitWindow(FILE13d_ASKDIFF_SWD);
     SWD_SetActiveField(v24, 8);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
@@ -559,10 +560,10 @@ LAB_00024094:
 }
 
 int sid_pics[4] = {
-    0x10116,
-    0x10119,
-    0x10117,
-    0x10118
+    FILE116_WMALEID_PIC,
+    FILE119_BMALEID_PIC,
+    FILE117_WFMALEID_PIC,
+    FILE118_BFMALEID_PIC
 };
 
 int WIN_Register(void)
@@ -588,7 +589,7 @@ int WIN_Register(void)
     vd8.f_40[2] = 2;
     vd8.f_40[3] = 2;
     vd8.f_20 = 0;
-    v24 = SWD_InitWindow(0x10037);
+    v24 = SWD_InitWindow(FILE137_REGISTER_SWD);
     SWD_SetFieldItem(v24, 0, sid_pics[vd8.f_20]);
     SWD_SetActiveField(v24, 1);
     SWD_ShowAllWindows();
@@ -857,7 +858,7 @@ int WIN_Hangar(void)
     else
     {
         GFX_FadeOut(0, 0, 0, 2);
-        v28 = SWD_InitMasterWindow(0x10034);
+        v28 = SWD_InitMasterWindow(FILE134_HANGAR_SWD);
         SWD_GetFieldItem(v28, 0);
         SND_PlaySong(88, 1, 1);
         SWD_ShowAllWindows();
@@ -887,7 +888,7 @@ int WIN_Hangar(void)
             {
                 v40 = 0;
                 if ((wrand() % 3) == 0)
-                    SWD_SetFieldItem(v28, 0, 0x1010b);
+                    SWD_SetFieldItem(v28, 0, FILE10b_HANGP_PIC);
                 else
                     SWD_SetFieldItem(v28, 0, -1);
                 SWD_ShowAllWindows();
@@ -1150,7 +1151,7 @@ void WIN_LoadComp(void)
         "OUTER REGIONS"
     };
 
-    v1c = SWD_InitMasterWindow(0x10040);
+    v1c = SWD_InitMasterWindow(FILE140_LOADCOMP_SWD);
     SWD_GetFieldXYL(v1c, 11, &g_x, &g_y, &g_lx, &g_ly);
     sprintf(v44, "WAVE %d", game_wave[cur_game]);
     SWD_SetFieldText(v1c, 10, v44);
@@ -1194,15 +1195,15 @@ int WIN_ShipComp(void)
     KBD_Clear();
     GFX_FadeOut(0, 0, 0, 2);
     cur_diff &= ~7;
-    v3c = SWD_InitMasterWindow(0x10033);
-    GLB_LockItem(0x1012a);
-    GLB_LockItem(0x1012b);
+    v3c = SWD_InitMasterWindow(FILE133_SHIPCOMP_SWD);
+    GLB_LockItem(FILE12a_LIGHTON_PIC);
+    GLB_LockItem(FILE12b_LIGHTOFF_PIC);
     SWD_GetFieldXYL(v3c, 11, &v40, &v44, &v38, &v4c);
     PTR_SetPos(v40 + (v38 >> 1), v44 + (v4c >> 1));
     SWD_SetActiveField(v3c, 11);
-    SWD_SetFieldItem(v3c, 0, 0x1012b);
-    SWD_SetFieldItem(v3c, 1, 0x1012b);
-    SWD_SetFieldItem(v3c, 2, 0x1012b);
+    SWD_SetFieldItem(v3c, 0, FILE12b_LIGHTOFF_PIC);
+    SWD_SetFieldItem(v3c, 1, FILE12b_LIGHTOFF_PIC);
+    SWD_SetFieldItem(v3c, 2, FILE12b_LIGHTOFF_PIC);
 
     if (bday_flag)
     {
@@ -1210,9 +1211,9 @@ int WIN_ShipComp(void)
         v28 = 1;
         v2c = 1;
         v30 = 1;
-        SWD_SetFieldItem(v3c, 0, 0x1012a);
-        SWD_SetFieldItem(v3c, 1, 0x1012a);
-        SWD_SetFieldItem(v3c, 2, 0x1012a);
+        SWD_SetFieldItem(v3c, 0, FILE12a_LIGHTON_PIC);
+        SWD_SetFieldItem(v3c, 1, FILE12a_LIGHTON_PIC);
+        SWD_SetFieldItem(v3c, 2, FILE12a_LIGHTON_PIC);
         SND_Patch(14, 127);
     }
     SWD_ShowAllWindows();
@@ -1336,9 +1337,9 @@ int WIN_ShipComp(void)
                 {
                     v28 ^= 1;
                     if (v28)
-                        SWD_SetFieldItem(v3c, 0, 0x1012a);
+                        SWD_SetFieldItem(v3c, 0, FILE12a_LIGHTON_PIC);
                     else
-                        SWD_SetFieldItem(v3c, 0, 0x1012b);
+                        SWD_SetFieldItem(v3c, 0, FILE12b_LIGHTOFF_PIC);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
@@ -1348,9 +1349,9 @@ int WIN_ShipComp(void)
                 {
                     v2c ^= 1;
                     if (v2c)
-                        SWD_SetFieldItem(v3c, 1, 0x1012a);
+                        SWD_SetFieldItem(v3c, 1, FILE12a_LIGHTON_PIC);
                     else
-                        SWD_SetFieldItem(v3c, 1, 0x1012b);
+                        SWD_SetFieldItem(v3c, 1, FILE12b_LIGHTOFF_PIC);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
@@ -1360,9 +1361,9 @@ int WIN_ShipComp(void)
                 {
                     v30 ^= 1;
                     if (v30)
-                        SWD_SetFieldItem(v3c, 2, 0x1012a);
+                        SWD_SetFieldItem(v3c, 2, FILE12a_LIGHTON_PIC);
                     else
-                        SWD_SetFieldItem(v3c, 2, 0x1012b);
+                        SWD_SetFieldItem(v3c, 2, FILE12b_LIGHTOFF_PIC);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
@@ -1404,8 +1405,8 @@ LAB_000255a5:
         SND_Patch(14, 127);
     }
     hangto = 1;
-    GLB_FreeItem(0x1012a);
-    GLB_FreeItem(0x1012b);
+    GLB_FreeItem(FILE12a_LIGHTON_PIC);
+    GLB_FreeItem(FILE12b_LIGHTOFF_PIC);
     return v24;
 }
 
@@ -1576,39 +1577,39 @@ void WIN_MainAuto(int a1)
             v20 = WIN_Credits();
             break;
         case 2:
-            DEMO_GLBFile(0x10107);
+            DEMO_GLBFile(FILE107_DEMO1G1_REC);
             v20 = DEMO_Play();
             break;
         case 3:
-            DEMO_GLBFile(0x10108);
+            DEMO_GLBFile(FILE108_DEMO2G1_REC);
             v20 = DEMO_Play();
             break;
         case 4:
-            DEMO_GLBFile(0x10109);
+            DEMO_GLBFile(FILE109_DEMO3G1_REC);
             v20 = DEMO_Play();
             break;
         case 5:
-            DEMO_GLBFile(0x2000b);
+            DEMO_GLBFile(FILE20b_DEMO1G2_REC);
             v20 = DEMO_Play();
             break;
         case 6:
-            DEMO_GLBFile(0x2000c);
+            DEMO_GLBFile(FILE20c_DEMO2G2_REC);
             v20 = DEMO_Play();
             break;
         case 7:
-            DEMO_GLBFile(0x2000d);
+            DEMO_GLBFile(FILE20d_DEMO3G2_REC);
             v20 = DEMO_Play();
             break;
         case 8:
-            DEMO_GLBFile(0x30007);
+            DEMO_GLBFile(FILE307_DEMO1G3_REC);
             v20 = DEMO_Play();
             break;
         case 9:
-            DEMO_GLBFile(0x30008);
+            DEMO_GLBFile(FILE308_DEMO2G3_REC);
             v20 = DEMO_Play();
             break;
         case 10:
-            DEMO_GLBFile(0x30009);
+            DEMO_GLBFile(FILE309_DEMO3G3_REC);
             v20 = DEMO_Play();
             break;
         }
@@ -1657,11 +1658,11 @@ void WIN_MainMenu(void)
     FUN_00025c70(1);
     if (demo_flag == 1)
         return;
-    v20 = SWD_InitMasterWindow(0x10032);
+    v20 = SWD_InitMasterWindow(FILE132_MAIN_SWD);
     if (ingameflag)
     {
         SWD_SetFieldSelect(v20, 7, 1);
-        SWD_SetFieldItem(v20, 7, 0x10029);
+        SWD_SetFieldItem(v20, 7, FILE129_MENU7_PIC);
         SWD_SetFieldText(v20, 8, 0);
     }
     else
@@ -1699,9 +1700,9 @@ void WIN_MainMenu(void)
             memset(displayscreen, 0, 64000);
             WIN_MainAuto(v24);
             v24 = 0;
-            v20 = SWD_InitMasterWindow(0x10032);
+            v20 = SWD_InitMasterWindow(FILE132_MAIN_SWD);
             if (ingameflag)
-                SWD_SetFieldItem(v20, 7, 0x10029);
+                SWD_SetFieldItem(v20, 7, FILE129_MENU7_PIC);
             else
                 SWD_SetFieldItem(v20, 7, -1);
             PTR_DrawCursor(0);

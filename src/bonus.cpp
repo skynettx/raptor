@@ -6,6 +6,7 @@
 #include "glbapi.h"
 #include "objects.h"
 #include "fx.h"
+#include "fileids.h"
 
 bonus_t bons[12];
 bonus_t first_bonus, last_bonus;
@@ -72,14 +73,14 @@ void BONUS_Init(void)
 
     for (v1c = 0; v1c < 4; v1c++)
     {
-        glow[v1c] = 0x10225 + v1c;
+        glow[v1c] = FILE125_ICNGLW_BLK + v1c;
     }
-    v20 = (texture_t*)GLB_CacheItem(0x10225);
+    v20 = (texture_t*)GLB_CacheItem(FILE125_ICNGLW_BLK);
     glow_lx = v20->f_c;
     glow_ly = v20->f_10;
-    GLB_CacheItem(0x10226);
-    GLB_CacheItem(0x10227);
-    GLB_CacheItem(0x10228);
+    GLB_CacheItem(FILE126_ICNGLW_BLK);
+    GLB_CacheItem(FILE127_ICNGLW_BLK);
+    GLB_CacheItem(FILE128_ICNGLW_BLK);
     BONUS_Clear();
 }
 
@@ -181,7 +182,7 @@ void BONUS_Display(void)
             GFX_ShadeShape(1, (texture_t*)GLB_GetItem(glow[v1c->f_10]), v1c->f_24, v1c->f_28);
         }
         else
-            GFX_PutSprite((texture_t*)GLB_GetItem(0x1000f), v1c->f_1c, v1c->f_20);
+            GFX_PutSprite((texture_t*)GLB_GetItem(FILE10f_N$_PIC), v1c->f_1c, v1c->f_20);
     }
 }
 

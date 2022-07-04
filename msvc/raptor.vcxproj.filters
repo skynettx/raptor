@@ -132,6 +132,9 @@
     <ClInclude Include="..\src\i_lastscr.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\fileids.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\anims.cpp">

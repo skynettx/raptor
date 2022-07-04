@@ -9,6 +9,7 @@
 #include "movie.h"
 #include "kbdapi.h"
 #include "windows.h"
+#include "fileids.h"
 
 movie_t frm[90];
 
@@ -24,7 +25,7 @@ int INTRO_City(void)
         v28->f_0 = 0;
         v28->f_4 = 8;
         v28->f_8 = v24--;
-        v28->f_c = 0x10041 + i;
+        v28->f_c = FILE141_CHASE_AGX + i;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -71,7 +72,7 @@ int INTRO_Side1(void)
         v28->f_0 = 0;
         v28->f_4 = 18;
         v28->f_8 = v24--;
-        v28->f_c = 0x1005f + i;
+        v28->f_c = FILE15f_SHIPSD1_AGX + i;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -104,7 +105,7 @@ int INTRO_Pilot(void)
         v28->f_0 = 0;
         v28->f_4 = 10;
         v28->f_8 = v24--;
-        v28->f_c = 0x10073 + i;
+        v28->f_c = FILE173_PILOT_AGX + i;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -137,7 +138,7 @@ int INTRO_Explosion(void)
         v28->f_0 = 0;
         v28->f_4 = 12;
         v28->f_8 = v24--;
-        v28->f_c = 0x1009c + i;
+        v28->f_c = FILE19c_EXPLO_AGX + i;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -189,7 +190,7 @@ int INTRO_Side2(void)
         v28->f_0 = 0;
         v28->f_4 = 18;
         v28->f_8 = v24--;
-        v28->f_c = 0x1005f + i;
+        v28->f_c = FILE15f_SHIPSD1_AGX + i;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -218,7 +219,7 @@ int INTRO_Side2(void)
         v28->f_0 = 0;
         v28->f_4 = 18;
         v28->f_8 = v24--;
-        v28->f_c = 0x10088 + i;
+        v28->f_c = FILE188_SHIPSD2_AGX + i;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -255,7 +256,7 @@ int INTRO_Base(void)
         v28->f_0 = 0;
         v28->f_4 = 10;
         v28->f_8 = v24--;
-        v28->f_c = 0x2000e + v1c;
+        v28->f_c = FILE20e_BASE_AGX + v1c;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -290,7 +291,7 @@ int INTRO_Landing(void)
         v28->f_0 = 0;
         v28->f_4 = 10;
         v28->f_8 = v24--;
-        v28->f_c = 0x100bd + v1c;
+        v28->f_c = FILE1bd_LANDING_AGX + v1c;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -327,7 +328,7 @@ int INTRO_Death2(void)
         v28->f_0 = 0;
         v28->f_4 = 3;
         v28->f_8 = v24--;
-        v28->f_c = 0x100b2 + v1c;
+        v28->f_c = FILE1b2_SDEATH_AGX + v1c;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -363,7 +364,7 @@ int INTRO_Death1(void)
         v28->f_0 = 0;
         v28->f_4 = 11;
         v28->f_8 = v24--;
-        v28->f_c = 0x100de + v1c;
+        v28->f_c = FILE1de_DOWN_AGX + v1c;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -404,7 +405,7 @@ int INTRO_Game1End(void)
         v28->f_0 = 0;
         v28->f_4 = 4;
         v28->f_8 = v24--;
-        v28->f_c = 0x100b8 + v1c;
+        v28->f_c = FILE1b8_GAME1END_AGX + v1c;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -441,7 +442,7 @@ int INTRO_Game2End(void)
         v28->f_0 = 0;
         v28->f_4 = 4;
         v28->f_8 = v24--;
-        v28->f_c = 0x2002c + v1c;
+        v28->f_c = FILE22c_GAME2END_AGX + v1c;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -489,7 +490,7 @@ int INTRO_Game3End(void)
         v28->f_0 = 0;
         v28->f_4 = 8;
         v28->f_8 = v24--;
-        v28->f_c = 0x300c5 + v1c;
+        v28->f_c = FILE3c5_GAME3END_AGX + v1c;
         v28->f_10 = 0;
         v28->f_14 = 0;
         v28->f_18 = 0;
@@ -573,8 +574,8 @@ void INTRO_Taiwan(void)
     char *v20;
     v28 = GFX_GetFrameCount();
     framecount = 0;
-    v24 = (texture_t*)GLB_GetItem(0x1002f);
-    v20 = GLB_GetItem(0x10030);
+    v24 = (texture_t*)GLB_GetItem(FILE12f_TAIWARN_PIC);
+    v20 = GLB_GetItem(FILE130_TAIPAL_DAT);
     GFX_PutImage(v24, 0, 0, 0);
     GFX_DisplayUpdate();
     GFX_FadeIn(v20, 64);
@@ -588,8 +589,8 @@ void INTRO_Taiwan(void)
         }
     }
     GFX_FadeOut(0, 0, 0, 63);
-    GLB_FreeItem(0x10030);
-    GLB_FreeItem(0x1002f);
+    GLB_FreeItem(FILE130_TAIPAL_DAT);
+    GLB_FreeItem(FILE12f_TAIWARN_PIC);
 }
 
 int INTRO_Credits(void)
@@ -599,8 +600,8 @@ int INTRO_Credits(void)
     int now, i;
     now = GFX_GetFrameCount();
     framecount = 0;
-    apogee = (texture_t*)GLB_GetItem(0x1002b);
-    apogeepal = GLB_GetItem(0x1002c);
+    apogee = (texture_t*)GLB_GetItem(FILE12b_APOGEE_PIC);
+    apogeepal = GLB_GetItem(FILE12c_POGPAL_DAT);
     GFX_FadeOut(0, 0, 0, 5);
     GFX_PutImage(apogee, 0, 0, 0);
     GFX_DisplayUpdate();
@@ -631,13 +632,13 @@ int INTRO_Credits(void)
         }
     }
     GFX_FadeOut(0, 0, 0, 63);
-    GLB_FreeItem(0x1002c);
-    GLB_FreeItem(0x1002b);
+    GLB_FreeItem(FILE12c_POGPAL_DAT);
+    GLB_FreeItem(FILE12b_APOGEE_PIC);
     SND_PlaySong(-1, 0, 1);
     memset(displayscreen, 0, 64000);
     memset(displaybuffer, 0, 64000);
-    cyg = (texture_t*)GLB_GetItem(0x1002d);
-    cygpal = GLB_GetItem(0x1002e);
+    cyg = (texture_t*)GLB_GetItem(FILE12d_CYGNUS_PIC);
+    cygpal = GLB_GetItem(FILE12e_CYGPAL_DAT);
     GFX_PutImage(cyg, 0, 0, 0);
     GFX_DisplayUpdate();
     GFX_FadeIn(cygpal, 64); //??
@@ -662,8 +663,8 @@ int INTRO_Credits(void)
     GFX_MarkUpdate(0, 0, 320, 200);
     GFX_DisplayUpdate();
     GFX_SetPalette(palette, 0);
-    GLB_FreeItem(0x1002e);
-    GLB_FreeItem(0x1002d);
+    GLB_FreeItem(FILE12e_CYGPAL_DAT);
+    GLB_FreeItem(FILE12d_CYGNUS_PIC);
     IMS_StartAck();
     return 0;
 }

@@ -31,6 +31,7 @@
 #include "input.h"
 #include "joyapi.h"
 #include "i_lastscr.h"
+#include "fileids.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -187,10 +188,10 @@ void ShutDown(int a1)
     //PTR_End();
     //KBD_End();
     if (!reg_flag)
-        LASTSCR = GLB_GetItem(1);                    //Get ANSI Screen Shareware from GLB to char*
+        LASTSCR = GLB_GetItem(FILE001_LASTSCR1_TXT); //Get ANSI Screen Shareware from GLB to char*
 
     if (reg_flag)
-        LASTSCR = GLB_GetItem(2);                    //Get ANSI Screen Fullversion from GLB to char*
+        LASTSCR = GLB_GetItem(FILE002_LASTSCR2_TXT); //Get ANSI Screen Fullversion from GLB to char*
     
     closewindow();                                   //Close Main Window
     I_LASTSCR();                                     //Call to display ANSI Screen 
@@ -500,12 +501,12 @@ void RAP_DisplayStats(void)
         {
             if (damage)
             {
-                v2c = v34 = (texture_t*)GLB_GetItem(0x10011);
+                v2c = v34 = (texture_t*)GLB_GetItem(FILE111_WEPDEST_PIC);
                 GFX_PutSprite(v34, (320 - v2c->f_c) >> 1, 0xad);
             }
             if (startendwave == -1)
                 SND_Patch(22, 127);
-            v2c = v34 = (texture_t*)GLB_GetItem(0x10010);
+            v2c = v34 = (texture_t*)GLB_GetItem(FILE110_SHLDLOW_PIC);
             GFX_PutSprite(v34, (320 - v2c->f_c) >> 1, 0xb6);
         }
     }
@@ -1145,7 +1146,7 @@ int main(int argc, char *argv[])
     GLB_InitSystem(argv[0], 6, 0);
     if (reg_flag)
     {
-        reg_text = GLB_GetItem(0);
+        reg_text = GLB_GetItem(FILE000_ATENTION_TXT);
         printf("%s\n", reg_text);
         GLB_FreeItem(0);
     }
@@ -1154,7 +1155,7 @@ int main(int argc, char *argv[])
     GLB_FreeAll();
     RAP_InitMem();
     printf("Loading Graphics\n");
-    pal = GLB_LockItem(0x10000);
+    pal = GLB_LockItem(FILE100_PALETTE_DAT);
     memset(pal, 0, 3);
     palette = pal;
     SHADOW_Init();
@@ -1162,18 +1163,18 @@ int main(int argc, char *argv[])
     fflush(stdout);
     if (v28)
     {
-        ptrtex = (texture_t*)GLB_LockItem(0x10012);
+        ptrtex = (texture_t*)GLB_LockItem(FILE112_CURSOR_PIC);
         PTR_SetPic(ptrtex);
         PTR_SetPos(160, 100);
         PTR_DrawCursor(0);
     }
     for (i = 0; i < 7; i++)
     {
-        lship[i] = 0x1011a + i;
+        lship[i] = FILE11a_LPLAYER_PIC + i;
         if (gameflag[1])
         {
-            dship[i] = 0x20045 + i;
-            fship[i] = 0x2004c + i;
+            dship[i] = FILE245_DPLAYER_PIC + i;
+            fship[i] = FILE24c_FPLAYER_PIC + i;
         }
     }
     for (i = 0; i < 4; i++)
@@ -1188,7 +1189,7 @@ int main(int argc, char *argv[])
     }
     for (i = 0; i < 11; i++)
     {
-        v20 = 0x10005 + i;
+        v20 = FILE105_N0_PIC + i;
         numbers[i] = (texture_t*)GLB_LockItem(v20);
     }
 

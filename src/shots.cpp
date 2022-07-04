@@ -8,6 +8,7 @@
 #include "anims.h"
 #include "tile.h"
 #include "eshot.h"
+#include "fileids.h"
 
 shot_t shots[70];
 
@@ -84,19 +85,19 @@ void SHOTS_Init(void)
     SHOTS_Clear();
     for (i = 0; i < 4; i++)
     {
-        detpow[i] = (texture_t*)GLB_LockItem(0x10239 + i);
+        detpow[i] = (texture_t*)GLB_LockItem(FILE139_DETHPOW_BLK + i);
     }
     for (i = 0; i < 4; i++)
     {
-        laspow[i] = (texture_t*)GLB_LockItem(0x1023d + i);
+        laspow[i] = (texture_t*)GLB_LockItem(FILE13d_LASERPOW_BLK + i);
     }
     for (i = 0; i < 4; i++)
     {
-        lashit[i] = (texture_t*)GLB_LockItem(0x101f1 + i);
+        lashit[i] = (texture_t*)GLB_LockItem(FILE1f1_DRAYHIT_BLK + i);
     }
     memset(shot_lib, 0, sizeof(shot_lib));
     v1c = &shot_lib[0];
-    v1c->f_0 = 0x101c3;
+    v1c->f_0 = FILE1c3_NMSHOT_BLK;
     v1c->f_2c = 0;
     v1c->f_30 = 0;
     v1c->f_34 = 1;
@@ -150,7 +151,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 1;
 
     v1c = &shot_lib[2];
-    v1c->f_0 = 0x101c1;
+    v1c->f_0 = FILE1c1_MICROM_BLK;
     v1c->f_2c = 0;
     v1c->f_30 = 2;
     v1c->f_34 = 2;
@@ -177,7 +178,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 3;
 
     v1c = &shot_lib[3];
-    v1c->f_0 = 0x101ba;
+    v1c->f_0 = FILE1ba_MISDUM_BLK;
     v1c->f_2c = 1;
     v1c->f_30 = 3;
     v1c->f_34 = 4;
@@ -205,7 +206,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 0;
 
     v1c = &shot_lib[4];
-    v1c->f_0 = 0x101c3;
+    v1c->f_0 = FILE1c3_NMSHOT_BLK;
     v1c->f_2c = 1;
     v1c->f_30 = 4;
     v1c->f_34 = 1;
@@ -261,7 +262,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 0;
 
     v1c = &shot_lib[6];
-    v1c->f_0 = 0x101bd;
+    v1c->f_0 = FILE1bd_MISRAT_BLK;
     v1c->f_2c = 0;
     v1c->f_30 = 6;
     v1c->f_34 = 4;
@@ -289,7 +290,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 1;
 
     v1c = &shot_lib[7];
-    v1c->f_0 = 0x101bd;
+    v1c->f_0 = FILE1bd_MISRAT_BLK;
     v1c->f_2c = 0;
     v1c->f_30 = 6;
     v1c->f_34 = 4;
@@ -317,7 +318,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 1;
 
     v1c = &shot_lib[8];
-    v1c->f_0 = 0x101bf;
+    v1c->f_0 = FILE1bf_MISGRD_BLK;
     v1c->f_2c = 0;
     v1c->f_30 = 8;
     v1c->f_34 = 0x14;
@@ -345,7 +346,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 2;
 
     v1c = &shot_lib[9];
-    v1c->f_0 = 0x101d3;
+    v1c->f_0 = FILE1d3_BLDGBOMB_PIC;
     v1c->f_2c = 0;
     v1c->f_30 = 9;
     v1c->f_34 = 0x32;
@@ -373,7 +374,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 4;
 
     v1c = &shot_lib[10];
-    v1c->f_0 = 0x1021d;
+    v1c->f_0 = FILE11d_POWDIS_BLK;
     v1c->f_2c = 0;
     v1c->f_30 = 10;
     v1c->f_34 = 3;
@@ -401,7 +402,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 5;
 
     v1c = &shot_lib[11];
-    v1c->f_0 = 0x101cb;
+    v1c->f_0 = FILE1cb_MEGABM_BLK;
     v1c->f_2c = 1;
     v1c->f_30 = 0xb;
     v1c->f_34 = 0x32;
@@ -430,7 +431,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 0;
 
     v1c = &shot_lib[12];
-    v1c->f_0 = 0x10223;
+    v1c->f_0 = FILE123_SHOKWV_BLK;
     v1c->f_2c = 0;
     v1c->f_30 = 0xc;
     v1c->f_34 = 5;
@@ -459,7 +460,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 0;
 
     v1c = &shot_lib[13];
-    v1c->f_0 = 0x10235;
+    v1c->f_0 = FILE135_FRNTLAS_BLK;
     v1c->f_2c = 0;
     v1c->f_30 = 0xd;
     v1c->f_34 = 10;
@@ -488,7 +489,7 @@ void SHOTS_Init(void)
     v1c->f_60 = 1;
 
     v1c = &shot_lib[14];
-    v1c->f_0 = 0x10231;
+    v1c->f_0 = FILE131_DETHRY_BLK;
     v1c->f_2c = 0;
     v1c->f_30 = 0xe;
     v1c->f_34 = 6;

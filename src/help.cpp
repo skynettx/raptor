@@ -10,6 +10,7 @@
 #include "windows.h"
 #include "joyapi.h"
 #include "input.h"
+#include "fileids.h"
 
 static int startitem;
 static int curpage;
@@ -41,7 +42,7 @@ void HELP_Win(const char *a1)
     curpage = v20 - startitem;
 
     KBD_Clear();
-    v24 = SWD_InitWindow(0x10038);
+    v24 = SWD_InitWindow(FILE138_HELP_SWD);
     SND_Patch(12, 127);
     while (1)
     {

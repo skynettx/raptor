@@ -27,6 +27,7 @@
     <ClInclude Include="..\src\dspapi.h" />
     <ClInclude Include="..\src\enemy.h" />
     <ClInclude Include="..\src\eshot.h" />
+    <ClInclude Include="..\src\fileids.h" />
     <ClInclude Include="..\src\flame.h" />
     <ClInclude Include="..\src\fx.h" />
     <ClInclude Include="..\src\gfxapi.h" />

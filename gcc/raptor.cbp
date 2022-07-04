@@ -191,6 +191,7 @@
 		<Unit filename="../src/enemy.h" />
 		<Unit filename="../src/eshot.cpp" />
 		<Unit filename="../src/eshot.h" />
+		<Unit filename="../src/fileids.h" />
 		<Unit filename="../src/flame.cpp" />
 		<Unit filename="../src/flame.h" />
 		<Unit filename="../src/fx.cpp" />

@@ -6,6 +6,7 @@
 #include "enemy.h"
 #include "rap.h"
 #include "tile.h"
+#include "fileids.h"
 
 anim_t first_anims, last_anims, anims[100];
 anim_t *free_anims;
@@ -86,27 +87,27 @@ void ANIMS_Init(void)
     ANIMS_Clear();
     memset(animlib, 0, sizeof(animlib));
     curlib = 0;
-    ANIMS_Register(0x10164, 0x2a, 0, 0, 0, 0);
-    ANIMS_Register(0x1027d, 0x23, 0, 0, 0, 0);
-    ANIMS_Register(0x101f5, 7, 0, 0, 0, 0);
-    ANIMS_Register(0x10213, 10, 0, 0, 0, 0);
-    ANIMS_Register(0x101e5, 0xc, 2, 0, 0, 0);
-    ANIMS_Register(0x101d8, 0xd, 0, 0, 0, 0);
-    ANIMS_Register(0x101fc, 0xe, 2, 0, 0, 0);
-    ANIMS_Register(0x102a0, 0x10, 2, 0, 0, 0);
-    ANIMS_Register(0x101ae, 0xc, 2, 0, 0, 0);
-    ANIMS_Register(0x10229, 4, 2, 0, 0, 0);
-    ANIMS_Register(0x1020a, 9, 1, 0, 0, 0);
-    ANIMS_Register(0x1020e, 5, 1, 0, 1, 2);
-    ANIMS_Register(0x1022d, 4, 1, 0, 1, 1);
-    ANIMS_Register(0x1018e, 0xe, 1, 0, 0, 0);
-    ANIMS_Register(0x1019c, 9, 1, 0, 0, 0);
-    ANIMS_Register(0x101a5, 9, 1, 0, 0, 0);
-    ANIMS_Register(0x101c7, 4, 1, 1, 0, 0);
-    ANIMS_Register(0x10252, 0x1a, 0, 0, 0, 0);
-    ANIMS_Register(0x1026c, 0x11, 0, 0, 0, 0);
-    ANIMS_Register(0x1018e, 0xe, 2, 0, 0, 0);
-    ANIMS_Register(0x10249, 4, 2, 1, 1, 0);
+    ANIMS_Register(FILE164_GEXPLO_BLK, 0x2a, 0, 0, 0, 0);
+    ANIMS_Register(FILE17d_BOOM_PIC, 0x23, 0, 0, 0, 0);
+    ANIMS_Register(FILE1f5_SPLAT_BLK, 7, 0, 0, 0, 0);
+    ANIMS_Register(FILE113_BIGSPLAT_BLK, 10, 0, 0, 0, 0);
+    ANIMS_Register(FILE1e5_LGFLAK_BLK, 0xc, 2, 0, 0, 0);
+    ANIMS_Register(FILE1d8_EXPLO2_BLK, 0xd, 0, 0, 0, 0);
+    ANIMS_Register(FILE1fc_SMFLAK_BLK, 0xe, 2, 0, 0, 0);
+    ANIMS_Register(FILE1a0_AIRBOOM_PIC, 0x10, 2, 0, 0, 0);
+    ANIMS_Register(FILE1ae_NRGBANG_BLK, 0xc, 2, 0, 0, 0);
+    ANIMS_Register(FILE129_LRBLST_BLK, 4, 2, 0, 0, 0);
+    ANIMS_Register(FILE10a_SSMOKE_BLK, 9, 1, 0, 0, 0);
+    ANIMS_Register(FILE10e_SSMOKE_BLK, 5, 1, 0, 1, 2);
+    ANIMS_Register(FILE12d_SMOKTRAL_BLK, 4, 1, 0, 1, 1);
+    ANIMS_Register(FILE18e_LGHTIN_BLK, 0xe, 1, 0, 0, 0);
+    ANIMS_Register(FILE19c_BSPARK_BLK, 9, 1, 0, 0, 0);
+    ANIMS_Register(FILE1a5_OSPARK_BLK, 9, 1, 0, 0, 0);
+    ANIMS_Register(FILE1c7_GUNSTR_BLK, 4, 1, 1, 0, 0);
+    ANIMS_Register(FILE152_FLARE_PIC, 0x1a, 0, 0, 0, 0);
+    ANIMS_Register(FILE16c_SPARKLE_PIC, 0x11, 0, 0, 0, 0);
+    ANIMS_Register(FILE18e_LGHTIN_BLK, 0xe, 2, 0, 0, 0);
+    ANIMS_Register(FILE149_SHIPGLOW_BLK, 4, 2, 1, 1, 0);
 }
 
 void ANIMS_CachePics(void)

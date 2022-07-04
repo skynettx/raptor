@@ -16,10 +16,11 @@
 #include "flame.h"
 #include "joyapi.h"
 #include "input.h"
+#include "fileids.h"
 
 int spriteflag[4];
 int spriteitm[4] = {
-    0x100fc, 0x20000, 0x30000, 0x40000
+     FILE1fc_SPRITE1_ITM, FILE200_SPRITE2_ITM, FILE300_SPRITE3_ITM, FILE400_SPRITE4_ITM
 };
 
 slib_t *slib[4];
