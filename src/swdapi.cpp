@@ -1336,7 +1336,7 @@ swd_t* SWD_ReformatFieldData(swd_t* v1c, int a1)
         swdfield[i].f_84 = swdfield32[i].f_84;
         swdfield[i].f_88 = swdfield32[i].f_88;
         swdfield[i].f_8c = swdfield32[i].f_8c;
-        if (swdfield32[i].f_0 == 1 || swdfield32[i].f_0 == 2 || swdfield32[i].f_0 == 3) {
+        if (swdfield32[i].f_0 == 1 || swdfield32[i].f_0 == 2 || swdfield32[i].f_0 == 3 || swdfield32[i].f_0 == 6) {
             swdfield[i].f_8c += (v1c->f_60 - i) * 4;
         }
     }
