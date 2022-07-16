@@ -71,7 +71,7 @@ void KeyOffEvent(unsigned int chan, unsigned int key)
 
 void KeyOnEvent(int chan, unsigned int key, unsigned int volume) 
 {
-    float velocity = volume; 
+    float velocity = (float)volume; 
     velocity /= 127;
   
     tsf_channel_note_on(g_TinySoundFont, MPU_MapChannel(chan), key, velocity);
@@ -95,7 +95,7 @@ void AllNotesOffEvent(unsigned int chan, unsigned int param)
 
 void SetChannelVolume(unsigned int chan, unsigned int param)
 {
-    float volume = param;
+    float volume = (float)param;
     volume /= 127;
    
     tsf_channel_set_volume(g_TinySoundFont, MPU_MapChannel(chan), volume);
@@ -104,7 +104,7 @@ void SetChannelVolume(unsigned int chan, unsigned int param)
 void SetChannelPan(unsigned int chan, unsigned int param)
 {
 
-    float pan = param;
+    float pan = (float)param;
     pan /= 127;
    
     tsf_channel_set_pan(g_TinySoundFont, MPU_MapChannel(chan), pan);
