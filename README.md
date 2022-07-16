@@ -2,7 +2,8 @@
 Based on the reverse-engineered codebase from Raptor Call Of The Shadows by nukeykt
 
 ## Media
-Click on the thumbnail to watch some videos showing the project in action. 
+Click on the thumbnail to watch some videos showing the project in action  
+
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Nt2HfchiudY/0.jpg)](https://www.youtube.com/channel/UCedmTTlonJK5DvkiMpA_teQ)
 ## Installing
 You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or fullversion.
@@ -116,7 +117,7 @@ to `fullscreen=1`. Or aspect ratio mode off `aspect_ratio_correct=1` to `aspect_
 
 ## Thanks
 Special thanks to [nukeykt](https://github.com/nukeykt) and [wel97459](https://github.com/wel97459) for their great work on the reconstructed source code.
-Also many thanks to [schellingb](https://github.com/schellingb) for the great TinySoundFont libary and to all contributors from the
+Also many thanks to [schellingb](https://github.com/schellingb) for the great TinySoundFont library and to all contributors from the
 [chocolate-doom project](https://github.com/chocolate-doom) for the awesome libtextscreen. Furthermore, many thanks to Tim Brechbill for the TimGM6mb
 soundfont.
 
