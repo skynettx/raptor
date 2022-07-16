@@ -86,6 +86,7 @@
     <ClCompile Include="..\src\movia_a.cpp" />
     <ClCompile Include="..\src\movie.cpp" />
     <ClCompile Include="..\src\mpuapi.cpp" />
+    <ClCompile Include="..\src\mputsf.cpp" />
     <ClCompile Include="..\src\musapi.cpp" />
     <ClCompile Include="..\src\m_misc.cpp" />
     <ClCompile Include="..\src\objects.cpp" />
@@ -174,7 +175,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\include\textscreen\include;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include\TinySoundFont;..\include\textscreen\include;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -195,7 +196,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\include\textscreen\include;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include\TinySoundFont;..\include\textscreen\include;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -216,7 +217,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\include\textscreen\include;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include\TinySoundFont;..\include\textscreen\include;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -235,7 +236,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\include\textscreen\include;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;C:\Users\Skynet\source\libs\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include\TinySoundFont;..\include\textscreen\include;..\include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;C:\Users\Skynet\source\libs\SDL2-devel-2.0.14-VC\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996;4703;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>

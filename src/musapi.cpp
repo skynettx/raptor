@@ -320,10 +320,14 @@ int MUS_Init(int card, int option)
     case CARD_MPU2:
     case CARD_MPU3:
     default:
-        #ifdef _WIN32
-        music_device = &mus_device_mpu;
-        #endif // _WIN32
-
+        if (sys_midi)
+        {
+            #ifdef _WIN32
+            music_device = &mus_device_mpu;
+            #endif // _WIN32
+        }
+        else
+        music_device = &mus_device_tsf;
         break;
     }
 

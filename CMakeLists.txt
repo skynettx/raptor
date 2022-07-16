@@ -12,6 +12,7 @@ find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(./src/)
 include_directories(./include/textscreen/include/)
+include_directories(./include/TinySoundFont/)
 
 add_subdirectory(./include/textscreen/include)
 add_executable(${CMAKE_PROJECT_NAME}
@@ -56,6 +57,7 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/loadsave.cpp
     src/enemy.cpp
     src/mpuapi.cpp
+    src/mputsf.cpp
 )
 
     target_link_libraries(raptor

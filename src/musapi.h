@@ -13,7 +13,7 @@ struct musdevice_t {
     void (*PitchBendEvent)(unsigned int chan, int bend);
 };
 
-extern musdevice_t mus_device_fm, mus_device_mpu;
+extern musdevice_t mus_device_fm, mus_device_mpu, mus_device_tsf;
 extern musdevice_t *music_device;
 
 
