@@ -1009,6 +1009,8 @@ int main(int argc, char *argv[])
     if (access(RAP_GetSetupPath(), 0))
     {
         printf("\n\n** You must run SETUP first! **\n");
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+            "Raptor", "** You must run SETUP first! **", NULL);
         exit(0);
     }
 
@@ -1063,6 +1065,8 @@ int main(int argc, char *argv[])
     if (access("FILE0000.GLB", 0) || !eps)
     {
         printf("All game data files NOT FOUND cannot proceed !!\n");
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+            "Raptor", "All game data files NOT FOUND cannot proceed !!", NULL);
         exit(0);
     }
     printf("Init -\n");

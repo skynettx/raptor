@@ -32,6 +32,8 @@ int Init (int option)
     if (!g_TinySoundFont)
     {
         fprintf(stderr, "Could not load SoundFont.sf2\n");
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+            "Raptor", "Could not load SoundFont.sf2", NULL);
         EXIT_Error("Could not load SoundFont.");
         return 0;
     }
