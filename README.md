@@ -86,7 +86,7 @@ The project supports the compilers msvc, gcc and clang.
 When you have installed git on your system you can clone the repository by type in `git clone https://github.com/skynettx/raptor.git`.
 
 ### Windows
-You can use the projectfile for Visual Studio 2019 under `msvc\` or the projectfile for CodeBlocks under `gcc\`.
+You can use the projectfile for Visual Studio 2022 under `msvc\` or the projectfile for CodeBlocks under `gcc\`.
 
 ### Linux
 Please remember to install the required dependencies lib-sdl2. In some distros there is an extra libsdl2-dev package like Debian or Ubuntu.  
