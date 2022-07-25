@@ -325,6 +325,10 @@ int MUS_Init(int card, int option)
             #ifdef _WIN32
             music_device = &mus_device_mpu;
             #endif // _WIN32
+            
+            #ifdef __linux__
+            music_device = &mus_device_alsa;
+            #endif // __linux__
         }
         else
         music_device = &mus_device_tsf;

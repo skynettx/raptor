@@ -23,7 +23,7 @@ int fx_freq = 44100;
 int music_song = -1;
 int fx_gus;
 int fx_channels;
-int sys_midi;
+int sys_midi, alsaclient, alsaport;
 
 enum {
     FXDEV_NONE = 0,
@@ -110,6 +110,8 @@ int SND_InitSound(void)
     music_volume = INI_GetPreferenceLong("Music", "Volume", 127);
     music_card = INI_GetPreferenceLong("Music", "CardType", CARD_NONE);
     sys_midi = INI_GetPreferenceLong("Setup", "sys_midi", 0);
+    alsaclient = INI_GetPreferenceLong("Setup", "alsa_output_client", 128);
+    alsaport = INI_GetPreferenceLong("Setup", "alsa_output_port", 0);
 
     switch (music_card)
     {

@@ -58,11 +58,19 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/enemy.cpp
     src/mpuapi.cpp
     src/mputsf.cpp
+    src/mpualsa.cpp
 )
-
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    target_link_libraries(raptor
+        textscreen
+        asound
+        SDL2::SDL2
+        SDL2::SDL2main
+        )
+else()
     target_link_libraries(raptor
         textscreen
         SDL2::SDL2
         SDL2::SDL2main
         )
-
+endif()

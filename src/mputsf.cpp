@@ -17,7 +17,7 @@ void AudioCallback(void* data, uint8_t* stream, int len)
     tsf_render_short(g_TinySoundFont, (short*)stream, SampleCount, 0);
 }
 
-int Init (int option)
+int TSF_Init (int option)
 {
     SDL_AudioSpec OutputAudioSpec;
     OutputAudioSpec.freq = 44100;
@@ -52,7 +52,7 @@ int Init (int option)
     return 1;
 }
 
-void DeInit(void) 
+void TSF_DeInit(void) 
 {
     tsf_close(g_TinySoundFont);
 }
@@ -66,12 +66,12 @@ static unsigned int MPU_MapChannel(unsigned chan)
     return chan +1;
 }
 
-void KeyOffEvent(unsigned int chan, unsigned int key)
+static void KeyOffEvent(unsigned int chan, unsigned int key)
 {
     tsf_channel_note_off(g_TinySoundFont, MPU_MapChannel(chan), key);
 }
 
-void KeyOnEvent(int chan, unsigned int key, unsigned int volume) 
+static void KeyOnEvent(int chan, unsigned int key, unsigned int volume) 
 {
     float velocity = (float)volume; 
     velocity /= 127;
@@ -79,23 +79,23 @@ void KeyOnEvent(int chan, unsigned int key, unsigned int volume)
     tsf_channel_note_on(g_TinySoundFont, MPU_MapChannel(chan), key, velocity);
 }
 
-void PitchBendEvent(unsigned int chan, int bend) 
+static void PitchBendEvent(unsigned int chan, int bend) 
 {
     tsf_channel_set_pitchwheel(g_TinySoundFont, MPU_MapChannel(chan), bend);
 }
 
-void ProgramEvent(unsigned int chan, unsigned int param)
+static void ProgramEvent(unsigned int chan, unsigned int param)
 {
     tsf_channel_set_bank_preset(g_TinySoundFont, 9, 128, 0);
     tsf_channel_set_presetindex(g_TinySoundFont, MPU_MapChannel(chan), param);
 }
 
-void AllNotesOffEvent(unsigned int chan, unsigned int param)
+static void AllNotesOffEvent(unsigned int chan, unsigned int param)
 {
     tsf_note_off_all(g_TinySoundFont);
 }
 
-void SetChannelVolume(unsigned int chan, unsigned int param)
+static void SetChannelVolume(unsigned int chan, unsigned int param)
 {
     float volume = (float)param;
     volume /= 127;
@@ -103,7 +103,7 @@ void SetChannelVolume(unsigned int chan, unsigned int param)
     tsf_channel_set_volume(g_TinySoundFont, MPU_MapChannel(chan), volume);
 }
 
-void SetChannelPan(unsigned int chan, unsigned int param)
+static void SetChannelPan(unsigned int chan, unsigned int param)
 {
 
     float pan = (float)param;
@@ -112,7 +112,7 @@ void SetChannelPan(unsigned int chan, unsigned int param)
     tsf_channel_set_pan(g_TinySoundFont, MPU_MapChannel(chan), pan);
 }
 
-void ControllerEvent(unsigned int chan, unsigned int controller, unsigned int param)
+static void ControllerEvent(unsigned int chan, unsigned int controller, unsigned int param)
 {
     
     static int event_map[] = {          
@@ -150,8 +150,8 @@ void ControllerEvent(unsigned int chan, unsigned int controller, unsigned int pa
 }
 
 musdevice_t mus_device_tsf = {
-    Init,
-    DeInit,
+    TSF_Init,
+    TSF_DeInit,
     NULL,
 
     KeyOffEvent,

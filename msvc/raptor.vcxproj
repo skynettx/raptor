@@ -85,6 +85,7 @@
     <ClCompile Include="..\src\loadsave.cpp" />
     <ClCompile Include="..\src\movia_a.cpp" />
     <ClCompile Include="..\src\movie.cpp" />
+    <ClCompile Include="..\src\mpualsa.cpp" />
     <ClCompile Include="..\src\mpuapi.cpp" />
     <ClCompile Include="..\src\mputsf.cpp" />
     <ClCompile Include="..\src\musapi.cpp" />
