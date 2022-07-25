@@ -79,9 +79,9 @@ input modes, set under the [Setup] section in the `SETUP.INI` file:
 `joy_ipt_MenuNew=1`  
 System Midi support (only Windows Multimedia and Linux ALSA at the moment) can be switched off or on in the [Setup] section in the `SETUP.INI` file:  
 `sys_midi=0`  
-`sys_midi=1` 
+`sys_midi=1`  
 For ALSA Midi support on Linux, install timidity and soundfont-fluid from the packagemanager of your distro. When timidity is running
-get the timidity client and port with `aplaymidi -l` and set it in the [Setup] section in the `SETUP.INI` file:
+get the timidity client and port with `aplaymidi -l` and set it in the [Setup] section in the `SETUP.INI` file:  
 `alsa_output_client=128`  
 `alsa_output_port=0`  
 
