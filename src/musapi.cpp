@@ -329,6 +329,10 @@ int MUS_Init(int card, int option)
             #ifdef __linux__
             music_device = &mus_device_alsa;
             #endif // __linux__
+            
+            #ifdef __APPLE__
+            music_device = &mus_device_core;
+            #endif // __APPLE__
         }
         else
         music_device = &mus_device_tsf;

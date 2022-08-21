@@ -77,7 +77,7 @@ If you want to turn off the menu pointer control via the joystick in mode `Contr
 input modes, set under the [Setup] section in the `SETUP.INI` file:  
 `joy_ipt_MenuNew=0`  
 `joy_ipt_MenuNew=1`  
-System Midi support (only Windows Multimedia and Linux ALSA at the moment) can be switched off or on in the [Setup] section in the `SETUP.INI` file:  
+System Midi support (Windows Multimedia, Linux ALSA and macOS CoreAudio) can be switched off or on in the [Setup] section in the `SETUP.INI` file:  
 `sys_midi=0`  
 `sys_midi=1`  
 For ALSA Midi support on Linux, install timidity and soundfont-fluid from the packagemanager of your distro. When timidity is running
