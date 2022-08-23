@@ -28,31 +28,31 @@ extern int playerbasepic;
 extern char* LASTSCR;
 
 struct player_t {
-    char f_0[20];
-    char f_14[12];
-    int f_20;
-    unsigned int f_24;
-    int f_28;
-    int f_2c;
-    int f_30[3];
-    int f_3c;
-    int f_40[4];
+    char name[20];
+    char callsign[12];
+    int pilotPicId;
+    unsigned int money;
+    int currentWeapon;
+    int currentGame;
+    int waveGameLevel[3];
+    int amountOfItems;
+    int waveProgression[4];
     int f_50;
     int f_54;
 };
 
 struct mobj_t {
-    int f_0;
-    int f_4;
-    int f_8;
-    int f_c;
-    int f_10;
-    int f_14;
-    int f_18;
-    int f_1c;
-    int f_20;
+    int x;
+    int y;
+    int dirX;
+    int dirY;
+    int max_x;
+    int max_y;
+    int dir_x;
+    int dir_y;
+    int triggerDelay;
     int f_24;
-    int f_28;
+    int trigger;
 };
 
 struct flat_t {
@@ -62,7 +62,7 @@ struct flat_t {
 };
 
 extern flat_t *flatlib[4];
-extern player_t plr;
+extern player_t player;
 
 int wrand(void);
 

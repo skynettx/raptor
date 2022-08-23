@@ -33,13 +33,13 @@ int demo_wave;
 
 void DEMO_MakePlayer(int a1)
 {
-    memset(&plr, 0, sizeof(plr));
+    memset(&player, 0, sizeof(player));
 
-    plr.f_28 = -1;
-    plr.f_40[0] = 3;
-    plr.f_40[1] = 3;
-    plr.f_40[2] = 3;
-    plr.f_20 = 0;
+    player.currentWeapon = -1;
+    player.waveProgression[0] = 3;
+    player.waveProgression[1] = 3;
+    player.waveProgression[2] = 3;
+    player.pilotPicId = 0;
     RAP_SetPlayerDiff();
     OBJS_Add(0);
     OBJS_Add(16);
@@ -47,7 +47,7 @@ void DEMO_MakePlayer(int a1)
     OBJS_Add(16);
     OBJS_Add(16);
     OBJS_Add(17);
-    plr.f_24 = 10000;
+    player.money = 10000;
     switch (a1)
     {
     default:
@@ -69,7 +69,7 @@ void DEMO_MakePlayer(int a1)
         OBJS_Add(2);
         OBJS_Add(5);
         OBJS_Add(8);
-        plr.f_24 += 0x50003;
+        player.money += 0x50003;
         break;
     case 2:
         OBJS_Add(11);
@@ -81,7 +81,7 @@ void DEMO_MakePlayer(int a1)
         OBJS_Add(2);
         OBJS_Add(13);
         OBJS_Add(8);
-        plr.f_24 += 0xd5fff;
+        player.money += 0xd5fff;
         break;
     }
     OBJS_GetNext();
@@ -118,11 +118,11 @@ void DEMO_SetFileName(const char *a1)
 
 void DEMO_GLBFile(int a1)
 {
-    char *demo;
-    demo = GLB_GetItem(a1);
+    char *demo = GLB_GetItem(a1);
+    int size = GLB_GetItemSize(a1);
     if (demo)
     {
-        memcpy(playback, demo, sizeof(playback));
+        memcpy(playback, demo, size);
         cur_play = 1;
         max_play = playback[0].f_8;
         demo_game = playback[0].f_4;

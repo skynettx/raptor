@@ -184,6 +184,8 @@ void MUS_Reset(void)
                     newvol = music_currentvol;
                 music_device->ControllerEvent(i, 3, newvol);
             }
+            if (music_device && music_device->AllNotesOffEvent)
+                music_device->AllNotesOffEvent(i,0);
     }
 }
 
@@ -200,88 +202,118 @@ void MUS_Service(void)
             int chan = cmd & 15;
             switch ((cmd >> 4) & 7)
             {
-            case 0:
-            {
-                uint8_t key = music_ptr[music_cmdptr + music_startoffset] & 127;
-                music_cmdptr++;
-                if (music_device && music_device->KeyOffEvent)
-                    music_device->KeyOffEvent(chan, key);
-                break;
-            }
-            case 1:
-            {
-                uint8_t key = music_ptr[music_cmdptr + music_startoffset];
-                music_cmdptr++;
-                uint8_t vol = music_chanvel[chan];
-                if (key & 128)
+                case 0:
                 {
-                    vol = music_ptr[music_cmdptr + music_startoffset];
+                    uint8_t key = music_ptr[music_cmdptr + music_startoffset] & 127;
+                    //printf("KeyOff: cmd:0x%02x, key:0x%02x\n", cmd, key);
                     music_cmdptr++;
-                    music_chanvel[chan] = vol;
-                    key &= ~128;
+                    if (music_device && music_device->KeyOffEvent)
+                        music_device->KeyOffEvent(chan, key);
+                    break;
                 }
-                if (music_device && music_device->KeyOnEvent)
-                    music_device->KeyOnEvent(chan, key, vol);
-                break;
-            }
-            case 2:
-            {
-                uint8_t bend = music_ptr[music_cmdptr + music_startoffset];
-                music_cmdptr++;
-                if (music_device && music_device->PitchBendEvent)
-                    music_device->PitchBendEvent(chan, bend);
-                break;
-            }
-            case 3:
-            {
-                uint8_t cmd = music_ptr[music_cmdptr + music_startoffset];
-                music_cmdptr++;
-                if (music_device && music_device->ControllerEvent)
-                    music_device->ControllerEvent(chan, cmd, 0);
-                break;
-            }
-            case 4:
-            {
-                uint8_t cmd = music_ptr[music_cmdptr + music_startoffset];
-                music_cmdptr++;
-                uint8_t param = music_ptr[music_cmdptr + music_startoffset];
-                music_cmdptr++;
-                if (cmd == 3) // Volume
+                case 1:
                 {
-                    music_chanvol2[chan] = param;
-                    if (param > music_currentvol)
-                        param = music_currentvol;
-                    if (param > music_vol)
-                        param = music_vol;
-                    music_chanvol[chan] = param;
+                    uint8_t key = music_ptr[music_cmdptr + music_startoffset];
+                    music_cmdptr++;
+                    uint8_t vol = music_chanvel[chan];
+                    if (key & 128)
+                    {
+                        vol = music_ptr[music_cmdptr + music_startoffset];
+                        //printf("KeyOn: cmd:0x%02x, key:0x%02x, vol:0x%02x\n", cmd, key, vol);
+                        music_cmdptr++;
+                        music_chanvel[chan] = vol;
+                        key &= ~128;
+                    }else{
+                        //printf("KeyOn: cmd:0x%02x, key:0x%02x\n", cmd, key);
+                    }
+                    if (music_device && music_device->KeyOnEvent)
+                        music_device->KeyOnEvent(chan, key, vol);
+                    break;
                 }
-                if (music_device && music_device->ControllerEvent)
-                    music_device->ControllerEvent(chan, cmd, param);
-                if (cmd == 14) // Restore volume setting
+                case 2:
                 {
-                    param = music_chanvel[chan];
-                    if (param > music_currentvol)
-                        param = music_currentvol;
-                    if (param > music_vol)
-                        param = music_vol;
+                    uint8_t bend = music_ptr[music_cmdptr + music_startoffset];
+                    //printf("Bend: cmd:0x%03u, bend:0x%03u\n", cmd, bend);
+                    music_cmdptr++;
+                    if (music_device && music_device->PitchBendEvent)
+                        music_device->PitchBendEvent(chan, bend);
+                    break;
+                }
+                case 3:
+                {
+                    uint8_t cmd = music_ptr[music_cmdptr + music_startoffset];
+                    music_cmdptr++;
                     if (music_device && music_device->ControllerEvent)
-                        music_device->ControllerEvent(chan, 3, param);
+                        music_device->ControllerEvent(chan, cmd, 0);
+                    break;
                 }
-                break;
-            }
-            case 6:
-            {
-                if (music_loop)
+                case 4:
                 {
-                    MUS_Reset();
+                    uint8_t cmd = music_ptr[music_cmdptr + music_startoffset];
+                    music_cmdptr++;
+                    uint8_t param = music_ptr[music_cmdptr + music_startoffset];
+                    music_cmdptr++;
+
+                    switch (cmd)
+                    {
+                        case 0: // Program Channel
+                            if(music_device && music_device->ProgramEvent)
+                                music_device->ProgramEvent(chan, param);
+                            break;
+                        case 3: // Volume
+                            music_chanvol2[chan] = param;
+                            if (param > music_currentvol)
+                                param = music_currentvol;
+                            if (param > music_vol)
+                                param = music_vol;
+                            music_chanvol[chan] = param;
+                            if (music_device && music_device->ControllerEvent)
+                                music_device->ControllerEvent(chan, cmd, param);
+                            break;
+                        case 4: //SetChannelPan
+                            if (music_device && music_device->ControllerEvent)
+                                music_device->ControllerEvent(chan, cmd, param);
+                            break;
+                        case 10:
+                        case 11:
+                            if (music_device && music_device->AllNotesOffEvent)
+                                music_device->AllNotesOffEvent(chan, param);
+                            break;
+                        case 12:
+                        case 13:
+                            // TODO: mono/poly mode
+                            break;
+                        case 14: // Restore volume setting
+                            if (music_device && music_device->AllNotesOffEvent)
+                                music_device->AllNotesOffEvent(chan, param);
+
+                            param = music_chanvel[chan];
+                            if (param > music_currentvol)
+                                param = music_currentvol;
+                            if (param > music_vol)
+                                param = music_vol;
+                            if (music_device && music_device->ControllerEvent)
+                                music_device->ControllerEvent(chan, 3, param);
+                                break;
+
+                        default:
+                            break;
+                    }
+                    break;
                 }
-                else
+                case 6:
                 {
-                    music_active = 0;
-                    return;
+                    if (music_loop)
+                    {
+                        MUS_Reset();
+                    }
+                    else
+                    {
+                        music_active = 0;
+                        return;
+                    }
+                    break;
                 }
-                break;
-            }
             }
             if (cmd & 128)
             {
@@ -342,6 +374,9 @@ int MUS_Init(int card, int option)
     if (music_device && music_device->Init)
         music_device->Init(option);
 
+    if (music_device && music_device->AllNotesOffEvent)
+        music_device->AllNotesOffEvent(0,0);
+
     music_timer = SDL_GetTicks();
     music_init = 1;
     return 1;
@@ -351,7 +386,12 @@ void MUS_DeInit(void)
 {
     if (!music_init)
         return;
-
+    for (int i = 0; i < 16; i++)
+    {
+        if (music_device && music_device->AllNotesOffEvent)
+            music_device->AllNotesOffEvent(i,0);
+    }
+    
     music_init = 0;
     music_active = 0;
     music_ptr = NULL;
@@ -408,6 +448,8 @@ void MUS_StopSong(int fadeout)
             music_device->ControllerEvent(i, 10, 0);
             music_device->ControllerEvent(i, 11, 0);
         }
+        if (music_device && music_device->AllNotesOffEvent)
+            music_device->AllNotesOffEvent(i,0);
     }
     music_ptr = NULL;
     SND_Unlock();

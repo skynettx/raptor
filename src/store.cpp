@@ -19,7 +19,7 @@
 
 static int window;
 int buy_count, s_count;
-int b_items[24], s_items[24];
+int buy_items[24], sell_items[24];
 int id_pics[4] = {
     FILE111_WMALE_PIC, FILE114_BMALE_PIC, FILE112_WFEMALE_PIC, FILE113_BFEMALE_PIC
 };
@@ -65,12 +65,12 @@ int MakeBuyItems(void)
 {
     int i, v24, v28, v2c, v20;
     buy_count = 0;
-    memset(b_items, 0, sizeof(b_items));
+    memset(buy_items, 0, sizeof(buy_items));
     for (i = 0; i < 18; i++)
     {
         if (OBJS_CanBuy(i))
         {
-            b_items[buy_count] = i;
+            buy_items[buy_count] = i;
             buy_count++;
         }
     }
@@ -81,14 +81,14 @@ int MakeBuyItems(void)
             v24 = 0;
             for (i = 0; i < buy_count - 1; i++)
             {
-                v28 = OBJS_GetCost(b_items[i]);
-                v2c = OBJS_GetCost(b_items[i+1]);
+                v28 = OBJS_GetCost(buy_items[i]);
+                v2c = OBJS_GetCost(buy_items[i+1]);
                 if (v28 > v2c)
                 {
                     v24 = 1;
-                    v20 = b_items[i];
-                    b_items[i] = b_items[i + 1];
-                    b_items[i + 1] = v20;
+                    v20 = buy_items[i];
+                    buy_items[i] = buy_items[i + 1];
+                    buy_items[i + 1] = v20;
                 }
             }
         } while (v24);
@@ -99,13 +99,13 @@ int MakeBuyItems(void)
 int MakeSellItems(void)
 {
     int i, v24, v28, v2c, v20;
-    memset(s_items, 0, sizeof(s_items));
+    memset(sell_items, 0, sizeof(sell_items));
     s_count = 0;
     for (i = 0; i < 18; i++)
     {
         if (OBJS_CanSell(i))
         {
-            s_items[s_count] = i;
+            sell_items[s_count] = i;
             s_count++;
         }
     }
@@ -116,14 +116,14 @@ int MakeSellItems(void)
             v24 = 0;
             for (i = 0; i < s_count - 1; i++)
             {
-                v28 = OBJS_GetCost(s_items[i]);
-                v2c = OBJS_GetCost(s_items[i+1]);
+                v28 = OBJS_GetCost(sell_items[i]);
+                v2c = OBJS_GetCost(sell_items[i+1]);
                 if (v28 > v2c)
                 {
                     v24 = 1;
-                    v20 = s_items[i];
-                    s_items[i] = s_items[i + 1];
-                    s_items[i + 1] = v20;
+                    v20 = sell_items[i];
+                    sell_items[i] = sell_items[i + 1];
+                    sell_items[i + 1] = v20;
                 }
             }
         } while (v24);
@@ -180,12 +180,12 @@ void STORE_Enter(void)
     GFX_FadeOut(0, 0, 0, 5);
     g_button_flag = 0;
     window = SWD_InitMasterWindow(FILE131_STORE_SWD);
-    SWD_SetFieldItem(window, 0, id_pics[plr.f_20]);
+    SWD_SetFieldItem(window, 0, id_pics[player.pilotPicId]);
     SWD_SetFieldItem(window, 5, mainbut[mode]);
     SWD_GetFieldText(window, 11, yh_hold);
     SWD_SetFieldText(window, 11, NULL);
-    SWD_SetFieldText(window, 1, plr.f_14);
-    sprintf(v70, "%07d", plr.f_24);
+    SWD_SetFieldText(window, 1, player.callsign);
+    sprintf(v70, "%07d", player.money);
     SWD_SetFieldText(window, 10, v70);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
@@ -240,7 +240,7 @@ void STORE_Enter(void)
                 cur_item = 0;
             if (mode == 0)
             {
-                v2c = b_items[cur_item];
+                v2c = buy_items[cur_item];
                 SWD_SetFieldItem(window, 4, buybut[0]);
                 SWD_SetFieldItem(window, 6, sellbut[1]);
                 v34 = OBJS_GetCost(v2c);
@@ -253,7 +253,7 @@ void STORE_Enter(void)
             }
             else
             {
-                v2c = s_items[cur_item];
+                v2c = sell_items[cur_item];
                 SWD_SetFieldItem(window, 4, buybut[1]);
                 SWD_SetFieldItem(window, 6, sellbut[0]);
                 v34 = OBJS_GetResale(v2c);
@@ -268,7 +268,7 @@ void STORE_Enter(void)
             SWD_SetFieldText(window, 12, saying[mode]);
             SWD_SetFieldText(window, 13, v70);
             SWD_SetFieldText(window, 9, va4);
-            sprintf(v70, "%07d", plr.f_24);
+            sprintf(v70, "%07d", player.money);
             SWD_SetFieldText(window, 10, v70);
             SWD_SetFieldItem(window, 5, FILE134_BUYITEM_PIC);
             if (v2c < 24)
@@ -515,7 +515,7 @@ void STORE_Enter(void)
             case 5:
                 if (mode == 0)
                 {
-                    v2c = b_items[cur_item];
+                    v2c = buy_items[cur_item];
                     switch (OBJS_Buy(v2c))
                     {
                     case 0:
@@ -536,20 +536,20 @@ void STORE_Enter(void)
                     MakeBuyItems();
                     for (v38 = 0; v38 < buy_count; v38++)
                     {
-                        if (b_items[v38] == v2c)
+                        if (buy_items[v38] == v2c)
                             cur_item = v38;
                         break;
                     }
                 }
                 else
                 {
-                    v2c = s_items[cur_item];
+                    v2c = sell_items[cur_item];
                     OBJS_Sell(v2c);
                     MakeSellItems();
                     SND_Patch(20, 127);
                     for (v38 = 0; v38 < s_count; v38++)
                     {
-                        if (s_items[v38] == v2c)
+                        if (sell_items[v38] == v2c)
                             cur_item = v38;
                         break;
                     }

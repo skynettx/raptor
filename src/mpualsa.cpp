@@ -101,14 +101,15 @@ static void KeyOffEvent(unsigned int chan, unsigned int key)
 	int err;
 	snd_seq_ev_set_noteoff(&ev, MPU_MapChannel(chan), key, 0);
 	err = snd_seq_event_output_direct(seq, &ev);
+	printf("KeyOffEvent\n");
 	check_snd("KeyOffEvent", err);
-
 }
 
 static void KeyOnEvent(int chan, unsigned int key, unsigned int volume) {
 	int err;
 	snd_seq_ev_set_noteon(&ev, MPU_MapChannel(chan), key, volume);
 	err = snd_seq_event_output_direct(seq, &ev);
+	printf("KeyOnEvent\n");
 	check_snd("KeyOnEvent", err);
 }
 
@@ -116,7 +117,8 @@ static void ProgramEvent(unsigned int chan, unsigned int param) {
 	int err;
 	snd_seq_ev_set_pgmchange(&ev, MPU_MapChannel(chan), param);
 	err = snd_seq_event_output_direct(seq, &ev);
-	check_snd("ControllerEvent", err);
+	check_snd("ProgramEvent", err);
+	printf("ProgramEvent\n");
 }
 
 static void PitchBendEvent(unsigned int chan, int bend) {
@@ -124,13 +126,15 @@ static void PitchBendEvent(unsigned int chan, int bend) {
 	snd_seq_ev_set_pitchbend(&ev, MPU_MapChannel(chan), bend);
 	err = snd_seq_event_output_direct(seq, &ev);
 	check_snd("PitchBendEvent", err);
+	printf("PitchBendEvent\n");
 }
 
 static void AllNotesOffEvent(unsigned int chan, unsigned int param) {
 	int err;
 	snd_seq_ev_set_pgmchange(&ev, chan, param);
 	err = snd_seq_event_output_direct(seq, &ev);
-	check_snd("PitchBendEvent", err);
+	check_snd("AllNotesOffEvent", err);
+	printf("AllNotesOffEvent\n");
 }
 
 static void ControllerEvent(unsigned int chan, unsigned int controller, unsigned int param)
@@ -141,29 +145,10 @@ static void ControllerEvent(unsigned int chan, unsigned int controller, unsigned
 	};
 	int err;
 	
-	switch (controller)
-	{
-	case 0:
-		ProgramEvent(MPU_MapChannel(chan), param);
-		break;
-	case 10:
-	case 11:
-		AllNotesOffEvent(MPU_MapChannel(chan), param);
-		break;
-	case 12:
-	case 13:
-		// TODO: mono/poly mode
-		break;
-	case 14:
-		AllNotesOffEvent(MPU_MapChannel(chan), param);
-		break;
-	default:
-		break;
-	}
-	
 	snd_seq_ev_set_controller(&ev, MPU_MapChannel(chan), event_map[controller], param);
 	err = snd_seq_event_output_direct(seq, &ev);
 	check_snd("ControllerEvent", err);
+	printf("ControllerEvent\n");
 }
 
 musdevice_t mus_device_alsa = {
@@ -175,5 +160,7 @@ musdevice_t mus_device_alsa = {
     KeyOnEvent,
     ControllerEvent,
     PitchBendEvent,
+	ProgramEvent,
+	AllNotesOffEvent,
 };
 #endif

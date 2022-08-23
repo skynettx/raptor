@@ -88,7 +88,7 @@ texture_t *numbers[11];
 
 char gdmodestr[] = "CASTLE";
 
-player_t plr;
+player_t player;
 
 char* g_highmem;
 char* LASTSCR;
@@ -271,79 +271,79 @@ void Rot_Color(char *a1, int a2, int a3)
 
 void InitMobj(mobj_t *m)
 {
-    m->f_28 = 0;
-    m->f_18 = 1;
-    m->f_1c = 1;
-    m->f_10 = m->f_8 - m->f_0;
-    m->f_14 = m->f_c - m->f_4;
-    if (m->f_10 < 0)
+    m->trigger = 0;
+    m->dir_x = 1;
+    m->dir_y = 1;
+    m->max_x = m->dirX - m->x;
+    m->max_y = m->dirY - m->y;
+    if (m->max_x < 0)
     {
-        m->f_10 = -m->f_10;
-        m->f_18 = -m->f_18;
+        m->max_x = -m->max_x;
+        m->dir_x = -m->dir_x;
     }
-    if (m->f_14 < 0)
+    if (m->max_y < 0)
     {
-        m->f_14 = -m->f_14;
-        m->f_1c = -m->f_1c;
+        m->max_y = -m->max_y;
+        m->dir_y = -m->dir_y;
     }
-    if (m->f_10 >= m->f_14)
+    if (m->max_x >= m->max_y)
     {
-        m->f_24 = -(m->f_14 >> 1);
-        m->f_20 = m->f_10 + 1;
+        m->f_24 = -(m->max_y >> 1);
+        m->triggerDelay = m->max_x + 1;
     }
     else
     {
-        m->f_24 = m->f_10 >> 1;
-        m->f_20 = m->f_14 + 1;
+        m->f_24 = m->max_x >> 1;
+        m->triggerDelay = m->max_y + 1;
     }
 }
 
 void MoveMobj(mobj_t *m)
 {
-    if (m->f_20 == 0)
+    if (m->triggerDelay == 0)
     {
-        m->f_28 = 1;
+        m->trigger = 1;
         return;
     }
-    if (m->f_10 >= m->f_14)
+    if (m->max_x >= m->max_y)
     {
-        m->f_0 += m->f_18;
-        m->f_24 += m->f_14;
+        m->x += m->dir_x;
+        m->f_24 += m->max_y;
         if (m->f_24 > 0)
         {
-            m->f_4 += m->f_1c;
-            m->f_24 -= m->f_10;
+            m->y += m->dir_y;
+            m->f_24 -= m->max_x;
         }
     }
     else
     {
-        m->f_4 += m->f_1c;
-        m->f_24 += m->f_10;
+        m->y += m->dir_y;
+        m->f_24 += m->max_x;
         if (m->f_24 > 0)
         {
-            m->f_0 += m->f_18;
-            m->f_24 -= m->f_14;
+            m->x += m->dir_x;
+            m->f_24 -= m->max_y;
         }
     }
-    m->f_20--;
+    m->triggerDelay--;
 }
 
 int MoveSobj(mobj_t *m, int a2)
 {
     if (a2 == 0)
         return 0;
-    if (m->f_10 >= m->f_14)
+    if (m->max_x >= m->max_y)
     {
         while (a2)
         {
             a2--;
-            m->f_20--;
-            m->f_0 += m->f_18;
-            m->f_24 += m->f_14;
+            m->triggerDelay--;
+            m->x += m->dir_x;
+            m->f_24 += m->max_y;
             if (m->f_24 > 0)
             {
-                m->f_4 += m->f_1c;
-                m->f_24 -= m->f_10;
+                m->y += m->dir_y;
+                m->f_24 -= m->max_x;
             }
         }
     }
@@ -352,18 +352,18 @@ int MoveSobj(mobj_t *m, int a2)
         while (a2)
         {
             a2--;
-            m->f_20--;
-            m->f_4 += m->f_1c;
-            m->f_24 += m->f_10;
+            m->triggerDelay--;
+            m->y += m->dir_y;
+            m->f_24 += m->max_x;
             if (m->f_24 > 0)
             {
-                m->f_0 += m->f_18;
-                m->f_24 -= m->f_14;
+                m->x += m->dir_x;
+                m->f_24 -= m->max_y;
             }
         }
     }
-    if (m->f_20 < 1)
-        m->f_28 = 1;
+    if (m->triggerDelay < 1)
+        m->trigger = 1;
     return a2;
 }
 
@@ -512,13 +512,13 @@ void RAP_DisplayStats(void)
     }
     g_oldshield = v20;
     OBJS_DisplayStats();
-    sprintf(v4c, "%08u", plr.f_24);
+    sprintf(v4c, "%08u", player.money);
     RAP_PrintNum(0x77, 2, v4c);
     if (demo_mode == 1)
         DEMO_DisplayStats();
     if (debugflag)
     {
-        sprintf(v4c, "%02u", plr.f_40[cur_game]);
+        sprintf(v4c, "%02u", player.waveProgression[cur_game]);
         RAP_PrintNum(0x12, 2, v4c);
         v1c = 32;
         for (i = 0; i < 16; i++)
@@ -678,7 +678,7 @@ int Do_Game(void)
     if (demo_flag == 1)
         DEMO_StartRec();
 
-    v30 = plr.f_24;
+    v30 = player.money;
     IMS_StartAck();
     memset(buttons, 0, sizeof(buttons));
     do
@@ -790,8 +790,8 @@ int Do_Game(void)
             OBJS_Use(1);
             OBJS_Use(2);
             buttons[0] = 0;
-            if (plr.f_28 != -1)
-                OBJS_Use(plr.f_28);
+            if (player.currentWeapon != -1)
+                OBJS_Use(player.currentWeapon);
         }
         if (buttons[1])
         {
@@ -909,7 +909,7 @@ int Do_Game(void)
             OBJS_Add(16);
             OBJS_Add(16);
             OBJS_Add(16);
-            plr.f_24 = 0;
+            player.money = 0;
         }
         if (v28)
         {
@@ -947,7 +947,7 @@ int Do_Game(void)
                 RAP_ClearSides();
                 if (WIN_AskBool("Abort Mission ?"))
                 {
-                    plr.f_24 = v30;
+                    player.money = v30;
                     v2c = 1;
                     break;
                 }

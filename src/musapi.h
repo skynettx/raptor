@@ -11,6 +11,8 @@ struct musdevice_t {
     void (*KeyOnEvent)(int chan, unsigned int key, unsigned int volume);
     void (*ControllerEvent)(unsigned int chan, unsigned int controller, unsigned int param);
     void (*PitchBendEvent)(unsigned int chan, int bend);
+    void (*ProgramEvent)(unsigned int chan, unsigned int param);
+    void (*AllNotesOffEvent)(unsigned int chan, unsigned int param);
 };
 
 extern musdevice_t mus_device_fm, mus_device_mpu, mus_device_tsf, mus_device_alsa, mus_device_core;

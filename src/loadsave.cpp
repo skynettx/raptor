@@ -53,7 +53,7 @@ char *ml;
 void RAP_SetPlayerDiff(void)
 {
     cur_diff = 0;
-    curplr_diff = plr.f_40[cur_game];
+    curplr_diff = player.waveProgression[cur_game];
     switch (curplr_diff)
     {
     case 0:
@@ -79,13 +79,13 @@ void RAP_ClearPlayer(void)
 {
     OBJS_Clear();
     filepos = -1;
-    memset(&plr, 0, sizeof(plr));
-    plr.f_28 = -1;
-    plr.f_40[0] = 2;
-    plr.f_40[1] = 2;
-    plr.f_40[2] = 2;
-    plr.f_40[3] = 2;
-    plr.f_54 = 0;
+    memset(&player, 0, sizeof(player));
+    player.currentWeapon = -1;
+    player.waveProgression[0] = 2;
+    player.waveProgression[1] = 2;
+    player.waveProgression[2] = 2;
+    player.waveProgression[3] = 2;
+    player.f_54 = 0;
     cur_game = 0;
     memset(game_wave, 0, sizeof(game_wave));
 }
@@ -169,7 +169,7 @@ int RAP_IsSaveFile(player_t *a1)
         {
             fread(&vb0, 1, sizeof(vb0), v20);
             fclose(v20);
-            if (!strcmp(vb0.f_0, a1->f_0) && !strcmp(vb0.f_14, a1->f_14))
+            if (!strcmp(vb0.name, a1->name) && !strcmp(vb0.callsign, a1->callsign))
             {
                 v1c = 1;
                 break;
@@ -190,7 +190,7 @@ int RAP_LoadPlayer(void)
     if (filepos == -1)
         return 0;
     OBJS_Clear();
-    memset(&plr, 0, sizeof(plr));
+    memset(&player, 0, sizeof(player));
     if (hasdatapath)
         sprintf(v6c, fmt2, g_data_path, filepos);
     else
@@ -201,9 +201,9 @@ int RAP_LoadPlayer(void)
         WIN_Msg("Load Player Error");
         return 0;
     }
-    fread(&plr, 1, sizeof(plr), v20);
-    GLB_DeCrypt(gdmodestr, &plr, sizeof(plr));
-    for (v24 = 0; v24 < plr.f_3c; v24++)
+    fread(&player, 1, sizeof(player), v20);
+    GLB_DeCrypt(gdmodestr, &player, sizeof(player));
+    for (v24 = 0; v24 < player.amountOfItems; v24++)
     {
         fread(&v40, 1, sizeof(v40), v20);
         GLB_DeCrypt(gdmodestr, &v40, sizeof(v40));
@@ -211,11 +211,11 @@ int RAP_LoadPlayer(void)
             break;
     }
     fclose(v20);
-    cur_game = plr.f_2c;
-    game_wave[0] = plr.f_30[0];
-    game_wave[1] = plr.f_30[1];
-    game_wave[2] = plr.f_30[2];
-    if (!OBJS_IsEquip(plr.f_28))
+    cur_game = player.currentGame;
+    game_wave[0] = player.waveGameLevel[0];
+    game_wave[1] = player.waveGameLevel[1];
+    game_wave[2] = player.waveGameLevel[2];
+    if (!OBJS_IsEquip(player.currentWeapon))
         OBJS_GetNext();
     if (OBJS_GetAmt(16) <= 0)
         EXIT_Error("RAP_LoadPLayer() - Loaded DEAD player");
@@ -247,18 +247,18 @@ int RAP_SavePlayer(void)
         WIN_Msg("Save Player Error !!!");
         return 0;
     }
-    plr.f_2c = cur_game;
-    plr.f_30[0] = game_wave[0];
-    plr.f_30[1] = game_wave[1];
-    plr.f_30[2] = game_wave[2];
-    plr.f_3c = 0;
+    player.currentGame = cur_game;
+    player.waveGameLevel[0] = game_wave[0];
+    player.waveGameLevel[1] = game_wave[1];
+    player.waveGameLevel[2] = game_wave[2];
+    player.amountOfItems = 0;
     for (v28 = first_objs.f_4; &last_objs != v28; v28 = v28->f_4)
     {
-        plr.f_3c++;
+        player.amountOfItems++;
     }
-    GLB_EnCrypt(gdmodestr, &plr, sizeof(plr));
-    fwrite(&plr, 1, sizeof(plr), v20);
-    GLB_DeCrypt(gdmodestr, &plr, sizeof(plr));
+    GLB_EnCrypt(gdmodestr, &player, sizeof(player));
+    fwrite(&player, 1, sizeof(player), v20);
+    GLB_DeCrypt(gdmodestr, &player, sizeof(player));
     for (v28 = first_objs.f_4; &last_objs != v28; v28 = v28->f_4)
     {
         GLB_EnCrypt(gdmodestr, v28, sizeof(object_t));
@@ -403,10 +403,10 @@ int RAP_LoadWin(void)
                 RAP_ReadFile(v254[v20], &v108, sizeof(v108));
                 v24 = v20;
             }
-            SWD_SetFieldItem(v2c, 1, id_pics[v108.f_20]);
-            SWD_SetFieldText(v2c, 9, v108.f_0);
-            SWD_SetFieldText(v2c, 10, v108.f_14);
-            sprintf(v68, "%07u", v108.f_24);
+            SWD_SetFieldItem(v2c, 1, id_pics[v108.pilotPicId]);
+            SWD_SetFieldText(v2c, 9, v108.name);
+            SWD_SetFieldText(v2c, 10, v108.callsign);
+            sprintf(v68, "%07u", v108.money);
             SWD_SetFieldText(v2c, 11, v68);
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
@@ -448,7 +448,7 @@ int RAP_LoadWin(void)
                 break;
             case 4:
                 v30 = 1;
-                sprintf(v68, "Delete Pilot %s ?", v108.f_14);
+                sprintf(v68, "Delete Pilot %s ?", v108.callsign);
                 if (WIN_AskBool(v68))
                 {
                     remove(v254[v20]);

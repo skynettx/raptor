@@ -454,7 +454,7 @@ void GLB_FreeAll(void)
     }
 }
 
-int GLB_ItemSize(int a1)
+int GLB_GetItemSize(int a1)
 {
     uint16_t f = (a1 >> 16) & 0xffff;
     uint16_t n = (a1 >> 0) & 0xffff;

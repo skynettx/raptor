@@ -1346,6 +1346,19 @@ void I_OPL_Mix(int16_t *stream, int len)
     OPL3_GenerateStream(&opl, stream, len);
 }
 
+void ProgramChgEvent(unsigned int chan, unsigned int param){
+    opl_channel_data_t *channel;
+    channel = &channels[chan];
+
+    ProgramChangeEvent(channel, param);
+}
+void AllOffEvent(unsigned int chan, unsigned int param){
+    opl_channel_data_t *channel;
+    channel = &channels[chan];
+
+    AllNotesOff(channel, param);
+}
+
 musdevice_t mus_device_fm = {
     I_OPL_InitMusic,
     I_OPL_ShutdownMusic,
@@ -1355,4 +1368,6 @@ musdevice_t mus_device_fm = {
     KeyOnEvent,
     ControllerEvent,
     PitchBendEvent,
+    ProgramChgEvent,
+    AllOffEvent,
 };

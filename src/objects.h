@@ -4,8 +4,8 @@
 struct objlib_t {
     int f_0;
     int f_4;
-    int f_8;
-    int f_c;
+    int payAmount;
+    int resaleAmount;
     int f_10;
     int (*f_14)(int);
     int f_18;
@@ -13,7 +13,7 @@ struct objlib_t {
     int f_20;
     int f_24;
     int f_28;
-    int f_2c;
+    int pays;
     int f_30;
     int f_34;
 };

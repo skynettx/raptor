@@ -62,7 +62,7 @@ struct enemy_t {
     int f_50;
     int f_54;
     int f_58;
-    mobj_t f_5c;
+    mobj_t mobj;
     int f_88;
     int f_8c;
     int f_90;

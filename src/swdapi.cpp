@@ -199,7 +199,7 @@ void SWD_FillText(font_t *a1, int a2, int a3, int a4, int a5, int a6, int a7)
     textcmd_x2 = a4 + a6 - 1;
     textcmd_y2 = a5 + a7 - 1;
     textcmd_line = a4;
-    vbp = GLB_ItemSize(a2);
+    vbp = GLB_GetItemSize(a2);
     vsi = SWD_GetLine(dat);
     while (1)
     {
@@ -1291,7 +1291,7 @@ void SWD_End(void)
 
 swd_t* SWD_ReformatFieldData(swd_t* v1c, int a1)
 {
-    int fileLen = GLB_ItemSize(a1);
+    int fileLen = GLB_GetItemSize(a1);
     int len = sizeof(swd_t) + (v1c->f_60 * sizeof(swdfield_t));
     int oldLen = sizeof(swd_t) + (v1c->f_60 * sizeof(swdfield_32_t));
     int eof = fileLen - oldLen;
