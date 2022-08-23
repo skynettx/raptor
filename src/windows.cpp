@@ -526,7 +526,7 @@ int WIN_AskDiff(void)
     while (1)
     {
         SWD_Dialog(&v7c);
-        if (KBD_IsKey(1) || Back || BButton)                                                      //Fixed Line Gamepad Difficulty Men�
+        if (KBD_IsKey(1) || Back || BButton)                                                      //Fixed Line Gamepad Difficulty Menü
         {
             v1c = -1;
             goto LAB_00024094;

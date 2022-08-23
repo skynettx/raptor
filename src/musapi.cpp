@@ -254,6 +254,9 @@ void MUS_Service(void)
                     uint8_t param = music_ptr[music_cmdptr + music_startoffset];
                     music_cmdptr++;
 
+                    if (music_device && music_device->ControllerEvent)
+                        music_device->ControllerEvent(chan, cmd, param);
+                    
                     switch (cmd)
                     {
                         case 0: // Program Channel
