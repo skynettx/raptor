@@ -184,6 +184,8 @@ void MUS_Reset(void)
                     newvol = music_currentvol;
                 music_device->ControllerEvent(i, 3, newvol);
             }
+            if (music_device && music_device->AllNotesOffEvent)
+                music_device->AllNotesOffEvent(i,0);
     }
 }
 
@@ -242,32 +244,57 @@ void MUS_Service(void)
             }
             case 4:
             {
-                uint8_t cmd = music_ptr[music_cmdptr + music_startoffset];
-                music_cmdptr++;
-                uint8_t param = music_ptr[music_cmdptr + music_startoffset];
-                music_cmdptr++;
-                if (cmd == 3) // Volume
-                {
-                    music_chanvol2[chan] = param;
-                    if (param > music_currentvol)
-                        param = music_currentvol;
-                    if (param > music_vol)
-                        param = music_vol;
-                    music_chanvol[chan] = param;
-                }
-                if (music_device && music_device->ControllerEvent)
-                    music_device->ControllerEvent(chan, cmd, param);
-                if (cmd == 14) // Restore volume setting
-                {
-                    param = music_chanvel[chan];
-                    if (param > music_currentvol)
-                        param = music_currentvol;
-                    if (param > music_vol)
-                        param = music_vol;
-                    if (music_device && music_device->ControllerEvent)
-                        music_device->ControllerEvent(chan, 3, param);
-                }
-                break;
+                    uint8_t cmd = music_ptr[music_cmdptr + music_startoffset];
+                    music_cmdptr++;
+                    uint8_t param = music_ptr[music_cmdptr + music_startoffset];
+                    music_cmdptr++;
+
+                    switch (cmd)
+                    {
+                        case 0: // Program Channel
+                            if(music_device && music_device->ProgramEvent)
+                                music_device->ProgramEvent(chan, param);
+                            break;
+                        case 3: // Volume
+                            music_chanvol2[chan] = param;
+                            if (param > music_currentvol)
+                                param = music_currentvol;
+                            if (param > music_vol)
+                                param = music_vol;
+                            music_chanvol[chan] = param;
+                            if (music_device && music_device->ControllerEvent)
+                                music_device->ControllerEvent(chan, cmd, param);
+                            break;
+                        case 4: //SetChannelPan
+                            if (music_device && music_device->ControllerEvent)
+                                music_device->ControllerEvent(chan, cmd, param);
+                            break;
+                        case 10:
+                        case 11:
+                            if (music_device && music_device->AllNotesOffEvent)
+                                music_device->AllNotesOffEvent(chan, param);
+                            break;
+                        case 12:
+                        case 13:
+                            // TODO: mono/poly mode
+                            break;
+                        case 14: // Restore volume setting
+                            if (music_device && music_device->AllNotesOffEvent)
+                                music_device->AllNotesOffEvent(chan, param);
+
+                            param = music_chanvel[chan];
+                            if (param > music_currentvol)
+                                param = music_currentvol;
+                            if (param > music_vol)
+                                param = music_vol;
+                            if (music_device && music_device->ControllerEvent)
+                                music_device->ControllerEvent(chan, 3, param);
+                                break;
+
+                        default:
+                            break;
+                    }
+                    break;
             }
             case 6:
             {

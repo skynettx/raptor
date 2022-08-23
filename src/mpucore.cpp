@@ -417,26 +417,6 @@ static void ControllerEvent(unsigned int chan, unsigned int controller, unsigned
       0, 0, 1, 7, 10, 11, 91, 93, 64, 67, 120, 123, -1, -1, 121, -1
     };
     
-    switch (controller)
-    {
-    case 0:
-        ProgramEvent(MPU_MapChannel(chan), param);
-        break;
-    case 10:
-    case 11:
-        AllNotesOffEvent(MPU_MapChannel(chan), param);
-        break;
-    case 12:
-    case 13:
-        // TODO: mono/poly mode
-        break;
-    case 14:
-        AllNotesOffEvent(MPU_MapChannel(chan), param);
-        break;
-    default:
-        break;
-    }
-    
     MusicDeviceMIDIEvent(synthunit,
                          0xB0 | MPU_MapChannel(chan),
                          event_map[controller],
@@ -454,5 +434,7 @@ musdevice_t mus_device_core = {
     KeyOnEvent,
     ControllerEvent,
     PitchBendEvent,
+    ProgramEvent,
+	AllNotesOffEvent
 };    
 #endif

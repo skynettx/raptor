@@ -141,26 +141,6 @@ static void ControllerEvent(unsigned int chan, unsigned int controller, unsigned
 	};
 	int err;
 	
-	switch (controller)
-	{
-	case 0:
-		ProgramEvent(MPU_MapChannel(chan), param);
-		break;
-	case 10:
-	case 11:
-		AllNotesOffEvent(MPU_MapChannel(chan), param);
-		break;
-	case 12:
-	case 13:
-		// TODO: mono/poly mode
-		break;
-	case 14:
-		AllNotesOffEvent(MPU_MapChannel(chan), param);
-		break;
-	default:
-		break;
-	}
-	
 	snd_seq_ev_set_controller(&ev, MPU_MapChannel(chan), event_map[controller], param);
 	err = snd_seq_event_output_direct(seq, &ev);
 	check_snd("ControllerEvent", err);
@@ -175,5 +155,7 @@ musdevice_t mus_device_alsa = {
     KeyOnEvent,
     ControllerEvent,
     PitchBendEvent,
+	ProgramEvent,
+	AllNotesOffEvent
 };
 #endif
