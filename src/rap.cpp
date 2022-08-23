@@ -659,7 +659,7 @@ int Do_Game(void)
     buttons[3] = 0;
     playerx = 0x90;
     playery = 0xa0;
-    if (demo_mode == 0) {
+    if (!demo_mode) {
         PTR_SetPos(0x90, 0xa0);
         IPT_Start();
     }
