@@ -809,7 +809,7 @@ void ENEMY_Think(void)
         }
         if (v1c->f_50 <= 0)
         {
-            plr.f_24 += v20->f_48;
+            player.money += v20->f_48;
             SND_3DPatch(8, v1c->f_18 + v1c->f_30, v1c->f_18 + v1c->f_30);
             switch (v20->f_18)
             {

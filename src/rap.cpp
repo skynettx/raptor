@@ -88,7 +88,7 @@ texture_t *numbers[11];
 
 char gdmodestr[] = "CASTLE";
 
-player_t plr;
+player_t player;
 
 char* g_highmem;
 char* LASTSCR;
@@ -512,13 +512,13 @@ void RAP_DisplayStats(void)
     }
     g_oldshield = v20;
     OBJS_DisplayStats();
-    sprintf(v4c, "%08u", plr.f_24);
+    sprintf(v4c, "%08u", player.money);
     RAP_PrintNum(0x77, 2, v4c);
     if (demo_mode == 1)
         DEMO_DisplayStats();
     if (debugflag)
     {
-        sprintf(v4c, "%02u", plr.f_40[cur_game]);
+        sprintf(v4c, "%02u", player.waveProgression[cur_game]);
         RAP_PrintNum(0x12, 2, v4c);
         v1c = 32;
         for (i = 0; i < 16; i++)
@@ -678,7 +678,7 @@ int Do_Game(void)
     if (demo_flag == 1)
         DEMO_StartRec();
 
-    v30 = plr.f_24;
+    v30 = player.money;
     IMS_StartAck();
     memset(buttons, 0, sizeof(buttons));
     do
@@ -790,8 +790,8 @@ int Do_Game(void)
             OBJS_Use(1);
             OBJS_Use(2);
             buttons[0] = 0;
-            if (plr.f_28 != -1)
-                OBJS_Use(plr.f_28);
+            if (player.currentWeapon != -1)
+                OBJS_Use(player.currentWeapon);
         }
         if (buttons[1])
         {
@@ -909,7 +909,7 @@ int Do_Game(void)
             OBJS_Add(16);
             OBJS_Add(16);
             OBJS_Add(16);
-            plr.f_24 = 0;
+            player.money = 0;
         }
         if (v28)
         {
@@ -947,7 +947,7 @@ int Do_Game(void)
                 RAP_ClearSides();
                 if (WIN_AskBool("Abort Mission ?"))
                 {
-                    plr.f_24 = v30;
+                    player.money = v30;
                     v2c = 1;
                     break;
                 }

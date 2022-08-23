@@ -526,7 +526,7 @@ int WIN_AskDiff(void)
     while (1)
     {
         SWD_Dialog(&v7c);
-        if (KBD_IsKey(1) || Back || BButton)                                                      //Fixed Line Gamepad Difficulty Menü
+        if (KBD_IsKey(1) || Back || BButton)                                                      //Fixed Line Gamepad Difficulty Menï¿½
         {
             v1c = -1;
             goto LAB_00024094;
@@ -583,14 +583,14 @@ int WIN_Register(void)
     KBD_Clear();
     GFX_FadeOut(0, 0, 0, 2);
     memset(&vd8, 0, sizeof(vd8));
-    vd8.f_28 = -1;
-    vd8.f_40[0] = 2;
-    vd8.f_40[1] = 2;
-    vd8.f_40[2] = 2;
-    vd8.f_40[3] = 2;
-    vd8.f_20 = 0;
+    vd8.currentWeapon = -1;
+    vd8.waveProgression[0] = 2;
+    vd8.waveProgression[1] = 2;
+    vd8.waveProgression[2] = 2;
+    vd8.waveProgression[3] = 2;
+    vd8.pilotPicId = 0;
     v24 = SWD_InitWindow(FILE137_REGISTER_SWD);
-    SWD_SetFieldItem(v24, 0, sid_pics[vd8.f_20]);
+    SWD_SetFieldItem(v24, 0, sid_pics[vd8.pilotPicId]);
     SWD_SetActiveField(v24, 1);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
@@ -635,7 +635,7 @@ int WIN_Register(void)
             v28++;
             v28 %= 4;
             SWD_SetFieldItem(v24, 0, sid_pics[v28]);
-            vd8.f_20 = v28;
+            vd8.pilotPicId = v28;
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
             break;
@@ -677,7 +677,7 @@ int WIN_Register(void)
                     v28++;
                     v28 %= 4;
                     SWD_SetFieldItem(v24, 0, sid_pics[v28]);
-                    vd8.f_20 = v28;
+                    vd8.pilotPicId = v28;
                 }
                 SWD_SetFieldText(v24, 3, regtext[1]);
                 SWD_ShowAllWindows();
@@ -712,8 +712,8 @@ int WIN_Register(void)
             switch (v80.f_4)
             {
             case 1:
-                SWD_GetFieldText(v24, 1, vd8.f_0);
-                if (strlen(vd8.f_0) != 0 && v80.f_10 == 0x1c)
+                SWD_GetFieldText(v24, 1, vd8.name);
+                if (strlen(vd8.name) != 0 && v80.f_10 == 0x1c)
                 {
                     fi_sec_field = true;
                     SWD_SetActiveField(v24, 2);
@@ -722,16 +722,16 @@ int WIN_Register(void)
                 GFX_DisplayUpdate();
                 break;
             case 2:
-                SWD_GetFieldText(v24, 2, vd8.f_14);
-                SWD_GetFieldText(v24, 2, vd8.f_0);
-                if (!strlen(vd8.f_0))
+                SWD_GetFieldText(v24, 2, vd8.callsign);
+                SWD_GetFieldText(v24, 2, vd8.name);
+                if (!strlen(vd8.name))
                 {
                     fi_sec_field = false;
                     SWD_SetActiveField(v24, 1);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
-                else if (!strlen(vd8.f_14))
+                else if (!strlen(vd8.callsign))
                 {
                     SWD_SetActiveField(v24, 2);
                     SWD_ShowAllWindows();
@@ -753,14 +753,14 @@ int WIN_Register(void)
         }
     }
 LAB_000244ea:
-    SWD_GetFieldText(v24, 1, vd8.f_0);
-    SWD_GetFieldText(v24, 2, vd8.f_14);
-    if (!strlen(vd8.f_0))
+    SWD_GetFieldText(v24, 1, vd8.name);
+    SWD_GetFieldText(v24, 2, vd8.callsign);
+    if (!strlen(vd8.name))
     {
         SWD_SetActiveField(v24, 1);
         v20 = 0;
     }
-    if (!strlen(vd8.f_14))
+    if (!strlen(vd8.callsign))
     {
         SWD_SetActiveField(v24, 2);
         v20 = 0;
@@ -787,9 +787,9 @@ LAB_000244ea:
     if (v20)
     {
         ingameflag = 0;
-        vd8.f_40[0] = v30;
-        vd8.f_40[1] = v30;
-        vd8.f_40[2] = v30;
+        vd8.waveProgression[0] = v30;
+        vd8.waveProgression[1] = v30;
+        vd8.waveProgression[2] = v30;
         if (v30 == 0)
         {
             vd8.f_50 = 1;
@@ -800,16 +800,16 @@ LAB_000244ea:
             vd8.f_50 = 0;
             vd8.f_54 = 1;
         }
-        memcpy(&plr, &vd8, sizeof(player_t));
+        memcpy(&player, &vd8, sizeof(player_t));
         RAP_SetPlayerDiff();
         OBJS_Add(0);
         OBJS_Add(16);
         OBJS_Add(16);
         OBJS_Add(16);
-        plr.f_24 = 10000;
+        player.money = 10000;
         if (godmode)
         {
-            plr.f_24 += 0xd5fff;
+            player.money += 0xd5fff;
             OBJS_Add(11);
             OBJS_Add(11);
             OBJS_Add(11);
@@ -850,9 +850,9 @@ int WIN_Hangar(void)
     PTR_DrawCursor(0);
     KBD_Clear();
 
-    if (plr.f_50)
+    if (player.f_50)
     {
-        plr.f_50 = 0;
+        player.f_50 = 0;
         v2c = 3;
     }
     else
@@ -971,7 +971,7 @@ int WIN_Hangar(void)
             case 0x1f:
             case 0x3e:
                 v34 = 3;
-                sprintf(v88, "Save %s - %s ?", plr.f_0, plr.f_14);
+                sprintf(v88, "Save %s - %s ?", player.name, player.callsign);
                 if (WIN_AskBool(v88))
                     RAP_SavePlayer();
                 break;
@@ -1097,7 +1097,7 @@ LAB_00024b33:
                         while (IMS_IsAck())
                         {
                         }
-                        sprintf(v88, "Save %s - %s ?", plr.f_0, plr.f_14);
+                        sprintf(v88, "Save %s - %s ?", player.name, player.callsign);
                         if (WIN_AskBool(v88))
                             RAP_SavePlayer();
                         while (IMS_IsAck())
@@ -1156,7 +1156,7 @@ void WIN_LoadComp(void)
     sprintf(v44, "WAVE %d", game_wave[cur_game]);
     SWD_SetFieldText(v1c, 10, v44);
     SWD_SetFieldText(v1c, 9, v74[cur_game]);
-    if (diff_wrap[plr.f_40[cur_game]] - 1 == game_wave[cur_game])
+    if (diff_wrap[player.waveProgression[cur_game]] - 1 == game_wave[cur_game])
     {
         sprintf(v44, "FINAL WAVE %d", game_wave[cur_game] + 1);
         SWD_SetFieldText(v1c, 10, v44);
@@ -1501,30 +1501,30 @@ void WIN_MainLoop(void)
             INTRO_Landing();
             continue;
         }
-        v24 = diff_wrap[plr.f_40[cur_game]] - 1;
+        v24 = diff_wrap[player.waveProgression[cur_game]] - 1;
         if (game_wave[cur_game] == v24)
         {
-            if (!plr.f_40[cur_game] && !plr.f_54)
+            if (!player.waveProgression[cur_game] && !player.f_54)
             {
                 OBJS_Init();
-                plr.f_28 = -1;
-                plr.f_54 = 1;
-                plr.f_24 = 0;
+                player.currentWeapon = -1;
+                player.f_54 = 1;
+                player.money = 0;
                 OBJS_Add(0);
                 OBJS_Add(16);
                 OBJS_Add(16);
                 OBJS_Add(16);
-                plr.f_24 = 0x2710;
-                if (plr.f_40[cur_game] < 3)
-                    plr.f_40[cur_game]++;
+                player.money = 0x2710;
+                if (player.waveProgression[cur_game] < 3)
+                    player.waveProgression[cur_game]++;
                 for (v28 = 0; v28 < 4; v28++)
-                    if (!plr.f_40[v28])
-                        plr.f_40[v28] = 1;
+                    if (!player.waveProgression[v28])
+                        player.waveProgression[v28] = 1;
             }
             else
             {
-                if (plr.f_40[cur_game] < 3)
-                    plr.f_40[cur_game]++;
+                if (player.waveProgression[cur_game] < 3)
+                    player.waveProgression[cur_game]++;
             }
             RAP_SetPlayerDiff();
             game_wave[cur_game] = 0;

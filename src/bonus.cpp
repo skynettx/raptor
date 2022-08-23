@@ -144,7 +144,7 @@ void BONUS_Think(void)
                     OBJS_AddEnergy(25);
                 else
                     OBJS_Add(v1c->f_38);
-                if (v1c->f_3c->f_2c)
+                if (v1c->f_3c->pays)
                 {
                     v1c->f_30 = 1;
                     v1c->f_34 = 50;
