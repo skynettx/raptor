@@ -24,7 +24,7 @@ struct anim_t {
     int f_1c;
     animlib_t *f_20;
     int f_24;
-    enemy_t *f_28;
+    enemy_t *enemy;
     int f_2c;
 };
 

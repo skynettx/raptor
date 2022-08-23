@@ -123,6 +123,7 @@ void OBJS_Init(void)
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
+//Plasma Cannon
     v1c = &obj_lib[1];
     v1c->f_0 = FILE1b1_BONUS01_PIC;
     v1c->f_4 = 2;
@@ -138,6 +139,7 @@ void OBJS_Init(void)
     v1c->f_2c = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
+
 
     v1c = &obj_lib[2];
     v1c->f_0 = FILE1b3_BONUS02_PIC;
@@ -155,6 +157,7 @@ void OBJS_Init(void)
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
+    //Dumbfire Missile
     v1c = &obj_lib[3];
     v1c->f_0 = FILE1b5_BONUS03_PIC;
     v1c->f_4 = 1;
@@ -219,6 +222,7 @@ void OBJS_Init(void)
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
+    //Air/Air Missile
     v1c = &obj_lib[7];
     v1c->f_0 = FILE1bf_BONUS07_PIC;
     v1c->f_4 = 1;
@@ -235,6 +239,7 @@ void OBJS_Init(void)
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
+    //AIR/Ground Missile
     v1c = &obj_lib[8];
     v1c->f_0 = FILE1c0_BONUS08_PIC;
     v1c->f_4 = 1;
@@ -251,6 +256,7 @@ void OBJS_Init(void)
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
+    //Bomb
     v1c = &obj_lib[9];
     v1c->f_0 = FILE1da_BONUS21_PIC;
     v1c->f_4 = 1;
@@ -283,6 +289,7 @@ void OBJS_Init(void)
     v1c->f_30 = 0;
     v1c->f_34 = 1;
 
+    //Megabomb
     v1c = &obj_lib[11];
     v1c->f_0 = FILE1c5_BONUS10_PIC;
     v1c->f_4 = 1;
@@ -377,6 +384,7 @@ void OBJS_Init(void)
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
+    //Ion Scanner
     v1c = &obj_lib[17];
     v1c->f_0 = FILE1d5_BONUS16_PIC;
     v1c->f_4 = 1;

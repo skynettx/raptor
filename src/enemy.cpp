@@ -48,23 +48,23 @@ int MoveEobj(mobj_t *a1, int a2)
 {
     if (!a2)
         return 0;
-    if (a1->f_10 >= a1->f_14)
+    if (a1->max_x >= a1->max_y)
     {
         while (a2)
         {
             a2--;
-            a1->f_20--;
-            if (a1->f_20 == 0)
+            a1->triggerDelay--;
+            if (a1->triggerDelay == 0)
             {
-                a1->f_28 = 1;
+                a1->trigger = 1;
                 return a2;
             }
-            a1->f_0 += a1->f_18;
-            a1->f_24 += a1->f_14;
+            a1->x += a1->dir_x;
+            a1->f_24 += a1->max_y;
             if (a1->f_24 > 0)
             {
-                a1->f_4 += a1->f_1c;
-                a1->f_24 -= a1->f_10;
+                a1->y += a1->dir_y;
+                a1->f_24 -= a1->max_x;
             }
         }
     }
@@ -73,23 +73,23 @@ int MoveEobj(mobj_t *a1, int a2)
         while (a2)
         {
             a2--;
-            a1->f_20--;
-            if (a1->f_20 == 0)
+            a1->triggerDelay--;
+            if (a1->triggerDelay == 0)
             {
-                a1->f_28 = 1;
+                a1->trigger = 1;
                 return a2;
             }
-            a1->f_4 += a1->f_1c;
-            a1->f_24 += a1->f_10;
+            a1->y += a1->dir_y;
+            a1->f_24 += a1->max_x;
             if (a1->f_24 > 0)
             {
-                a1->f_0 += a1->f_18;
-                a1->f_24 -= a1->f_14;
+                a1->x += a1->dir_x;
+                a1->f_24 -= a1->max_y;
             }
         }
     }
-    if (a1->f_20 < 1)
-        a1->f_28 = 1;
+    if (a1->triggerDelay < 1)
+        a1->trigger = 1;
     return a2;
 }
 
@@ -295,11 +295,11 @@ void ENEMY_Add(csprite_t *a1)
     v20->f_1c -= v20->f_34;
     v20->f_20 = v20->f_18 + v20->f_28;
     v20->f_24 = v20->f_1c + v20->f_2c;
-    v20->f_5c.f_0 = v20->f_10 = v20->f_18;
-    v20->f_5c.f_4 = v20->f_14 = v20->f_1c;
+    v20->mobj.x = v20->f_10 = v20->f_18;
+    v20->mobj.y = v20->f_14 = v20->f_1c;
     v20->f_a4 = v1c->f_28;
     v20->f_b4 = v1c->f_58;
-    v20->f_88 = v1c->f_30 - v20->f_5c.f_4;
+    v20->f_88 = v1c->f_30 - v20->mobj.y;
     v20->f_ac = 0;
     v20->f_a8 = 0;
     v20->f_3c = -1;
@@ -335,30 +335,30 @@ void ENEMY_Add(csprite_t *a1)
     case 2:
         v20->f_54 = 0;
         v20->f_14 = 100 - v20->f_34;
-        v20->f_5c.f_8 = v20->f_10 + v1c->f_198[0];
-        v20->f_5c.f_c = v20->f_14 + v1c->f_1d4[0];
+        v20->mobj.dirX = v20->f_10 + v1c->f_198[0];
+        v20->mobj.dirY = v20->f_14 + v1c->f_1d4[0];
         v20->f_38 = 1;
-        InitMobj(&v20->f_5c);
-        MoveMobj(&v20->f_5c);
+        InitMobj(&v20->mobj);
+        MoveMobj(&v20->mobj);
         break;
     case 3:                                           //Ground
         v20->f_54 = 1;
-        v20->f_5c.f_8 = v20->f_18;
-        v20->f_5c.f_c = 211;
+        v20->mobj.dirX = v20->f_18;
+        v20->mobj.dirY = 211;
         break;
     case 5:                                           //Groundright
         v20->f_18 -= v20->f_28;
-        v20->f_5c.f_0 = v20->f_10 = v20->f_18;
+        v20->mobj.x = v20->f_10 = v20->f_18;
         v20->f_54 = 1;
-        v20->f_5c.f_8 = 335;
-        v20->f_5c.f_c = 211;
+        v20->mobj.dirX = 335;
+        v20->mobj.dirY = 211;
         break;
     case 4:                                           //Groundleft
         v20->f_18 += v20->f_28;
-        v20->f_5c.f_0 = v20->f_10 = v20->f_18;
+        v20->mobj.x = v20->f_10 = v20->f_18;
         v20->f_54 = 1;
-        v20->f_5c.f_8 = -v20->f_30;
-        v20->f_5c.f_c = 211;
+        v20->mobj.dirX = -v20->f_30;
+        v20->mobj.dirY = 211;
         break;
     }
     v20->f_b8 = v1c->f_44 >> 4;
@@ -590,21 +590,21 @@ void ENEMY_Think(void)
         switch (v20->f_64)
         {
         case 0:
-            v1c->f_18 = v1c->f_5c.f_0;
-            v1c->f_1c = v1c->f_5c.f_4;
+            v1c->f_18 = v1c->mobj.x;
+            v1c->f_1c = v1c->mobj.y;
             v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
             v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
             v28 = v20->f_58;
-            v28 = MoveEobj(&v1c->f_5c, v28);
-            if (v1c->f_5c.f_28)
+            v28 = MoveEobj(&v1c->mobj, v28);
+            if (v1c->mobj.trigger)
             {
-                v1c->f_5c.f_0 = v1c->f_5c.f_8;
-                v1c->f_5c.f_4 = v1c->f_5c.f_c;
-                v1c->f_5c.f_8 = v1c->f_10 + v20->f_198[v1c->f_38];
-                v1c->f_5c.f_c = v1c->f_14 + v20->f_1d4[v1c->f_38];
-                InitMobj(&v1c->f_5c);
-                MoveMobj(&v1c->f_5c);
-                v28 = MoveEobj(&v1c->f_5c, v28);
+                v1c->mobj.x = v1c->mobj.dirX;
+                v1c->mobj.y = v1c->mobj.dirY;
+                v1c->mobj.dirX = v1c->f_10 + v20->f_198[v1c->f_38];
+                v1c->mobj.dirY = v1c->f_14 + v20->f_1d4[v1c->f_38];
+                InitMobj(&v1c->mobj);
+                MoveMobj(&v1c->mobj);
+                v28 = MoveEobj(&v1c->mobj, v28);
                 if (!v1c->f_9c)
                 {
                     v1c->f_38++;
@@ -626,43 +626,43 @@ void ENEMY_Think(void)
             }
             break;
         case 2:
-            v1c->f_18 = v1c->f_5c.f_0;
-            v1c->f_1c = v1c->f_5c.f_4;
+            v1c->f_18 = v1c->mobj.x;
+            v1c->f_1c = v1c->mobj.y;
             v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
             v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
             v28 = v20->f_58;
-            v28 = MoveEobj(&v1c->f_5c, v28);
+            v28 = MoveEobj(&v1c->mobj, v28);
             if (v1c->f_a0 == 2)
             {
-                if (v1c->f_5c.f_4 > 0xc9)
+                if (v1c->mobj.y > 0xc9)
                     v1c->f_58 = 1;
-                if (v1c->f_30 + 320 < v1c->f_5c.f_0)
+                if (v1c->f_30 + 320 < v1c->mobj.x)
                     v1c->f_58 = 1;
-                if (v1c->f_5c.f_4 + v1c->f_28 < 0)
+                if (v1c->mobj.y + v1c->f_28 < 0)
                     v1c->f_58 = 1;
-                if (v1c->f_5c.f_0 + v1c->f_28 < 0)
+                if (v1c->mobj.x + v1c->f_28 < 0)
                     v1c->f_58 = 1;
             }
-            if (v1c->f_5c.f_28 && v1c->f_a0 != 2)
+            if (v1c->mobj.trigger && v1c->f_a0 != 2)
             {
-                v1c->f_5c.f_0 = v1c->f_5c.f_8;
-                v1c->f_5c.f_4 = v1c->f_5c.f_c;
+                v1c->mobj.x = v1c->mobj.dirX;
+                v1c->mobj.y = v1c->mobj.dirY;
                 v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
                 v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
                 if (v1c->f_a0 == 1)
                 {
-                    v1c->f_5c.f_8 = player_cx;
-                    v1c->f_5c.f_c = player_cy;
+                    v1c->mobj.dirX = player_cx;
+                    v1c->mobj.dirY = player_cy;
                     v1c->f_a0 = 2;
                 }
                 else
                 {
-                    v1c->f_5c.f_8 = v1c->f_10 + v20->f_198[v1c->f_38];
-                    v1c->f_5c.f_c = v1c->f_14 + v20->f_1d4[v1c->f_38];
+                    v1c->mobj.dirX = v1c->f_10 + v20->f_198[v1c->f_38];
+                    v1c->mobj.dirY = v1c->f_14 + v20->f_1d4[v1c->f_38];
                 }
-                InitMobj(&v1c->f_5c);
-                MoveMobj(&v1c->f_5c);
-                v28 = MoveEobj(&v1c->f_5c, v28);
+                InitMobj(&v1c->mobj);
+                MoveMobj(&v1c->mobj);
+                v28 = MoveEobj(&v1c->mobj, v28);
                 if (v20->f_5c - 1 > v1c->f_38)
                     v1c->f_38++;
                 else if (v1c->f_a0 == 0)
@@ -670,21 +670,21 @@ void ENEMY_Think(void)
             }
             break;
         case 1:
-            v1c->f_18 = v1c->f_5c.f_0;
-            v1c->f_1c = v1c->f_5c.f_4;
+            v1c->f_18 = v1c->mobj.x;
+            v1c->f_1c = v1c->mobj.y;
             v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
             v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
             v28 = v20->f_58;
-            v28 = MoveEobj(&v1c->f_5c, v28);
-            if (v1c->f_5c.f_28)
+            v28 = MoveEobj(&v1c->mobj, v28);
+            if (v1c->mobj.trigger)
             {
-                v1c->f_5c.f_0 = v1c->f_5c.f_8;
-                v1c->f_5c.f_4 = v1c->f_5c.f_c;
-                v1c->f_5c.f_8 = v1c->f_10 + v20->f_198[v1c->f_38];
-                v1c->f_5c.f_c = v1c->f_14 + v20->f_1d4[v1c->f_38];
-                InitMobj(&v1c->f_5c);
-                MoveMobj(&v1c->f_5c);
-                v28 = MoveEobj(&v1c->f_5c, v28);
+                v1c->mobj.x = v1c->mobj.dirX;
+                v1c->mobj.y = v1c->mobj.dirY;
+                v1c->mobj.dirX = v1c->f_10 + v20->f_198[v1c->f_38];
+                v1c->mobj.dirY = v1c->f_14 + v20->f_1d4[v1c->f_38];
+                InitMobj(&v1c->mobj);
+                MoveMobj(&v1c->mobj);
+                v28 = MoveEobj(&v1c->mobj, v28);
                 v1c->f_38++;
                 if (v1c->f_38 > v20->f_5c)
                     v1c->f_58 = 1;
@@ -693,7 +693,7 @@ void ENEMY_Think(void)
         case 3:
             if (scroll_flag)
                 v1c->f_1c++;
-            if (v1c->f_1c > v1c->f_5c.f_c)
+            if (v1c->f_1c > v1c->mobj.dirY)
                 v1c->f_58 = 1;
             v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
             v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
@@ -704,9 +704,9 @@ void ENEMY_Think(void)
             if (v1c->f_1c >= 0)
             {
                 v1c->f_18 += v20->f_58;
-                if (v1c->f_18 > v1c->f_5c.f_8)
+                if (v1c->f_18 > v1c->mobj.dirX)
                     v1c->f_58 = 1;
-                else if (v1c->f_1c > v1c->f_5c.f_c)
+                else if (v1c->f_1c > v1c->mobj.dirY)
                     v1c->f_58 = 1;
             }
             v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
@@ -718,9 +718,9 @@ void ENEMY_Think(void)
             if (v1c->f_1c >= 0)
             {
                 v1c->f_18 -= v20->f_58;
-                if (v1c->f_18 < v1c->f_5c.f_8)
+                if (v1c->f_18 < v1c->mobj.dirX)
                     v1c->f_58 = 1;
-                else if (v1c->f_1c > v1c->f_5c.f_c)
+                else if (v1c->f_1c > v1c->mobj.dirY)
                     v1c->f_58 = 1;
             }
             v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;

@@ -175,7 +175,7 @@ void ANIMS_StartEAnim(enemy_t *a1, int a2, int a3, int a4)
     v10 = ANIMS_Get();
     if (!v10)
         return;
-    v10->f_28 = a1;
+    v10->enemy = a1;
     v10->f_20 = &animlib[a2];
     v10->f_14 = a3 - v14->f_18;
     v10->f_18 = a4 - v14->f_1c;
@@ -215,14 +215,14 @@ void ANIMS_Think(void)
             v1c->f_c = player_cx + v1c->f_14;
             v1c->f_10 = player_cy + v1c->f_18;
         }
-        else if (v1c->f_28)
+        else if (v1c->enemy)
         {
-            if (v1c->f_28->f_8 == -1)
+            if (v1c->enemy->f_8 == -1)
                 v1c->f_2c = 1;
             if (!v1c->f_2c)
             {
-                v1c->f_c = v1c->f_28->f_5c.f_0 + v1c->f_14;
-                v1c->f_10 = v1c->f_28->f_5c.f_4 + v1c->f_18;
+                v1c->f_c = v1c->enemy->mobj.x + v1c->f_14;
+                v1c->f_10 = v1c->enemy->mobj.y + v1c->f_18;
             }
         }
         else

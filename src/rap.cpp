@@ -271,79 +271,79 @@ void Rot_Color(char *a1, int a2, int a3)
 
 void InitMobj(mobj_t *m)
 {
-    m->f_28 = 0;
-    m->f_18 = 1;
-    m->f_1c = 1;
-    m->f_10 = m->f_8 - m->f_0;
-    m->f_14 = m->f_c - m->f_4;
-    if (m->f_10 < 0)
+    m->trigger = 0;
+    m->dir_x = 1;
+    m->dir_y = 1;
+    m->max_x = m->dirX - m->x;
+    m->max_y = m->dirY - m->y;
+    if (m->max_x < 0)
     {
-        m->f_10 = -m->f_10;
-        m->f_18 = -m->f_18;
+        m->max_x = -m->max_x;
+        m->dir_x = -m->dir_x;
     }
-    if (m->f_14 < 0)
+    if (m->max_y < 0)
     {
-        m->f_14 = -m->f_14;
-        m->f_1c = -m->f_1c;
+        m->max_y = -m->max_y;
+        m->dir_y = -m->dir_y;
     }
-    if (m->f_10 >= m->f_14)
+    if (m->max_x >= m->max_y)
     {
-        m->f_24 = -(m->f_14 >> 1);
-        m->f_20 = m->f_10 + 1;
+        m->f_24 = -(m->max_y >> 1);
+        m->triggerDelay = m->max_x + 1;
     }
     else
     {
-        m->f_24 = m->f_10 >> 1;
-        m->f_20 = m->f_14 + 1;
+        m->f_24 = m->max_x >> 1;
+        m->triggerDelay = m->max_y + 1;
     }
 }
 
 void MoveMobj(mobj_t *m)
 {
-    if (m->f_20 == 0)
+    if (m->triggerDelay == 0)
     {
-        m->f_28 = 1;
+        m->trigger = 1;
         return;
     }
-    if (m->f_10 >= m->f_14)
+    if (m->max_x >= m->max_y)
     {
-        m->f_0 += m->f_18;
-        m->f_24 += m->f_14;
+        m->x += m->dir_x;
+        m->f_24 += m->max_y;
         if (m->f_24 > 0)
         {
-            m->f_4 += m->f_1c;
-            m->f_24 -= m->f_10;
+            m->y += m->dir_y;
+            m->f_24 -= m->max_x;
         }
     }
     else
     {
-        m->f_4 += m->f_1c;
-        m->f_24 += m->f_10;
+        m->y += m->dir_y;
+        m->f_24 += m->max_x;
         if (m->f_24 > 0)
         {
-            m->f_0 += m->f_18;
-            m->f_24 -= m->f_14;
+            m->x += m->dir_x;
+            m->f_24 -= m->max_y;
         }
     }
-    m->f_20--;
+    m->triggerDelay--;
 }
 
 int MoveSobj(mobj_t *m, int a2)
 {
     if (a2 == 0)
         return 0;
-    if (m->f_10 >= m->f_14)
+    if (m->max_x >= m->max_y)
     {
         while (a2)
         {
             a2--;
-            m->f_20--;
-            m->f_0 += m->f_18;
-            m->f_24 += m->f_14;
+            m->triggerDelay--;
+            m->x += m->dir_x;
+            m->f_24 += m->max_y;
             if (m->f_24 > 0)
             {
-                m->f_4 += m->f_1c;
-                m->f_24 -= m->f_10;
+                m->y += m->dir_y;
+                m->f_24 -= m->max_x;
             }
         }
     }
@@ -352,18 +352,18 @@ int MoveSobj(mobj_t *m, int a2)
         while (a2)
         {
             a2--;
-            m->f_20--;
-            m->f_4 += m->f_1c;
-            m->f_24 += m->f_10;
+            m->triggerDelay--;
+            m->y += m->dir_y;
+            m->f_24 += m->max_x;
             if (m->f_24 > 0)
             {
-                m->f_0 += m->f_18;
-                m->f_24 -= m->f_14;
+                m->x += m->dir_x;
+                m->f_24 -= m->max_y;
             }
         }
     }
-    if (m->f_20 < 1)
-        m->f_28 = 1;
+    if (m->triggerDelay < 1)
+        m->trigger = 1;
     return a2;
 }
 

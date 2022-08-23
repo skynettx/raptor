@@ -42,17 +42,17 @@ struct player_t {
 };
 
 struct mobj_t {
-    int f_0;
-    int f_4;
-    int f_8;
-    int f_c;
-    int f_10;
-    int f_14;
-    int f_18;
-    int f_1c;
-    int f_20;
+    int x;
+    int y;
+    int dirX;
+    int dirY;
+    int max_x;
+    int max_y;
+    int dir_x;
+    int dir_y;
+    int triggerDelay;
     int f_24;
-    int f_28;
+    int trigger;
 };
 
 struct flat_t {

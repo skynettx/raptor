@@ -188,8 +188,8 @@ void ESHOT_Shoot(enemy_t *a1, int a2)
         v18 = ESHOT_Get();
         if (!v18)
             return;
-        v18->f_18.f_0 = v1c;
-        v18->f_18.f_4 = v20;
+        v18->f_18.x = v1c;
+        v18->f_18.y = v20;
         v18->f_5c = a1;
         v18->f_60 = a2;
         v2c = a1->f_c->f_78[a2];
@@ -201,68 +201,68 @@ void ESHOT_Shoot(enemy_t *a1, int a2)
         case 0:                                              //Atplayer
             SND_3DPatch(28, v1c, v20);                      
             v18->f_48 = &plib[1];
-            v18->f_18.f_0 -= v18->f_48->f_38;
-            v18->f_18.f_4 -= v18->f_48->f_3c;
-            v18->f_18.f_8 = player_cx;
-            v18->f_18.f_c = player_cy;
+            v18->f_18.x -= v18->f_48->f_38;
+            v18->f_18.y -= v18->f_48->f_3c;
+            v18->f_18.dirX = player_cx;
+            v18->f_18.dirY = player_cy;
             v18->f_50 = 1;
             v18->f_58 = 0;
             break;
         case 1:                                              //Atdown
             SND_3DPatch(28, v1c, v20);
             v18->f_48 = &plib[0];
-            v18->f_18.f_0 -= v18->f_48->f_38;
-            v18->f_18.f_4 -= v18->f_48->f_3c;
-            v18->f_18.f_8 = v18->f_18.f_0;
-            v18->f_18.f_c = 200;
+            v18->f_18.x -= v18->f_48->f_38;
+            v18->f_18.y -= v18->f_48->f_3c;
+            v18->f_18.dirX = v18->f_18.x;
+            v18->f_18.dirY = 200;
             v18->f_50 = v18->f_48->f_34 >> 1;
             v18->f_58 = 1;
             break;
         case 2:                                              //Angleleft
             SND_3DPatch(28, v1c, v20);
             v18->f_48 = &plib[0];
-            v18->f_18.f_0 -= v18->f_48->f_38;
-            v18->f_18.f_4 -= v18->f_48->f_3c;
-            v18->f_18.f_8 = v18->f_18.f_0 - 32;
-            v18->f_18.f_c = v18->f_18.f_4 + 32;
+            v18->f_18.x -= v18->f_48->f_38;
+            v18->f_18.y -= v18->f_48->f_3c;
+            v18->f_18.dirX = v18->f_18.x - 32;
+            v18->f_18.dirY = v18->f_18.y + 32;
             v18->f_50 = v18->f_48->f_34 >> 1;
             v18->f_58 = 2;
             break;
         case 3:                                              //Angleright
             SND_3DPatch(28, v1c, v20);
             v18->f_48 = &plib[0];
-            v18->f_18.f_0 -= v18->f_48->f_38;
-            v18->f_18.f_4 -= v18->f_48->f_3c;
-            v18->f_18.f_8 = v18->f_18.f_0 + 32;
-            v18->f_18.f_c = v18->f_18.f_4 + 32;
+            v18->f_18.x -= v18->f_48->f_38;
+            v18->f_18.y -= v18->f_48->f_3c;
+            v18->f_18.dirX = v18->f_18.x + 32;
+            v18->f_18.dirY = v18->f_18.y + 32;
             v18->f_50 = v18->f_48->f_34 >> 1;
             v18->f_58 = 3;
             break;
         case 4:                                              //Missle
             SND_3DPatch(30, v1c, v20);
             v18->f_48 = &plib[2];
-            v18->f_18.f_0 -= v18->f_48->f_38;
-            v18->f_18.f_8 = v18->f_18.f_0;
-            v18->f_18.f_c = 200;
+            v18->f_18.x -= v18->f_48->f_38;
+            v18->f_18.dirX = v18->f_18.x;
+            v18->f_18.dirY = 200;
             v18->f_50 = a1->f_b4 + 1;
             v18->f_58 = 4;
             break;
         case 5:                                              //Laser
             SND_3DPatch(29, v1c, v20);
             v18->f_48 = &plib[3];
-            v18->f_18.f_0 -= v18->f_48->f_38;
-            v18->f_18.f_8 = v18->f_18.f_0;
-            v18->f_18.f_c = 200;
+            v18->f_18.x -= v18->f_48->f_38;
+            v18->f_18.dirX = v18->f_18.x;
+            v18->f_18.dirY = 200;
             v18->f_50 = a1->f_b4;
             v18->f_58 = 5;
             break;
         case 6:                                              //Mines
             SND_3DPatch(28, v1c, v20);
             v18->f_48 = &plib[4];
-            v18->f_10 = v18->f_18.f_0;
-            v18->f_14 = v18->f_18.f_4;
-            v18->f_18.f_8 = 320;
-            v18->f_18.f_c = 200;
+            v18->f_10 = v18->f_18.x;
+            v18->f_14 = v18->f_18.y;
+            v18->f_18.dirX = 320;
+            v18->f_18.dirY = 200;
             v18->f_50 = 150;
             v18->f_54 = wrand() % 16;
             v18->f_58 = 6;
@@ -270,30 +270,30 @@ void ESHOT_Shoot(enemy_t *a1, int a2)
         case 7:                                              //Plasma
             SND_3DPatch(31, v1c, v20);
             v18->f_48 = &plib[5];
-            v18->f_18.f_0 -= v18->f_48->f_38;
-            v18->f_18.f_8 = v18->f_18.f_0;
-            v18->f_18.f_c = 200;
+            v18->f_18.x -= v18->f_48->f_38;
+            v18->f_18.dirX = v18->f_18.x;
+            v18->f_18.dirY = 200;
             v18->f_50 = 8;
             v18->f_58 = 7;
             break;
         case 8:                                              //Coconut
             SND_3DPatch(monkeys[wrand() % 6], v1c, v20);           
             v18->f_48 = &plib[6];
-            v18->f_18.f_0 -= v18->f_48->f_38;
-            v18->f_18.f_4 -= v18->f_48->f_3c;
-            v18->f_18.f_8 = player_cx;
-            v18->f_18.f_c = player_cy;
+            v18->f_18.x -= v18->f_48->f_38;
+            v18->f_18.y -= v18->f_48->f_3c;
+            v18->f_18.dirX = player_cx;
+            v18->f_18.dirY = player_cy;
             v18->f_50 = 1;
             v18->f_58 = 8;
             break;
         }
         InitMobj(&v18->f_18);
         MoveSobj(&v18->f_18, 1);
-        if (v18->f_18.f_0 < 0 || v18->f_18.f_0 >= 320)
-            v18->f_18.f_28 = 1;
-        if (v18->f_18.f_4 < 0 || v18->f_18.f_4 >= 200)
-            v18->f_18.f_28 = 1;
-        if (v18->f_18.f_28)
+        if (v18->f_18.x < 0 || v18->f_18.x >= 320)
+            v18->f_18.trigger = 1;
+        if (v18->f_18.y < 0 || v18->f_18.y >= 200)
+            v18->f_18.trigger = 1;
+        if (v18->f_18.trigger)
             ESHOT_Remove(v18);
     }
 }
@@ -316,11 +316,11 @@ void ESHOT_Think(void)
             {
                 v1c->f_10 = v1c->f_5c->f_18 + v1c->f_5c->f_c->f_138[v1c->f_60] - 4;
                 v1c->f_14 = v1c->f_5c->f_1c + v1c->f_5c->f_c->f_168[v1c->f_60];
-                v1c->f_18.f_c = 200;  
+                v1c->f_18.dirY = 200;  
                 v24 = abs(v1c->f_10 - player_cx);
                 if (v24 < 16 && v1c->f_14 < player_cy)
                 {
-                    v1c->f_18.f_c = player_cy + (wrand() % 4) - 2;
+                    v1c->f_18.dirY = player_cy + (wrand() % 4) - 2;
                     OBJS_SubEnergy(v20->f_40);
                     if ((haptic) && (control == 2))
                     {
@@ -338,8 +338,8 @@ void ESHOT_Think(void)
                 v1c->f_c = 0;
             if (v20->f_34)
             {
-                v1c->f_10 = v1c->f_18.f_0;
-                v1c->f_14 = v1c->f_18.f_4;
+                v1c->f_10 = v1c->f_18.x;
+                v1c->f_14 = v1c->f_18.y;
                 MoveSobj(&v1c->f_18, v1c->f_50);
                 if (v1c->f_50 < v20->f_34)
                     v1c->f_50++;
@@ -349,9 +349,9 @@ void ESHOT_Think(void)
                 v1c->f_50--;
                 if (v1c->f_50)
                 {
-                    v1c->f_10 = v1c->f_18.f_0 + xpos[v1c->f_54];
-                    v1c->f_14 = v1c->f_18.f_4 + ypos[v1c->f_54];
-                    v1c->f_18.f_4++;
+                    v1c->f_10 = v1c->f_18.x + xpos[v1c->f_54];
+                    v1c->f_14 = v1c->f_18.y + ypos[v1c->f_54];
+                    v1c->f_18.y++;
                     v1c->f_54++;
                     if (v1c->f_54 >= 16)
                         v1c->f_54 = 0;
@@ -402,11 +402,11 @@ void ESHOT_Display(void)
     {
         if (v1c->f_58 == 5)
         {
-            for (v20 = v1c->f_14; v20 < v1c->f_18.f_c; v20 += 3)
+            for (v20 = v1c->f_14; v20 < v1c->f_18.dirY; v20 += 3)
             GFX_PutSprite(v1c->f_8, v1c->f_10, v20);
             GFX_PutSprite(elaspow[v1c->f_c - 1], v1c->f_10, v1c->f_14);
             v24 = lashit[v1c->f_c - 1];
-            v28 = v1c->f_18.f_c - 8;
+            v28 = v1c->f_18.dirY - 8;
             if (v28 > 0 && v28 < 200)
             {
                 GFX_PutSprite(v24, v1c->f_10 - (v24->f_c >> 2), v28);
