@@ -200,7 +200,7 @@ void ENEMY_LoadLib(void)
             slib[v1c] = (slib_t*)GLB_LockItem(spriteitm[v1c]);
             if (!slib[v1c])
                 EXIT_Error("ENEMY_LoadSprites() - memory");
-            numslibs[v1c] = GLB_ItemSize(spriteitm[v1c]);
+            numslibs[v1c] = GLB_GetItemSize(spriteitm[v1c]);
             numslibs[v1c] /= sizeof(slib_t);
         }
     }

@@ -9,7 +9,7 @@ char *GLB_CacheItem(int a1);
 void GLB_FreeItem(int a1);
 void GLB_FreeAll(void);
 int GLB_GetItemID(const char *a1);
-int GLB_ItemSize(int a1);
+int GLB_GetItemSize(int a1);
 void GLB_EnCrypt(const char *key, void *buf, int size);
 void GLB_DeCrypt(const char *key, void *buf, int size);
 int GLB_ReadFile(const char *a1, char *a2);

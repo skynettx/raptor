@@ -118,11 +118,11 @@ void DEMO_SetFileName(const char *a1)
 
 void DEMO_GLBFile(int a1)
 {
-    char *demo;
-    demo = GLB_GetItem(a1);
+    char *demo = GLB_GetItem(a1);
+    int size = GLB_GetItemSize(a1);
     if (demo)
     {
-        memcpy(playback, demo, sizeof(playback));
+        memcpy(playback, demo, size);
         cur_play = 1;
         max_play = playback[0].f_8;
         demo_game = playback[0].f_4;
