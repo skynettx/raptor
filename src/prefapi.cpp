@@ -55,13 +55,13 @@ static int INI_OpenFile(const char *section, const char *key, const char *defaul
                 v10 = 0;
                 continue;
             }
-            va = strtok(v9c, "=\n");
+            va = strtok(v9c, "=\r\n");
             if (va)
             {
                 if (!strcmp(va, key))
                 {
                     fclose(vs);
-                    va = strtok(NULL, "=\n");
+                    va = strtok(NULL, "=\r\n");
                     if (va)
                     {
                         strncpy(value, va, length);
@@ -299,6 +299,7 @@ int INI_GetPreferenceBool(const char *section, const char *key, short defvalue)
         INI_GetPreference(section, key, s2, 10, "TRUE");
     else
         INI_GetPreference(section, key, s2, 10, "FALSE");
+        
     if (s2[0] == '1' || !strcmp(s2, "TRUE"))
         return 1;
     if (s2[0] == '0' || !strcmp(s2, "FALSE"))
