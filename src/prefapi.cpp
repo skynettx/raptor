@@ -21,7 +21,7 @@ char* ltoa(long i, char* s, int dummy_radix) {
 #define PATH_MAX MAX_PATH
 #endif
 
-static int FUN_0002f210(const char *a1, const char *a2, const char *a3, char *a4, int a5, const char *a6)
+static int INI_OpenFile(const char *section, const char *key, const char *defaultValue, char *value, int length, const char *filename)
 {
     char *va;
     char v9c[128];
@@ -29,7 +29,7 @@ static int FUN_0002f210(const char *a1, const char *a2, const char *a3, char *a4
     FILE *vs;
 
     v10 = 0;
-    vs = fopen(a6, "r");
+    vs = fopen(filename, "r");
     if (vs)
     {
 
@@ -42,7 +42,7 @@ static int FUN_0002f210(const char *a1, const char *a2, const char *a3, char *a4
                 if (v9c[i] == ']')
                 {
                     v9c[i] = '\0';
-                    if (!strcmp(v9c + 1, a1))
+                    if (!strcmp(v9c + 1, section))
                         v10 = 1;
                 }
             }
@@ -58,31 +58,31 @@ static int FUN_0002f210(const char *a1, const char *a2, const char *a3, char *a4
             va = strtok(v9c, "=\n");
             if (va)
             {
-                if (!strcmp(va, a2))
+                if (!strcmp(va, key))
                 {
                     fclose(vs);
                     va = strtok(NULL, "=\n");
                     if (va)
                     {
-                        strncpy(a4, va, a5);
-                        a4[a5-1] = '\0';
+                        strncpy(value, va, length);
+                        value[length-1] = '\0';
                     }
                     else
-                        a4[0] = '\0';
+                        value[0] = '\0';
                     return 1;
                 }
             }
         }
         fclose(vs);
     }
-    if (a3)
-        strncpy(a4, a3, a5);
+    if (defaultValue)
+        strncpy(value, defaultValue, length);
     else
-        a4[0] = '\0';
+        value[0] = '\0';
     return 0;
 }
 
-static int FUN_0002f3b4(const char *a1, const char *a2, const char *a3, const char *a4)
+static int INI_SaveFile(const char *section, const char *key, const char *value, const char *filename)
 {
     char *va;
     char va8[128];
@@ -91,12 +91,12 @@ static int FUN_0002f3b4(const char *a1, const char *a2, const char *a3, const ch
     int v28, vbp, vd, v10, l, v1c, v18, vdi, v20;
 
     vc = 0;
-    if (!a1 || !*a1)
+    if (!section || !*section)
         return 0;
-    vs = fopen(a4, "rb+");
+    vs = fopen(filename, "rb+");
     if (!vs)
     {
-        vs = fopen(a4, "wb+");
+        vs = fopen(filename, "wb+");
         if (!vs)
             return 0;
         fseek(vs, 0, SEEK_SET);
@@ -114,7 +114,7 @@ static int FUN_0002f3b4(const char *a1, const char *a2, const char *a3, const ch
             if (va8[i] == ']')
             {
                 va8[i] = '\0';
-                if (!strcmp(va8 + 1, a1))
+                if (!strcmp(va8 + 1, section))
                 {
                     vc = 1;
                     break;
@@ -128,12 +128,12 @@ static int FUN_0002f3b4(const char *a1, const char *a2, const char *a3, const ch
     if (!vc)
     {
         fseek(vs, 0, SEEK_END);
-        if (!a2 || !*a2)
+        if (!key || !*key)
         {
             fclose(vs);
             return 1;
         }
-        fprintf(vs, "\r\n[%s]\r\n", a1);
+        fprintf(vs, "\r\n[%s]\r\n", section);
         v28 = vbp = ftell(vs);
     }
     else
@@ -150,10 +150,10 @@ static int FUN_0002f3b4(const char *a1, const char *a2, const char *a3, const ch
             va = strtok(va8, "=\r\n");
             if (va)
             {
-                if (!strcmp(va, a2))
+                if (!strcmp(va, key))
                 {
                     va = strtok(NULL, "=\r\n");
-                    if (!strcmp(a3, va))
+                    if (!strcmp(value, va))
                     {
                         fclose(vs);
                         return 1;
@@ -170,19 +170,19 @@ static int FUN_0002f3b4(const char *a1, const char *a2, const char *a3, const ch
     {
         if (vbp == v28)
         {
-            if (!a2 || !*a2 || !a3 || !*a3)
+            if (!key || !*key || !value || !*value)
             {
                 fclose(vs);
                 return 1;
             }
             fseek(vs, 0, SEEK_END);
-            fprintf(vs, "%s=%s\r\n", a2, a3);
+            fprintf(vs, "%s=%s\r\n", key, value);
             fclose(vs);
             return 1;
         }
         else
         {
-            if (a2 && *a2)
+            if (key && *key)
                 vd = 0;
             else
             {
@@ -195,15 +195,15 @@ static int FUN_0002f3b4(const char *a1, const char *a2, const char *a3, const ch
     {
         vd = vbp - v28;
     }
-    if (a2 && *a2 && a3 && *a3)
+    if (key && *key && value && *value)
     {
-        sprintf(va8, "%s=%s\r\n", a2, a3);
+        sprintf(va8, "%s=%s\r\n", key, value);
         l = strlen(va8);
     }
     else
         l = 0;
     v1c = l - vd;
-    if (a2 && *a2)
+    if (key && *key)
         v10 = v28;
     if (v1c < 0)
     {
@@ -254,10 +254,10 @@ static int FUN_0002f3b4(const char *a1, const char *a2, const char *a3, const ch
             fflush(vs);
         }
     }
-    if (a2 && *a2 && a3 && *a3)
+    if (key && *key && value && *value)
     {
         fseek(vs, v10, SEEK_SET);
-        fprintf(vs, "%s=%s\r\n", a2, a3);
+        fprintf(vs, "%s=%s\r\n", key, value);
     }
     fclose(vs);
     return 1;
@@ -265,48 +265,40 @@ static int FUN_0002f3b4(const char *a1, const char *a2, const char *a3, const ch
 
 static char preference[PATH_MAX];
 
-int INI_InitPreference(const char *a1)
+int INI_InitPreference(const char *section)
 {
-    if (a1)
-        strcpy(preference, a1);
+    if (section)
+        strcpy(preference, section);
     return !access(preference, 4);
 }
 
-int INI_GetPreferenceLong(const char *a1, const char *a2, int a3)
+int INI_GetPreferenceLong(const char *section, const char *key, int defValue)
 {
     char s1[20], s2[20];
-    ltoa(a3, s1, 10);
-    INI_GetPreference(a1, a2, s2, 20, s1);
+    ltoa(defValue, s1, 10);
+    INI_GetPreference(section, key, s2, 20, s1);
     return atol(s2);
 }
 
-int INI_GetPreferenceHex(const char* a1, const char* a2, int a3)
+int INI_GetPreferenceHex(const char* section, const char* key, int defValue)
 {
     char s1[32], s2[32];
     unsigned int t;
 
-    ltoa(a3, s1, 10);
-    INI_GetPreference(a1, a2, s2, 32, s1);
+    ltoa(defValue, s1, 10);
+    INI_GetPreference(section, key, s2, 32, s1);
     sscanf(s2, "%x", &t);
 
     return t & 0xFF;
 }
-/*int INI_GetPreferenceHex(const char *a1, const char *a2, int a3)
-{
-    char s1[32], s2[32], t;
-    ltoa(a3, s1, 10);
-    INI_GetPreference(a1, a2, s2, 32, s1);
-    sscanf(s2, "%x", &t);
-    return t;
-}*/
 
-int INI_GetPreferenceBool(const char *a1, const char *a2, short a3)
+int INI_GetPreferenceBool(const char *section, const char *key, short defvalue)
 {
     char s2[10];
-    if (a3)
-        INI_GetPreference(a1, a2, s2, 10, "TRUE");
+    if (defvalue)
+        INI_GetPreference(section, key, s2, 10, "TRUE");
     else
-        INI_GetPreference(a1, a2, s2, 10, "FALSE");
+        INI_GetPreference(section, key, s2, 10, "FALSE");
     if (s2[0] == '1' || !strcmp(s2, "TRUE"))
         return 1;
     if (s2[0] == '0' || !strcmp(s2, "FALSE"))
@@ -314,59 +306,59 @@ int INI_GetPreferenceBool(const char *a1, const char *a2, short a3)
     return atoi(s2);
 }
 
-char *INI_GetPreference(const char *a1, const char *a2, char *a3, int a4, const char *a5)
+char *INI_GetPreference(const char *section, const char *key, char *retValue, int lenght, const char *defValue)
 {
-    if (!a1 || !a2 || !a3)
+    if (!section || !key || !retValue)
     {
-        if (a3)
-            *a3 = 0;
+        if (retValue)
+            *retValue = 0;
         return NULL;
     }
-    FUN_0002f210(a1, a2, a5, a3, a4, preference);
-    return a3;
+    INI_OpenFile(section, key, defValue, retValue, lenght, preference);
+    return retValue;
 }
 
-int INI_PutPreferenceLong(const char *a1, const char *a2, int a3)
+int INI_PutPreferenceLong(const char *section, const char *key, int value)
 {
     char s1[32];
-    if (a3 == -1)
+    if (value == -1)
     {
-        INI_DeletePreference(a1, a2);
+        INI_DeletePreference(section, key);
         return 0;
     }
-    ltoa(a3, s1, 10);
-    return INI_PutPreference(a1, a2, s1);
+    ltoa(value, s1, 10);
+    return INI_PutPreference(section, key, s1);
 }
 
-int INI_PutPreferenceHex(const char *a1, const char *a2, int a3)
+int INI_PutPreferenceHex(const char *section, const char *key, int value)
 {
     char s1[36];
-    if (a3 == -1)
+    if (value == -1)
     {
-        INI_DeletePreference(a1, a2);
+        INI_DeletePreference(section, key);
         return 0;
     }
-    sprintf(s1, "%x", a3);
-    return INI_PutPreference(a1, a2, s1);
+    sprintf(s1, "%x", value);
+    return INI_PutPreference(section, key, s1);
 }
 
-int INI_PutPreferenceBool(const char *a1, const char *a2, short a3)
+int INI_PutPreferenceBool(const char *section, const char *key, short value)
 {
-    if (a3)
-        return INI_PutPreference(a1, a2, "TRUE");
-    return INI_PutPreference(a1, a2, "FALSE");
+    if (value)
+        return INI_PutPreference(section, key, "TRUE");
+    return INI_PutPreference(section, key, "FALSE");
 }
 
-int INI_PutPreference(const char *a1, const char *a2, const char *a3)
+int INI_PutPreference(const char *section, const char *key, const char *value)
 {
-    if (!a1 || !a2 || !a3)
+    if (!section || !key || !value)
         return 0;
-    return FUN_0002f3b4(a1, a2, a3, preference);
+    return INI_SaveFile(section, key, value, preference);
 }
 
-int INI_DeletePreference(const char *a1, const char *a2)
+int INI_DeletePreference(const char *section, const char *key)
 {
-    if (!a1)
+    if (!section)
         return 0;
-    return FUN_0002f3b4(a1, a2, NULL, preference);
+    return INI_SaveFile(section, key, NULL, preference);
 }

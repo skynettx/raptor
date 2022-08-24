@@ -659,8 +659,10 @@ int Do_Game(void)
     buttons[3] = 0;
     playerx = 0x90;
     playery = 0xa0;
-    PTR_SetPos(0x90, 0xa0);
-    IPT_Start();
+    if (!demo_mode) {
+        PTR_SetPos(0x90, 0xa0);
+        IPT_Start();
+    }
     RAP_GetShipPic();
     BONUS_Clear();
     ANIMS_Clear();

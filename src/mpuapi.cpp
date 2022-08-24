@@ -93,20 +93,12 @@ static void ControllerEvent(unsigned int chan, unsigned int controller, unsigned
         0, 0, 1, 7, 10, 11, 91, 93, 64, 67, 120, 123, -1, -1, 121, -1
     };
     uint32_t data = 0;
-    switch (controller)
-    {
-    case 0:
-        data = 0xc0 | MPU_MapChannel(chan);
-        data |= param << 8;
-        break;
-    default:
-        if (event_map[controller] == -1)
-            return;
-        data = 0xb0 | MPU_MapChannel(chan);
-        data |= event_map[controller] << 8;
-        data |= param << 16;
-        break;
-    }
+
+    if (event_map[controller] == -1)
+        return;
+    data = 0xb0 | MPU_MapChannel(chan);
+    data |= event_map[controller] << 8;
+    data |= param << 16;
 
     midiOutShortMsg((HMIDIOUT)mpu_stream, data);
 }
@@ -125,6 +117,28 @@ static void PitchBendEvent(unsigned int chan, int bend)
     midiOutShortMsg((HMIDIOUT)mpu_stream, data);
 }
 
+void ProgramEvent(unsigned int chan, unsigned int param){
+    if (!mpu_init)
+        return;
+    uint32_t data = 0;
+
+    data = 0xc0 | MPU_MapChannel(chan);
+    data |= (param & 127) << 8;
+
+    midiOutShortMsg((HMIDIOUT)mpu_stream, data);
+}
+
+void AllNotesOffEvent(unsigned int chan, unsigned int param){
+    if (!mpu_init)
+        return;
+    uint32_t data = 0;
+
+    data = 0xB0 | MPU_MapChannel(chan);
+    data |= 0x7B;
+
+    midiOutShortMsg((HMIDIOUT)mpu_stream, data);
+}
+
 musdevice_t mus_device_mpu = {
     MPU_Init,
     MPU_DeInit,
@@ -134,5 +148,7 @@ musdevice_t mus_device_mpu = {
     KeyOnEvent,
     ControllerEvent,
     PitchBendEvent,
+    ProgramEvent,
+    AllNotesOffEvent,
 };
 #endif // _WIN32

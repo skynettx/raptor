@@ -8,6 +8,7 @@
 #include "tsf.h"
 
 #include "musapi.h"
+#include "prefapi.h"
 
 static tsf* g_TinySoundFont;
 
@@ -26,14 +27,19 @@ int TSF_Init (int option)
     OutputAudioSpec.samples = 512;
     OutputAudioSpec.callback = AudioCallback;
     
+    char fn[128];
+    INI_GetPreference("Setup", "SoundFont", fn, 127, "SoundFont.sf2");
+
     // Load the SoundFont from a file
-    g_TinySoundFont = tsf_load_filename("SoundFont.sf2");
+    g_TinySoundFont = tsf_load_filename(fn);
     
     if (!g_TinySoundFont)
     {
-        fprintf(stderr, "Could not load SoundFont.sf2\n");
+        char errmsg[255];
+        fprintf(stderr, "Could not load %s\n", fn);
+        sprintf(errmsg,"Could not load %s\n", fn);
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-            "Raptor", "Could not load SoundFont.sf2", NULL);
+            "Raptor", errmsg, NULL);
         EXIT_Error("Could not load SoundFont.");
         return 0;
     }

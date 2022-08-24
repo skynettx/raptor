@@ -253,9 +253,6 @@ void MUS_Service(void)
                     music_cmdptr++;
                     uint8_t param = music_ptr[music_cmdptr + music_startoffset];
                     music_cmdptr++;
-
-                    if (music_device && music_device->ControllerEvent)
-                        music_device->ControllerEvent(chan, cmd, param);
                     
                     switch (cmd)
                     {
