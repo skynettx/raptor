@@ -61,11 +61,13 @@ You have to take care of these files yourself.
    ```
 
 ### Configuration
-If you want Midi over the TinySoundFont lib rename the `TimGM6mb.sf2` to `SoundFont.sf2` or use any other soundfont in the sf2 format and rename it. 
-For a better Midi sound quality I recommend the [FluidR3_GM.sf2](https://musescore.org/node/101). This font is 140 mb so it is not in the repository.
 You can build or download [Raptor Setup](https://github.com/skynettx/raptorsetup.git) to create and edit the
 `SETUP.INI`, or edit it manually as follows.
-Rename the `SETUP(ADLIB).INI` or the `SETUP(MIDI).INI` file to `SETUP.INI` in Raptor directory.
+Rename the `SETUP(ADLIB).INI` or the `SETUP(MIDI).INI` file to `SETUP.INI` in Raptor directory.  
+If you want Midi over the TinySoundFont lib rename the `TimGM6mb.sf2` to `SoundFont.sf2` or specify the filename in the `SETUP.INI` file:  
+`SoundFont=SoundFont.sf2`  
+You can use any other GM compatible soundfont in sf2 format. For a better Midi sound quality I recommend the [FluidR3_GM.sf2](https://musescore.org/node/101).
+This font is 140 mb so it is not in the repository.  
 To play with one of the following input devices set `Control=0` under the [Setup] section in the `SETUP.INI` file to:  
 `Control=0` Keyboard  
 `Control=1` Mouse  
