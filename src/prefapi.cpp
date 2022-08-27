@@ -61,7 +61,7 @@ static int INI_OpenFile(const char *section, const char *key, const char *defaul
                 if (!strcmp(va, key))
                 {
                     fclose(vs);
-                    va = strtok(NULL, "=\r\n");
+                    va = strtok(NULL, "\r\n");
                     if (va)
                     {
                         strncpy(value, va, length);
