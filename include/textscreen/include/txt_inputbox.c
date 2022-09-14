@@ -26,6 +26,10 @@
 #include "txt_utf8.h"
 #include "txt_window.h"
 
+#ifdef _MSC_VER
+#define strdup _strdup
+#endif
+
 extern txt_widget_class_t txt_inputbox_class;
 extern txt_widget_class_t txt_int_inputbox_class;
 

@@ -33,6 +33,10 @@
 #include <shellapi.h>
 #endif
 
+#ifdef _MSC_VER
+#define strdup _strdup
+#endif
+
 void TXT_SetWindowAction(txt_window_t *window,
                          txt_horiz_align_t position,
                          TXT_UNCAST_ARG(action))
@@ -281,7 +285,7 @@ void TXT_LayoutWindow(txt_window_t *window)
     CalcActionAreaSize(window, &actionarea_w, &actionarea_h);
 
     if (actionarea_w > widgets_w)
-        widgets_w = actionarea_w;
+        widgets_w = actionarea_w - 2;
 
     // Set the window size based on widgets_w
 
@@ -340,13 +344,27 @@ void TXT_DrawWindow(txt_window_t *window)
         TXT_BGColor(TXT_INACTIVE_WINDOW_BACKGROUND, 0);
     }
 
-    TXT_FGColor(TXT_COLOR_BRIGHT_WHITE);
+    if (window->table.widget.focused)
+        TXT_FGColor(TXT_COLOR_BRIGHT_WHITE);
+
+    else
+        TXT_FGColor(TXT_COLOR_DARK_GREY);
 
     // Draw the window
 
-    TXT_DrawWindowFrame(window->title,
-                        window->window_x, window->window_y,
-                        window->window_w, window->window_h);
+    if (window->table.widget.focused)
+    {
+        TXT_DrawWindowFrame(window->title,
+            window->window_x, window->window_y,
+            window->window_w, window->window_h);
+    }
+    
+    else
+    {
+        TXT_DrawWindowFrameInActive(window->title,
+            window->window_x, window->window_y,
+            window->window_w, window->window_h);
+    }
 
     // Draw all widgets
 
@@ -359,9 +377,17 @@ void TXT_DrawWindow(txt_window_t *window)
     if (widgets->y + widgets->h < window->window_y + window->window_h - 1)
     {
         // Separator for action area
+        if (window->table.widget.focused)
+        {
+            TXT_DrawSeparator(window->window_x, widgets->y + widgets->h,
+                window->window_w);
+        }
 
-        TXT_DrawSeparator(window->window_x, widgets->y + widgets->h,
-                          window->window_w);
+        else
+        {
+            TXT_DrawSeparatorInActive(window->window_x, widgets->y + widgets->h,
+                window->window_w);
+        }
 
         // Action area at the window bottom
 

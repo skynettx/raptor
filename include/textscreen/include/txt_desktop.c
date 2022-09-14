@@ -25,6 +25,10 @@
 #include "txt_separator.h"
 #include "txt_window.h"
 
+#ifdef _MSC_VER
+#define strdup _strdup
+#endif
+
 #define HELP_KEY KEY_F1
 #define MAXWINDOWS 128
 

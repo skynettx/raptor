@@ -118,6 +118,8 @@ static int max_scaling_buffer_pixels = 16000000;
 // int fullscreen = true;
 int fullscreen; //Defined in VIDEO_LoadPrefs to read config from setup.ini
 
+int txt_fullscreen;
+
 // Aspect ratio correction mode
 
 int aspect_ratio_correct; //Defined in VIDEO_LoadPrefs to read config from setup.ini
@@ -196,6 +198,7 @@ void VIDEO_LoadPrefs(void)
 {
     fullscreen = INI_GetPreferenceLong("Video", "fullscreen", 0);
     aspect_ratio_correct = INI_GetPreferenceLong("Video", "aspect_ratio_correct", 1);
+    txt_fullscreen = INI_GetPreferenceLong("Video", "txt_fullscreen", 0);
 }
 
 static bool MouseShouldBeGrabbed()

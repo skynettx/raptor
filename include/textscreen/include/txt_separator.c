@@ -22,6 +22,10 @@
 #include "txt_utf8.h"
 #include "txt_window.h"
 
+#ifdef _MSC_VER
+#define strdup _strdup
+#endif
+
 static void TXT_SeparatorSizeCalc(TXT_UNCAST_ARG(separator))
 {
     TXT_CAST_ARG(txt_separator_t, separator);

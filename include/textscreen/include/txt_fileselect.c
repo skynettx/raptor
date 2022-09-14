@@ -29,6 +29,10 @@
 #include "txt_main.h"
 #include "txt_widget.h"
 
+#ifdef _MSC_VER
+#define strdup _strdup
+#endif
+
 struct txt_fileselect_s {
     txt_widget_t widget;
     txt_inputbox_t *inputbox;

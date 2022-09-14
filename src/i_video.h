@@ -35,6 +35,7 @@ typedef bool (*grabmouse_callback_t)(void);
 
 extern int window_width;
 extern int window_height;
+extern int txt_fullscreen;
 
 extern pixel_t *I_VideoBuffer;
 

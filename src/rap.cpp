@@ -198,6 +198,7 @@ void ShutDown(int a1)
     GLB_FreeAll();
     IPT_CloJoy();                                    //Close Joystick
     SWD_End();
+    SDL_Quit();
     free(g_highmem);
 }
 

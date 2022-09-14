@@ -24,6 +24,10 @@
 #include "txt_utf8.h"
 #include "txt_window.h"
 
+#ifdef _MSC_VER
+#define strdup _strdup
+#endif
+
 static void TXT_ButtonSizeCalc(TXT_UNCAST_ARG(button))
 {
     TXT_CAST_ARG(txt_button_t, button);

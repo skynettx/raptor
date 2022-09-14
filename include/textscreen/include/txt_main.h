@@ -197,5 +197,8 @@ int TXT_vsnprintf(char *buf, size_t buf_len, const char *s, va_list args);
 // Safe version of snprintf().
 int TXT_snprintf(char *buf, size_t buf_len, const char *s, ...) PRINTF_ATTR(3, 4);
 
+// Set fullscreenmode
+void TXT_Fullscreen(int fullscreen);
+
 #endif /* #ifndef TXT_MAIN_H */
 

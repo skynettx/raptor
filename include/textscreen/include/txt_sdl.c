@@ -63,6 +63,8 @@ static txt_input_mode_t input_mode = TXT_INPUT_NORMAL;
 // is the value that was passed to SDL_CreateWindow().
 static int screen_image_w, screen_image_h;
 
+static int fullscreenflag;
+
 static TxtSDLEventCallbackFunc event_callback;
 static void *event_callback_data;
 
@@ -220,6 +222,13 @@ static void ChooseFont(void)
     }
 }
 
+//Set fullscreenmode
+
+void TXT_Fullscreen(int fullscreen)
+{
+    fullscreenflag = fullscreen;
+}
+
 //
 // Initialize text mode screen
 //
@@ -244,6 +253,12 @@ int TXT_Init(void)
     if (font == &highdpi_font)
     {
         flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+    }
+
+    //If fullscreenflag is true set SDL to fullscreenmode 
+    if (fullscreenflag)
+    {
+        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
 
     TXT_SDLWindow =
@@ -473,10 +488,33 @@ void TXT_GetMousePosition(int *x, int *y)
     // what SDL_GetWindowSize() returns; we must calculate and subtract the
     // origin position since we center the image within the window.
     SDL_GetWindowSize(TXT_SDLWindow, &window_w, &window_h);
-    origin_x = (window_w - screen_image_w) / 2;
-    origin_y = (window_h - screen_image_h) / 2;
-    *x = ((*x - origin_x) * TXT_SCREEN_W) / screen_image_w;
-    *y = ((*y - origin_y) * TXT_SCREEN_H) / screen_image_h;
+    
+    if (fullscreenflag)
+    {
+        if ((strcmp(font->name, "large") == 0))
+        {
+            origin_x = (window_w - (screen_image_w * 2)) / 2;
+            origin_y = (window_h - (screen_image_h * 2)) / 2;
+            *x = ((*x - origin_x) * TXT_SCREEN_W) / (screen_image_w * 2);
+            *y = ((*y - origin_y) * TXT_SCREEN_H) / (screen_image_h * 2);
+        }
+
+        else
+        {
+            origin_x = (window_w - screen_image_w) / 2;
+            origin_y = (window_h - screen_image_h) / 2;
+            *x = ((*x - origin_x) * TXT_SCREEN_W) / screen_image_w;
+            *y = ((*y - origin_y) * TXT_SCREEN_H) / screen_image_h;
+        }
+    }
+    
+    else
+    {
+        origin_x = (window_w - screen_image_w) / 2;
+        origin_y = (window_h - screen_image_h) / 2;
+        *x = ((*x - origin_x) * TXT_SCREEN_W) / screen_image_w;
+        *y = ((*y - origin_y) * TXT_SCREEN_H) / screen_image_h;
+    }
 
     if (*x < 0)
     {

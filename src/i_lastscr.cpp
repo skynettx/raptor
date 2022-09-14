@@ -41,6 +41,8 @@ void I_LASTSCR(void)
     int y;
     int indent;
 
+    TXT_Fullscreen(txt_fullscreen);
+    
     // Set up text mode screen
 
     TXT_Init();

@@ -86,6 +86,9 @@ For ALSA Midi support on Linux, install timidity and soundfont-fluid from the pa
 get the timidity client and port with `aplaymidi -l` and set it in the [Setup] section in the `SETUP.INI` file:  
 `alsa_output_client=128`  
 `alsa_output_port=0`  
+To display the text mode ending screen after the game quits in fullscreen mode set under the [Video] section in the `SETUP.INI` file:  
+`txt_fullscreen=0`  
+`txt_fullscreen=1`  
 
 ## Build
 The project supports the compilers msvc, gcc and clang.  

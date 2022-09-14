@@ -24,6 +24,10 @@
 #include "txt_utf8.h"
 #include "txt_window.h"
 
+#ifdef _MSC_VER
+#define strdup _strdup
+#endif
+
 static void TXT_CheckBoxSizeCalc(TXT_UNCAST_ARG(checkbox))
 {
     TXT_CAST_ARG(txt_checkbox_t, checkbox);
