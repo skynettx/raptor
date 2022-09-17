@@ -5,8 +5,8 @@ struct texture_t {
     int f_0; // x
     int f_4; // y
     int f_8; // marker
-    int f_c; // width
-    int f_10; // height
+    int width; // width
+    int height; // height
     char f_14[1];
 };
 

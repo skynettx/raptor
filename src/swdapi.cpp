@@ -134,7 +134,7 @@ int SWD_GetLine(const char *a1)
                 }
                 if (x > textcmd_x2 || y > textcmd_y2)
                     break;
-                textdraw_x += img->f_c + 1;
+                textdraw_x += img->width + 1;
                 textdraw_y = y;
                 GFX_PutImage(img, x, y, 0);
                 GLB_FreeItem(id);
@@ -295,7 +295,7 @@ void SWD_PutField(swd_t *a1, swdfield_t *a2)
                 GFX_PutTexture(tex, vbp, v1c, a2->f_84, a2->f_88);
                 goto LAB_0002c422;
             }
-            if (a2->f_84 < tex->f_c || a2->f_88 < tex->f_10)
+            if (a2->f_84 < tex->width || a2->f_88 < tex->height)
             {
                 GFX_ScalePic(tex, vbp, v1c, a2->f_84, a2->f_88, 0);
             }
@@ -1128,8 +1128,8 @@ int SWD_ShowAllFields(swd_t *a1)
             v20 = a1->f_68 + vs[i].f_80;
             if (vs[i].f_70 && vs[i].f_90)
             {
-                vs[i].f_90->f_c = (short)vs[i].f_84;
-                vs[i].f_90->f_10 = (short)vs[i].f_88;
+                vs[i].f_90->width = (short)vs[i].f_84;
+                vs[i].f_90->height = (short)vs[i].f_88;
                 GFX_GetScreen(vs[i].f_90->f_14, vbp, v20, vs[i].f_84, vs[i].f_88);
             }
             if (vs[i].f_74)

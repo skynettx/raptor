@@ -34,8 +34,8 @@ void SHADOW_Draw(char *a1, int a2, int a3)
     GFX_3DPoint();
     v2c = G3D_screenx;
     v30 = G3D_screeny;
-    G3D_x = v2c + v14->f_c - 1;
-    G3D_y = v30 + v14->f_10 - 1;
+    G3D_x = v2c + v14->width - 1;
+    G3D_y = v30 + v14->height - 1;
     G3D_z = 0x500;
     GFX_3DPoint();
     v18 = G3D_screenx - v2c + 1;
@@ -49,7 +49,7 @@ void SHADOW_Draw(char *a1, int a2, int a3)
         a1 += 16;
         v2c = v20->f_0 + a2;
         v30 = v20->f_4 + a3;
-        v34 = v2c + v20->f_c - 1;
+        v34 = v2c + v20->width - 1;
         v38 = v30 + 1;
         G3D_x = v2c;
         G3D_y = v30;
@@ -74,7 +74,7 @@ void SHADOW_Draw(char *a1, int a2, int a3)
             v3c = v20->f_4;
         }
         v40 = v28;
-        a1 += v20->f_c;
+        a1 += v20->width;
         v20 = (texture_t*)a1;
     }
 }

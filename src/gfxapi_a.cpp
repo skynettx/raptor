@@ -52,9 +52,9 @@ void GFX_ShadeSprite(char *p, texture_t *t, char *s)
     while ((int16_t)t->f_8 != -1)
     {
         char *d = p + (uint16_t)t->f_8;
-        for (int i = 0; i < (uint16_t)t->f_c; i++, d++)
+        for (int i = 0; i < (uint16_t)t->width; i++, d++)
             *d = s[(uint8_t)*d];
-        t = (texture_t*)((char*)&t->f_10 + (uint16_t)t->f_c);
+        t = (texture_t*)((char*)&t->height + (uint16_t)t->width);
     }
 }
 
@@ -62,8 +62,8 @@ void GFX_DrawSprite(char *a1, texture_t *a2)
 {
     while ((int16_t)a2->f_8 != -1)
     {
-        memcpy(a1 + (uint16_t)a2->f_8, (char*)&a2->f_10, (uint16_t)a2->f_c);
-        a2 = (texture_t*)((char*)&a2->f_10 + (uint16_t)a2->f_c);
+        memcpy(a1 + (uint16_t)a2->f_8, (char*)&a2->height, (uint16_t)a2->width);
+        a2 = (texture_t*)((char*)&a2->height + (uint16_t)a2->width);
     }
 }
 

@@ -8,293 +8,396 @@
 #include "tile.h"
 #include "fileids.h"
 
-anim_t first_anims, last_anims, anims[100];
+#define MAX_ANIMLIB 25
+#define MAX_ANIMS   100
+
+anim_t first_anims, last_anims, anims[MAX_ANIMS];
 anim_t *free_anims;
 
-animlib_t animlib[25];
+animlib_t animlib[MAX_ANIMLIB];
 int curlib;
 
 int adir[3] = {
     0, -1, 1
 };
 
-void ANIMS_Clear(void)
+/***************************************************************************
+ANIMS_Clear () - Clears out All ANIM Objects
+ ***************************************************************************/
+void ANIMS_Clear(
+    void
+)
 {
-    int v1c;
-    first_anims.f_0 = NULL;
-    first_anims.f_4 = &last_anims;
-    last_anims.f_0 = &first_anims;
-    last_anims.f_4 = NULL;
+    int loop;
+    first_anims.prev = NULL;
+    first_anims.next = &last_anims;
+    last_anims.prev = &first_anims;
+    last_anims.next = NULL;
     free_anims = anims;
     memset(anims, 0, sizeof(anims));
-    for (v1c = 0; v1c < 99; v1c++)
-        anims[v1c].f_4 = &anims[v1c + 1];
+    for (loop = 0; loop < MAX_ANIMS - 1; loop++)
+        anims[loop].next = &anims[loop + 1];
 }
 
-anim_t *ANIMS_Get(void)
+/*-------------------------------------------------------------------------*
+ANIMS_Get () - Gets A Free ANIM from Link List
+ *-------------------------------------------------------------------------*/
+anim_t *ANIMS_Get(
+    void
+)
 {
-    anim_t *v1c;
+    anim_t *newa;
     if (!free_anims)
         return NULL;
-    v1c = free_anims;
-    free_anims = free_anims->f_4;
-    memset(v1c, 0, sizeof(anim_t));
-    v1c->f_4 = &last_anims;
-    v1c->f_0 = last_anims.f_0;
-    last_anims.f_0 = v1c;
-    v1c->f_0->f_4 = v1c;
-    return v1c;
+    newa = free_anims;
+    free_anims = free_anims->next;
+    memset(newa, 0, sizeof(anim_t));
+    newa->next = &last_anims;
+    newa->prev = last_anims.prev;
+    last_anims.prev = newa;
+    newa->prev->next = newa;
+    return newa;
 }
 
-anim_t *ANIMS_Remove(anim_t *a1)
+/*-------------------------------------------------------------------------*
+ANIMS_Remove () Removes ANIM from Link List
+ *-------------------------------------------------------------------------*/
+anim_t *ANIMS_Remove(
+    anim_t *anim
+)
 {
-    anim_t *v1c;
-    v1c = a1->f_0;
-    a1->f_4->f_0 = a1->f_0;
-    a1->f_0->f_4 = a1->f_4;
-    memset(a1, 0, sizeof(anim_t));
-    a1->f_4 = free_anims;
-    free_anims = a1;
-    return v1c;
+    anim_t *next;
+    next = anim->prev;
+    anim->next->prev = anim->prev;
+    anim->prev->next = anim->next;
+    memset(anim, 0, sizeof(anim_t));
+    anim->next = free_anims;
+    free_anims = anim;
+    return next;
 }
 
-
-int ANIMS_Register(int a1, int a2, int a3, int a4, int a5, int a6)
+/***************************************************************************
+ANIMS_Register () - Register a ANIM for USE with this stuff
+ ***************************************************************************/
+int ANIMS_Register(
+    int item,              // INPUT : lumpnum of first frame
+    int numframes,         // INPUT : number of frames
+    int groundflag,        // INPUT : on the ground = TRUE
+    int playerflag,        // INPUT : follow player movements
+    int transparent,       // INPUT : Transparent ( LIGHT )
+    int adir               // INPUT : Anim Direction
+)
 {
-    animlib_t *v14;
-    texture_t *v18;
-    int v10;
-    v10 = curlib;
-    if (curlib >= 25)
+    animlib_t *cur;
+    texture_t *h;
+    int handle;
+    handle = curlib;
+    if (curlib >= MAX_ANIMLIB)
         EXIT_Error("ANIMS_Register() - Max LIBs");
-    v14 = &animlib[curlib];
+    cur = &animlib[curlib];
     curlib++;
-    v14->f_0 = a1;
-    v14->f_4 = a2;
-    v14->f_8 = a3;
-    v14->f_c = a4;
-    v14->f_10 = a5;
-    v14->f_14 = a6;
-    v18 = (texture_t*)GLB_LockItem(a1);
-    v14->f_18 = v18->f_c >> 1;
-    v14->f_1c = v18->f_10 >> 1;
-    GLB_FreeItem(a1);
-    return v10;
+    cur->item = item;
+    cur->numframes = numframes;
+    cur->groundflag = groundflag;
+    cur->playerflag = playerflag;
+    cur->transparent = transparent;
+    cur->adir = adir;
+    h = (texture_t*)GLB_LockItem(item);
+    cur->xoff = h->width >> 1;
+    cur->yoff = h->height >> 1;
+    GLB_FreeItem(item);
+    return handle;
 }
 
-void ANIMS_Init(void)
+/***************************************************************************
+ANIMS_Init () Initializes ANIM Stuff
+ ***************************************************************************/
+void ANIMS_Init(
+    void
+)
 {
     ANIMS_Clear();
     memset(animlib, 0, sizeof(animlib));
     curlib = 0;
-    ANIMS_Register(FILE164_GEXPLO_BLK, 0x2a, 0, 0, 0, 0);
-    ANIMS_Register(FILE17d_BOOM_PIC, 0x23, 0, 0, 0, 0);
-    ANIMS_Register(FILE1f5_SPLAT_BLK, 7, 0, 0, 0, 0);
-    ANIMS_Register(FILE113_BIGSPLAT_BLK, 10, 0, 0, 0, 0);
-    ANIMS_Register(FILE1e5_LGFLAK_BLK, 0xc, 2, 0, 0, 0);
-    ANIMS_Register(FILE1d8_EXPLO2_BLK, 0xd, 0, 0, 0, 0);
-    ANIMS_Register(FILE1fc_SMFLAK_BLK, 0xe, 2, 0, 0, 0);
-    ANIMS_Register(FILE1a0_AIRBOOM_PIC, 0x10, 2, 0, 0, 0);
-    ANIMS_Register(FILE1ae_NRGBANG_BLK, 0xc, 2, 0, 0, 0);
-    ANIMS_Register(FILE129_LRBLST_BLK, 4, 2, 0, 0, 0);
-    ANIMS_Register(FILE10a_SSMOKE_BLK, 9, 1, 0, 0, 0);
-    ANIMS_Register(FILE10e_SSMOKE_BLK, 5, 1, 0, 1, 2);
-    ANIMS_Register(FILE12d_SMOKTRAL_BLK, 4, 1, 0, 1, 1);
-    ANIMS_Register(FILE18e_LGHTIN_BLK, 0xe, 1, 0, 0, 0);
-    ANIMS_Register(FILE19c_BSPARK_BLK, 9, 1, 0, 0, 0);
-    ANIMS_Register(FILE1a5_OSPARK_BLK, 9, 1, 0, 0, 0);
-    ANIMS_Register(FILE1c7_GUNSTR_BLK, 4, 1, 1, 0, 0);
-    ANIMS_Register(FILE152_FLARE_PIC, 0x1a, 0, 0, 0, 0);
-    ANIMS_Register(FILE16c_SPARKLE_PIC, 0x11, 0, 0, 0, 0);
-    ANIMS_Register(FILE18e_LGHTIN_BLK, 0xe, 2, 0, 0, 0);
-    ANIMS_Register(FILE149_SHIPGLOW_BLK, 4, 2, 1, 1, 0);
+    
+    // GROUND EXPLOSIONS
+    ANIMS_Register(FILE164_GEXPLO_BLK, 0x2a, GROUND, 0, 0, A_NORM);
+    ANIMS_Register(FILE17d_BOOM_PIC, 0x23, GROUND, 0, 0, A_NORM);
+    ANIMS_Register(FILE1f5_SPLAT_BLK, 7, GROUND, 0, 0, A_NORM);
+    ANIMS_Register(FILE113_BIGSPLAT_BLK, 10, GROUND, 0, 0, A_NORM);
+    
+    // AIR EXPLOSIONS
+    ANIMS_Register(FILE1e5_LGFLAK_BLK, 0xc, HIGH_AIR, 0, 0, A_NORM);
+    ANIMS_Register(FILE1d8_EXPLO2_BLK, 0xd, GROUND, 0, 0, A_NORM);
+    ANIMS_Register(FILE1fc_SMFLAK_BLK, 0xe, HIGH_AIR, 0, 0, A_NORM);
+    ANIMS_Register(FILE1a0_AIRBOOM_PIC, 0x10, HIGH_AIR, 0, 0, A_NORM);
+    ANIMS_Register(FILE1ae_NRGBANG_BLK, 0xc, HIGH_AIR, 0, 0, A_NORM);
+    ANIMS_Register(FILE129_LRBLST_BLK, 4, HIGH_AIR, 0, 0, A_NORM);
+    
+    // MISC ANIMS
+    ANIMS_Register(FILE10a_SSMOKE_BLK, 9, MID_AIR, 0, 0, A_NORM);
+    ANIMS_Register(FILE10e_SSMOKE_BLK, 5, MID_AIR, 0, 1, A_MOVEDOWN);
+    ANIMS_Register(FILE12d_SMOKTRAL_BLK, 4, MID_AIR, 0, 1, A_MOVEUP);
+    
+    ANIMS_Register(FILE18e_LGHTIN_BLK, 0xe, MID_AIR, 0, 0, A_NORM);
+    ANIMS_Register(FILE19c_BSPARK_BLK, 9, MID_AIR, 0, 0, A_NORM);
+    ANIMS_Register(FILE1a5_OSPARK_BLK, 9, MID_AIR, 0, 0, A_NORM);
+    ANIMS_Register(FILE1c7_GUNSTR_BLK, 4, MID_AIR, 1, 0, A_NORM);
+    
+    // GROUND EXPLOSION OVERLAYS
+    ANIMS_Register(FILE152_FLARE_PIC, 0x1a, GROUND, 0, 0, A_NORM);
+    ANIMS_Register(FILE16c_SPARKLE_PIC, 0x11, GROUND, 0, 0, A_NORM);
+    
+    // ENERGY GRAB
+    ANIMS_Register(FILE18e_LGHTIN_BLK, 0xe, HIGH_AIR, 0, 0, A_NORM);
+    
+    // SUPER SHIELD
+    ANIMS_Register(FILE149_SHIPGLOW_BLK, 4, HIGH_AIR, 1, 1, A_NORM);
 }
 
-void ANIMS_CachePics(void)
+/***************************************************************************
+ANIMS_CachePics() - Cache registered anim pics
+ ***************************************************************************/
+void ANIMS_CachePics(
+    void
+)
 {
-    int v1c;
-    unsigned int v24;
-    animlib_t *v20;
-    v20 = animlib;
-    for (v1c = 0; v1c < curlib; v1c++, v20++)
+    int loop;
+    unsigned int frames;
+    animlib_t *cur;
+    cur = animlib;
+    for (loop = 0; loop < curlib; loop++, cur++)
     {
-        for (v24 = 0; v24 < (unsigned int)v20->f_4; v24++)
+        for (frames = 0; frames < (unsigned int)cur->numframes; frames++)
         {
-            GLB_CacheItem(v20->f_4 + v24);
+            GLB_CacheItem(cur->item + frames);
         }
     }
 }
 
-void ANIMS_FreePics(void)
+/***************************************************************************
+ANIMS_FreePics() - Free Up Anims Used
+ ***************************************************************************/
+void ANIMS_FreePics(
+    void
+)
 {
-    int v1c;
-    unsigned int v24;
-    animlib_t *v20;
-    v20 = animlib;
-    for (v1c = 0; v1c < curlib; v1c++, v20++)
+    int loop;
+    unsigned int frames;
+    animlib_t *cur;
+    cur = animlib;
+    for (loop = 0; loop < curlib; loop++, cur++)
     {
-        for (v24 = 0; v24 < (unsigned int)v20->f_4; v24++)
+        for (frames = 0; frames < (unsigned int)cur->numframes; frames++)
         {
-            GLB_FreeItem(v20->f_4 + v24);
+            GLB_FreeItem(cur->item + frames);
         }
     }
 }
 
-
-void ANIMS_StartAnim(int a1, int a2, int a3)
+/***************************************************************************
+ANIMS_StartAnim () - Start An ANIM Playing
+ ***************************************************************************/
+void ANIMS_StartAnim(
+    int handle,            // INPUT : ANIM handle
+    int x,                 // INPUT : x position
+    int y                  // INPUT : y position
+)
 {
-    animlib_t *v18;
-    anim_t *v14;
-    v18 = &animlib[a1];
-    v14 = ANIMS_Get();
-    if (!v14)
+    animlib_t *lib;
+    anim_t *cur;
+    lib = &animlib[handle];
+    cur = ANIMS_Get();
+    if (!cur)
         return;
-    v14->f_20 = v18;
-    v14->f_14 = a2 - v18->f_18;
-    v14->f_18 = a3 - v18->f_1c;
-    v14->f_24 = v18->f_8;
+    cur->lib = lib;
+    cur->x = x - lib->xoff;
+    cur->y = y - lib->yoff;
+    cur->groundflag = lib->groundflag;
 }
 
-void ANIMS_StartGAnim(int a1, int a2, int a3)
+/***************************************************************************
+ANIMS_StartGAnim () - Start An ANIM Playing with groundflag == GROUND
+ ***************************************************************************/
+void ANIMS_StartGAnim(
+    int handle,             // INPUT : ANIM handle        
+    int x,                  // INPUT : x position
+    int y                   // INPUT : y position
+)
 {
-    anim_t *v14;
-    v14 = ANIMS_Get();
-    if (!v14)
+    anim_t *cur;
+    cur = ANIMS_Get();
+    if (!cur)
         return;
-    v14->f_20 = &animlib[a1];
-    v14->f_14 = a2;
-    v14->f_18 = a3;
-    v14->f_24 = 0;
+    cur->lib = &animlib[handle];
+    cur->x = x;
+    cur->y = y;
+    cur->groundflag = 0;
 }
 
-void ANIMS_StartEAnim(enemy_t *a1, int a2, int a3, int a4)
+/***************************************************************************
+ANIMS_StartEAnim () - Start An ANIM Playing locked onto ENEMY
+ ***************************************************************************/
+void ANIMS_StartEAnim(
+    enemy_t *en,            // INPUT : pointer to ENEMY
+    int handle,             // INPUT : ANIM handle
+    int x,                  // INPUT : x position
+    int y                   // INPUT : y position
+)
 {
-    animlib_t *v14;
-    anim_t *v10;
-    v14 = &animlib[a2];
-    v10 = ANIMS_Get();
-    if (!v10)
+    animlib_t *lib;
+    anim_t *cur;
+    lib = &animlib[handle];
+    cur = ANIMS_Get();
+    if (!cur)
         return;
-    v10->enemy = a1;
-    v10->f_20 = &animlib[a2];
-    v10->f_14 = a3 - v14->f_18;
-    v10->f_18 = a4 - v14->f_1c;
-    v10->f_24 = 2;
+    cur->en = en;
+    cur->lib = &animlib[handle];
+    cur->x = x - lib->xoff;
+    cur->y = y - lib->yoff;
+    cur->groundflag = HIGH_AIR;
 }
 
-void ANIMS_StartAAnim(int a1, int a2, int a3)
+/***************************************************************************
+ANIMS_StartAAnim () - Start An ANIM Playing with groundflag == HIGH_AIR
+ ***************************************************************************/
+void ANIMS_StartAAnim(
+    int handle,             // INPUT : ANIM handle
+    int x,                  // INPUT : x position
+    int y                   // INPUT : y position
+)
 {
-    animlib_t *v18;
-    anim_t *v14;
-    v18 = &animlib[a1];
-    v14 = ANIMS_Get();
-    if (!v14)
+    animlib_t *lib;
+    anim_t *cur;
+    lib = &animlib[handle];
+    cur = ANIMS_Get();
+    if (!cur)
         return;
-    v14->f_20 = &animlib[a1];
-    v14->f_14 = a2 - v18->f_18;
-    v14->f_18 = a3 - v18->f_1c;
-    v14->f_24 = 2;
+    cur->lib = &animlib[handle];
+    cur->x = x - lib->xoff;
+    cur->y = y - lib->yoff;
+    cur->groundflag = HIGH_AIR;
 }
 
-void ANIMS_Think(void)
+/***************************************************************************
+ANIMS_Think () - Does all thinking for ANIMS
+ ***************************************************************************/
+void ANIMS_Think(
+    void
+)
 {
-    anim_t *v1c;
-    animlib_t *v20;
+    anim_t *cur;
+    animlib_t *lib;
 
-    for (v1c = first_anims.f_4; &last_anims != v1c; v1c = v1c->f_4)
+    for (cur = first_anims.next; &last_anims != cur; cur = cur->next)
     {
-        v20 = v1c->f_20;
-        if (v1c->f_1c >= v20->f_4)
+        lib = cur->lib;
+        if (cur->curframe >= lib->numframes)
         {
-            v1c = ANIMS_Remove(v1c);
+            cur = ANIMS_Remove(cur);
             continue;
         }
-        v1c->f_8 = v20->f_0 + v1c->f_1c;
-        if (v20->f_c)
+        cur->item = lib->item + cur->curframe;
+        if (lib->playerflag)
         {
-            v1c->f_c = player_cx + v1c->f_14;
-            v1c->f_10 = player_cy + v1c->f_18;
+            cur->dx = player_cx + cur->x;
+            cur->dy = player_cy + cur->y;
         }
-        else if (v1c->enemy)
+        else if (cur->en)
         {
-            if (v1c->enemy->f_8 == -1)
-                v1c->f_2c = 1;
-            if (!v1c->f_2c)
+            if (cur->en->item == -1)
+                cur->edone = 1;
+            if (!cur->edone)
             {
-                v1c->f_c = v1c->enemy->mobj.x + v1c->f_14;
-                v1c->f_10 = v1c->enemy->mobj.y + v1c->f_18;
+                cur->dx = cur->en->mobj.x + cur->x;
+                cur->dy = cur->en->mobj.y + cur->y;
             }
         }
         else
         {
-            v1c->f_c = v1c->f_14;
-            v1c->f_10 = v1c->f_18;
+            cur->dx = cur->x;
+            cur->dy = cur->y;
         }
-        switch (v20->f_14)
+        switch (lib->adir)
         {
         case 0:
             break;
         case 2:
-            v1c->f_18++;
+            cur->y++;
             break;
         case 1:
-            v1c->f_18--;
+            cur->y--;
             break;
         }
-        v1c->f_18 += adir[v20->f_14];
-        if (!v20->f_8 && scroll_flag)
-            v1c->f_18++;
-        v1c->f_1c++;
+        cur->y += adir[lib->adir];
+        if ((lib->groundflag == GROUND) && (scroll_flag))
+            cur->y++;
+        cur->curframe++;
     }
 }
 
-void ANIMS_DisplayGround(void)
+/***************************************************************************
+ANIMS_DisplayGround () - Displays All Active ANIMS on the Ground
+ ***************************************************************************/
+void ANIMS_DisplayGround(
+    void
+)
 {
-    anim_t *v1c;
-    texture_t *v20;
+    anim_t *cur;
+    texture_t *pic;
 
-    for (v1c = first_anims.f_4; &last_anims != v1c; v1c = v1c->f_4)
+    for (cur = first_anims.next; &last_anims != cur; cur = cur->next)
     {
-        if (v1c->f_24)
+        if (cur->groundflag)
             continue;
-        v20 = (texture_t*)GLB_GetItem(v1c->f_8);
-        if (v1c->f_20->f_10)
-            GFX_ShadeShape(1, v20, v1c->f_c, v1c->f_10);
+        pic = (texture_t*)GLB_GetItem(cur->item);
+        if (cur->lib->transparent)
+            GFX_ShadeShape(1, pic, cur->dx, cur->dy);
         else
-            GFX_PutSprite(v20, v1c->f_c, v1c->f_10);
+            GFX_PutSprite(pic, cur->dx, cur->dy);
     }
 }
 
-void ANIMS_DisplaySky(void)
+/***************************************************************************
+ANIMS_DisplaySky () - Displays All Active ANIMS in SKY
+ ***************************************************************************/
+void ANIMS_DisplaySky(
+    void
+)
 {
-    anim_t *v1c;
-    texture_t *v20;
+    anim_t *cur;
+    texture_t *pic;
 
-    for (v1c = first_anims.f_4; &last_anims != v1c; v1c = v1c->f_4)
+    for (cur = first_anims.next; &last_anims != cur; cur = cur->next)
     {
-        if (v1c->f_24 != 1)
+        if (cur->groundflag != MID_AIR)
             continue;
-        v20 = (texture_t*)GLB_GetItem(v1c->f_8);
-        if (v1c->f_20->f_10)
-            GFX_ShadeShape(1, v20, v1c->f_c, v1c->f_10);
+        pic = (texture_t*)GLB_GetItem(cur->item);
+        if (cur->lib->transparent)
+            GFX_ShadeShape(1, pic, cur->dx, cur->dy);
         else
-            GFX_PutSprite(v20, v1c->f_c, v1c->f_10);
+            GFX_PutSprite(pic, cur->dx, cur->dy);
     }
 }
 
-void ANIMS_DisplayHigh(void)
+/***************************************************************************
+ANIMS_DisplayHigh () - Displays All Active ANIMS in ABOVE PLAYER
+ ***************************************************************************/
+void ANIMS_DisplayHigh(
+    void
+)
 {
-    anim_t *v1c;
-    texture_t *v20;
+    anim_t *cur;
+    texture_t *pic;
 
-    for (v1c = first_anims.f_4; &last_anims != v1c; v1c = v1c->f_4)
+    for (cur = first_anims.next; &last_anims != cur; cur = cur->next)
     {
-        if (v1c->f_24 != 2)
+        if (cur->groundflag != HIGH_AIR)
             continue;
-        v20 = (texture_t*)GLB_GetItem(v1c->f_8);
-        if (v1c->f_20->f_10)
-            GFX_ShadeShape(1, v20, v1c->f_c, v1c->f_10);
+        pic = (texture_t*)GLB_GetItem(cur->item);
+        if (cur->lib->transparent)
+            GFX_ShadeShape(1, pic, cur->dx, cur->dy);
         else
-            GFX_PutSprite(v20, v1c->f_c, v1c->f_10);
+            GFX_PutSprite(pic, cur->dx, cur->dy);
     }
 }

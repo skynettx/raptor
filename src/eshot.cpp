@@ -98,8 +98,8 @@ void ESHOT_Init(void)
     for (v20 = 0; v20 < v1c->f_2c; v20++)
         v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
     v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    v1c->f_38 = v24->width >> 1;
+    v1c->f_3c = v24->height >> 1;
 
     v1c = &plib[1];                          //Lib at play
     v1c->f_40 = 1;
@@ -110,8 +110,8 @@ void ESHOT_Init(void)
     for (v20 = 0; v20 < v1c->f_2c; v20++)
         v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
     v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    v1c->f_38 = v24->width >> 1;
+    v1c->f_3c = v24->height >> 1;
 
     v1c = &plib[2];                         //Lib Missle
     v1c->f_40 = 4;
@@ -122,8 +122,8 @@ void ESHOT_Init(void)
     for (v20 = 0; v20 < v1c->f_2c; v20++)
         v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
     v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    v1c->f_38 = v24->width >> 1;
+    v1c->f_3c = v24->height >> 1;
 
     v1c = &plib[4];                        //Lib Mines
     v1c->f_40 = 0x10;
@@ -134,8 +134,8 @@ void ESHOT_Init(void)
     for (v20 = 0; v20 < v1c->f_2c; v20++)
         v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
     v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    v1c->f_38 = v24->width >> 1;
+    v1c->f_3c = v24->height >> 1;
 
     v1c = &plib[3];                        //Lib Laser 
     v1c->f_40 = 0xc;
@@ -146,8 +146,8 @@ void ESHOT_Init(void)
     for (v20 = 0; v20 < v1c->f_2c; v20++)
         v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
     v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    v1c->f_38 = v24->width >> 1;
+    v1c->f_3c = v24->height >> 1;
 
     v1c = &plib[5];                       //Lib Plasma
     v1c->f_40 = 0xf;
@@ -158,8 +158,8 @@ void ESHOT_Init(void)
     for (v20 = 0; v20 < v1c->f_2c; v20++)
         v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
     v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    v1c->f_38 = v24->width >> 1;
+    v1c->f_3c = v24->height >> 1;
 
     v1c = &plib[6];                       //Lib Coco
     v1c->f_40 = 1;
@@ -170,8 +170,8 @@ void ESHOT_Init(void)
     for (v20 = 0; v20 < v1c->f_2c; v20++)
         v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
     v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    v1c->f_38 = v24->width >> 1;
+    v1c->f_3c = v24->height >> 1;
 }
 
 void ESHOT_Shoot(enemy_t *a1, int a2)
@@ -409,7 +409,7 @@ void ESHOT_Display(void)
             v28 = v1c->f_18.dirY - 8;
             if (v28 > 0 && v28 < 200)
             {
-                GFX_PutSprite(v24, v1c->f_10 - (v24->f_c >> 2), v28);
+                GFX_PutSprite(v24, v1c->f_10 - (v24->width >> 2), v28);
             }
         }
         else

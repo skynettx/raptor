@@ -42,7 +42,7 @@ struct slib_t {
 struct enemy_t {
     enemy_t *f_0;
     enemy_t *f_4;
-    int f_8;
+    int item;
     slib_t *f_c;
     int f_10;
     int f_14;

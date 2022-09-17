@@ -262,7 +262,7 @@ enemy_t *ENEMY_Remove(enemy_t *a1)
     a1->f_4->f_0 = a1->f_0;
     a1->f_0->f_4 = a1->f_4;
     memset(a1, 0, sizeof(enemy_t));
-    a1->f_8 = -1;
+    a1->item = -1;
     a1->f_4 = free_enemy;
     free_enemy = a1;
     return v1c;
@@ -278,11 +278,11 @@ void ENEMY_Add(csprite_t *a1)
     v20 = ENEMY_Get();
     v28 = GLB_GetItem(v1c->f_10);
     v24 = (texture_t*)v28;
-    v20->f_8 = v1c->f_10;
-    v20->f_28 = v24->f_c;
-    v20->f_2c = v24->f_10;
-    v20->f_30 = v24->f_c >> 1;
-    v20->f_34 = v24->f_10 >> 1;
+    v20->item = v1c->f_10;
+    v20->f_28 = v24->width;
+    v20->f_2c = v24->height;
+    v20->f_30 = v24->width >> 1;
+    v20->f_34 = v24->height >> 1;
     v20->f_a0 = 0;
     v20->f_50 = v1c->f_44;
     v20->f_c = &slib[a1->f_10][a1->f_4];
@@ -518,7 +518,7 @@ void ENEMY_Think(void)
         v20 = v1c->f_c;
         if (v20->f_2c > 1)
         {
-            v1c->f_8 = v20->f_10 + v1c->f_8c;
+            v1c->item = v20->f_10 + v1c->f_8c;
             if (v1c->f_a4 < 1)
             {
                 v1c->f_a4 = v20->f_28;
@@ -767,11 +767,11 @@ void ENEMY_Think(void)
         {
             if (v1c->f_54)
             {
-                SHADOW_GAdd(v1c->f_8, v1c->f_18, v1c->f_1c);
+                SHADOW_GAdd(v1c->item, v1c->f_18, v1c->f_1c);
             }
             else
             {
-                SHADOW_Add(v1c->f_8, v1c->f_18, v1c->f_1c);
+                SHADOW_Add(v1c->item, v1c->f_18, v1c->f_1c);
             }
         }
         if (v20->f_40)
@@ -911,7 +911,7 @@ void ENEMY_DisplayGround(void)
     {
         if (!v1c->f_54)
             continue;
-        GFX_PutSprite((texture_t*)GLB_GetItem(v1c->f_8), v1c->f_18, v1c->f_1c);
+        GFX_PutSprite((texture_t*)GLB_GetItem(v1c->item), v1c->f_18, v1c->f_1c);
     }
 }
 
@@ -923,7 +923,7 @@ void ENEMY_DisplaySky(void)
     {
         if (v1c->f_54)
             continue;
-        GFX_PutSprite((texture_t*)GLB_GetItem(v1c->f_8), v1c->f_18, v1c->f_1c);
+        GFX_PutSprite((texture_t*)GLB_GetItem(v1c->item), v1c->f_18, v1c->f_1c);
         for (v20 = 0; v20 < v1c->f_c->f_6c; v20++)
         {
             FLAME_Up(v1c->f_18 + v1c->f_c->f_a8[v20], v1c->f_1c + v1c->f_c->f_d8[v20], v1c->f_c->f_108[v20], v1c->f_90);

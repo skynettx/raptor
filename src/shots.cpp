@@ -119,8 +119,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 0;
 
     v1c = &shot_lib[1];
@@ -146,8 +146,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 1;
 
     v1c = &shot_lib[2];
@@ -173,8 +173,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 3;
 
     v1c = &shot_lib[3];
@@ -201,8 +201,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 0;
 
     v1c = &shot_lib[4];
@@ -229,8 +229,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 3;
 
     v1c = &shot_lib[5];
@@ -285,8 +285,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 1;
 
     v1c = &shot_lib[7];
@@ -313,8 +313,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 1;
 
     v1c = &shot_lib[8];
@@ -341,8 +341,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 2;
 
     v1c = &shot_lib[9];
@@ -369,8 +369,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 4;
 
     v1c = &shot_lib[10];
@@ -397,8 +397,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 5;
 
     v1c = &shot_lib[11];
@@ -426,8 +426,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 0;
 
     v1c = &shot_lib[12];
@@ -455,8 +455,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 0;
 
     v1c = &shot_lib[13];
@@ -484,8 +484,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 1;
 
     v1c = &shot_lib[14];
@@ -513,8 +513,8 @@ void SHOTS_Init(void)
         v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
     }
     v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->f_c >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->f_10 >> 1;
+    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
+    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
     v1c->damageType = 3;
 }
 
@@ -1142,7 +1142,7 @@ void SHOTS_Display(void)
             else
                 GFX_PutSprite(laspow[v1c->f_5c], v1c->x, v1c->y);
             v2c = lashit[v1c->f_5c];
-            v24 = v1c->x - (v2c->f_c >> 2);
+            v24 = v1c->x - (v2c->width >> 2);
             v28 = v1c->mobj.dirY - 8;
             if (v28 > 0)
                 GFX_PutSprite(v2c, v24, v28);

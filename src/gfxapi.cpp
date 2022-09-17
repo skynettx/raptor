@@ -369,25 +369,25 @@ void GFX_PutTexture(texture_t *a1, int a2, int a3, int a4, int a5)
         v28 = 319;
     if (v30 >= 200)
         v30 = 199;
-    for (i = a3; i < v48; i += a1->f_10)
+    for (i = a3; i < v48; i += a1->height)
     {
-        if (i <= v30 && i + a1->f_10 > 0)
+        if (i <= v30 && i + a1->height > 0)
         {
             if (i < 0)
             {
                 v1c += i;
-                v24 += (-i) * a1->f_c;
+                v24 += (-i) * a1->width;
                 v20 = 0;
             }
             else
                 v20 = i;
-            for (j = a2; j < v34; j += a1->f_c)
+            for (j = a2; j < v34; j += a1->width)
             {
-                if (j <= v28 && j + a1->f_c > 0)
+                if (j <= v28 && j + a1->width > 0)
                 {
                     v24 = a1->f_14;
-                    v10 = a1->f_c;
-                    v1c = a1->f_10;
+                    v10 = a1->width;
+                    v1c = a1->height;
                     if (j < 0)
                     {
                         v10 += j;
@@ -405,7 +405,7 @@ void GFX_PutTexture(texture_t *a1, int a2, int a3, int a4, int a5)
                     gfx_yp = v20;
                     gfx_lx = v10;
                     gfx_ly = v1c;
-                    gfx_imga = a1->f_c - v10;
+                    gfx_imga = a1->width - v10;
                     GFX_PutPic();
                     GFX_MarkUpdate(v14, v20, v10, v1c);
                 }
@@ -447,8 +447,8 @@ void GFX_ShadeShape(int a1, texture_t* a2, int a3, int a4)
     char *v14;
     int v20 = a3;
     int v24 = a4;
-    int v28 = a2->f_c;
-    int v2c = a2->f_10;
+    int v28 = a2->width;
+    int v2c = a2->height;
     texture_t *vbp = (texture_t*)a2->f_14;
 
     c = GFX_ClipLines(NULL, &v20, &v24, &v28, &v2c);
@@ -478,11 +478,11 @@ void GFX_ShadeShape(int a1, texture_t* a2, int a3, int a4)
             v24 = vbp->f_4 + a4;
             if (v24 > 200)
                 return;
-            v28 = vbp->f_c;
+            v28 = vbp->width;
             v2c = 1;
             if (GFX_ClipLines(NULL, &v20, &v24, &v28, &v2c))
                 GFX_Shade(&displaybuffer[v20 + ylookup[v24]], v28, v14);
-            vbp = (texture_t*)((char*)vbp + 16 + vbp->f_c);
+            vbp = (texture_t*)((char*)vbp + 16 + vbp->width);
         }
         break;
     }
@@ -737,8 +737,8 @@ void GFX_ScalePic(texture_t *a1, int a2, int a3, int a4, int a5, int a6)
     char *p;
     int v10, vdi, i;
     char *v14 = a1->f_14;
-    int v20 = (a1->f_c<<16) / a4;
-    int v18 = (a1->f_10<<16) / a5;
+    int v20 = (a1->width<<16) / a4;
+    int v18 = (a1->height<<16) / a5;
     v10 = 0;
     vdi = 0;
     if (!a1->f_0)
@@ -757,7 +757,7 @@ void GFX_ScalePic(texture_t *a1, int a2, int a3, int a4, int a5, int a6)
     if (a3 < 0)
     {
         vdi = v18 * (-a3);
-        v14 += (a1->f_c) * (vdi >> 16);
+        v14 += (a1->width) * (vdi >> 16);
         vdi &= 0xffff;
         a5 += a3;
         a3 = 0;
@@ -782,7 +782,7 @@ void GFX_ScalePic(texture_t *a1, int a2, int a3, int a4, int a5, int a6)
     {
         while (a5--)
         {
-            GFX_CScaleLine(p, v14 + a1->f_c * (vdi>>16));
+            GFX_CScaleLine(p, v14 + a1->width * (vdi>>16));
             vdi += v18;
             p += 320;
         }
@@ -791,7 +791,7 @@ void GFX_ScalePic(texture_t *a1, int a2, int a3, int a4, int a5, int a6)
     {
         while (a5--)
         {
-            GFX_ScaleLine(p, v14 + a1->f_c * (vdi>>16));
+            GFX_ScaleLine(p, v14 + a1->width * (vdi>>16));
             vdi += v18;
             p += 320;
         }
@@ -922,8 +922,8 @@ void GFX_DisplayUpdate(void)
 void GFX_PutImage(texture_t *a1, int a2, int a3, int a4)
 {
     char *v14;
-    gfx_lx = a1->f_c;
-    gfx_ly = a1->f_10;
+    gfx_lx = a1->width;
+    gfx_ly = a1->height;
     if (a1->f_0 == 0)
     {
         GFX_PutSprite(a1, a2, a3);
@@ -936,7 +936,7 @@ void GFX_PutImage(texture_t *a1, int a2, int a3, int a4)
     gfx_xp = a2;
     gfx_yp = a3;
     gfx_inmem = v14;
-    gfx_imga = a1->f_c;
+    gfx_imga = a1->width;
     if (a4 == 0)
     {
         gfx_imga -= gfx_lx;
@@ -954,8 +954,8 @@ void GFX_PutSprite(texture_t *a1, int a2, int a3)
     char *v20;
     int v24 = a2;
     int v28 = a3;
-    int v2c = a1->f_c;
-    int v30 = a1->f_10;
+    int v2c = a1->width;
+    int v30 = a1->height;
     c = GFX_ClipLines(NULL, &v24, &v28, &v2c, &v30);
     if (!c)
         return;
@@ -973,12 +973,12 @@ void GFX_PutSprite(texture_t *a1, int a2, int a3)
             vbp = (char*)v14 + 16;
             if (v28 > 200)
                 break;
-            v2c = v14->f_c;
+            v2c = v14->width;
             v30 = 1;
             v20 = vbp;
             if (GFX_ClipLines(&v20, &v24, &v28, &v2c, &v30))
                 memcpy(&displaybuffer[v24 + ylookup[v28]], v20, v2c);
-            v14 = (texture_t*)(vbp + v14->f_c);
+            v14 = (texture_t*)(vbp + v14->width);
         }
         break;
     }
@@ -988,18 +988,18 @@ void GFX_OverlayImage(texture_t *a1, texture_t *a2, int a3, int a4)
 {
     char *vsi, *vdx;
     int vbp, i, j;
-    int v14 = a3 + a2->f_c - 1;
-    int v10 = a4 + a2->f_10 - 1;
+    int v14 = a3 + a2->width - 1;
+    int v10 = a4 + a2->height - 1;
     if (a3 < 0 || a4 < 0)
         return;
-    if (v14 >= a1->f_c || v10 >= a1->f_10)
+    if (v14 >= a1->width || v10 >= a1->height)
         return;
-    vsi = &a1->f_14[a3 + a1->f_c * a4];
-    vbp = a2->f_c - a1->f_c;
+    vsi = &a1->f_14[a3 + a1->width * a4];
+    vbp = a2->width - a1->width;
     vdx = a2->f_14;
-    for (i = 0; i < a2->f_10; i++)
+    for (i = 0; i < a2->height; i++)
     {
-        for (j = 0; j < a2->f_c; j++)
+        for (j = 0; j < a2->width; j++)
         {
             if (j != 255)
                 *vsi = *vdx;
@@ -1082,7 +1082,7 @@ void GFX_3D_PutImage(texture_t *a1, int a2, int a3, int a4, int a5)
     int v10, v14, vd, vb;
     if (a4 == 200)
     {
-        GFX_MarkUpdate(a2, a3, a1->f_c, a1->f_10);
+        GFX_MarkUpdate(a2, a3, a1->width, a1->height);
         GFX_PutImage(a1, a2, a3, a5);
         return;
     }
@@ -1092,8 +1092,8 @@ void GFX_3D_PutImage(texture_t *a1, int a2, int a3, int a4, int a5)
     GFX_3DPoint();
     v10 = G3D_screenx;
     v14 = G3D_screeny;
-    G3D_x = a2 + a1->f_c - 1;
-    G3D_y = a3 + a1->f_10 - 1;
+    G3D_x = a2 + a1->width - 1;
+    G3D_y = a3 + a1->height - 1;
     G3D_z = a4;
     GFX_3DPoint();
     vd = G3D_screenx - v10;

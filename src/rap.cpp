@@ -503,12 +503,12 @@ void RAP_DisplayStats(void)
             if (damage)
             {
                 v2c = v34 = (texture_t*)GLB_GetItem(FILE111_WEPDEST_PIC);
-                GFX_PutSprite(v34, (320 - v2c->f_c) >> 1, 0xad);
+                GFX_PutSprite(v34, (320 - v2c->width) >> 1, 0xad);
             }
             if (startendwave == -1)
                 SND_Patch(22, 127);
             v2c = v34 = (texture_t*)GLB_GetItem(FILE110_SHLDLOW_PIC);
-            GFX_PutSprite(v34, (320 - v2c->f_c) >> 1, 0xb6);
+            GFX_PutSprite(v34, (320 - v2c->width) >> 1, 0xb6);
         }
     }
     g_oldshield = v20;

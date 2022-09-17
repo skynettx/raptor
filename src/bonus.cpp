@@ -76,8 +76,8 @@ void BONUS_Init(void)
         glow[v1c] = FILE125_ICNGLW_BLK + v1c;
     }
     v20 = (texture_t*)GLB_CacheItem(FILE125_ICNGLW_BLK);
-    glow_lx = v20->f_c;
-    glow_ly = v20->f_10;
+    glow_lx = v20->width;
+    glow_ly = v20->height;
     GLB_CacheItem(FILE126_ICNGLW_BLK);
     GLB_CacheItem(FILE127_ICNGLW_BLK);
     GLB_CacheItem(FILE128_ICNGLW_BLK);
