@@ -1,4 +1,8 @@
 #pragma once
+
+#define MAX_SHIELD 100
+#define MAX_SUPER  100
+
 extern int reg_flag;
 extern int bday_num;
 extern int demo_mode;

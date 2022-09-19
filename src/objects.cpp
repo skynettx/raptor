@@ -70,11 +70,11 @@ void OBJS_CachePics(void)
     for (v20 = 0; v20 < 24; v20++)
     {
         v1c = &obj_lib[v20];
-        if (v1c && v1c->f_0 != -1)
+        if (v1c && v1c->item != -1)
         {
-            for (v24 = 0; v24 < v1c->f_4; v24++)
+            for (v24 = 0; v24 < v1c->numframes; v24++)
             {
-                GLB_CacheItem(v1c->f_0 + v24);
+                GLB_CacheItem(v1c->item + v24);
             }
         }
     }
@@ -89,11 +89,11 @@ void OBJS_FreePics(void)
     for (v20 = 0; v20 < 24; v20++)
     {
         v1c = &obj_lib[v20];
-        if (v1c && v1c->f_0 != -1)
+        if (v1c && v1c->item != -1)
         {
-            for (v24 = 0; v24 < v1c->f_4; v24++)
+            for (v24 = 0; v24 < v1c->numframes; v24++)
             {
-                GLB_FreeItem(v1c->f_0 + v24);
+                GLB_FreeItem(v1c->item + v24);
             }
         }
     }
@@ -108,8 +108,8 @@ void OBJS_Init(void)
     memset(obj_lib, 0, sizeof(obj_lib));
     memset(p_objs, 0, sizeof(p_objs));
     v1c = &obj_lib[0];
-    v1c->f_0 = FILE1b0_BONUS00_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1b0_BONUS00_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0x2ee0;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -119,14 +119,14 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 0;
     v1c->f_28 = 0;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
 //Plasma Cannon
     v1c = &obj_lib[1];
-    v1c->f_0 = FILE1b1_BONUS01_PIC;
-    v1c->f_4 = 2;
+    v1c->item = FILE1b1_BONUS01_PIC;
+    v1c->numframes = 2;
     v1c->payAmount = 0x133d0;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -136,14 +136,14 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 0;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
 
     v1c = &obj_lib[2];
-    v1c->f_0 = FILE1b3_BONUS02_PIC;
-    v1c->f_4 = 2;
+    v1c->item = FILE1b3_BONUS02_PIC;
+    v1c->numframes = 2;
     v1c->payAmount = 0x2adf0;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -153,14 +153,14 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 0;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     //Dumbfire Missile
     v1c = &obj_lib[3];
-    v1c->f_0 = FILE1b5_BONUS03_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1b5_BONUS03_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0x23730;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -170,13 +170,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 1;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[4];
-    v1c->f_0 = FILE1b6_BONUS04_PIC;
-    v1c->f_4 = 4;
+    v1c->item = FILE1b6_BONUS04_PIC;
+    v1c->numframes = 4;
     v1c->payAmount = 0x3d31a;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -186,13 +186,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 1;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[5];
-    v1c->f_0 = FILE1ba_BONUS05_PIC;
-    v1c->f_4 = 4;
+    v1c->item = FILE1ba_BONUS05_PIC;
+    v1c->numframes = 4;
     v1c->payAmount = 0x7d352;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -202,13 +202,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 1;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 0;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[6];
-    v1c->f_0 = FILE1be_BONUS06_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1be_BONUS06_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0x32096;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -218,14 +218,14 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 1;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     //Air/Air Missile
     v1c = &obj_lib[7];
-    v1c->f_0 = FILE1bf_BONUS07_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1bf_BONUS07_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0xf80c;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -235,14 +235,14 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 1;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     //AIR/Ground Missile
     v1c = &obj_lib[8];
-    v1c->f_0 = FILE1c0_BONUS08_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1c0_BONUS08_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 110000;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -252,14 +252,14 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 1;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     //Bomb
     v1c = &obj_lib[9];
-    v1c->f_0 = FILE1da_BONUS21_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1da_BONUS21_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0x17f98;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -269,13 +269,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 1;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 0;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[10];
-    v1c->f_0 = FILE1c1_BONUS09_PIC;
-    v1c->f_4 = 4;
+    v1c->item = FILE1c1_BONUS09_PIC;
+    v1c->numframes = 4;
     v1c->payAmount = 0x496ce;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -285,14 +285,14 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 1;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 0;
     v1c->f_34 = 1;
 
     //Megabomb
     v1c = &obj_lib[11];
-    v1c->f_0 = FILE1c5_BONUS10_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1c5_BONUS10_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0x07dfa;
     v1c->resaleAmount = 1;
     v1c->f_10 = 5;
@@ -302,13 +302,13 @@ void OBJS_Init(void)
     v1c->f_20 = 1;
     v1c->f_24 = 1;
     v1c->f_28 = 0;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[12];
-    v1c->f_0 = FILE1c6_BONUS11_PIC;
-    v1c->f_4 = 2;
+    v1c->item = FILE1c6_BONUS11_PIC;
+    v1c->numframes = 2;
     v1c->payAmount = 0xb1008;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -318,13 +318,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 1;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[13];
-    v1c->f_0 = FILE1c8_BONUS12_PIC;
-    v1c->f_4 = 4;
+    v1c->item = FILE1c8_BONUS12_PIC;
+    v1c->numframes = 4;
     v1c->payAmount = 0x1ab3f0;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -334,13 +334,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 1;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 0;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[14];
-    v1c->f_0 = FILE1cc_BONUS13_PIC;
-    v1c->f_4 = 4;
+    v1c->item = FILE1cc_BONUS13_PIC;
+    v1c->numframes = 4;
     v1c->payAmount = 950000;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -350,13 +350,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 1;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 0;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[15];
-    v1c->f_0 = FILE1d0_BONUS14_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1d0_BONUS14_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0x132a4;
     v1c->resaleAmount = 100;
     v1c->f_10 = 100;
@@ -365,13 +365,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 0;
     v1c->f_28 = 0;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[16];
-    v1c->f_0 = FILE1d1_BONUS15_PIC;
-    v1c->f_4 = 4;
+    v1c->item = FILE1d1_BONUS15_PIC;
+    v1c->numframes = 4;
     v1c->payAmount = 400;
     v1c->resaleAmount = 0x19;
     v1c->f_10 = 100;
@@ -380,14 +380,14 @@ void OBJS_Init(void)
     v1c->f_20 = 1;
     v1c->f_24 = 0;
     v1c->f_28 = 0;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     //Ion Scanner
     v1c = &obj_lib[17];
-    v1c->f_0 = FILE1d5_BONUS16_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1d5_BONUS16_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0x02710;
     v1c->resaleAmount = 1;
     v1c->f_10 = 1;
@@ -396,13 +396,13 @@ void OBJS_Init(void)
     v1c->f_20 = 1;
     v1c->f_24 = 0;
     v1c->f_28 = 0;
-    v1c->pays = 0;
+    v1c->moneyflag = 0;
     v1c->f_30 = 1;
     v1c->f_34 = 0;
 
     v1c = &obj_lib[18];
-    v1c->f_0 = FILE1d5_BONUS16_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1d5_BONUS16_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0x16e68;
     v1c->resaleAmount = 0x16e68;
     v1c->f_10 = 0x16e68;
@@ -411,13 +411,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 0;
-    v1c->pays = 1;
+    v1c->moneyflag = 1;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[19];
-    v1c->f_0 = FILE1d6_BONUS17_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1d6_BONUS17_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 76000;
     v1c->resaleAmount = 76000;
     v1c->f_10 = 76000;
@@ -426,13 +426,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 0;
-    v1c->pays = 1;
+    v1c->moneyflag = 1;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[20];
-    v1c->f_0 = FILE1d7_BONUS18_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1d7_BONUS18_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0xd994;
     v1c->resaleAmount = 0xd994;
     v1c->f_10 = 0xd994;
@@ -441,13 +441,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 0;
-    v1c->pays = 1;
+    v1c->moneyflag = 1;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[21];
-    v1c->f_0 = FILE1d8_BONUS19_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1d8_BONUS19_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0x8980;
     v1c->resaleAmount = 0x8980;
     v1c->f_10 = 0x8980;
@@ -456,13 +456,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 0;
-    v1c->pays = 1;
+    v1c->moneyflag = 1;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[22];
-    v1c->f_0 = FILE1d9_BONUS20_PIC;
-    v1c->f_4 = 1;
+    v1c->item = FILE1d9_BONUS20_PIC;
+    v1c->numframes = 1;
     v1c->payAmount = 0x1de84;
     v1c->resaleAmount = 0x1de84;
     v1c->f_10 = 0x1de84;
@@ -471,13 +471,13 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 0;
-    v1c->pays = 1;
+    v1c->moneyflag = 1;
     v1c->f_30 = 1;
     v1c->f_34 = 1;
 
     v1c = &obj_lib[23];
-    v1c->f_0 = FILE1db_BONUS22_PIC;
-    v1c->f_4 = 4;
+    v1c->item = FILE1db_BONUS22_PIC;
+    v1c->numframes = 4;
     v1c->payAmount = 0x32;
     v1c->resaleAmount = 0x32;
     v1c->f_10 = 0x32;
@@ -486,7 +486,7 @@ void OBJS_Init(void)
     v1c->f_20 = 0;
     v1c->f_24 = 1;
     v1c->f_28 = 0;
-    v1c->pays = 1;
+    v1c->moneyflag = 1;
     v1c->f_30 = 1;
     v1c->f_34 = 0;
 }
@@ -515,7 +515,7 @@ void OBJS_DisplayStats(void)
     }
     if (player.currentWeapon != -1)
     {
-        v1c = obj_lib[player.currentWeapon].f_0;
+        v1c = obj_lib[player.currentWeapon].item;
         GFX_PutSprite((texture_t*)GLB_GetItem(v1c), 0x11e, 2);
     }
     if (p_objs[15])
@@ -580,7 +580,7 @@ int OBJS_Add(int a1)
     g_oldsuper = -1;
     g_oldshield = -1;
     v20 = &obj_lib[a1];
-    if (v20->pays)
+    if (v20->moneyflag)
     {
         player.money += v20->payAmount;
         return 0;
