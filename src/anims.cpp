@@ -29,12 +29,17 @@ void ANIMS_Clear(
 )
 {
     int loop;
+    
     first_anims.prev = NULL;
     first_anims.next = &last_anims;
+    
     last_anims.prev = &first_anims;
     last_anims.next = NULL;
+    
     free_anims = anims;
+    
     memset(anims, 0, sizeof(anims));
+    
     for (loop = 0; loop < MAX_ANIMS - 1; loop++)
         anims[loop].next = &anims[loop + 1];
 }
@@ -47,15 +52,21 @@ anim_t *ANIMS_Get(
 )
 {
     anim_t *newa;
+    
     if (!free_anims)
         return NULL;
+    
     newa = free_anims;
     free_anims = free_anims->next;
+    
     memset(newa, 0, sizeof(anim_t));
+    
     newa->next = &last_anims;
     newa->prev = last_anims.prev;
+    
     last_anims.prev = newa;
     newa->prev->next = newa;
+    
     return newa;
 }
 
@@ -67,12 +78,18 @@ anim_t *ANIMS_Remove(
 )
 {
     anim_t *next;
+    
     next = anim->prev;
+    
     anim->next->prev = anim->prev;
     anim->prev->next = anim->next;
+    
     memset(anim, 0, sizeof(anim_t));
+    
     anim->next = free_anims;
+    
     free_anims = anim;
+    
     return next;
 }
 
@@ -92,20 +109,25 @@ int ANIMS_Register(
     texture_t *h;
     int handle;
     handle = curlib;
+    
     if (curlib >= MAX_ANIMLIB)
         EXIT_Error("ANIMS_Register() - Max LIBs");
+    
     cur = &animlib[curlib];
     curlib++;
+    
     cur->item = item;
     cur->numframes = numframes;
     cur->groundflag = groundflag;
     cur->playerflag = playerflag;
     cur->transparent = transparent;
     cur->adir = adir;
+    
     h = (texture_t*)GLB_LockItem(item);
     cur->xoff = h->width >> 1;
     cur->yoff = h->height >> 1;
     GLB_FreeItem(item);
+    
     return handle;
 }
 
@@ -117,7 +139,9 @@ void ANIMS_Init(
 )
 {
     ANIMS_Clear();
+    
     memset(animlib, 0, sizeof(animlib));
+    
     curlib = 0;
     
     // GROUND EXPLOSIONS
@@ -165,7 +189,9 @@ void ANIMS_CachePics(
     int loop;
     unsigned int frames;
     animlib_t *cur;
+    
     cur = animlib;
+    
     for (loop = 0; loop < curlib; loop++, cur++)
     {
         for (frames = 0; frames < (unsigned int)cur->numframes; frames++)
@@ -185,7 +211,9 @@ void ANIMS_FreePics(
     int loop;
     unsigned int frames;
     animlib_t *cur;
+    
     cur = animlib;
+    
     for (loop = 0; loop < curlib; loop++, cur++)
     {
         for (frames = 0; frames < (unsigned int)cur->numframes; frames++)
@@ -207,9 +235,11 @@ void ANIMS_StartAnim(
     animlib_t *lib;
     anim_t *cur;
     lib = &animlib[handle];
+    
     cur = ANIMS_Get();
     if (!cur)
         return;
+    
     cur->lib = lib;
     cur->x = x - lib->xoff;
     cur->y = y - lib->yoff;
@@ -226,9 +256,11 @@ void ANIMS_StartGAnim(
 )
 {
     anim_t *cur;
+    
     cur = ANIMS_Get();
     if (!cur)
         return;
+    
     cur->lib = &animlib[handle];
     cur->x = x;
     cur->y = y;
@@ -248,9 +280,11 @@ void ANIMS_StartEAnim(
     animlib_t *lib;
     anim_t *cur;
     lib = &animlib[handle];
+    
     cur = ANIMS_Get();
     if (!cur)
         return;
+    
     cur->en = en;
     cur->lib = &animlib[handle];
     cur->x = x - lib->xoff;
@@ -270,9 +304,11 @@ void ANIMS_StartAAnim(
     animlib_t *lib;
     anim_t *cur;
     lib = &animlib[handle];
+    
     cur = ANIMS_Get();
     if (!cur)
         return;
+    
     cur->lib = &animlib[handle];
     cur->x = x - lib->xoff;
     cur->y = y - lib->yoff;
@@ -292,12 +328,15 @@ void ANIMS_Think(
     for (cur = first_anims.next; &last_anims != cur; cur = cur->next)
     {
         lib = cur->lib;
+        
         if (cur->curframe >= lib->numframes)
         {
             cur = ANIMS_Remove(cur);
             continue;
         }
+        
         cur->item = lib->item + cur->curframe;
+        
         if (lib->playerflag)
         {
             cur->dx = player_cx + cur->x;
@@ -307,6 +346,7 @@ void ANIMS_Think(
         {
             if (cur->en->item == -1)
                 cur->edone = 1;
+            
             if (!cur->edone)
             {
                 cur->dx = cur->en->mobj.x + cur->x;
@@ -318,6 +358,7 @@ void ANIMS_Think(
             cur->dx = cur->x;
             cur->dy = cur->y;
         }
+        
         switch (lib->adir)
         {
         case 0:
@@ -329,9 +370,12 @@ void ANIMS_Think(
             cur->y--;
             break;
         }
+        
         cur->y += adir[lib->adir];
+        
         if ((lib->groundflag == GROUND) && (scroll_flag))
             cur->y++;
+        
         cur->curframe++;
     }
 }
@@ -350,7 +394,9 @@ void ANIMS_DisplayGround(
     {
         if (cur->groundflag)
             continue;
+        
         pic = (texture_t*)GLB_GetItem(cur->item);
+        
         if (cur->lib->transparent)
             GFX_ShadeShape(1, pic, cur->dx, cur->dy);
         else
@@ -372,9 +418,12 @@ void ANIMS_DisplaySky(
     {
         if (cur->groundflag != MID_AIR)
             continue;
+        
         pic = (texture_t*)GLB_GetItem(cur->item);
+        
         if (cur->lib->transparent)
             GFX_ShadeShape(1, pic, cur->dx, cur->dy);
+        
         else
             GFX_PutSprite(pic, cur->dx, cur->dy);
     }
@@ -394,7 +443,9 @@ void ANIMS_DisplayHigh(
     {
         if (cur->groundflag != HIGH_AIR)
             continue;
+        
         pic = (texture_t*)GLB_GetItem(cur->item);
+        
         if (cur->lib->transparent)
             GFX_ShadeShape(1, pic, cur->dx, cur->dy);
         else

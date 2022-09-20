@@ -53,7 +53,7 @@ char *ml;
 void RAP_SetPlayerDiff(void)
 {
     cur_diff = 0;
-    curplr_diff = player.waveProgression[cur_game];
+    curplr_diff = player.diff[cur_game];
     switch (curplr_diff)
     {
     case 0:
@@ -80,12 +80,12 @@ void RAP_ClearPlayer(void)
     OBJS_Clear();
     filepos = -1;
     memset(&player, 0, sizeof(player));
-    player.currentWeapon = -1;
-    player.waveProgression[0] = 2;
-    player.waveProgression[1] = 2;
-    player.waveProgression[2] = 2;
-    player.waveProgression[3] = 2;
-    player.f_54 = 0;
+    player.sweapon = -1;
+    player.diff[0] = 2;
+    player.diff[1] = 2;
+    player.diff[2] = 2;
+    player.diff[3] = 2;
+    player.fintrain = 0;
     cur_game = 0;
     memset(game_wave, 0, sizeof(game_wave));
 }
@@ -203,7 +203,7 @@ int RAP_LoadPlayer(void)
     }
     fread(&player, 1, sizeof(player), v20);
     GLB_DeCrypt(gdmodestr, &player, sizeof(player));
-    for (v24 = 0; v24 < player.amountOfItems; v24++)
+    for (v24 = 0; v24 < player.numobjs; v24++)
     {
         fread(&v40, 1, sizeof(v40), v20);
         GLB_DeCrypt(gdmodestr, &v40, sizeof(v40));
@@ -211,11 +211,11 @@ int RAP_LoadPlayer(void)
             break;
     }
     fclose(v20);
-    cur_game = player.currentGame;
-    game_wave[0] = player.waveGameLevel[0];
-    game_wave[1] = player.waveGameLevel[1];
-    game_wave[2] = player.waveGameLevel[2];
-    if (!OBJS_IsEquip(player.currentWeapon))
+    cur_game = player.cur_game;
+    game_wave[0] = player.game_wave[0];
+    game_wave[1] = player.game_wave[1];
+    game_wave[2] = player.game_wave[2];
+    if (!OBJS_IsEquip(player.sweapon))
         OBJS_GetNext();
     if (OBJS_GetAmt(16) <= 0)
         EXIT_Error("RAP_LoadPLayer() - Loaded DEAD player");
@@ -247,14 +247,14 @@ int RAP_SavePlayer(void)
         WIN_Msg("Save Player Error !!!");
         return 0;
     }
-    player.currentGame = cur_game;
-    player.waveGameLevel[0] = game_wave[0];
-    player.waveGameLevel[1] = game_wave[1];
-    player.waveGameLevel[2] = game_wave[2];
-    player.amountOfItems = 0;
+    player.cur_game = cur_game;
+    player.game_wave[0] = game_wave[0];
+    player.game_wave[1] = game_wave[1];
+    player.game_wave[2] = game_wave[2];
+    player.numobjs = 0;
     for (v28 = first_objs.f_4; &last_objs != v28; v28 = v28->f_4)
     {
-        player.amountOfItems++;
+        player.numobjs++;
     }
     GLB_EnCrypt(gdmodestr, &player, sizeof(player));
     fwrite(&player, 1, sizeof(player), v20);
@@ -403,10 +403,10 @@ int RAP_LoadWin(void)
                 RAP_ReadFile(v254[v20], &v108, sizeof(v108));
                 v24 = v20;
             }
-            SWD_SetFieldItem(v2c, 1, id_pics[v108.pilotPicId]);
+            SWD_SetFieldItem(v2c, 1, id_pics[v108.id_pic]);
             SWD_SetFieldText(v2c, 9, v108.name);
             SWD_SetFieldText(v2c, 10, v108.callsign);
-            sprintf(v68, "%07u", v108.money);
+            sprintf(v68, "%07u", v108.score);
             SWD_SetFieldText(v2c, 11, v68);
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();

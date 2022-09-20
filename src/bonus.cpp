@@ -153,7 +153,7 @@ void BONUS_Add(
     cur->type = type;
     cur->lib = OBJS_GetLib(type);
     cur->curframe = 0;
-    cur->x = 16 + x;
+    cur->x = MAP_LEFT + x;
     cur->y = y;
     cur->pos = wrand() % 16;
 }
@@ -171,8 +171,8 @@ void BONUS_Think(
 
     x = playerx;
     y = playery;
-    x2 = playerx + 32;
-    y2 = playery + 32;
+    x2 = playerx + PLAYERWIDTH;
+    y2 = playery + PLAYERHEIGHT;
     
     for (cur = first_bonus.next; &last_bonus != cur; cur = cur->next)
     {

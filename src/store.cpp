@@ -180,12 +180,12 @@ void STORE_Enter(void)
     GFX_FadeOut(0, 0, 0, 5);
     g_button_flag = 0;
     window = SWD_InitMasterWindow(FILE131_STORE_SWD);
-    SWD_SetFieldItem(window, 0, id_pics[player.pilotPicId]);
+    SWD_SetFieldItem(window, 0, id_pics[player.id_pic]);
     SWD_SetFieldItem(window, 5, mainbut[mode]);
     SWD_GetFieldText(window, 11, yh_hold);
     SWD_SetFieldText(window, 11, NULL);
     SWD_SetFieldText(window, 1, player.callsign);
-    sprintf(v70, "%07d", player.money);
+    sprintf(v70, "%07d", player.score);
     SWD_SetFieldText(window, 10, v70);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
@@ -268,7 +268,7 @@ void STORE_Enter(void)
             SWD_SetFieldText(window, 12, saying[mode]);
             SWD_SetFieldText(window, 13, v70);
             SWD_SetFieldText(window, 9, va4);
-            sprintf(v70, "%07d", player.money);
+            sprintf(v70, "%07d", player.score);
             SWD_SetFieldText(window, 10, v70);
             SWD_SetFieldItem(window, 5, FILE134_BUYITEM_PIC);
             if (v2c < 24)

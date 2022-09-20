@@ -3,6 +3,24 @@
 #define MAX_SHIELD 100
 #define MAX_SUPER  100
 
+#define MAX_FLIGHT      30
+
+#define MAP_ROWS        150
+#define MAP_ONSCREEN    8
+#define MAP_COLS        9
+#define MAP_BLOCKSIZE   32
+#define MAP_BOTTOM      200 - 18
+#define MAP_TOP         2
+#define MAP_LEFT        16
+#define MAP_RIGHT       ( 320 - 16 )
+#define MAP_SIZE        ( MAP_ROWS * MAP_COLS )
+
+#define MAX_TILES       2048
+#define MAX_GUNS        24
+
+#define ENGINE_COLOR    254
+#define SHOT_COLOR      255
+
 extern int reg_flag;
 extern int bday_num;
 extern int demo_mode;
@@ -34,16 +52,28 @@ extern char* LASTSCR;
 struct player_t {
     char name[20];
     char callsign[12];
-    int pilotPicId;
-    unsigned int money;
-    int currentWeapon;
-    int currentGame;
-    int waveGameLevel[3];
-    int amountOfItems;
-    int waveProgression[4];
-    int f_50;
-    int f_54;
+    int id_pic;
+    unsigned int score;                   // MONEY/POINTS
+    int sweapon;                          // CURENT SPECIAL WEAPON
+    int cur_game;                         // CURRENT GAME
+    int game_wave[3];                     // CURRENT WAVE
+    int numobjs;                          // NUMBER OF OBJECTS TO FOLLOW
+    int diff[4];                          // DIFFICULTY LEVEL
+    int trainflag;
+    int fintrain;
 };
+
+#define  DIFF_0   0  // TRAINING MODE
+#define  DIFF_1   1  // EASY MODE
+#define  DIFF_2   2  // NORMAL MODE
+#define  DIFF_3   3  // HARD MODE
+
+#define PLAYERWIDTH  32
+#define PLAYERHEIGHT 32
+#define PLAYERMINX   5
+#define PLAYERMAXX   314
+#define PLAYERINITX  160-(PLAYERWIDTH/2)
+#define PLAYERINITY  160
 
 struct mobj_t {
     int x;

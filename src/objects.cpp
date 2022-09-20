@@ -513,9 +513,9 @@ void OBJS_DisplayStats(void)
             dpos %= 50;
         }
     }
-    if (player.currentWeapon != -1)
+    if (player.sweapon != -1)
     {
-        v1c = obj_lib[player.currentWeapon].item;
+        v1c = obj_lib[player.sweapon].item;
         GFX_PutSprite((texture_t*)GLB_GetItem(v1c), 0x11e, 2);
     }
     if (p_objs[15])
@@ -582,7 +582,7 @@ int OBJS_Add(int a1)
     v20 = &obj_lib[a1];
     if (v20->moneyflag)
     {
-        player.money += v20->payAmount;
+        player.score += v20->payAmount;
         return 0;
     }
     if (!reg_flag && !v20->f_30)
@@ -612,9 +612,9 @@ int OBJS_Add(int a1)
     {
         v1c->f_14 = 1;
         p_objs[a1] = v1c;
-        if (player.currentWeapon == -1 && v20->f_28)
+        if (player.sweapon == -1 && v20->f_28)
         {
-            player.currentWeapon = a1;
+            player.sweapon = a1;
         }
     }
     return 0;
@@ -629,7 +629,7 @@ void OBJS_Del(int a1)
         OBJS_Remove(v1c);
         p_objs[a1] = NULL;
         OBJS_Equip(a1);
-        if (a1 == player.currentWeapon)
+        if (a1 == player.sweapon)
             OBJS_GetNext();
     }
 }
@@ -640,10 +640,10 @@ void OBJS_GetNext(void)
     object_t *v28;
 
     v24 = -1;
-    if (player.currentWeapon < 3)
+    if (player.sweapon < 3)
         v20 = 3;
     else
-        v20 = player.currentWeapon + 1;
+        v20 = player.sweapon + 1;
     for (v1c = 3; v1c <= 14; v1c++)
     {
         if (v20 > 14)
@@ -656,7 +656,7 @@ void OBJS_GetNext(void)
         }
         v20++;
     }
-    player.currentWeapon = v24;
+    player.sweapon = v24;
 }
 
 void OBJS_Use(int a1)
@@ -679,7 +679,7 @@ void OBJS_Use(int a1)
             OBJS_Remove(v1c);
             p_objs[a1] = NULL;
             OBJS_Equip(a1);
-            if (player.currentWeapon == a1)
+            if (player.sweapon == a1)
                 OBJS_GetNext();
         }
     }
@@ -694,7 +694,7 @@ int OBJS_Sell(int a1)
     v20 = &obj_lib[a1];
     if (!v1c)
         return 0;
-    player.money += OBJS_GetResale(a1);
+    player.score += OBJS_GetResale(a1);
     if (a1 == 17)
     {
         p_objs[a1] = NULL;
@@ -712,7 +712,7 @@ int OBJS_Sell(int a1)
                 OBJS_Remove(v1c);
                 p_objs[a1] = NULL;
                 OBJS_Equip(a1);
-                if (player.currentWeapon == a1)
+                if (player.sweapon == a1)
                     OBJS_GetNext();
             }
         }
@@ -738,11 +738,11 @@ int OBJS_Buy(unsigned int a1)
         if (v20 >= 5)
             return 2;
     }
-    if ((unsigned int)OBJS_GetCost(a1) <= player.money)
+    if ((unsigned int)OBJS_GetCost(a1) <= player.score)
     {
         v1c = OBJS_Add(a1);
         if (!v1c)
-            player.money -= OBJS_GetCost(a1);
+            player.score -= OBJS_GetCost(a1);
     }
     return v1c;
 }
@@ -947,7 +947,7 @@ int OBJS_LoseObj(void)
     int v24, v20;
     objlib_t *v1c;
     v24 = 1;
-    if (player.currentWeapon == -1)
+    if (player.sweapon == -1)
     {
         for (v20 = 23; v20 >= 0; v20--)
         {
@@ -962,7 +962,7 @@ int OBJS_LoseObj(void)
     }
     else
     {
-        OBJS_Del(player.currentWeapon);
+        OBJS_Del(player.sweapon);
         v24 = 1;
     }
     return v24;
@@ -1000,7 +1000,7 @@ int OBJS_MakeSpecial(int a1)
         return 0;
     if (!v20->f_28)
         return 0;
-    player.currentWeapon = a1;
+    player.sweapon = a1;
     return 1;
 }
 

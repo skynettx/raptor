@@ -583,14 +583,14 @@ int WIN_Register(void)
     KBD_Clear();
     GFX_FadeOut(0, 0, 0, 2);
     memset(&vd8, 0, sizeof(vd8));
-    vd8.currentWeapon = -1;
-    vd8.waveProgression[0] = 2;
-    vd8.waveProgression[1] = 2;
-    vd8.waveProgression[2] = 2;
-    vd8.waveProgression[3] = 2;
-    vd8.pilotPicId = 0;
+    vd8.sweapon = -1;
+    vd8.diff[0] = 2;
+    vd8.diff[1] = 2;
+    vd8.diff[2] = 2;
+    vd8.diff[3] = 2;
+    vd8.id_pic = 0;
     v24 = SWD_InitWindow(FILE137_REGISTER_SWD);
-    SWD_SetFieldItem(v24, 0, sid_pics[vd8.pilotPicId]);
+    SWD_SetFieldItem(v24, 0, sid_pics[vd8.id_pic]);
     SWD_SetActiveField(v24, 1);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
@@ -635,7 +635,7 @@ int WIN_Register(void)
             v28++;
             v28 %= 4;
             SWD_SetFieldItem(v24, 0, sid_pics[v28]);
-            vd8.pilotPicId = v28;
+            vd8.id_pic = v28;
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
             break;
@@ -677,7 +677,7 @@ int WIN_Register(void)
                     v28++;
                     v28 %= 4;
                     SWD_SetFieldItem(v24, 0, sid_pics[v28]);
-                    vd8.pilotPicId = v28;
+                    vd8.id_pic = v28;
                 }
                 SWD_SetFieldText(v24, 3, regtext[1]);
                 SWD_ShowAllWindows();
@@ -787,18 +787,18 @@ LAB_000244ea:
     if (v20)
     {
         ingameflag = 0;
-        vd8.waveProgression[0] = v30;
-        vd8.waveProgression[1] = v30;
-        vd8.waveProgression[2] = v30;
+        vd8.diff[0] = v30;
+        vd8.diff[1] = v30;
+        vd8.diff[2] = v30;
         if (v30 == 0)
         {
-            vd8.f_50 = 1;
-            vd8.f_54 = 0;
+            vd8.trainflag = 1;
+            vd8.fintrain = 0;
         }
         else
         {
-            vd8.f_50 = 0;
-            vd8.f_54 = 1;
+            vd8.trainflag = 0;
+            vd8.fintrain = 1;
         }
         memcpy(&player, &vd8, sizeof(player_t));
         RAP_SetPlayerDiff();
@@ -806,10 +806,10 @@ LAB_000244ea:
         OBJS_Add(16);
         OBJS_Add(16);
         OBJS_Add(16);
-        player.money = 10000;
+        player.score = 10000;
         if (godmode)
         {
-            player.money += 0xd5fff;
+            player.score += 0xd5fff;
             OBJS_Add(11);
             OBJS_Add(11);
             OBJS_Add(11);
@@ -850,9 +850,9 @@ int WIN_Hangar(void)
     PTR_DrawCursor(0);
     KBD_Clear();
 
-    if (player.f_50)
+    if (player.trainflag)
     {
-        player.f_50 = 0;
+        player.trainflag = 0;
         v2c = 3;
     }
     else
@@ -1156,7 +1156,7 @@ void WIN_LoadComp(void)
     sprintf(v44, "WAVE %d", game_wave[cur_game]);
     SWD_SetFieldText(v1c, 10, v44);
     SWD_SetFieldText(v1c, 9, v74[cur_game]);
-    if (diff_wrap[player.waveProgression[cur_game]] - 1 == game_wave[cur_game])
+    if (diff_wrap[player.diff[cur_game]] - 1 == game_wave[cur_game])
     {
         sprintf(v44, "FINAL WAVE %d", game_wave[cur_game] + 1);
         SWD_SetFieldText(v1c, 10, v44);
@@ -1501,30 +1501,30 @@ void WIN_MainLoop(void)
             INTRO_Landing();
             continue;
         }
-        v24 = diff_wrap[player.waveProgression[cur_game]] - 1;
+        v24 = diff_wrap[player.diff[cur_game]] - 1;
         if (game_wave[cur_game] == v24)
         {
-            if (!player.waveProgression[cur_game] && !player.f_54)
+            if (!player.diff[cur_game] && !player.fintrain)
             {
                 OBJS_Init();
-                player.currentWeapon = -1;
-                player.f_54 = 1;
-                player.money = 0;
+                player.sweapon = -1;
+                player.fintrain = 1;
+                player.score = 0;
                 OBJS_Add(0);
                 OBJS_Add(16);
                 OBJS_Add(16);
                 OBJS_Add(16);
-                player.money = 0x2710;
-                if (player.waveProgression[cur_game] < 3)
-                    player.waveProgression[cur_game]++;
+                player.score = 0x2710;
+                if (player.diff[cur_game] < 3)
+                    player.diff[cur_game]++;
                 for (v28 = 0; v28 < 4; v28++)
-                    if (!player.waveProgression[v28])
-                        player.waveProgression[v28] = 1;
+                    if (!player.diff[v28])
+                        player.diff[v28] = 1;
             }
             else
             {
-                if (player.waveProgression[cur_game] < 3)
-                    player.waveProgression[cur_game]++;
+                if (player.diff[cur_game] < 3)
+                    player.diff[cur_game]++;
             }
             RAP_SetPlayerDiff();
             game_wave[cur_game] = 0;
