@@ -63,6 +63,10 @@ struct player_t {
     int fintrain;
 };
 
+#define END_DURATION ( 20 * 3 )
+#define END_EXPLODE  ( 24 )
+#define END_FLYOFF   ( 20 * 2 )
+
 #define  DIFF_0   0  // TRAINING MODE
 #define  DIFF_1   1  // EASY MODE
 #define  DIFF_2   2  // NORMAL MODE
@@ -75,18 +79,47 @@ struct player_t {
 #define PLAYERINITX  160-(PLAYERWIDTH/2)
 #define PLAYERINITY  160
 
+#define MINPLAYERY   0
+#define MAXPLAYERY   160
+
+#define GREEN        100
+#define RED          34
+#define YELLOW       50
+
+#define MAP_ABORT    -1
+#define MAP_NEXT     -2
+
+#define MAX_ONSCREEN 30
+
 struct mobj_t {
     int x;
     int y;
-    int dirX;
-    int dirY;
-    int max_x;
-    int max_y;
-    int dir_x;
-    int dir_y;
-    int triggerDelay;
-    int f_24;
-    int trigger;
+    int x2;
+    int y2;
+    int delx;
+    int dely;
+    int addx;
+    int addy;
+    int maxloop;
+    int err;
+    int done;
+};
+
+enum FLIGHT_TYPE
+{
+    F_REPEAT,
+    F_LINEAR,
+    F_KAMI,
+    F_GROUND,
+    F_GROUNDLEFT,
+    F_GROUNDRIGHT,
+};
+
+enum ANIMTYPE
+{
+    GANIM_NORM,
+    GANIM_SHOOT,
+    GANIM_MULTI
 };
 
 struct flat_t {

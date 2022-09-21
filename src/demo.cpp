@@ -34,8 +34,9 @@ int demo_wave;
 /***************************************************************************
 DEMO_MakePlayer() -
  ***************************************************************************/
-void DEMO_MakePlayer(int 
-    game
+void 
+DEMO_MakePlayer(
+    int game
 )
 {
     memset(&player, 0, sizeof(player));
@@ -101,7 +102,8 @@ void DEMO_MakePlayer(int
 /***************************************************************************
 DEMO_DisplayStats (
  ***************************************************************************/
-void DEMO_DisplayStats(
+void 
+DEMO_DisplayStats(
     void
 )
 {
@@ -118,7 +120,8 @@ void DEMO_DisplayStats(
 /***************************************************************************
 DEMO_StartRec (
  ***************************************************************************/
-void DEMO_StartRec(
+void 
+DEMO_StartRec(
     void
 )
 {
@@ -131,7 +134,8 @@ void DEMO_StartRec(
 /***************************************************************************
 DEMO_StartPlayback (
  ***************************************************************************/
-void DEMO_StartPlayback(
+void 
+DEMO_StartPlayback(
     void
 )
 {
@@ -142,7 +146,8 @@ void DEMO_StartPlayback(
 /***************************************************************************
 DEMO_SetFileName ()
  ***************************************************************************/
-void DEMO_SetFileName(
+void 
+DEMO_SetFileName(
     const char *in_name
 )
 {
@@ -152,7 +157,8 @@ void DEMO_SetFileName(
 /***************************************************************************
 DEMO_GLBFile (
  ***************************************************************************/
-void DEMO_GLBFile(
+void 
+DEMO_GLBFile(
     int item
 )
 {
@@ -176,7 +182,8 @@ void DEMO_GLBFile(
 /***************************************************************************
 DEMO_LoadFile()
  ***************************************************************************/
-void DEMO_LoadFile(
+void 
+DEMO_LoadFile(
     void
 )
 {
@@ -195,7 +202,8 @@ void DEMO_LoadFile(
 /***************************************************************************
 DEMO_SaveFile (
  ***************************************************************************/
-void DEMO_SaveFile(
+void 
+DEMO_SaveFile(
     void
 )
 {
@@ -212,7 +220,8 @@ void DEMO_SaveFile(
 /***************************************************************************
 DEMO_Play() - Demo playback routine
  ***************************************************************************/
-int DEMO_Play( // TRUE=Aborted, FALSE = timeout
+int        // TRUE=Aborted, FALSE = timeout
+DEMO_Play( 
     void
 )
 {
@@ -270,7 +279,8 @@ int DEMO_Play( // TRUE=Aborted, FALSE = timeout
 /***************************************************************************
 DEMO_Think (
  ***************************************************************************/
-int DEMO_Think(
+int 
+DEMO_Think(
     void
 )
 {

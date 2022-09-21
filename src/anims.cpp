@@ -24,7 +24,8 @@ int adir[3] = {
 /***************************************************************************
 ANIMS_Clear () - Clears out All ANIM Objects
  ***************************************************************************/
-void ANIMS_Clear(
+void 
+ANIMS_Clear(
     void
 )
 {
@@ -47,7 +48,8 @@ void ANIMS_Clear(
 /*-------------------------------------------------------------------------*
 ANIMS_Get () - Gets A Free ANIM from Link List
  *-------------------------------------------------------------------------*/
-anim_t *ANIMS_Get(
+anim_t 
+*ANIMS_Get(
     void
 )
 {
@@ -73,7 +75,8 @@ anim_t *ANIMS_Get(
 /*-------------------------------------------------------------------------*
 ANIMS_Remove () Removes ANIM from Link List
  *-------------------------------------------------------------------------*/
-anim_t *ANIMS_Remove(
+anim_t 
+*ANIMS_Remove(
     anim_t *anim
 )
 {
@@ -96,7 +99,8 @@ anim_t *ANIMS_Remove(
 /***************************************************************************
 ANIMS_Register () - Register a ANIM for USE with this stuff
  ***************************************************************************/
-int ANIMS_Register(
+int 
+ANIMS_Register(
     int item,              // INPUT : lumpnum of first frame
     int numframes,         // INPUT : number of frames
     int groundflag,        // INPUT : on the ground = TRUE
@@ -134,7 +138,8 @@ int ANIMS_Register(
 /***************************************************************************
 ANIMS_Init () Initializes ANIM Stuff
  ***************************************************************************/
-void ANIMS_Init(
+void 
+ANIMS_Init(
     void
 )
 {
@@ -182,7 +187,8 @@ void ANIMS_Init(
 /***************************************************************************
 ANIMS_CachePics() - Cache registered anim pics
  ***************************************************************************/
-void ANIMS_CachePics(
+void 
+ANIMS_CachePics(
     void
 )
 {
@@ -204,7 +210,8 @@ void ANIMS_CachePics(
 /***************************************************************************
 ANIMS_FreePics() - Free Up Anims Used
  ***************************************************************************/
-void ANIMS_FreePics(
+void 
+ANIMS_FreePics(
     void
 )
 {
@@ -226,7 +233,8 @@ void ANIMS_FreePics(
 /***************************************************************************
 ANIMS_StartAnim () - Start An ANIM Playing
  ***************************************************************************/
-void ANIMS_StartAnim(
+void 
+ANIMS_StartAnim(
     int handle,            // INPUT : ANIM handle
     int x,                 // INPUT : x position
     int y                  // INPUT : y position
@@ -249,7 +257,8 @@ void ANIMS_StartAnim(
 /***************************************************************************
 ANIMS_StartGAnim () - Start An ANIM Playing with groundflag == GROUND
  ***************************************************************************/
-void ANIMS_StartGAnim(
+void 
+ANIMS_StartGAnim(
     int handle,             // INPUT : ANIM handle        
     int x,                  // INPUT : x position
     int y                   // INPUT : y position
@@ -270,7 +279,8 @@ void ANIMS_StartGAnim(
 /***************************************************************************
 ANIMS_StartEAnim () - Start An ANIM Playing locked onto ENEMY
  ***************************************************************************/
-void ANIMS_StartEAnim(
+void 
+ANIMS_StartEAnim(
     enemy_t *en,            // INPUT : pointer to ENEMY
     int handle,             // INPUT : ANIM handle
     int x,                  // INPUT : x position
@@ -295,7 +305,8 @@ void ANIMS_StartEAnim(
 /***************************************************************************
 ANIMS_StartAAnim () - Start An ANIM Playing with groundflag == HIGH_AIR
  ***************************************************************************/
-void ANIMS_StartAAnim(
+void 
+ANIMS_StartAAnim(
     int handle,             // INPUT : ANIM handle
     int x,                  // INPUT : x position
     int y                   // INPUT : y position
@@ -318,7 +329,8 @@ void ANIMS_StartAAnim(
 /***************************************************************************
 ANIMS_Think () - Does all thinking for ANIMS
  ***************************************************************************/
-void ANIMS_Think(
+void 
+ANIMS_Think(
     void
 )
 {
@@ -383,7 +395,8 @@ void ANIMS_Think(
 /***************************************************************************
 ANIMS_DisplayGround () - Displays All Active ANIMS on the Ground
  ***************************************************************************/
-void ANIMS_DisplayGround(
+void 
+ANIMS_DisplayGround(
     void
 )
 {
@@ -407,7 +420,8 @@ void ANIMS_DisplayGround(
 /***************************************************************************
 ANIMS_DisplaySky () - Displays All Active ANIMS in SKY
  ***************************************************************************/
-void ANIMS_DisplaySky(
+void 
+ANIMS_DisplaySky(
     void
 )
 {
@@ -432,7 +446,8 @@ void ANIMS_DisplaySky(
 /***************************************************************************
 ANIMS_DisplayHigh () - Displays All Active ANIMS in ABOVE PLAYER
  ***************************************************************************/
-void ANIMS_DisplayHigh(
+void 
+ANIMS_DisplayHigh(
     void
 )
 {

@@ -103,9 +103,17 @@ struct channel_t {
 
 channel_t dsp_channels[8];
 
-void DSP_Init(int channels, int freq)
+/***************************************************************************
+DSP_Init() -
+ ***************************************************************************/
+void 
+DSP_Init(
+    int channels, 
+    int freq
+)
 {
     int i;
+    
     if (dsp_init)
         return;
 
@@ -130,7 +138,13 @@ void DSP_Init(int channels, int freq)
     dsp_init = 1;
 }
 
-void DSP_DeInit(void)
+/***************************************************************************
+DSP_DeInit() -
+ ***************************************************************************/
+void 
+DSP_DeInit(
+    void
+)
 {
     if (!dsp_init)
         return;
@@ -138,59 +152,78 @@ void DSP_DeInit(void)
     dsp_init = 0;
 }
 
-void DSP_Mix(int16_t *buffer, int len)
+/***************************************************************************
+DSP_Mix() -
+ ***************************************************************************/
+void 
+DSP_Mix(
+    int16_t *buffer, 
+    int len
+)
 {
     channel_t *chan;
     int i, l, r, j;
+    
     if (!dsp_init)
         return;
 
     for (i = 0; i < len; i++)
     {
         dsp_rsmp += dsp_freq;
+        
         while (dsp_rsmp >= fx_freq)
         {
             dsp_rsmp -= fx_freq;
             l = 0;
             r = 0;
+            
             for (j = 0; j < dsp_channelnum; j++)
             {
                 chan = &dsp_channels[j];
+                
                 if (chan->samples)
                 {
                     l += chan->voltable1[(uint8_t)*chan->data];
                     r += chan->voltable2[(uint8_t)*chan->data];
                     chan->phase_sub += chan->phase_sub_inc;
+                    
                     if (chan->phase_sub >= 256)
                     {
                         chan->phase_sub &= 255;
                         chan->data++;
                     }
+                    
                     chan->data += chan->phase_inc;
                     chan->samples--;
                 }
             }
+            
             if (l < -128)
                 l = -128;
             else if (l > 127)
                 l = 127;
+            
             if (r < -128)
                 r = -128;
             else if (r > 127)
                 r = 127;
+            
             dsp_samp[0] = l * 128;
             dsp_samp[1] = r * 128;
         }
         l = buffer[0] + dsp_samp[0];
         r = buffer[1] + dsp_samp[1];
+        
         if (l < INT16_MIN)
             l = INT16_MIN;
         else if (l > INT16_MAX)
             l = INT16_MAX;
+        
         if (r < INT16_MIN)
             r = INT16_MIN;
         else if (r > INT16_MAX)
             r = INT16_MAX;
+        
         buffer[0] = l;
         buffer[1] = r;
 
@@ -198,12 +231,20 @@ void DSP_Mix(int16_t *buffer, int len)
     }
 }
 
-int DSP_PatchIsPlaying(int handle)
+/***************************************************************************
+DSP_PatchIsPlaying() -
+ ***************************************************************************/
+int 
+DSP_PatchIsPlaying(
+    int handle
+)
 {
     int i, stat;
     handle &= FXHAND_MASK;
     stat = 0;
+    
     SND_Lock();
+    
     for (i = 0; i < dsp_channelnum; i++)
     {
         if (dsp_channels[i].samples && dsp_channels[i].handle == handle)
@@ -212,11 +253,20 @@ int DSP_PatchIsPlaying(int handle)
             break;
         }
     }
+    
     SND_Unlock();
+    
     return stat;
 }
 
-void DSP_VolTable(int *table, int vol)
+/***************************************************************************
+DSP_VolTable() -
+ ***************************************************************************/
+void 
+DSP_VolTable(
+    int *table, 
+    int vol
+)
 {
     int val;
     int step;
@@ -228,11 +278,13 @@ void DSP_VolTable(int *table, int vol)
     step = vol >> 8;
     sub_step = vol & 255;
     accm = sub_step >> 1;
+    
     for (i = 0; i < 256; i++)
     {
         table[i] = val;
         val += step;
         accm += sub_step;
+        
         while (accm >= 256)
         {
             val++;
@@ -241,7 +293,17 @@ void DSP_VolTable(int *table, int vol)
     }
 }
 
-int DSP_StartPatch(dsp_t *dsp, int sep, int pitch, int volume, int priority)
+/***************************************************************************
+DSP_StartPatch() -
+ ***************************************************************************/
+int 
+DSP_StartPatch(
+    dsp_t *dsp, 
+    int sep, 
+    int pitch, 
+    int volume, 
+    int priority
+)
 {
     channel_t *chan = NULL;
     int i, lowpriority, samples, best, step, lvol, rvol;
@@ -251,6 +313,7 @@ int DSP_StartPatch(dsp_t *dsp, int sep, int pitch, int volume, int priority)
         return -1;
 
     SND_Lock();
+    
     for (i = 0; i < dsp_channelnum; i++)
     {
         if (!dsp_channels[i].samples)
@@ -259,11 +322,13 @@ int DSP_StartPatch(dsp_t *dsp, int sep, int pitch, int volume, int priority)
             break;
         }
     }
+    
     if (!chan) // No free channels
     {
         lowpriority = 0;
         samples = INT32_MAX;
         best = 0;
+        
         for (i = 0; i < dsp_channelnum; i++)
         {
             if (dsp_channels[i].priority > lowpriority)
@@ -278,6 +343,7 @@ int DSP_StartPatch(dsp_t *dsp, int sep, int pitch, int volume, int priority)
                 best = i;
             }
         }
+        
         if (lowpriority < priority || lowpriority == 0)
         {
             SND_Unlock();
@@ -318,14 +384,23 @@ int DSP_StartPatch(dsp_t *dsp, int sep, int pitch, int volume, int priority)
     chan->samples = (samples << 8) / step;
 
     SND_Unlock();
+    
     return handle | FXHAND_DSP;
 }
 
-void DSP_StopPatch(int handle)
+/***************************************************************************
+DSP_StopPatch() -
+ ***************************************************************************/
+void 
+DSP_StopPatch(
+    int handle
+)
 {
     int i;
     handle &= FXHAND_MASK;
+    
     SND_Lock();
+    
     for (i = 0; i < dsp_channelnum; i++)
     {
         if (dsp_channels[i].samples && dsp_channels[i].handle == handle)
@@ -334,5 +409,6 @@ void DSP_StopPatch(int handle)
             break;
         }
     }
+    
     SND_Unlock();
 }

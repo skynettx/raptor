@@ -25,7 +25,8 @@ static int ypos[16] = {
 /***************************************************************************
 BONUS_Clear () - Clears out All bonuses
  ***************************************************************************/
-void BONUS_Clear(
+void 
+BONUS_Clear(
     void
 )
 {
@@ -50,7 +51,8 @@ void BONUS_Clear(
 /*-------------------------------------------------------------------------*
 BONUS_Get () - Gets A Free BONUS from Link List
  *-------------------------------------------------------------------------*/
-bonus_t *BONUS_Get(
+bonus_t 
+*BONUS_Get(
     void
 )
 {
@@ -75,7 +77,8 @@ bonus_t *BONUS_Get(
 /*-------------------------------------------------------------------------*
 BONUS_Remove () Removes BONUS from Link List
  *-------------------------------------------------------------------------*/
-bonus_t *BONUS_Remove(
+bonus_t 
+*BONUS_Remove(
     bonus_t *sh
 )
 {
@@ -101,7 +104,8 @@ bonus_t *BONUS_Remove(
 /***************************************************************************
 BONUS_Init () - Sets up Bonus stuff
  ***************************************************************************/
-void BONUS_Init(
+void 
+BONUS_Init(
     void
 )
 {
@@ -128,7 +132,8 @@ void BONUS_Init(
 /***************************************************************************
 BONUS_Add () - Adds A BONUS to Game so player can Try to pick it up
  ***************************************************************************/
-void BONUS_Add(
+void 
+BONUS_Add(
     int type,              // INPUT : OBJECT TYPE
     int x,                 // INPUT : X POSITION
     int y                  // INPUT : Y POSITION
@@ -161,7 +166,8 @@ void BONUS_Add(
 /***************************************************************************
 BONUS_Think () - Does all BONUS Thinking
  ***************************************************************************/
-void BONUS_Think(
+void 
+BONUS_Think(
     void
 )
 {
@@ -251,7 +257,8 @@ void BONUS_Think(
 /***************************************************************************
 BONUS_Display () - Displays Active Bonuses in game
  ***************************************************************************/
-void BONUS_Display(
+void 
+BONUS_Display(
     void
 )
 {

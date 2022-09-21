@@ -552,8 +552,8 @@ int SHOTS_PlayerShoot(int a1)
         
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         ANIMS_StartAnim(16, o_gun1[playerpic], 0);
@@ -570,8 +570,8 @@ int SHOTS_PlayerShoot(int a1)
 
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         ANIMS_StartAnim(16, -o_gun1[playerpic] - 1, 0);
@@ -587,8 +587,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         break;
@@ -603,8 +603,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         v1c = SHOTS_Get();
@@ -617,8 +617,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         break;
@@ -632,8 +632,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x + (wrand() % 16) + 10;
-        v1c->mobj.dirY = v1c->y + 5;
+        v1c->mobj.x2 = v1c->x + (wrand() % 16) + 10;
+        v1c->mobj.y2 = v1c->y + 5;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         InitMobj(&v1c->mobj);
@@ -647,8 +647,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x - (wrand() % 16) - 10;
-        v1c->mobj.dirY = v1c->y + 5;
+        v1c->mobj.x2 = v1c->x - (wrand() % 16) - 10;
+        v1c->mobj.y2 = v1c->y + 5;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         InitMobj(&v1c->mobj);
@@ -669,8 +669,8 @@ int SHOTS_PlayerShoot(int a1)
             v1c->y = player_cy;
             v1c->mobj.x = v1c->x;
             v1c->mobj.y = v1c->y;
-            v1c->mobj.dirX = (wrand() % v24->f_28) + v24->f_18 - 1;
-            v1c->mobj.dirY = (wrand() % v24->f_2c) + v24->f_34 + v24->f_1c - 1;
+            v1c->mobj.x2 = (wrand() % v24->width) + v24->x - 1;
+            v1c->mobj.y2 = (wrand() % v24->height) + v24->hly + v24->y - 1;
             v1c->f_50 = player_cx;
             v1c->f_54 = player_cy;
             InitMobj(&v1c->mobj);
@@ -687,16 +687,16 @@ int SHOTS_PlayerShoot(int a1)
         {
             SND_Patch(21, 127);
             v1c->shotLib = &shot_lib[a1];
-            v24->f_50 -= v20->damageAmount;
+            v24->hits -= v20->damageAmount;
             v1c->currentFrame = 0;
             v1c->f_4c = v20->offsetX;
             v1c->speedY = v20->startSpeed;
             v1c->x = player_cx;
             v1c->y = player_cy;
-            v1c->mobj.x = (wrand() % v24->f_28) + v24->mobj.x - 1;
-            v1c->mobj.y = (wrand() % v24->f_2c) + v24->mobj.y - 1;
-            v1c->mobj.dirX = player_cx;
-            v1c->mobj.dirY = player_cy;
+            v1c->mobj.x = (wrand() % v24->width) + v24->mobj.x - 1;
+            v1c->mobj.y = (wrand() % v24->height) + v24->mobj.y - 1;
+            v1c->mobj.x2 = player_cx;
+            v1c->mobj.y2 = player_cy;
             v1c->f_50 = player_cx;
             v1c->f_54 = player_cy;
             InitMobj(&v1c->mobj);
@@ -712,8 +712,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         ANIMS_StartAnim(16, o_gun2[playerpic], 1);
@@ -727,8 +727,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         ANIMS_StartAnim(16, -o_gun2[playerpic] - 1, 1);
@@ -742,8 +742,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         v1c = SHOTS_Get();
@@ -756,8 +756,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         break;
@@ -770,8 +770,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         v1c = SHOTS_Get();
@@ -784,8 +784,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         break;
@@ -798,8 +798,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         break;
@@ -812,8 +812,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         break;
@@ -826,8 +826,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = 160;
-        v1c->mobj.dirY = 75;
+        v1c->mobj.x2 = 160;
+        v1c->mobj.y2 = 75;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         InitMobj(&v1c->mobj);
@@ -841,8 +841,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = 0;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = 0;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         break;
@@ -855,8 +855,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = -24;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = -24;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         v1c = SHOTS_Get();
@@ -869,8 +869,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
         v1c->mobj.y = v1c->y;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = -24;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = -24;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
         break;
@@ -885,8 +885,8 @@ int SHOTS_PlayerShoot(int a1)
         v1c->mobj.y = v1c->y;
         v1c->f_50 = player_cx;
         v1c->f_54 = player_cy;
-        v1c->mobj.dirX = v1c->x;
-        v1c->mobj.dirY = -24;
+        v1c->mobj.x2 = v1c->x;
+        v1c->mobj.y2 = -24;
         break;
     }
     return 1;
@@ -933,14 +933,14 @@ void SHOTS_Think(void)
             v20->TexturePtr = v1c->f_4[v20->currentFrame];
             v20->x = v20->mobj.x - v1c->texWidthX2;
             v20->y = v20->mobj.y;
-            for (v24 = first_enemy.f_4; &last_enemy != v24; v24 = v24->f_4)
+            for (v24 = first_enemy.next; &last_enemy != v24; v24 = v24->next)
             {
-                if (v20->x > v24->f_18 && v20->x < v24->f_20 && v24->f_1c < player_cy && v24->f_1c > -30)
+                if (v20->x > v24->x && v20->x < v24->x2 && v24->y < player_cy && v24->y > -30)
                 {
-                    v24->f_50 -= v1c->damageAmount;
-                    if (v24->f_50 != -1)
+                    v24->hits -= v1c->damageAmount;
+                    if (v24->hits != -1)
                     {
-                        v20->mobj.dirY = v24->f_1c + v24->f_34;
+                        v20->mobj.y2 = v24->y + v24->hly;
                         break;
                     }
                 }
@@ -956,7 +956,7 @@ void SHOTS_Think(void)
         {
             if (v1c->f_5c)
             {
-                v20->mobj.trigger = 1;
+                v20->mobj.done = 1;
                 goto LAB_00015d11;
             }
         }
@@ -972,14 +972,14 @@ void SHOTS_Think(void)
                     v20->currentFrame = v1c->frameResetPoint;
                 else
                 {
-                    v20->mobj.trigger = 1;
+                    v20->mobj.done = 1;
                     goto LAB_00015d11;
                 }
             }
         }
         if (v20->f_48)
         {
-            v20->mobj.trigger = 1;
+            v20->mobj.done = 1;
             goto LAB_00015d11;
         }
         if (v1c->skipDamage)
@@ -992,7 +992,7 @@ void SHOTS_Think(void)
             {
                 v20->f_48 = 1;
                 ANIMS_StartAnim(14, v20->x, v20->y);
-                ANIMS_StartEAnim(v24, 19, v24->f_30, v24->f_34);
+                ANIMS_StartEAnim(v24, 19, v24->hlx, v24->hly);
             }
             break;
         case 3:
@@ -1018,7 +1018,7 @@ void SHOTS_Think(void)
             {
                 if (TILE_IsHit(v1c->damageAmount, v20->x, v20->y))
                 {
-                    v20->mobj.trigger = 1;
+                    v20->mobj.done = 1;
                 }
             }
             break;
@@ -1042,14 +1042,14 @@ void SHOTS_Think(void)
             {
                 if (TILE_IsHit(v1c->damageAmount, v20->x, v20->y))
                 {
-                    v20->mobj.trigger = 1;
+                    v20->mobj.done = 1;
                 }
             }
             break;
         case 4:
             if (TILE_Bomb(v1c->damageAmount, v20->x, v20->y))
             {
-                v20->mobj.trigger = 1;
+                v20->mobj.done = 1;
             }
             if (ENEMY_DamageGround(v20->x, v20->y, 5))
             {
@@ -1059,13 +1059,13 @@ void SHOTS_Think(void)
             break;
         }
     LAB_00015d11:
-        if (v20->mobj.trigger)
+        if (v20->mobj.done)
         {
             if (v20->f_4c)
             {
                 v20->f_4c = 0;
-                v20->mobj.dirX = v20->mobj.x + ((wrand() % 32) - 16);
-                v20->mobj.dirY = 0;
+                v20->mobj.x2 = v20->mobj.x + ((wrand() % 32) - 16);
+                v20->mobj.y2 = 0;
                 ANIMS_StartAnim(11, v20->mobj.x, v20->mobj.y);
                 InitMobj(&v20->mobj);
             }
@@ -1076,9 +1076,9 @@ void SHOTS_Think(void)
                 case 11:
                     ESHOT_Clear();
                     TILE_DamageAll();
-                    for (v24 = first_enemy.f_4; &last_enemy != v24; v24 = v24->f_4)
+                    for (v24 = first_enemy.next; &last_enemy != v24; v24 = v24->next)
                     {
-                        v24->f_50 -= v1c->damageAmount;
+                        v24->hits -= v1c->damageAmount;
                     }
                     startfadeflag = 1;
                     ANIMS_StartAnim(20, 0, 0);
@@ -1103,7 +1103,7 @@ void SHOTS_Think(void)
                 v20->mobj.y -= v20->speedY;
                 if (v20->mobj.y < 0)
                 {
-                    v20->mobj.trigger = 1;
+                    v20->mobj.done = 1;
                     v20->f_48 = 1;
                 }
             }
@@ -1133,7 +1133,7 @@ void SHOTS_Display(void)
             v1c = SHOTS_Remove(v1c);
             break;
         case 2:
-            for (v20 = v1c->mobj.dirY; v20 < v1c->y; v20 += 3)
+            for (v20 = v1c->mobj.y2; v20 < v1c->y; v20 += 3)
             {
                 GFX_PutSprite(v1c->TexturePtr, v1c->x, v20);
             }
@@ -1143,7 +1143,7 @@ void SHOTS_Display(void)
                 GFX_PutSprite(laspow[v1c->f_5c], v1c->x, v1c->y);
             v2c = lashit[v1c->f_5c];
             v24 = v1c->x - (v2c->width >> 2);
-            v28 = v1c->mobj.dirY - 8;
+            v28 = v1c->mobj.y2 - 8;
             if (v28 > 0)
                 GFX_PutSprite(v2c, v24, v28);
             v1c->f_5c++;

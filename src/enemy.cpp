@@ -18,6 +18,9 @@
 #include "input.h"
 #include "fileids.h"
 
+#define NORM_SHOOT  -1
+#define START_SHOOT   0
+
 int spriteflag[4];
 int spriteitm[4] = {
      FILE1fc_SPRITE1_ITM, FILE200_SPRITE2_ITM, FILE300_SPRITE3_ITM, FILE400_SPRITE4_ITM
@@ -41,190 +44,253 @@ csprite_t *end_enemy, *cur_enemy;
 
 int tiley;
 
-enemy_t *onscreen[30], *rscreen[30];
+enemy_t *onscreen[MAX_ONSCREEN], *rscreen[MAX_ONSCREEN];
 
-
-int MoveEobj(mobj_t *a1, int a2)
+/***************************************************************************
+   MoveEobj() - gets next postion for an Object at speed
+ ***************************************************************************/
+int 
+MoveEobj(
+    mobj_t *cur,           // INPUT : pointer to MOVEOBJ
+    int speed              // INPUT : speed to plot at
+)      
 {
-    if (!a2)
+    if (!speed)
         return 0;
-    if (a1->max_x >= a1->max_y)
+    
+    if (cur->delx >= cur->dely)
     {
-        while (a2)
+        while (speed)
         {
-            a2--;
-            a1->triggerDelay--;
-            if (a1->triggerDelay == 0)
+            speed--;
+            cur->maxloop--;
+            
+            if (cur->maxloop == 0)
             {
-                a1->trigger = 1;
-                return a2;
+                cur->done = 1;
+                return speed;
             }
-            a1->x += a1->dir_x;
-            a1->f_24 += a1->max_y;
-            if (a1->f_24 > 0)
+            
+            cur->x += cur->addx;
+            cur->err += cur->dely;
+            
+            if (cur->err > 0)
             {
-                a1->y += a1->dir_y;
-                a1->f_24 -= a1->max_x;
+                cur->y += cur->addy;
+                cur->err -= cur->delx;
             }
         }
     }
     else
     {
-        while (a2)
+        while (speed)
         {
-            a2--;
-            a1->triggerDelay--;
-            if (a1->triggerDelay == 0)
+            speed--;
+            cur->maxloop--;
+            
+            if (cur->maxloop == 0)
             {
-                a1->trigger = 1;
-                return a2;
+                cur->done = 1;
+                return speed;
             }
-            a1->y += a1->dir_y;
-            a1->f_24 += a1->max_x;
-            if (a1->f_24 > 0)
+            
+            cur->y += cur->addy;
+            cur->err += cur->delx;
+            
+            if (cur->err > 0)
             {
-                a1->x += a1->dir_x;
-                a1->f_24 -= a1->max_y;
+                cur->x += cur->addx;
+                cur->err -= cur->dely;
             }
         }
     }
-    if (a1->triggerDelay < 1)
-        a1->trigger = 1;
-    return a2;
+    
+    if (cur->maxloop < 1)
+        cur->done = 1;
+    
+    return speed;
 }
 
-void ENEMY_FreeSprites(void)
+/***************************************************************************
+ENEMY_FreeSprites () - Free Memory Used by Sprites use in last level
+ ***************************************************************************/
+void 
+ENEMY_FreeSprites(
+    void
+)
 {
-    int v1c, v20;
-    csprite_t *v28;
-    slib_t *v24;
+    int loop, i;
+    csprite_t *curfld;
+    slib_t *curlib;
 
-    for (v1c = 0; v1c < 4; v1c++)
+    for (loop = 0; loop < 4; loop++)
     {
-        if (spriteflag[v1c])
-            GLB_FreeItem(spriteitm[v1c]);
+        if (spriteflag[loop])
+            GLB_FreeItem(spriteitm[loop]);
     }
-    for (v1c = 0; v1c < mapmem->f_8; v1c++)
+    
+    for (loop = 0; loop < mapmem->numsprites; loop++)
     {
-        v28 = &csprite[v1c];
-        v24 = &slib[csprite[v1c].f_10][csprite[v1c].f_4];
-        if (cur_diff & v28->f_14)
+        curfld = &csprite[loop];
+        curlib = &slib[csprite[loop].game][csprite[loop].slib];
+        
+        if (cur_diff & curfld->level)
         {
-            for (v20 = 0; v20 < v24->f_2c; v20++)
+            for (i = 0; i < curlib->num_frames; i++)
             {
-                GLB_FreeItem(v24->f_10 + v20);
+                GLB_FreeItem(curlib->item + i);
             }
         }
     }
 }
 
-void ENEMY_LoadSprites(void)
+/***************************************************************************
+ENEMY_LoadSprites() -
+ ***************************************************************************/
+void 
+ENEMY_LoadSprites(
+    void
+)
 {
-    int v1c, v20, v2c;
-    csprite_t *v28;
-    slib_t *v24;
+    int loop, i, item;
+    csprite_t *curfld;
+    slib_t *curlib;
+    
     ENEMY_Clear();
     cur_visable = 0;
     boss_sound = 0;
-    for (v1c = 0; v1c < mapmem->f_8; v1c++)
+    
+    for (loop = 0; loop < mapmem->numsprites; loop++)
     {
-        v28 = &csprite[v1c];
-        v24 = &slib[csprite[v1c].f_10][csprite[v1c].f_4];
-        v24->f_10 = GLB_GetItemID(v24->f_0);
-        switch (v28->f_14)
+        curfld = &csprite[loop];
+        curlib = &slib[csprite[loop].game][csprite[loop].slib];
+        curlib->item = GLB_GetItemID(curlib->iname);
+        
+        switch (curfld->level)
         {
         default:
-            v28->f_14 = 64;
+            curfld->level = EB_NOT_USED;
             break;
-        case 0:
-            v28->f_14 = 1;
+        
+        case E_SECRET_1:
+            curfld->level = EB_SECRET_1;
             break;
-        case 1:
-            v28->f_14 = 2;
+        
+        case E_SECRET_2:
+            curfld->level = EB_SECRET_2;
             break;
-        case 2:
-            v28->f_14 = 4;
+        
+        case E_SECRET_3:
+            curfld->level = EB_SECRET_3;
             break;
-        case 3:
-            v28->f_14 = 8;
+        
+        case E_EASY_LEVEL:
+            curfld->level = EB_EASY_LEVEL;
             break;
-        case 4:
-            v28->f_14 = 16;
+        
+        case E_MED_LEVEL:
+            curfld->level = EB_MED_LEVEL;
             break;
-        case 5:
-            v28->f_14 = 32;
+        
+        case E_HARD_LEVEL:
+            curfld->level = EB_HARD_LEVEL;
             break;
         }
-        if (cur_diff & v28->f_14)
+        
+        if (cur_diff & curfld->level)
         {
-            if (v24->f_10 != -1)
+            if (curlib->item != -1)
             {
-                for (v20 = 0; v20 < v24->f_2c; v20++)
+                for (i = 0; i < curlib->num_frames; i++)
                 {
-                    v2c = v24->f_10 + v20;
-                    GLB_CacheItem(v2c);
+                    item = curlib->item + i;
+                    
+                    GLB_CacheItem(item);
                 }
             }
             else
             {
-                v28->f_14 = 64;
+                curfld->level = EB_NOT_USED;
             }
         }
         else
-            v28->f_14 = 64;
+            curfld->level = EB_NOT_USED;
     }
 }
 
-void ENEMY_LoadLib(void)
+/***************************************************************************
+ENEMY_LoadLib () - Loads and Locks spritelib's MUST becalled b4 LoadSprites
+ ***************************************************************************/
+void ENEMY_LoadLib(
+    void
+)
 {
-    int v1c;
+    int loop;
+    
     memset(spriteflag, 0, sizeof(spriteflag));
-    for (v1c = 0; v1c < mapmem->f_8; v1c++)
+    
+    for (loop = 0; loop < mapmem->numsprites; loop++)
     {
-        spriteflag[csprite[v1c].f_10] = 1;
+        spriteflag[csprite[loop].game] = 1;
     }
     g_numslibs = 0;
-    for (v1c = 0; v1c < 4; v1c++)
+    for (loop = 0; loop < 4; loop++)
     {
-        slib[v1c] = NULL;
-        numslibs[v1c] = 0;
-        if (spriteflag[v1c])
+        slib[loop] = NULL;
+        numslibs[loop] = 0;
+        
+        if (spriteflag[loop])
             g_numslibs++;
     }
+    
     if (g_numslibs > 1 && !gameflag[2] && !gameflag[3])
         EXIT_Error("ENEMY_LoadSprites() - F:%d  G1:%d G2:%d G3:%d G4:%d", g_numslibs, spriteflag[0], spriteflag[1], spriteflag[2], spriteflag[3]);
-    for (v1c = 0; v1c < 4; v1c++)
+    
+    for (loop = 0; loop < 4; loop++)
     {
-        if (spriteflag[v1c])
+        if (spriteflag[loop])
         {
-            slib[v1c] = (slib_t*)GLB_LockItem(spriteitm[v1c]);
-            if (!slib[v1c])
+            slib[loop] = (slib_t*)GLB_LockItem(spriteitm[loop]);
+            
+            if (!slib[loop])
                 EXIT_Error("ENEMY_LoadSprites() - memory");
-            numslibs[v1c] = GLB_GetItemSize(spriteitm[v1c]);
-            numslibs[v1c] /= sizeof(slib_t);
+            
+            numslibs[loop] = GLB_GetItemSize(spriteitm[loop]);
+            numslibs[loop] /= sizeof(slib_t);
         }
     }
 }
 
-void ENEMY_Clear(void)
+/***************************************************************************
+ENEMY_Clear()
+ ***************************************************************************/
+void ENEMY_Clear(
+    void
+)
 {
-    int v1c;
+    int loop;
+    
     numboss = 0;
     numships = 0;
     end_waveflag = 0;
-    first_enemy.f_0 = NULL;
-    first_enemy.f_4 = &last_enemy;
-    last_enemy.f_0 = &first_enemy;
-    last_enemy.f_4 = NULL;
+    
+    first_enemy.prev = NULL;
+    first_enemy.next = &last_enemy;
+    
+    last_enemy.prev = &first_enemy;
+    last_enemy.next = NULL;
+    
     free_enemy = ships;
+    
     memset(ships, 0, sizeof(ships));
-    for (v1c = 0; v1c < 29; v1c++)
+    
+    for (loop = 0; loop < MAX_ONSCREEN - 1; loop++)
     {
-        ships[v1c].f_4 = &ships[v1c + 1];
+        ships[loop].next = &ships[loop + 1];
     }
-    if (mapmem->f_8)
+    if (mapmem->numsprites)
     {
-        end_enemy = csprite + mapmem->f_8 - 1;
+        end_enemy = csprite + mapmem->numsprites - 1;
         cur_enemy = csprite;
     }
     else
@@ -234,135 +300,183 @@ void ENEMY_Clear(void)
     }
 }
 
-enemy_t *ENEMY_Get(void)
+/*-------------------------------------------------------------------------*
+ENEMY_Get() - Gets An Free Enemy from link list
+ *-------------------------------------------------------------------------*/
+enemy_t 
+*ENEMY_Get(
+    void
+)
 {
-    enemy_t *v1c;
+    enemy_t *sh;
+    
     if (!free_enemy)
         EXIT_Error("ENEMY_Get() - Max Sprites");
+    
     numships++;
-    v1c = free_enemy;
-    free_enemy = free_enemy->f_4;
-    memset(v1c, 0, sizeof(enemy_t));
-    v1c->f_4 = &last_enemy;
-    v1c->f_0 = last_enemy.f_0;
-    last_enemy.f_0 = v1c;
-    v1c->f_0->f_4 = v1c;
-    return v1c;
+    
+    sh = free_enemy;
+    free_enemy = free_enemy->next;
+    
+    memset(sh, 0, sizeof(enemy_t));
+    
+    sh->next = &last_enemy;
+    sh->prev = last_enemy.prev;
+    last_enemy.prev = sh;
+    sh->prev->next = sh;
+    
+    return sh;
 }
 
-enemy_t *ENEMY_Remove(enemy_t *a1)
+/*-------------------------------------------------------------------------*
+ENEMY_Remove () - Removes an Enemy OBJECT from linklist
+ *-------------------------------------------------------------------------*/
+enemy_t 
+*ENEMY_Remove(
+    enemy_t *sh
+)
 {
-    enemy_t *v1c;
-    if (a1->f_c->f_40)
+    enemy_t *next;
+    
+    if (sh->lib->bossflag)
         numboss--;
+    
     numships--;
+    
     if (end_waveflag && numships < 1)
-        startendwave = 60;
-    v1c = a1->f_0;
-    a1->f_4->f_0 = a1->f_0;
-    a1->f_0->f_4 = a1->f_4;
-    memset(a1, 0, sizeof(enemy_t));
-    a1->item = -1;
-    a1->f_4 = free_enemy;
-    free_enemy = a1;
-    return v1c;
+        startendwave = END_DURATION;
+    
+    next = sh->prev;
+    
+    sh->next->prev = sh->prev;
+    sh->prev->next = sh->next;
+    
+    memset(sh, 0, sizeof(enemy_t));
+    sh->item = -1;
+    
+    sh->next = free_enemy;
+    
+    free_enemy = sh;
+    
+    return next;
 }
 
-void ENEMY_Add(csprite_t *a1)
+/*-------------------------------------------------------------------------*
+ENEMY_Add () - Adds Enemy to attack player
+ *-------------------------------------------------------------------------*/
+void 
+ENEMY_Add(
+    csprite_t *sprite
+)
 {
-    slib_t *v1c;
-    enemy_t *v20;
-    char *v28;
-    texture_t *v24;
-    v1c = &slib[a1->f_10][a1->f_4];
-    v20 = ENEMY_Get();
-    v28 = GLB_GetItem(v1c->f_10);
-    v24 = (texture_t*)v28;
-    v20->item = v1c->f_10;
-    v20->f_28 = v24->width;
-    v20->f_2c = v24->height;
-    v20->f_30 = v24->width >> 1;
-    v20->f_34 = v24->height >> 1;
-    v20->f_a0 = 0;
-    v20->f_50 = v1c->f_44;
-    v20->f_c = &slib[a1->f_10][a1->f_4];
-    v20->f_1c = tileyoff - (tiley - a1->f_c) * 32 - 97;
-    v20->f_18 = a1->f_8 * 32 + 16;
-    v20->f_9c = 0;
-    v20->f_18 += 16;
-    v20->f_1c += 16;
-    v20->f_18 -= v20->f_30;
-    v20->f_1c -= v20->f_34;
-    v20->f_20 = v20->f_18 + v20->f_28;
-    v20->f_24 = v20->f_1c + v20->f_2c;
-    v20->mobj.x = v20->f_10 = v20->f_18;
-    v20->mobj.y = v20->f_14 = v20->f_1c;
-    v20->f_a4 = v1c->f_28;
-    v20->f_b4 = v1c->f_58;
-    v20->f_88 = v1c->f_30 - v20->mobj.y;
-    v20->f_ac = 0;
-    v20->f_a8 = 0;
-    v20->f_3c = -1;
-    v20->f_40 = v1c->f_50;
-    v20->f_44 = v1c->f_4c;
-    if (v1c->f_40 && curplr_diff <= 1)
+    slib_t *curlib;
+    enemy_t *newe;
+    char *pic;
+    texture_t *h;
+    curlib = &slib[sprite->game][sprite->slib];
+    
+    newe = ENEMY_Get();
+    pic = GLB_GetItem(curlib->item);
+    h = (texture_t*)pic;
+    
+    newe->item = curlib->item;
+    newe->width = h->width;
+    newe->height = h->height;
+    newe->hlx = h->width >> 1;
+    newe->hly = h->height >> 1;
+    
+    newe->kami = KAMI_FLY;
+    newe->hits = curlib->hits;
+    newe->lib = &slib[sprite->game][sprite->slib];
+    newe->y = tileyoff - (tiley - sprite->y) * 32 - 97;
+    newe->x = sprite->x * 32 + MAP_LEFT;
+    
+    newe->edir = E_FORWARD;
+    newe->x += 16;
+    newe->y += 16;
+    newe->x -= newe->hlx;
+    newe->y -= newe->hly;
+    newe->x2 = newe->x + newe->width;
+    newe->y2 = newe->y + newe->height;
+    newe->mobj.x = newe->sx = newe->x;
+    newe->mobj.y = newe->sy = newe->y;
+    newe->frame_rate = curlib->frame_rate;
+    newe->speed = curlib->movespeed;
+    
+    newe->countdown = curlib->countdown - newe->mobj.y;
+    newe->shoot_disable = 0;
+    newe->shoot_on = 0;
+    newe->shootagain = NORM_SHOOT;
+    newe->shootcount = curlib->shootcnt;
+    newe->shootflag = curlib->shootstart;
+    
+    if (curlib->bossflag && curplr_diff <= DIFF_1)
     {
-        v20->f_50 -= v20->f_50 >> 1;
-        v20->f_40 -= v20->f_40 >> 2;
+        newe->hits -= newe->hits >> 1;
+        newe->shootcount -= newe->shootcount >> 2;
     }
-    switch (v1c->f_38)
+    
+    switch (curlib->animtype)
     {
     default:
         EXIT_Error("ENEMY_Add() - Invalid ANIMTYPE");
         break;
-    case 0:
-        v20->f_98 = 1;
-        v20->f_94 = v1c->f_2c;
+    case GANIM_NORM:
+        newe->anim_on = 1;
+        newe->num_frames = curlib->num_frames;
         break;
-    case 1:
-        v20->f_98 = 0;
-        v20->f_94 = v1c->f_2c;
+    
+    case GANIM_SHOOT:
+        newe->anim_on = 0;
+        newe->num_frames = curlib->num_frames;
         break;
-    case 2:
-        v20->f_98 = 1;
-        v20->f_94 = v1c->f_34;
+    
+    case GANIM_MULTI:
+        newe->anim_on = 1;
+        newe->num_frames = curlib->rewind;
         break;
     }
-    switch (v1c->f_64)
+    
+    switch (curlib->flighttype)
     {
-    case 0:
-    case 1:
-    case 2:
-        v20->f_54 = 0;
-        v20->f_14 = 100 - v20->f_34;
-        v20->mobj.dirX = v20->f_10 + v1c->f_198[0];
-        v20->mobj.dirY = v20->f_14 + v1c->f_1d4[0];
-        v20->f_38 = 1;
-        InitMobj(&v20->mobj);
-        MoveMobj(&v20->mobj);
+    case F_REPEAT:
+    case F_LINEAR:
+    case F_KAMI:
+        newe->groundflag = 0;
+        newe->sy = 100 - newe->hly;
+        newe->mobj.x2 = newe->sx + curlib->flightx[0];
+        newe->mobj.y2 = newe->sy + curlib->flighty[0];
+        newe->movepos = 1;
+        InitMobj(&newe->mobj);
+        MoveMobj(&newe->mobj);
         break;
-    case 3:                                           //Ground
-        v20->f_54 = 1;
-        v20->mobj.dirX = v20->f_18;
-        v20->mobj.dirY = 211;
+    
+    case F_GROUND:                                          
+        newe->groundflag = 1;
+        newe->mobj.x2 = newe->x;
+        newe->mobj.y2 = 211;
         break;
-    case 5:                                           //Groundright
-        v20->f_18 -= v20->f_28;
-        v20->mobj.x = v20->f_10 = v20->f_18;
-        v20->f_54 = 1;
-        v20->mobj.dirX = 335;
-        v20->mobj.dirY = 211;
+    
+    case F_GROUNDRIGHT:                                           
+        newe->x -= newe->width;
+        newe->mobj.x = newe->sx = newe->x;
+        newe->groundflag = 1;
+        newe->mobj.x2 = 335;
+        newe->mobj.y2 = 211;
         break;
-    case 4:                                           //Groundleft
-        v20->f_18 += v20->f_28;
-        v20->mobj.x = v20->f_10 = v20->f_18;
-        v20->f_54 = 1;
-        v20->mobj.dirX = -v20->f_30;
-        v20->mobj.dirY = 211;
+    
+    case F_GROUNDLEFT:                                           
+        newe->x += newe->width;
+        newe->mobj.x = newe->sx = newe->x;
+        newe->groundflag = 1;
+        newe->mobj.x2 = -newe->hlx;
+        newe->mobj.y2 = 211;
         break;
     }
-    v20->f_b8 = v1c->f_44 >> 4;
-    if (v1c->f_74 != -1)
+    
+    newe->suckagain = curlib->hits >> 4;
+    
+    if (curlib->song != -1)
         boss_sound = 1;
 }
 
@@ -384,7 +498,7 @@ enemy_t *ENEMY_GetRandomAir(void)
     v1c = 0;
     for (v20 = 0; v20 < cur_visable; v20++)
     {
-        if (onscreen[v20]->f_54)
+        if (onscreen[v20]->groundflag)
             continue;
         rscreen[v1c] = onscreen[v20];
         v1c++;
@@ -404,9 +518,9 @@ int ENEMY_DamageAll(int a1, int a2, int a3)
     for (v14 = 0; v14 < cur_visable; v14++)
     {
         v18 = onscreen[v14];
-        if (a1 > v18->f_18&& a1 < v18->f_20 && a2 > v18->f_1c&& a2 < v18->f_24)
+        if (a1 > v18->x&& a1 < v18->x2 && a2 > v18->y&& a2 < v18->y2)
         {
-            v18->f_50 -= a3;
+            v18->hits -= a3;
             return 1;
         }
     }
@@ -420,13 +534,13 @@ int ENEMY_DamageGround(int a1, int a2, int a3)
     for (v14 = 0; v14 < cur_visable; v14++)
     {
         v18 = onscreen[v14];
-        if (!v18->f_54)
+        if (!v18->groundflag)
             continue;
-        if (a1 > v18->f_18 && a1 < v18->f_20 && a2 > v18->f_1c&& a2 < v18->f_24)
+        if (a1 > v18->x && a1 < v18->x2 && a2 > v18->y&& a2 < v18->y2)
         {
-            v18->f_50 -= a3;
+            v18->hits -= a3;
             if (curplr_diff == 0)
-                v18->f_50 -= a3;
+                v18->hits -= a3;
             return 1;
         }
     }
@@ -440,13 +554,13 @@ int ENEMY_DamageAir(int a1, int a2, int a3)
     for (v14 = 0; v14 < cur_visable; v14++)
     {
         v18 = onscreen[v14];
-        if (v18->f_54)
+        if (v18->groundflag)
             continue;
-        if (a1 > v18->f_18 && a1 < v18->f_20 && a2 > v18->f_1c&& a2 < v18->f_24)
+        if (a1 > v18->x && a1 < v18->x2 && a2 > v18->y&& a2 < v18->y2)
         {
-            v18->f_50 -= a3;
+            v18->hits -= a3;
             if (curplr_diff == 0)
-                v18->f_50 -= a3;
+                v18->hits -= a3;
             return 1;
         }
     }
@@ -460,23 +574,23 @@ enemy_t *ENEMY_DamageEnergy(int a1, int a2, int a3)
     for (v14 = 0; v14 < cur_visable; v14++)
     {
         v18 = onscreen[v14];
-        if (v18->f_54)
+        if (v18->groundflag)
             continue;
-        if (a1 > v18->f_18&& a1 < v18->f_20 && a2 > v18->f_1c&& a2 < v18->f_24)
+        if (a1 > v18->x&& a1 < v18->x2 && a2 > v18->y&& a2 < v18->y2)
         {
-            v18->f_50--;
-            if (v18->f_c->f_24)
+            v18->hits--;
+            if (v18->lib->f_24)
             {
-                if (v18->f_b8 > 0)
+                if (v18->suckagain > 0)
                 {
-                    v18->f_b8 -= a3;
+                    v18->suckagain -= a3;
                 }
                 else
                 {
-                    v18->f_a8 = 0;
-                    v18->f_ac = 1;
-                    v18->f_3c = -1;
-                    SND_3DPatch(14, v18->f_18 + v18->f_30, v18->f_1c + v18->f_30);
+                    v18->shoot_on = 0;
+                    v18->shoot_disable = 1;
+                    v18->shootagain = -1;
+                    SND_3DPatch(14, v18->x + v18->hlx, v18->y + v18->hlx);
                 }
             }
             return v18;
@@ -497,12 +611,12 @@ void ENEMY_Think(void)
             SND_Patch(23, 127);
     }
     tiley = tilepos / 9 - 3;
-    while (!end_waveflag && cur_enemy->f_c == tiley)
+    while (!end_waveflag && cur_enemy->y == tiley)
     {
         do
         {
             v24 = cur_enemy;
-            if (cur_enemy->f_14 != 64)
+            if (cur_enemy->level != 64)
                 ENEMY_Add(cur_enemy);
             if (cur_enemy == end_enemy)
             {
@@ -513,40 +627,40 @@ void ENEMY_Think(void)
         } while (v24->f_0 != -1 && v24->f_0 != 1);
     }
     cur_visable = 0;
-    for (v1c = first_enemy.f_4; &last_enemy != v1c; v1c = v1c->f_4)
+    for (v1c = first_enemy.next; &last_enemy != v1c; v1c = v1c->next)
     {
-        v20 = v1c->f_c;
-        if (v20->f_2c > 1)
+        v20 = v1c->lib;
+        if (v20->num_frames > 1)
         {
-            v1c->item = v20->f_10 + v1c->f_8c;
-            if (v1c->f_a4 < 1)
+            v1c->item = v20->item + v1c->f_8c;
+            if (v1c->frame_rate < 1)
             {
-                v1c->f_a4 = v20->f_28;
-                if (v1c->f_98)
+                v1c->frame_rate = v20->frame_rate;
+                if (v1c->anim_on)
                 {
                     v1c->f_8c++;
-                    if ((unsigned int)v1c->f_8c >= (unsigned int)v1c->f_94)
+                    if ((unsigned int)v1c->f_8c >= (unsigned int)v1c->num_frames)
                     {
-                        v1c->f_8c -= v20->f_34;
-                        switch (v20->f_38)
+                        v1c->f_8c -= v20->rewind;
+                        switch (v20->animtype)
                         {
                         default:
                             EXIT_Error("ENEMY_Think() - Invalid ANIMTYPE1");
                         case 0:
                             break;
                         case 1:
-                            v1c->f_98 = 0;
-                            v1c->f_a8 = 1;
+                            v1c->anim_on = 0;
+                            v1c->shoot_on = 1;
                             break;
                         case 2:
                             switch (v1c->f_b0)
                             {
                             case 1:
-                                v1c->f_94 = v20->f_2c;
+                                v1c->num_frames = v20->num_frames;
                                 v1c->f_b0 = 2;
                                 break;
                             case 2:
-                                v1c->f_a8 = 1;
+                                v1c->shoot_on = 1;
                                 break;
                             }
                             break;
@@ -555,18 +669,18 @@ void ENEMY_Think(void)
                 }
             }
             else
-                v1c->f_a4--;
-            if (v1c->f_88 < 1)
+                v1c->frame_rate--;
+            if (v1c->countdown < 1)
             {
-                switch (v20->f_38)
+                switch (v20->animtype)
                 {
                 default:
                     EXIT_Error("ENEMY_Think() - Invalid ANIMTYPE2");
                 case 0:
-                    v1c->f_a8 = 1;
+                    v1c->shoot_on = 1;
                     break;
                 case 1:
-                    v1c->f_98 = 1;
+                    v1c->anim_on = 1;
                     break;
                 case 2:
                     if (!v1c->f_b0)
@@ -575,186 +689,186 @@ void ENEMY_Think(void)
                 }
             }
             else
-                v1c->f_88 -= v20->f_58;
+                v1c->countdown -= v20->movespeed;
         }
         else
         {
-            if (v1c->f_88 < 1)
+            if (v1c->countdown < 1)
             {
-                v1c->f_88 = -1;
-                v1c->f_a8 = 1;
+                v1c->countdown = -1;
+                v1c->shoot_on = 1;
             }
             else
-                v1c->f_88 -= v20->f_58;
+                v1c->countdown -= v20->movespeed;
         }
-        switch (v20->f_64)
+        switch (v20->flighttype)
         {
         case 0:
-            v1c->f_18 = v1c->mobj.x;
-            v1c->f_1c = v1c->mobj.y;
-            v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
-            v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
-            v28 = v20->f_58;
+            v1c->x = v1c->mobj.x;
+            v1c->y = v1c->mobj.y;
+            v1c->x2 = v1c->x + v1c->width - 1;
+            v1c->y2 = v1c->y + v1c->height - 1;
+            v28 = v20->movespeed;
             v28 = MoveEobj(&v1c->mobj, v28);
-            if (v1c->mobj.trigger)
+            if (v1c->mobj.done)
             {
-                v1c->mobj.x = v1c->mobj.dirX;
-                v1c->mobj.y = v1c->mobj.dirY;
-                v1c->mobj.dirX = v1c->f_10 + v20->f_198[v1c->f_38];
-                v1c->mobj.dirY = v1c->f_14 + v20->f_1d4[v1c->f_38];
+                v1c->mobj.x = v1c->mobj.x2;
+                v1c->mobj.y = v1c->mobj.y2;
+                v1c->mobj.x2 = v1c->sx + v20->flightx[v1c->movepos];
+                v1c->mobj.y2 = v1c->sy + v20->flighty[v1c->movepos];
                 InitMobj(&v1c->mobj);
                 MoveMobj(&v1c->mobj);
                 v28 = MoveEobj(&v1c->mobj, v28);
-                if (!v1c->f_9c)
+                if (!v1c->edir)
                 {
-                    v1c->f_38++;
-                    if (v1c->f_38 >= v20->f_5c)
+                    v1c->movepos++;
+                    if (v1c->movepos >= v20->f_5c)
                     {
-                        v1c->f_9c = 1;
-                        v1c->f_38 = v20->f_5c - 1;
+                        v1c->edir = 1;
+                        v1c->movepos = v20->f_5c - 1;
                     }
                 }
                 else
                 {
-                    v1c->f_38--;
-                    if (v1c->f_38 <= v20->f_60)
+                    v1c->movepos--;
+                    if (v1c->movepos <= v20->f_60)
                     {
-                        v1c->f_9c = 0;
-                        v1c->f_38 = v20->f_60;
+                        v1c->edir = 0;
+                        v1c->movepos = v20->f_60;
                     }
                 }
             }
             break;
         case 2:
-            v1c->f_18 = v1c->mobj.x;
-            v1c->f_1c = v1c->mobj.y;
-            v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
-            v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
-            v28 = v20->f_58;
+            v1c->x = v1c->mobj.x;
+            v1c->y = v1c->mobj.y;
+            v1c->x2 = v1c->x + v1c->width - 1;
+            v1c->y2 = v1c->y + v1c->height - 1;
+            v28 = v20->movespeed;
             v28 = MoveEobj(&v1c->mobj, v28);
-            if (v1c->f_a0 == 2)
+            if (v1c->kami == 2)
             {
                 if (v1c->mobj.y > 0xc9)
                     v1c->f_58 = 1;
-                if (v1c->f_30 + 320 < v1c->mobj.x)
+                if (v1c->hlx + 320 < v1c->mobj.x)
                     v1c->f_58 = 1;
-                if (v1c->mobj.y + v1c->f_28 < 0)
+                if (v1c->mobj.y + v1c->width < 0)
                     v1c->f_58 = 1;
-                if (v1c->mobj.x + v1c->f_28 < 0)
+                if (v1c->mobj.x + v1c->width < 0)
                     v1c->f_58 = 1;
             }
-            if (v1c->mobj.trigger && v1c->f_a0 != 2)
+            if (v1c->mobj.done && v1c->kami != 2)
             {
-                v1c->mobj.x = v1c->mobj.dirX;
-                v1c->mobj.y = v1c->mobj.dirY;
-                v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
-                v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
-                if (v1c->f_a0 == 1)
+                v1c->mobj.x = v1c->mobj.x2;
+                v1c->mobj.y = v1c->mobj.y2;
+                v1c->x2 = v1c->x + v1c->width - 1;
+                v1c->y2 = v1c->y + v1c->height - 1;
+                if (v1c->kami == 1)
                 {
-                    v1c->mobj.dirX = player_cx;
-                    v1c->mobj.dirY = player_cy;
-                    v1c->f_a0 = 2;
+                    v1c->mobj.x2 = player_cx;
+                    v1c->mobj.y2 = player_cy;
+                    v1c->kami = 2;
                 }
                 else
                 {
-                    v1c->mobj.dirX = v1c->f_10 + v20->f_198[v1c->f_38];
-                    v1c->mobj.dirY = v1c->f_14 + v20->f_1d4[v1c->f_38];
+                    v1c->mobj.x2 = v1c->sx + v20->flightx[v1c->movepos];
+                    v1c->mobj.y2 = v1c->sy + v20->flighty[v1c->movepos];
                 }
                 InitMobj(&v1c->mobj);
                 MoveMobj(&v1c->mobj);
                 v28 = MoveEobj(&v1c->mobj, v28);
-                if (v20->f_5c - 1 > v1c->f_38)
-                    v1c->f_38++;
-                else if (v1c->f_a0 == 0)
-                    v1c->f_a0 = 1;
+                if (v20->f_5c - 1 > v1c->movepos)
+                    v1c->movepos++;
+                else if (v1c->kami == 0)
+                    v1c->kami = 1;
             }
             break;
         case 1:
-            v1c->f_18 = v1c->mobj.x;
-            v1c->f_1c = v1c->mobj.y;
-            v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
-            v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
-            v28 = v20->f_58;
+            v1c->x = v1c->mobj.x;
+            v1c->y = v1c->mobj.y;
+            v1c->x2 = v1c->x + v1c->width - 1;
+            v1c->y2 = v1c->y + v1c->height - 1;
+            v28 = v20->movespeed;
             v28 = MoveEobj(&v1c->mobj, v28);
-            if (v1c->mobj.trigger)
+            if (v1c->mobj.done)
             {
-                v1c->mobj.x = v1c->mobj.dirX;
-                v1c->mobj.y = v1c->mobj.dirY;
-                v1c->mobj.dirX = v1c->f_10 + v20->f_198[v1c->f_38];
-                v1c->mobj.dirY = v1c->f_14 + v20->f_1d4[v1c->f_38];
+                v1c->mobj.x = v1c->mobj.x2;
+                v1c->mobj.y = v1c->mobj.y2;
+                v1c->mobj.x2 = v1c->sx + v20->flightx[v1c->movepos];
+                v1c->mobj.y2 = v1c->sy + v20->flighty[v1c->movepos];
                 InitMobj(&v1c->mobj);
                 MoveMobj(&v1c->mobj);
                 v28 = MoveEobj(&v1c->mobj, v28);
-                v1c->f_38++;
-                if (v1c->f_38 > v20->f_5c)
+                v1c->movepos++;
+                if (v1c->movepos > v20->f_5c)
                     v1c->f_58 = 1;
             }
             break;
         case 3:
             if (scroll_flag)
-                v1c->f_1c++;
-            if (v1c->f_1c > v1c->mobj.dirY)
+                v1c->y++;
+            if (v1c->y > v1c->mobj.y2)
                 v1c->f_58 = 1;
-            v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
-            v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
+            v1c->x2 = v1c->x + v1c->width - 1;
+            v1c->y2 = v1c->y + v1c->height - 1;
             break;
         case 5:
             if (scroll_flag)
-                v1c->f_1c++;
-            if (v1c->f_1c >= 0)
+                v1c->y++;
+            if (v1c->y >= 0)
             {
-                v1c->f_18 += v20->f_58;
-                if (v1c->f_18 > v1c->mobj.dirX)
+                v1c->x += v20->movespeed;
+                if (v1c->x > v1c->mobj.x2)
                     v1c->f_58 = 1;
-                else if (v1c->f_1c > v1c->mobj.dirY)
+                else if (v1c->y > v1c->mobj.y2)
                     v1c->f_58 = 1;
             }
-            v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
-            v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
+            v1c->x2 = v1c->x + v1c->width - 1;
+            v1c->y2 = v1c->y + v1c->height - 1;
             break;
         case 4:
             if (scroll_flag)
-                v1c->f_1c++;
-            if (v1c->f_1c >= 0)
+                v1c->y++;
+            if (v1c->y >= 0)
             {
-                v1c->f_18 -= v20->f_58;
-                if (v1c->f_18 < v1c->mobj.dirX)
+                v1c->x -= v20->movespeed;
+                if (v1c->x < v1c->mobj.x2)
                     v1c->f_58 = 1;
-                else if (v1c->f_1c > v1c->mobj.dirY)
+                else if (v1c->y > v1c->mobj.y2)
                     v1c->f_58 = 1;
             }
-            v1c->f_20 = v1c->f_18 + v1c->f_28 - 1;
-            v1c->f_24 = v1c->f_1c + v1c->f_2c - 1;
+            v1c->x2 = v1c->x + v1c->width - 1;
+            v1c->y2 = v1c->y + v1c->height - 1;
             break;
         }
-        if (v1c->f_a8)
+        if (v1c->shoot_on)
         {
-            switch (v1c->f_3c)
+            switch (v1c->shootagain)
             {
             case -1:
-                v1c->f_44--;
-                if (v1c->f_44 < 0)
+                v1c->shootflag--;
+                if (v1c->shootflag < 0)
                 {
-                    v1c->f_44 = v20->f_1c;
-                    if (v1c->f_ac == 0)
+                    v1c->shootflag = v20->f_1c;
+                    if (v1c->shoot_disable == 0)
                     {
                         for (v2c = 0; v2c < v20->f_68; v2c++)
                         {
                             ESHOT_Shoot(v1c, v2c);
                         }
                     }
-                    v1c->f_40--;
-                    if (v1c->f_40 < 1)
-                        v1c->f_3c = v20->f_54;
+                    v1c->shootcount--;
+                    if (v1c->shootcount < 1)
+                        v1c->shootagain = v20->f_54;
                 }
                 break;
             case 0:
-                v1c->f_3c = -1;
-                v1c->f_40 = v20->f_50;
-                v1c->f_44 = v20->f_1c;
+                v1c->shootagain = -1;
+                v1c->shootcount = v20->shootcnt;
+                v1c->shootflag = v20->f_1c;
                 break;
             default:
-                v1c->f_3c--;
+                v1c->shootagain--;
                 break;
             }
         }
@@ -765,40 +879,40 @@ void ENEMY_Think(void)
         }
         if (v20->f_3c)
         {
-            if (v1c->f_54)
+            if (v1c->groundflag)
             {
-                SHADOW_GAdd(v1c->item, v1c->f_18, v1c->f_1c);
+                SHADOW_GAdd(v1c->item, v1c->x, v1c->y);
             }
             else
             {
-                SHADOW_Add(v1c->item, v1c->f_18, v1c->f_1c);
+                SHADOW_Add(v1c->item, v1c->x, v1c->y);
             }
         }
-        if (v20->f_40)
+        if (v20->bossflag)
         {
             numboss++;
-            if (v1c->f_50 < 50 && (gl_cnt & 2) != 0)
+            if (v1c->hits < 50 && (gl_cnt & 2) != 0)
             {
-                v30 = v1c->f_18 + (wrand() % v1c->f_28);
-                v34 = v1c->f_1c + (wrand() % v1c->f_2c);
+                v30 = v1c->x + (wrand() % v1c->width);
+                v34 = v1c->y + (wrand() % v1c->height);
                 ANIMS_StartAnim(6, v30, v34);
             }
         }
-        if (!v1c->f_54)
+        if (!v1c->groundflag)
         {
-            if (player_cx > v1c->f_18 && player_cx < v1c->f_20)
+            if (player_cx > v1c->x && player_cx < v1c->x2)
             {
-                if (player_cy > v1c->f_1c && player_cy < v1c->f_24)
+                if (player_cy > v1c->y && player_cy < v1c->y2)
                 {
                     if ((haptic) && (control == 2))
                     {
                         IPT_CalJoyRumbleMedium();                                                            //Rumble when enemy hit
                     }
-                    v1c->f_50 -= 16;
-                    if (v1c->f_28 > v1c->f_2c)
-                        v3c = v1c->f_28;
+                    v1c->hits -= 16;
+                    if (v1c->width > v1c->height)
+                        v3c = v1c->width;
                     else
-                        v3c = v1c->f_2c;
+                        v3c = v1c->height;
                     OBJS_SubEnergy(v3c >> 2);
                     v30 = player_cx + (wrand() % 8) - 4;
                     v34 = player_cy + (wrand() % 8) - 4;
@@ -807,32 +921,32 @@ void ENEMY_Think(void)
                 }
             }
         }
-        if (v1c->f_50 <= 0)
+        if (v1c->hits <= 0)
         {
             player.score += v20->f_48;
-            SND_3DPatch(8, v1c->f_18 + v1c->f_30, v1c->f_18 + v1c->f_30);
+            SND_3DPatch(8, v1c->x + v1c->hlx, v1c->x + v1c->hlx);
             switch (v20->f_18)
             {
             case 8:
-                ANIMS_StartAnim(8, v1c->f_18 + v1c->f_30, v1c->f_1c + v1c->f_34);
-                BONUS_Add(23, v1c->f_18, v1c->f_1c);
+                ANIMS_StartAnim(8, v1c->x + v1c->hlx, v1c->y + v1c->hly);
+                BONUS_Add(23, v1c->x, v1c->y);
                 break;
             case 0:
-                ANIMS_StartAnim(5, v1c->f_18 + v1c->f_30, v1c->f_1c + v1c->f_34);
+                ANIMS_StartAnim(5, v1c->x + v1c->hlx, v1c->y + v1c->hly);
                 break;
             case 10:
-                ANIMS_StartAnim(7, v1c->f_18 + v1c->f_30, v1c->f_1c + v1c->f_34);
+                ANIMS_StartAnim(7, v1c->x + v1c->hlx, v1c->y + v1c->hly);
                 break;
             case 1:
-                ANIMS_StartAnim(4, v1c->f_18 + v1c->f_30, v1c->f_1c + v1c->f_34);
+                ANIMS_StartAnim(4, v1c->x + v1c->hlx, v1c->y + v1c->hly);
                 break;
             case 2:
-                ANIMS_StartAnim(4, v1c->f_18 + v1c->f_30, v1c->f_1c + v1c->f_34);
-                v38 = (v1c->f_28>>4) * (v1c->f_2c>>4);
+                ANIMS_StartAnim(4, v1c->x + v1c->hlx, v1c->y + v1c->hly);
+                v38 = (v1c->width>>4) * (v1c->height>>4);
                 for (v2c = 0; v2c < v38; v2c++)
                 {
-                    v30 = v1c->f_18 + (wrand() % v1c->f_28);
-                    v34 = v1c->f_1c + (wrand() % v1c->f_2c);
+                    v30 = v1c->x + (wrand() % v1c->width);
+                    v34 = v1c->y + (wrand() % v1c->height);
                     if (v2c & 1)
                         ANIMS_StartAnim(5, v30, v34);
                     else
@@ -840,24 +954,24 @@ void ENEMY_Think(void)
                 }
                 break;
             case 3:
-                ANIMS_StartAnim(1, v1c->f_18 + v1c->f_30, v1c->f_1c + v1c->f_34);
+                ANIMS_StartAnim(1, v1c->x + v1c->hlx, v1c->y + v1c->hly);
                 break;
             case 4:
-                v30 = v1c->f_18 + (wrand() % v1c->f_28);
-                v34 = v1c->f_1c + (wrand() % v1c->f_2c);
+                v30 = v1c->x + (wrand() % v1c->width);
+                v34 = v1c->y + (wrand() % v1c->height);
                 if ((wrand() % 2) == 0)
                     ANIMS_StartAnim(18, v30, v34);
                 else
                     ANIMS_StartAnim(17, v30, v34);
-                ANIMS_StartAnim(0, v1c->f_18 + v1c->f_30, v1c->f_1c + v1c->f_34);
+                ANIMS_StartAnim(0, v1c->x + v1c->hlx, v1c->y + v1c->hly);
                 break;
             case 5:
-                ANIMS_StartAnim(0, v1c->f_18 + v1c->f_30, v1c->f_1c + v1c->f_34);
-                v38 = (v1c->f_28>>4) * (v1c->f_2c>>4);
+                ANIMS_StartAnim(0, v1c->x + v1c->hlx, v1c->y + v1c->hly);
+                v38 = (v1c->width>>4) * (v1c->height>>4);
                 for (v2c = 0; v2c < v38; v2c++)
                 {
-                    v30 = v1c->f_18 + (wrand() % v1c->f_28);
-                    v34 = v1c->f_1c + (wrand() % v1c->f_2c);
+                    v30 = v1c->x + (wrand() % v1c->width);
+                    v34 = v1c->y + (wrand() % v1c->height);
                     if ((wrand()%2) == 0)
                         ANIMS_StartAnim(17, v30, v34);
                     else
@@ -866,12 +980,12 @@ void ENEMY_Think(void)
                 }
                 break;
             case 6:
-                ANIMS_StartAnim(4, v1c->f_18 + v1c->f_30, v1c->f_1c + v1c->f_34);
-                v38 = (v1c->f_28>>4) * (v1c->f_2c>>4);
+                ANIMS_StartAnim(4, v1c->x + v1c->hlx, v1c->y + v1c->hly);
+                v38 = (v1c->width>>4) * (v1c->height>>4);
                 for (v2c = 0; v2c < v38; v2c++)
                 {
-                    v30 = v1c->f_18 + (wrand() % v1c->f_28);
-                    v34 = v1c->f_1c + (wrand() % v1c->f_2c);
+                    v30 = v1c->x + (wrand() % v1c->width);
+                    v34 = v1c->y + (wrand() % v1c->height);
                     ANIMS_StartAAnim(17, v30, v34);
                     if (v2c & 1)
                         ANIMS_StartAnim(4, v30, v34);
@@ -880,22 +994,22 @@ void ENEMY_Think(void)
                 }
                 break;
             case 7:
-                ANIMS_StartAnim(2, v1c->f_18 + v1c->f_30, v1c->f_1c + v1c->f_34);
+                ANIMS_StartAnim(2, v1c->x + v1c->hlx, v1c->y + v1c->hly);
                 break;
             case 9:
-                ANIMS_StartAnim(3, v1c->f_18 + v1c->f_30, v1c->f_1c + v1c->f_34);
+                ANIMS_StartAnim(3, v1c->x + v1c->hlx, v1c->y + v1c->hly);
                 break;
             }
             if (v20->f_14 != -1)
-                BONUS_Add(v20->f_14, v1c->f_18, v1c->f_1c);
+                BONUS_Add(v20->f_14, v1c->x, v1c->y);
             v1c = ENEMY_Remove(v1c);
             continue;
         }
-        v34 = v1c->f_1c + v1c->f_2c;
-        if (v34 > 0 && v1c->f_1c < 200)
+        v34 = v1c->y + v1c->height;
+        if (v34 > 0 && v1c->y < 200)
         {
-            v30 = v1c->f_18 + v1c->f_28;
-            if (v30 > 0 && v1c->f_18 < 320)
+            v30 = v1c->x + v1c->width;
+            if (v30 > 0 && v1c->x < 320)
             {
                 onscreen[cur_visable] = v1c;
                 cur_visable++;
@@ -907,11 +1021,11 @@ void ENEMY_Think(void)
 void ENEMY_DisplayGround(void)
 {
     enemy_t *v1c;
-    for (v1c = first_enemy.f_4; &last_enemy != v1c; v1c = v1c->f_4)
+    for (v1c = first_enemy.next; &last_enemy != v1c; v1c = v1c->next)
     {
-        if (!v1c->f_54)
+        if (!v1c->groundflag)
             continue;
-        GFX_PutSprite((texture_t*)GLB_GetItem(v1c->item), v1c->f_18, v1c->f_1c);
+        GFX_PutSprite((texture_t*)GLB_GetItem(v1c->item), v1c->x, v1c->y);
     }
 }
 
@@ -919,14 +1033,14 @@ void ENEMY_DisplaySky(void)
 {
     int v20;
     enemy_t *v1c;
-    for (v1c = first_enemy.f_4; &last_enemy != v1c; v1c = v1c->f_4)
+    for (v1c = first_enemy.next; &last_enemy != v1c; v1c = v1c->next)
     {
-        if (v1c->f_54)
+        if (v1c->groundflag)
             continue;
-        GFX_PutSprite((texture_t*)GLB_GetItem(v1c->item), v1c->f_18, v1c->f_1c);
-        for (v20 = 0; v20 < v1c->f_c->f_6c; v20++)
+        GFX_PutSprite((texture_t*)GLB_GetItem(v1c->item), v1c->x, v1c->y);
+        for (v20 = 0; v20 < v1c->lib->f_6c; v20++)
         {
-            FLAME_Up(v1c->f_18 + v1c->f_c->f_a8[v20], v1c->f_1c + v1c->f_c->f_d8[v20], v1c->f_c->f_108[v20], v1c->f_90);
+            FLAME_Up(v1c->x + v1c->lib->f_a8[v20], v1c->y + v1c->lib->f_d8[v20], v1c->lib->f_108[v20], v1c->f_90);
         }
         v1c->f_90 ^= 1;
     }
@@ -940,13 +1054,13 @@ int ENEMY_GetBaseDamage(void)
 
     v1c = 0;
     nums = 0;
-    for (v20 = first_enemy.f_4; &last_enemy != v20; v20 = v20->f_4)
+    for (v20 = first_enemy.next; &last_enemy != v20; v20 = v20->next)
     {
-        if (!v20->f_c->f_40)
+        if (!v20->lib->bossflag)
             continue;
-        if (v20->f_1c + v20->f_34 >= 0)
+        if (v20->y + v20->hly >= 0)
         {
-            v24 = (v20->f_50 * 100) / v20->f_c->f_44;
+            v24 = (v20->hits * 100) / v20->lib->hits;
             v1c += v24;
             nums++;
         }
