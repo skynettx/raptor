@@ -180,8 +180,8 @@ void ESHOT_Shoot(enemy_t *a1, int a2)
     int v20;
     int v2c;
     eshot_t *v18;
-    v1c = a1->x + a1->lib->f_138[a2];
-    v20 = a1->y + a1->lib->f_168[a2];
+    v1c = a1->x + a1->lib->shootx[a2];
+    v20 = a1->y + a1->lib->shooty[a2];
     
     if (((v1c >= 0) && (v1c < 320)) && ((v20 >= 0) && (v20 < 200)))
     {
@@ -192,7 +192,7 @@ void ESHOT_Shoot(enemy_t *a1, int a2)
         v18->f_18.y = v20;
         v18->f_5c = a1;
         v18->f_60 = a2;
-        v2c = a1->lib->f_78[a2];
+        v2c = a1->lib->shoot_type[a2];
         switch (v2c)
         {
         default:
@@ -314,8 +314,8 @@ void ESHOT_Think(void)
         case 5:
             if (v1c->f_5c && v1c->f_5c->lib && v1c->f_c < v20->f_2c)
             {
-                v1c->f_10 = v1c->f_5c->x + v1c->f_5c->lib->f_138[v1c->f_60] - 4;
-                v1c->f_14 = v1c->f_5c->y + v1c->f_5c->lib->f_168[v1c->f_60];
+                v1c->f_10 = v1c->f_5c->x + v1c->f_5c->lib->shootx[v1c->f_60] - 4;
+                v1c->f_14 = v1c->f_5c->y + v1c->f_5c->lib->shooty[v1c->f_60];
                 v1c->f_18.y2 = 200;  
                 v24 = abs(v1c->f_10 - player_cx);
                 if (v24 < 16 && v1c->f_14 < player_cy)

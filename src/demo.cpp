@@ -125,7 +125,7 @@ DEMO_StartRec(
     void
 )
 {
-    SND_Patch(10, 127);
+    SND_Patch(FX_BONUS, 127);
     memset(playback, 0, sizeof(playback));
     demo_mode = DEMO_RECORD;
     cur_play = 1;
@@ -262,7 +262,7 @@ DEMO_Play(
     {
         if (OBJS_GetAmt(S_ENERGY) <= 0)
         {
-            SND_PlaySong(93, 1, 1);
+            SND_PlaySong(FILE05d_RAP5_MUS, 1, 1);
             INTRO_Death();
         }
         else
@@ -324,7 +324,7 @@ DEMO_Think(
         cur_play++;
         if (cur_play == MAX_DEMO)
         {
-            SND_Patch(10, 127);
+            SND_Patch(FX_BONUS, 127);
             demo_mode = 0;
             rval = 1;
         }

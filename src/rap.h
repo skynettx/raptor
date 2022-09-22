@@ -122,6 +122,21 @@ enum ANIMTYPE
     GANIM_MULTI
 };
 
+enum EXP_TYPE
+{
+    EXP_AIRSMALL1, // 0  
+    EXP_AIRMED,    // 1 NORMAL AIR    ( norm )
+    EXP_AIRLARGE,  // 2 bigger that 32 by 32
+    EXP_GRDSMALL,  // 3 smaller than 32 by 32          
+    EXP_GRDMED,    // 4 NORMAL GROUND ( norm )
+    EXP_GRDLARGE,  // 5 bigger than 32 by 32
+    EXP_BOSS,      // 6 BIG BOSS SHIP ( AIR ) 
+    EXP_PERSON,    // 7 ONE LITTLE PERSON BLWING UP
+    EXP_ENERGY,    // 8 ENERGY SHIP BLOWING UP
+    EXP_PLATOON,   // 9 ONE LITTLE PERSON BLWING UP
+    EXP_AIRSMALL2  // 10  
+};
+
 struct flat_t {
     int f_0; // eitems
     short f_4; // hits

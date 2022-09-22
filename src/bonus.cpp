@@ -214,7 +214,7 @@ BONUS_Think(
         {
             if (!cur->dflag && OBJS_GetAmt(S_ENERGY) > 0)
             {
-                SND_Patch(10, 127);
+                SND_Patch(FX_BONUS, 127);
                 
                 if (cur->type == S_ENERGY)
                     OBJS_AddEnergy(MAX_SHIELD / 4);

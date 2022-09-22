@@ -31,39 +31,39 @@ enum MULTI
 struct slib_t {
     char iname[16];                         // ITEM NAME
     int item;                               // * GLB ITEM #
-    int f_14;
-    int f_18;
-    int f_1c;
+    int bonus;                              // BONUS # ( -1 == NONE )
+    int exptype;                            // EXPLOSION TYPE 
+    int shootspace;                         // SLOWDOWN SPEED
     int f_20;
-    int f_24;
+    int suck;                               // CAN SUCK WEAPON AFFECT
     int frame_rate;                         // FRAME RATE
     int num_frames;                         // NUM FRAMES
     int countdown;                          // COUNT DOWN TO START ANIM
     int rewind;                             // FRAMES TO REWIND
     int animtype;                           // FREE SPACE FOR LATER USE
-    int f_3c;
+    int shadow;                             // USE SHADOW ( TRUE/FALSE )
     int bossflag;                           // SHOULD THIS BE CONSIDERED A BOSS
     int hits;                               // HIT POINTS
-    int f_48;
+    int money;                              // $$ AMOUNT WHEN KILLED
     int shootstart;                         // SHOOT START OFFSET
     int shootcnt;                           // HOW MANY TO SHOOT
-    int f_54;
+    int shootframe;                         // FRAME RATE TO SHOOT
     int movespeed;                          // MOVEMENT SPEED
-    int f_5c;
-    int f_60;
+    int numflight;                          // NUMBER OF FLIGHT POSITIONS
+    int repos;                              // REPEAT TO POSITION
     int flighttype;                         // FLIGHT TYPE
-    int f_68;
-    int f_6c;
+    int numguns;                            // NUMBER OF GUNS
+    int numengs;                            // NUMBER OF ENGINES
     int f_70;
     int song;                               // SONG # TO PLAY
-    short f_78[24];
-    short f_a8[24];
-    short f_d8[24];
-    short f_108[24];
-    short f_138[24];
-    short f_168[24];
-    short flightx[MAX_FLIGHT];             // FLIGHT X POS
-    short flighty[MAX_FLIGHT];             // FLIGHT Y POS
+    short shoot_type[MAX_GUNS];             // ENEMY SHOOT TYPE
+    short engx[MAX_GUNS];                   // X POS ENGINE FLAME
+    short engy[MAX_GUNS];                   // Y POS ENGINE FLAME
+    short englx[MAX_GUNS];                  // WIDTH OF ENGINE FLAME
+    short shootx[MAX_GUNS];                 // X POS SHOOT FROM
+    short shooty[MAX_GUNS];                 // Y POS SHOOT FROM
+    short flightx[MAX_FLIGHT];              // FLIGHT X POS
+    short flighty[MAX_FLIGHT];              // FLIGHT Y POS
 }; // size 0x210
 
 struct enemy_t {
@@ -87,11 +87,11 @@ struct enemy_t {
     int shootflag;                    // * COUNTER TO SPACE SHOTS
     int hits;                         // *
     int groundflag;                   // *
-    int f_58;
+    int doneflag;
     mobj_t mobj;
     int countdown;
-    int f_8c;
-    int f_90;
+    int curframe;
+    int eframe;
     int num_frames;
     int anim_on;
     int edir;
@@ -99,7 +99,7 @@ struct enemy_t {
     int frame_rate;
     int shoot_on;
     int shoot_disable;
-    int f_b0;
+    int multi;
     int speed;
     int suckagain;
 };
@@ -128,11 +128,11 @@ void ENEMY_LoadLib(void);
 void ENEMY_LoadSprites(void);
 void ENEMY_FreeSprites(void);
 enemy_t *ENEMY_GetRandom(void);
-enemy_t* ENEMY_GetRandomAir(void);
-enemy_t *ENEMY_DamageEnergy(int a1, int a2, int a3);
-int ENEMY_DamageAll(int a1, int a2, int a3);
-int ENEMY_DamageGround(int a1, int a2, int a3);
-int ENEMY_DamageAir(int a1, int a2, int a3);
+enemy_t *ENEMY_GetRandomAir(void);
+enemy_t *ENEMY_DamageEnergy(int x, int y, int damage);
+int ENEMY_DamageAll(int x, int y, int damage);
+int ENEMY_DamageGround(int x, int y, int damage);
+int ENEMY_DamageAir(int x, int y, int damage);
 int ENEMY_GetBaseDamage(void);
 void ENEMY_Think(void);
 void ENEMY_DisplayGround(void);

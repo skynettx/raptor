@@ -3,7 +3,7 @@
 #include "rap.h"
 
 struct csprite_t {
-    int f_0;
+    int link;
     int slib;
     int x;
     int y;
