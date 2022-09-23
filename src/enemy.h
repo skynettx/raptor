@@ -34,7 +34,7 @@ struct slib_t {
     int bonus;                              // BONUS # ( -1 == NONE )
     int exptype;                            // EXPLOSION TYPE 
     int shootspace;                         // SLOWDOWN SPEED
-    int f_20;
+    int ground;                     //NOT USED IS ON GROUND
     int suck;                               // CAN SUCK WEAPON AFFECT
     int frame_rate;                         // FRAME RATE
     int num_frames;                         // NUM FRAMES
@@ -54,7 +54,7 @@ struct slib_t {
     int flighttype;                         // FLIGHT TYPE
     int numguns;                            // NUMBER OF GUNS
     int numengs;                            // NUMBER OF ENGINES
-    int f_70;
+    int sfx;                        //NOT USED SFX # TO PLAY
     int song;                               // SONG # TO PLAY
     short shoot_type[MAX_GUNS];             // ENEMY SHOOT TYPE
     short engx[MAX_GUNS];                   // X POS ENGINE FLAME
