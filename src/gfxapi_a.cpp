@@ -49,9 +49,9 @@ void GFX_DisplayScreen(void)
 
 void GFX_ShadeSprite(char *p, texture_t *t, char *s)
 {
-    while ((int16_t)t->f_8 != -1)
+    while ((int16_t)t->offset != -1)
     {
-        char *d = p + (uint16_t)t->f_8;
+        char *d = p + (uint16_t)t->offset;
         for (int i = 0; i < (uint16_t)t->width; i++, d++)
             *d = s[(uint8_t)*d];
         t = (texture_t*)((char*)&t->height + (uint16_t)t->width);
@@ -60,9 +60,9 @@ void GFX_ShadeSprite(char *p, texture_t *t, char *s)
 
 void GFX_DrawSprite(char *a1, texture_t *a2)
 {
-    while ((int16_t)a2->f_8 != -1)
+    while ((int16_t)a2->offset != -1)
     {
-        memcpy(a1 + (uint16_t)a2->f_8, (char*)&a2->height, (uint16_t)a2->width);
+        memcpy(a1 + (uint16_t)a2->offset, (char*)&a2->height, (uint16_t)a2->width);
         a2 = (texture_t*)((char*)&a2->height + (uint16_t)a2->width);
     }
 }

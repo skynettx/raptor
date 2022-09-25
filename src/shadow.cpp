@@ -44,11 +44,11 @@ void SHADOW_Draw(char *a1, int a2, int a3)
         return;
     a1 += 0x14;
     v20 = (texture_t*)a1;
-    while (v20->f_8 != -1)
+    while (v20->offset != -1)
     {
         a1 += 16;
-        v2c = v20->f_0 + a2;
-        v30 = v20->f_4 + a3;
+        v2c = v20->x + a2;
+        v30 = v20->y + a3;
         v34 = v2c + v20->width - 1;
         v38 = v30 + 1;
         G3D_x = v2c;
@@ -65,13 +65,13 @@ void SHADOW_Draw(char *a1, int a2, int a3)
         if (v28 > 200)
             return;
         v44 = 1;
-        if (v20->f_4 != v3c && v40 == v28)
+        if (v20->y != v3c && v40 == v28)
             v44 = 0;
         if (v44)
         {
             if (GFX_ClipLines(0, &v24, &v28, &v18, &v1c))
                 GFX_Shade(displaybuffer + v24 + ylookup[v28], v18, sdtable);
-            v3c = v20->f_4;
+            v3c = v20->y;
         }
         v40 = v28;
         a1 += v20->width;

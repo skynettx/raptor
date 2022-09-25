@@ -33,9 +33,17 @@ void (*framehook)(void (*call)(void));
 static int timer_init = 0;
 
 int retraceflag = 1;
+int fontspacing = 1;
 
-int G3D_viewx, G3D_viewy, G3D_viewz;
-int G3D_x, G3D_y, G3D_z, G3D_screenx, G3D_screeny;
+
+int G3D_x;                        // input: x position
+int G3D_y;                        // input: y position
+int G3D_z;                        // input: z position
+int G3D_screenx;                  // output: screen x pos
+int G3D_screeny;                  // output: screen y pos
+int G3D_viewx;                    // user view x pos
+int G3D_viewy;                    // user view y pos
+int G3D_viewz;                    // user view z pos
 
 void GFX_InitTimer(void)
 {
@@ -48,81 +56,126 @@ void GFX_InitTimer(void)
 
 #define GFX_RATE 70
 
-void GFX_UpdateTimer(void)
+/***************************************************************************
+GFX_UpdateTimer () - 
+ ***************************************************************************/
+void 
+GFX_UpdateTimer(
+    void
+)
 {
     if (!timer_init)
         return;
+    
     static int last;
     static int accm;
     int now = SDL_GetTicks();
+    
     if (last == 0)
         last = now;
+    
     for (int i = last; i < now;)
     {
         int step = (1000 - accm + (GFX_RATE - 1)) / GFX_RATE;
+        
         if (step < 1)
             step = 1;
+        
         if (step > now - i)
             step = now - i;
+        
         accm += GFX_RATE * step;
+        
         while (accm >= 1000)
         {
             accm -= 1000;
             framecount++;
         }
+        
         i += step;
     }
+    
     last = now;
 }
 
-int GFX_GetFrameCount(void)
+/***************************************************************************
+GFX_GetFrameCount () -
+ ***************************************************************************/
+int 
+GFX_GetFrameCount(
+    void
+)
 {
     I_GetEvent();
     GFX_UpdateTimer();
+    
     return framecount;
 }
 
-int GFX_ClipLines(char **a1, int *a2, int *a3, int *a4, int *a5)
+/*************************************************************************
+   GFX_ClipLines ()
+ *************************************************************************/
+int                        // RETURN: 0 = Off, 1 == No Clip , 2 == Cliped
+GFX_ClipLines(
+    char **image,          // INOUT : pointer to image or NUL
+    int *x,                // INOUT : pointer to x pos
+    int *y,                // INOUT : pointer to y pos
+    int *lx,               // INOUT : pointer to width
+    int *ly                // INOUT : pointer to length
+)
 {
-    int vsi = 1;
-    if (*a2 >= 320)
+    int rval = 1;
+    
+    if (*x >= SCREENWIDTH)
         return 0;
-    if (*a3 >= 200)
+    if (*y >= SCREENHEIGHT)
         return 0;
-    if (*a2 + *a4 <= 0)
+    if (*x + *lx <= 0)
         return 0;
-    if (*a3 + *a5 <= 0)
+    if (*y + *ly <= 0)
         return 0;
-    if (*a3 < 0)
+    
+    if (*y < 0)
     {
-        vsi = 2;
-        if (a1)
-            *a1 += -(*a3) * *a4;
-        *a5 += *a3;
-        *a3 = 0;
+        rval = 2;
+        if (image)
+            *image += -(*y) * *lx;
+        *ly += *y;
+        *y = 0;
     }
-    if (*a3 + *a5 > 200)
+    
+    if (*y + *ly > SCREENHEIGHT)
     {
-        vsi = 2;
-        *a5 = 200 - *a3;
+        rval = 2;
+        *ly = SCREENHEIGHT - *y;
     }
-    if (*a2 < 0)
+    
+    if (*x < 0)
     {
-        vsi = 2;
-        if (a1)
-            *a1 += -(*a2);
-        *a4 += *a2;
-        *a2 = 0;
+        rval = 2;
+        if (image)
+            *image += -(*x);
+        *lx += *x;
+        *x = 0;
     }
-    if (*a2 + *a4 > 320)
+    
+    if (*x + *lx > SCREENWIDTH)
     {
-        vsi = 2;
-        *a4 = 320 - *a2;
+        rval = 2;
+        *lx = SCREENWIDTH - *x;
     }
-    return vsi;
+    
+    return rval;
 }
 
-void GFX_SetPalette(char *a1, int a2)
+/**************************************************************************
+GFX_SetPalette() - Sets VGA palette
+ **************************************************************************/
+void 
+GFX_SetPalette(
+    char *palette, 
+    int start_pal
+)
 {
 #if 0
     if (retraceflag)
@@ -134,24 +187,37 @@ void GFX_SetPalette(char *a1, int a2)
             GFX_UpdateTimer();
     }
 #endif
-    I_SetPalette((uint8_t*)a1, a2);
+    
+    I_SetPalette((uint8_t*)palette, start_pal);
 }
 
-void GFX_InitSystem(void)
+/**************************************************************************
+  GFX_InitSystem() - allocates buffers, makes tables, does not set vmode
+ **************************************************************************/
+void 
+GFX_InitSystem(
+    void
+)
 {
     displaybuffer = (char*)malloc(64000);
+    
     if (!displaybuffer)
     {
         EXIT_Error("GFX_Init() - malloc");
         return;
     }
+    
     memset(displaybuffer, 0, 64000);
+    
     GFX_InitTimer();
-    for (int i = 0; i < 200; i++)
-        ylookup[i] = i * 320;
+    
+    for (int loop = 0; loop < SCREENHEIGHT; loop++)
+        ylookup[loop] = loop * SCREENWIDTH;
+    
     ltable = (char*)malloc(256);
     dtable = (char*)malloc(256);
     gtable = (char*)malloc(256);
+    
     if (!ltable || !dtable || !gtable)
     {
         EXIT_Error("GFX_Init() - malloc");
@@ -159,725 +225,1077 @@ void GFX_InitSystem(void)
     }
 }
 
-void GFX_InitVideo(char *pal)
+/**************************************************************************
+GFX_InitVideo() - Inits things related to Video, and sets up fade tables
+ **************************************************************************/
+void 
+GFX_InitVideo(
+    char *curpal
+)
 {
-    I_InitGraphics((uint8_t*)pal);
+    I_InitGraphics((uint8_t*)curpal);
     displayscreen = (char*)I_VideoBuffer;
-    GFX_MakeLightTable(pal, ltable, 9);
-    GFX_MakeLightTable(pal, dtable, -9);
-    GFX_MakeGreyTable(pal, gtable);
+    
+    GFX_MakeLightTable(curpal, ltable, 9);
+    GFX_MakeLightTable(curpal, dtable, -9);
+    GFX_MakeGreyTable(curpal, gtable);
 }
 
-void GFX_EndSystem(void)
+/**************************************************************************
+  GFX_EndSystem() - Frees up all resources used by GFX system
+ **************************************************************************/
+void 
+GFX_EndSystem(
+    void
+)
 {
     I_ShutdownGraphics();
 }
 
-void GFX_GetPalette(char* a1)
+/**************************************************************************
+  GFX_GetPalette() - Sets 256 color palette
+ **************************************************************************/
+void 
+GFX_GetPalette(
+    char* curpal           // OUTPUT : pointer to palette data
+)
 {
-    I_GetPalette((uint8_t*)a1);
+    I_GetPalette((uint8_t*)curpal);
 }
 
-void GFX_FadeOut(int a1, int a2, int a3, int a4)
+/**************************************************************************
+ GFX_FadeOut () - Fade Palette out to ( Red, Green , and Blue Value
+ **************************************************************************/
+void 
+GFX_FadeOut(
+    int red,               // INPUT : red ( 0 - 63 )
+    int green,             // INPUT : green ( 0 - 63 )
+    int blue,              // INPUT : blue ( 0 - 63 )
+    int steps              // INPUT : steps of fade ( 0 - 255 )
+)
 {
-    char pal[768];
+    char pal1[768];
     char pal2[768];
-    int i, j;
-    GFX_GetPalette(pal);
-    memcpy(pal2, pal, 768);
+    int loop, i;
+    
+    GFX_GetPalette(pal1);
+    memcpy(pal2, pal1, 768);
+    
     int now = GFX_GetFrameCount();
-    i = 0;
-    while (GFX_GetFrameCount() - now < a4)
+    loop = 0;
+    
+    while (GFX_GetFrameCount() - now < steps)
     {
-        if (GFX_GetFrameCount() - now != i)
+        if (GFX_GetFrameCount() - now != loop)
         {
-            i = GFX_GetFrameCount() - now;
-            for (j = 0; j < 256; j++)
+            loop = GFX_GetFrameCount() - now;
+            
+            for (i = 0; i < 256; i++)
             {
-                pal2[j * 3 + 0] = i * (a1 - pal[j * 3 + 0]) / a4 + pal[j * 3 + 0];
-                pal2[j * 3 + 1] = i * (a2 - pal[j * 3 + 1]) / a4 + pal[j * 3 + 1];
-                pal2[j * 3 + 2] = i * (a3 - pal[j * 3 + 2]) / a4 + pal[j * 3 + 2];
+                pal2[i * 3 + 0] = loop * (red - pal1[i * 3 + 0]) / steps + pal1[i * 3 + 0];
+                pal2[i * 3 + 1] = loop * (green - pal1[i * 3 + 1]) / steps + pal1[i * 3 + 1];
+                pal2[i * 3 + 2] = loop * (blue - pal1[i * 3 + 2]) / steps + pal1[i * 3 + 2];
             }
+            
             GFX_SetPalette(pal2, 0);
             I_FinishUpdate();
         }
     }
-    for (i = 0; i < 256; i++)
+    
+    for (loop = 0; loop < 256; loop++)
     {
-        pal2[i * 3 + 0] = a1;
-        pal2[i * 3 + 1] = a2;
-        pal2[i * 3 + 2] = a3;
+        pal2[loop * 3 + 0] = red;
+        pal2[loop * 3 + 1] = green;
+        pal2[loop * 3 + 2] = blue;
     }
 
     GFX_SetPalette(pal2, 0);
     I_FinishUpdate();
 }
 
-void GFX_FadeIn(char *a1, int a2)
+/**************************************************************************
+ GFX_FadeIn () - Fades From current palette to new palette
+ **************************************************************************/
+void 
+GFX_FadeIn(
+    char *palette,          // INPUT : palette to fade into
+    int steps               // INPUT : steps of fade ( 0 - 255 )
+)
 {
-    char pal[768];
+    char pal1[768];
     char pal2[768];
-    int i, j;
-    GFX_GetPalette(pal);
-    memcpy(pal2, pal, 768);
+    int loop, i;
+    
+    GFX_GetPalette(pal1);
+    memcpy(pal2, pal1, 768);
+    
     int now = GFX_GetFrameCount();
-    i = 0;
-    while (GFX_GetFrameCount() - now < a2)
+    loop = 0;
+    
+    while (GFX_GetFrameCount() - now < steps)
     {
-        if (GFX_GetFrameCount() - now != i)
+        if (GFX_GetFrameCount() - now != loop)
         {
-            i = GFX_GetFrameCount() - now;
-            for (j = 0; j < 768; j++)
+            loop = GFX_GetFrameCount() - now;
+            
+            for (i = 0; i < 768; i++)
             {
-                pal2[j] = i * (a1[j] - pal[j]) / a2 + pal[j];
+                pal2[i] = loop * (palette[i] - pal1[i]) / steps + pal1[i];
             }
+            
             GFX_SetPalette(pal2, 0);
             I_FinishUpdate();
         }
     }
 
-    GFX_SetPalette(a1, 0);
+    GFX_SetPalette(palette, 0);
     I_FinishUpdate();
 }
 
-void GFX_FadeStart(void)
+/**************************************************************************
+GFX_FadeStart () - Sets up fade for GFX_FadeFrame()
+ **************************************************************************/
+void 
+GFX_FadeStart(
+    void
+)
 {
     GFX_GetPalette(tpal1);
     memcpy(tpal2, tpal1, 768);
 }
 
-void GFX_FadeFrame(char* a1, int a2, int a3)
+/**************************************************************************
+GFX_FadeFrame () - Fades Individual Frames
+ **************************************************************************/
+void 
+GFX_FadeFrame(
+    char* palette,      // INPUT : palette to fade into    
+    int cur_step,       // INPUT : cur step position
+    int steps           // INPUT : total steps of fade ( 0 - 255 )
+)
 {
     int i;
+    
     for (i = 0; i < 768; i++)
     {
-        tpal2[i] = ((a1[i] - tpal1[i]) * a2) / a3 + tpal1[i];
+        tpal2[i] = ((palette[i] - tpal1[i]) * cur_step) / steps + tpal1[i];
     }
+    
     GFX_SetPalette(tpal2, 0);
 }
 
-void GFX_SetPalRange(int a1, int a2)
+/**************************************************************************
+GFX_SetPalRange() - Sets start and end range for remaping stuff
+ **************************************************************************/
+void 
+GFX_SetPalRange(
+    int start, 
+    int end
+)
 {
-    if (a1 < a2 && a2 < 256 && a1 >= 0)
+    if (start < end && end < 256 && start >= 0)
     {
-        start_lookup = a1;
-        end_lookup = a2;
+        start_lookup = start;
+        end_lookup = end;
     }
 }
 
-void GFX_GetRGB(char *a1, int a2, int *a3, int *a4, int *a5)
+/**************************************************************************
+  GFX_GetRGB() - gets R,G and B values from pallete data
+ **************************************************************************/
+void 
+GFX_GetRGB(
+    char *pal,             // INPUT : pointer to palette data
+    int num,               // INPUT : palette entry
+    int *red,              // OUTPUT: red value
+    int *green,            // OUTPUT: green value
+    int *blue              // OUTPUT: blue value
+)
 {
-    *a3 = a1[a2 * 3 + 0];
-    *a4 = a1[a2 * 3 + 1];
-    *a5 = a1[a2 * 3 + 2];
+    *red = pal[num * 3 + 0];
+    *green = pal[num * 3 + 1];
+    *blue = pal[num * 3 + 2];
 }
 
-int GFX_Remap(char *a1, int a2, int a3, int a4)
+/**************************************************************************
+  GFX_Remap() - Finds the closest color avalable
+ **************************************************************************/
+int                        // RETURN: new color number
+GFX_Remap(
+    char *pal,             // INPUT : pointer to palette data
+    int red,               // INPUT : red  ( 0 - 63 )
+    int green,             // INPUT : green( 0 - 63 )
+    int blue               // INPUT : blue ( 0 - 63 )          
+)
 {
-    int i, r, g, b, d;
-    int v5 = 769;
-    int v10 = 0;
-    for (i = start_lookup; i < end_lookup + 1; i++)
+    int loop, r, g, b, num;
+    int low = 769;
+    int pos = 0;
+    
+    for (loop = start_lookup; loop < end_lookup + 1; loop++)
     {
-        GFX_GetRGB(a1, i, &r, &g, &b);
-        d = abs(r - a2) + abs(g - a3) + abs(b - a4);
-        if (d <= v5)
+        GFX_GetRGB(pal, loop, &r, &g, &b);
+        num = abs(r - red) + abs(g - green) + abs(b - blue);
+        
+        if (num <= low)
         {
-            v5 = d;
-            v10 = i;
+            low = num;
+            pos = loop;
         }
     }
-    return v10;
+    
+    return pos;
 }
 
-void GFX_MakeLightTable(char *a1, char *a2, int a3)
+/**************************************************************************
+  GFX_MakeLightTable() - make a light/dark palette lookup table
+ **************************************************************************/
+void 
+GFX_MakeLightTable(
+    char *palette,         // INPUT : pointer to palette data
+    char *ltable,          // OUTPUT: pointer to lookup table  
+    int level              // INPUT : - 63 to + 63 
+)
 {
-    int i, r, g, b;
-    for (i = 0; i < 256; i++)
+    int loop, red, green, blue;
+    
+    for (loop = 0; loop < 256; loop++)
     {
-        GFX_GetRGB(a1, i, &r, &g, &b);
-        if (r >= 0)
-            r += a3;
+        GFX_GetRGB(palette, loop, &red, &green, &blue);
+        
+        if (red >= 0)
+            red += level;
         else
-            r = 0;
-        if (g >= 0)
-            g += a3;
+            red = 0;
+        
+        if (green >= 0)
+            green += level;
         else
-            g = 0;
-        if (b >= 0)
-            b += a3;
+            green = 0;
+        
+        if (blue >= 0)
+            blue += level;
         else
-            b = 0;
-        if (a3 >= 0)
+            blue = 0;
+        
+        if (level >= 0)
         {
-            if (r > 63)
-                r = 63;
-            if (g > 63)
-                g = 63;
-            if (b > 63)
-                b = 63;
+            if (red > 63)
+                red = 63;
+            if (green > 63)
+                green = 63;
+            if (blue > 63)
+                blue = 63;
         }
         else
         {
-            if (r < 0)
-                r = 0;
-            if (g < 0)
-                g = 0;
-            if (b < 0)
-                b = 0;
+            if (red < 0)
+                red = 0;
+            if (green < 0)
+                green = 0;
+            if (blue < 0)
+                blue = 0;
         }
-        a2[i] = GFX_Remap(a1, r, g, b);
+        
+        ltable[loop] = GFX_Remap(palette, red, green, blue);
     }
 }
 
-void GFX_MakeGreyTable(char *a1, char *a2)
+/**************************************************************************
+  GFX_MakeGreyTable() - make a grey palette lookup table
+ **************************************************************************/
+void 
+GFX_MakeGreyTable(
+    char *palette,         // INPUT : pointer to palette data
+    char *ltable)          // OUTPUT: pointer to lookup table        
 {
-    int i, c, r, g, b;
-    for (i = 0; i < 256; i++)
+    int loop, color, red, green, blue;
+    
+    for (loop = 0; loop < 256; loop++)
     {
-        GFX_GetRGB(a1, i, &r, &g, &b);
-        c = (r + g + b) / 3;
-        a2[i] = GFX_Remap(a1, c, c, c);
+        GFX_GetRGB(palette, loop, &red, &green, &blue);
+        
+        color = (red + green + blue) / 3;
+        
+        ltable[loop] = GFX_Remap(palette, color, color, color);
     }
 }
 
-void GFX_GetScreen(char *a1, int a2, int a3, int a4, int a5)
+/*************************************************************************
+   GFX_GetScreen() -     Gets A block of screen memory to CPU memory
+ *************************************************************************/
+void 
+GFX_GetScreen(
+    char *outmem,          // OUTPUT: pointer to CPU mem 
+    int x,                 // INPUT : x pos
+    int y,                 // INPUT : y pos
+    int lx,                // INPUT : x length     
+    int ly                 // INPUT : y length
+)
 {
-    char *p;
-    int i;
-    if (!GFX_ClipLines(&a1, &a2, &a3, &a4, &a5))
+    char *source;
+    int loop;
+    
+    if (!GFX_ClipLines(&outmem, &x, &y, &lx, &ly))
         return;
-    p = &displaybuffer[ylookup[a3] + a2];
-    for (i = 0; i < a5; i++)
+    
+    source = &displaybuffer[ylookup[y] + x];
+    
+    for (loop = 0; loop < ly; loop++)
     {
-        memcpy(a1, p, a4);
-        a1 += a4;
-        p += 320;
+        memcpy(outmem, source, lx);
+        outmem += lx;
+        source += SCREENWIDTH;
     }
 }
 
-void GFX_PutTexture(texture_t *a1, int a2, int a3, int a4, int a5)
+/*************************************************************************
+   GFX_PutTexture() - Repeats a Picture though the area specified
+ *************************************************************************/
+void 
+GFX_PutTexture(
+    texture_t *intxt,      // INPUT : color texture
+    int x,                 // INPUT : x pos
+    int y,                 // INPUT : y pos
+    int lx,                // INPUT : x length
+    int ly                 // INPUT : y length
+)
 {
-    int i, j;
-    int v34 = a4 + abs(a2);
-    int v48 = a5 + abs(a3);
-    int v30 = a5 + a3 - 1;
-    int v28 = a4 + a2 - 1;
-    int v1c, v20, v10, v14;
-    char *v24;
-    if (v28 >= 320)
-        v28 = 319;
-    if (v30 >= 200)
-        v30 = 199;
-    for (i = a3; i < v48; i += a1->height)
+    int loopy, loopx;
+    int maxxloop = lx + abs(x);
+    int maxyloop = ly + abs(y);
+    int y2 = ly + y - 1;
+    int x2 = lx + x - 1;
+    int new_ly, ypos, new_lx, xpos;
+    char *buf;
+    
+    if (x2 >= SCREENWIDTH)
+        x2 = SCREENWIDTH - 1;
+    if (y2 >= SCREENHEIGHT)
+        y2 = SCREENHEIGHT - 1;
+    
+    for (loopy = y; loopy < maxyloop; loopy += intxt->height)
     {
-        if (i <= v30 && i + a1->height > 0)
+        if (loopy <= y2 && loopy + intxt->height > 0)
         {
-            if (i < 0)
+            if (loopy < 0)
             {
-                v1c += i;
-                v24 += (-i) * a1->width;
-                v20 = 0;
+                new_ly += loopy;
+                buf += (-loopy) * intxt->width;
+                ypos = 0;
             }
             else
-                v20 = i;
-            for (j = a2; j < v34; j += a1->width)
+                ypos = loopy;
+            
+            for (loopx = x; loopx < maxxloop; loopx += intxt->width)
             {
-                if (j <= v28 && j + a1->width > 0)
+                if (loopx <= x2 && loopx + intxt->width > 0)
                 {
-                    v24 = a1->f_14;
-                    v10 = a1->width;
-                    v1c = a1->height;
-                    if (j < 0)
+                    buf = intxt->charofs;
+                    new_lx = intxt->width;
+                    new_ly = intxt->height;
+                    
+                    if (loopx < 0)
                     {
-                        v10 += j;
-                        v24 += -j;
-                        v14 = 0;
+                        new_lx += loopx;
+                        buf += -loopx;
+                        xpos = 0;
                     }
                     else
-                        v14 = j;
-                    if (v14 + v10 - 1 >= v28)
-                        v10 = (v28 + 1) - v14;
-                    if (v20 + v1c - 1 >= v30)
-                        v1c = (v30 + 1) - v20;
-                    gfx_inmem = v24;
-                    gfx_xp = v14;
-                    gfx_yp = v20;
-                    gfx_lx = v10;
-                    gfx_ly = v1c;
-                    gfx_imga = a1->width - v10;
+                        xpos = loopx;
+                    
+                    if (xpos + new_lx - 1 >= x2)
+                        new_lx = (x2 + 1) - xpos;
+                    
+                    if (ypos + new_ly - 1 >= y2)
+                        new_ly = (y2 + 1) - ypos;
+                    
+                    gfx_inmem = buf;
+                    gfx_xp = xpos;
+                    gfx_yp = ypos;
+                    gfx_lx = new_lx;
+                    gfx_ly = new_ly;
+                    gfx_imga = intxt->width - new_lx;
+                    
                     GFX_PutPic();
-                    GFX_MarkUpdate(v14, v20, v10, v1c);
+                    
+                    GFX_MarkUpdate(xpos, ypos, new_lx, new_ly);
                 }
             }
         }
     }
 }
 
-void GFX_ShadeArea(int a1, int a2, int a3, int a4, int a5)
+/*************************************************************************
+   GFX_ShadeArea()- lightens or darkens and area of the screen
+ *************************************************************************/
+void 
+GFX_ShadeArea(
+    int opt,               // INPUT : DARK/LIGHT or GREY 
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position
+    int lx,                // INPUT : x length     
+    int ly                 // INPUT : y length
+)
 {
-    int i;
-    char *p, *v14;
-    if (!GFX_ClipLines(NULL, &a2, &a3, &a4, &a5))
+    int loop;
+    char *buf, *cur_table;
+    
+    if (!GFX_ClipLines(NULL, &x, &y, &lx, &ly))
         return;
-    p = &displaybuffer[a2 + ylookup[a3]];
-    switch (a1)
+    
+    buf = &displaybuffer[x + ylookup[y]];
+    
+    switch (opt)
     {
-    case 0:
-        v14 = dtable;
+    case DARK:
+        cur_table = dtable;
         break;
-    case 1:
-        v14 = ltable;
+    case LIGHT:
+        cur_table = ltable;
         break;
-    case 2:
-        v14 = gtable;
+    case GREY:
+        cur_table = gtable;
         break;
     }
-    GFX_MarkUpdate(a2, a3, a4, a5);
-    for (i = 0; i < a5; i++)
+    
+    GFX_MarkUpdate(x, y, lx, ly);
+    
+    for (loop = 0; loop < ly; loop++)
     {
-        GFX_Shade(p, a4, v14);
-        p += 320;
+        GFX_Shade(buf, lx, cur_table);
+        buf += SCREENWIDTH;
     }
 }
 
-void GFX_ShadeShape(int a1, texture_t* a2, int a3, int a4)
+/*************************************************************************
+   GFX_ShadeShape()- lightens or darkens and area of the screen
+ *************************************************************************/
+void 
+GFX_ShadeShape(
+    int opt,               // INPUT : DARK/LIGHT or GREY        
+    texture_t* inmem,      // INPUT : mask 0 = no shade ( GFX format pic )
+    int x,                 // INPUT : x position
+    int y                  // INPUT : y position
+)
 {
-    char c;
-    char *v14;
-    int v20 = a3;
-    int v24 = a4;
-    int v28 = a2->width;
-    int v2c = a2->height;
-    texture_t *vbp = (texture_t*)a2->f_14;
+    char rval;
+    char *cur_table;
+    int ox = x;
+    int oy = y;
+    int lx = inmem->width;
+    int ly = inmem->height;
+    
+    texture_t *ah = (texture_t*)inmem->charofs;
 
-    c = GFX_ClipLines(NULL, &v20, &v24, &v28, &v2c);
-    if (!c)
+    rval = GFX_ClipLines(NULL, &ox, &oy, &lx, &ly);
+    if (!rval)
         return;
-    switch (a1)
+    
+    switch (opt)
     {
-    case 0:
-        v14 = dtable;
+    case DARK:
+        cur_table = dtable;
         break;
-    case 1:
-        v14 = ltable;
+    
+    case LIGHT:
+        cur_table = ltable;
         break;
-    case 2:
-        v14 = gtable;
+    
+    case GREY:
+        cur_table = gtable;
         break;
     }
-    switch (c)
+    
+    switch (rval)
     {
     case 1:
-        GFX_ShadeSprite(&displaybuffer[a3 + ylookup[a4]], vbp, v14);
+        GFX_ShadeSprite(&displaybuffer[x + ylookup[y]], ah, cur_table);
         break;
+    
     case 2:
-        while (vbp->f_8 != -1)
+        while (ah->offset != -1)
         {
-            v20 = vbp->f_0 + a3;
-            v24 = vbp->f_4 + a4;
-            if (v24 > 200)
+            ox = ah->x + x;
+            oy = ah->y + y;
+            
+            if (oy > SCREENHEIGHT)
                 return;
-            v28 = vbp->width;
-            v2c = 1;
-            if (GFX_ClipLines(NULL, &v20, &v24, &v28, &v2c))
-                GFX_Shade(&displaybuffer[v20 + ylookup[v24]], v28, v14);
-            vbp = (texture_t*)((char*)vbp + 16 + vbp->width);
+            
+            lx = ah->width;
+            ly = 1;
+            
+            if (GFX_ClipLines(NULL, &ox, &oy, &lx, &ly))
+                GFX_Shade(&displaybuffer[ox + ylookup[oy]], lx, cur_table);
+            
+            ah = (texture_t*)((char*)ah + 16 + ah->width);
         }
         break;
     }
 }
 
-
-void GFX_VShadeLine(int a1, int a2, int a3, int a4)
+/*************************************************************************
+   GFX_VShadeLine () - Shades a vertical line
+ *************************************************************************/
+void 
+GFX_VShadeLine(
+    int opt,               // INPUT : DARK/LIGHT or GREY    
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position
+    int ly                 // INPUT : length of line
+)
 {
-    char *vs;
-    char *p;
-    int v10 = 1;
-    if (a4 < 1)
+    char *cur_table;
+    char *outbuf;
+    int lx = 1;
+    
+    if (ly < 1)
         return;
-    if (!GFX_ClipLines(NULL, &a2, &a3, &v10, &a4))
+    
+    if (!GFX_ClipLines(NULL, &x, &y, &lx, &ly))
         return;
-    switch (a1)
+    
+    switch (opt)
     {
-    case 0:
-        vs = dtable;
+    case DARK:
+        cur_table = dtable;
         break;
-    case 1:
-        vs = ltable;
+    case LIGHT:
+        cur_table = ltable;
         break;
-    case 2:
-        vs = gtable;
+    case GREY:
+        cur_table = gtable;
         break;
     }
-    GFX_MarkUpdate(a2, a3, v10, a4);
-    p = &displaybuffer[a2 + ylookup[a3]];
-    while (a4--)
+    
+    GFX_MarkUpdate(x, y, lx, ly);
+    
+    outbuf = &displaybuffer[x + ylookup[y]];
+    
+    while (ly--)
     {
-        *p = vs[(uint8_t)*p];
-        p += 320;
+        *outbuf = cur_table[(uint8_t)*outbuf];
+        outbuf += SCREENWIDTH;
     }
 }
 
-void GFX_HShadeLine(int a1, int a2, int a3, int a4)
+/*************************************************************************
+   GFX_HShadeLine () Shades a Horizontal Line
+ *************************************************************************/
+void 
+GFX_HShadeLine(
+    int opt,               // INPUT : DARK/LIGHT or GREY          
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position
+    int lx                 // INPUT : length of line
+)
 {
-    char *vs;
-    char *p;
-    int v10 = 1;
-    if (a4 < 1)
+    char *cur_table;
+    char *outbuf;
+    int ly = 1;
+    
+    if (lx < 1)
         return;
-    if (!GFX_ClipLines(NULL, &a2, &a3, &a4, &v10))
+    
+    if (!GFX_ClipLines(NULL, &x, &y, &lx, &ly))
         return;
-    switch (a1)
+    
+    switch (opt)
     {
-    case 0:
-        vs = dtable;
+    case DARK:
+        cur_table = dtable;
         break;
-    case 1:
-        vs = ltable;
+    case LIGHT:
+        cur_table = ltable;
         break;
-    case 2:
-        vs = gtable;
+    case GREY:
+        cur_table = gtable;
         break;
     }
-    GFX_MarkUpdate(a2, a3, a4, v10);
-    p = &displaybuffer[a2 + ylookup[a3]];
-    GFX_Shade(p, a4, vs);
+    
+    GFX_MarkUpdate(x, y, lx, ly);
+    
+    outbuf = &displaybuffer[x + ylookup[y]];
+    
+    GFX_Shade(outbuf, lx, cur_table);
 }
 
-void GFX_LightBox(int a1, int a2, int a3, int a4, int a5)
+/*************************************************************************
+   GFX_LightBox()- Draws a rectangle border with light source
+ *************************************************************************/
+void 
+GFX_LightBox(
+    int opt,               // INPUT : light source
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position
+    int lx,                // INPUT : x length
+    int ly                 // INPUT : y length
+)
 {
-    if (a4 < 1 || a5 < 1)
+    if (lx < 1 || ly < 1)
         return;
-    switch (a1)
+    
+    switch (opt)
     {
-    case 0:
-        GFX_HShadeLine(1, a2, a3, a4 - 1);
-        GFX_VShadeLine(1, a2, a3 + 1, a5 - 2);
-        GFX_HShadeLine(0, a2, a3 + a5 - 1, a4);
-        GFX_VShadeLine(0, a2 + a4 - 1, a3 + 1, a5 - 2);
+    case UPPER_LEFT:
+        GFX_HShadeLine(LIGHT, x, y, lx - 1);
+        GFX_VShadeLine(LIGHT, x, y + 1, ly - 2);
+        GFX_HShadeLine(DARK, x, y + ly - 1, lx);
+        GFX_VShadeLine(DARK, x + lx - 1, y + 1, ly - 2);
         break;
-    case 1:
+    
+    case UPPER_RIGHT:
     default:
-        GFX_HShadeLine(1, a2 + 1, a3, a4 - 1);
-        GFX_VShadeLine(1, a2 + a4 - 1, a3 + 1, a5 - 2);
-        GFX_HShadeLine(0, a2, a3 + a5 - 1, a4);
-        GFX_VShadeLine(0, a2, a3, a5 - 1);
+        GFX_HShadeLine(LIGHT, x + 1, y, lx - 1);
+        GFX_VShadeLine(LIGHT, x + lx - 1, y + 1, ly - 2);
+        GFX_HShadeLine(DARK, x, y + ly - 1, lx);
+        GFX_VShadeLine(DARK, x, y, ly - 1);
         break;
-    case 2:
-        GFX_HShadeLine(1, a2, a3 + a5 - 1, a4 - 1);
-        GFX_VShadeLine(1, a2, a3 + 1, a5 - 2);
-        GFX_HShadeLine(0, a2, a3, a4);
-        GFX_VShadeLine(0, a2 + a4 - 1, a3 + 1, a5 - 1);
+    
+    case LOWER_LEFT:
+        GFX_HShadeLine(LIGHT, x, y + ly - 1, lx - 1);
+        GFX_VShadeLine(LIGHT, x, y + 1, ly - 2);
+        GFX_HShadeLine(DARK, x, y, lx);
+        GFX_VShadeLine(DARK, x + lx - 1, y + 1, ly - 1);
         break;
-    case 3:
-        GFX_HShadeLine(1, a2 + 1, a3, a4 - 1);
-        GFX_VShadeLine(1, a2 + a4 - 1, a3 + 1, a5 - 2);
-        GFX_HShadeLine(0, a2, a3, a4);
-        GFX_VShadeLine(0, a2, a3 + 1, a5 - 2);
+    
+    case LOWER_RIGHT:
+        GFX_HShadeLine(LIGHT, x + 1, y, lx - 1);
+        GFX_VShadeLine(LIGHT, x + lx - 1, y + 1, ly - 2);
+        GFX_HShadeLine(DARK, x, y, lx);
+        GFX_VShadeLine(DARK, x, y + 1, ly - 2);
         break;
     }
 }
 
-void GFX_ColorBox(int a1, int a2, int a3, int a4, int a5)
+/*************************************************************************
+   GFX_ColorBox () - sets a rectangular area to color
+ *************************************************************************/
+void 
+GFX_ColorBox(
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position         
+    int lx,                // INPUT : width
+    int ly,                // INPUT : length
+    int color              // INPUT : fill color ( 0 - 255 )
+)
 {
-    char *p;
-    if (a3 < 1 || a4 < 1)
+    
+    char *outbuf;
+    
+    if (lx < 1 || ly < 1)
         return;
-    if (!GFX_ClipLines(NULL, &a1, &a2, &a3, &a4))
+    
+    if (!GFX_ClipLines(NULL, &x, &y, &lx, &ly))
         return;
-    p = &displaybuffer[a1 + ylookup[a2]];
-    GFX_MarkUpdate(a1, a2, a3, a4);
-    if (a5 < 0)
+    
+    outbuf = &displaybuffer[x + ylookup[y]];
+    
+    GFX_MarkUpdate(x, y, lx, ly);
+    
+    if (color < 0)
     {
-        while (a4--)
+        while (ly--)
         {
-            GFX_HLine(a1, a2, a3, a5);
-            a2++;
+            GFX_HLine(x, y, lx, color);
+            y++;
         }
     }
     else
     {
-        while (a4--)
+        while (ly--)
         {
-            memset(p, a5, a3);
-            p += 320;
+            memset(outbuf, color, lx);
+            outbuf += SCREENWIDTH;
         }
     }
 }
 
-void GFX_HLine(int a1, int a2, int a3, int a4)
+/*************************************************************************
+   GFX_HLine () - plots a horizontal line in color
+ *************************************************************************/
+void 
+GFX_HLine(
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position
+    int lx,                // INPUT : width
+    int color              // INPUT : fill color ( 0 - 255 )
+)
 {
-    char *p;
-    int i;
-    int v14 = 1;
-    if (a3 < 1)
+    char *outbuf;
+    int loop;
+    int ly = 1;
+    
+    if (lx < 1)
         return;
-    if (!GFX_ClipLines(0, &a1, &a2, &a3, &v14))
+    
+    if (!GFX_ClipLines(0, &x, &y, &lx, &ly))
         return;
-    p = &displaybuffer[a1 + ylookup[a2]];
-    GFX_MarkUpdate(a1, a2, a3, 1);
-    if (a4 < 0)
+    
+    outbuf = &displaybuffer[x + ylookup[y]];
+    
+    GFX_MarkUpdate(x, y, lx, 1);
+    
+    if (color < 0)
     {
-        for (i = 0; i < a3; i++)
+        for (loop = 0; loop < lx; loop++)
         {
-            *p ^= (a4 + 255);
-            p++;
+            *outbuf ^= (color + 255);
+            outbuf++;
         }
     }
     else
-        memset(p, a4, a3);
+        memset(outbuf, color, lx);
 }
 
-void GFX_VLine(int a1, int a2, int a3, int a4)
+/*************************************************************************
+   GFX_VLine () plots a vertical line in color
+ *************************************************************************/
+void 
+GFX_VLine(
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position
+    int ly,                // INPUT : length
+    int color              // INPUT : fill color ( 0 - 255 )
+)
 {
-    char *p;
-    int v14 = 1;
-    if (a3 < 1)
+    char *outbuf;
+    int lx = 1;
+    
+    if (ly < 1)
         return;
-    if (!GFX_ClipLines(0, &a1, &a2, &v14, &a3))
+    
+    if (!GFX_ClipLines(0, &x, &y, &lx, &ly))
         return;
-    p = &displaybuffer[a1 + ylookup[a2]];
-    GFX_MarkUpdate(a1, a2, 1, a3);
-    if (a4 < 0)
+    
+    outbuf = &displaybuffer[x + ylookup[y]];
+    
+    GFX_MarkUpdate(x, y, 1, ly);
+    
+    if (color < 0)
     {
-        while (a3--)
+        while (ly--)
         {
-            *p ^= (a4 + 255);
-            p += 320;
+            *outbuf ^= (color + 255);
+            outbuf += SCREENWIDTH;
         }
     }
     else
     {
-        while (a3--)
+        while (ly--)
         {
-            *p = a4;
-            p += 320;
+            *outbuf = color;
+            outbuf += SCREENWIDTH;
         }
     }
 }
 
-void GFX_Line(int a1, int a2, int a3, int a4, int a5)
+/*************************************************************************
+   GFX_Line () plots a line in color ( Does no Clipping )
+ *************************************************************************/
+void 
+GFX_Line(
+    int x,                 // INPUT : x start point 
+    int y,                 // INPUT : y start point
+    int x2,                // INPUT : x2 end point
+    int y2,                // INPUT : y2 end point 
+    int color              // INPUT : color ( 0 - 255 )
+)
 {
-    int v18 = 1;
-    int v14 = 1;
-    int v10 = a4 - a2;
-    int vdi = a3 - a1;
-    int t, vsi;
-    if (vdi < 0)
+    int addx = 1;
+    int addy = 1;
+    int dely = y2 - y;
+    int delx = x2 - x;
+    int err, maxloop;
+    
+    if (delx < 0)
     {
-        vdi = -vdi;
-        v18 = -v18;
+        delx = -delx;
+        addx = -addx;
     }
-    if (v10 < 0)
+    if (dely < 0)
     {
-        v10 = -v10;
-        v14 = -v14;
+        dely = -dely;
+        addy = -addy;
     }
-    if (vdi >= v10)
+    
+    if (delx >= dely)
     {
-        t = -(v10 >> 1);
-        vsi = vdi + 1;
+        err = -(dely >> 1);
+        maxloop = delx + 1;
     }
     else
     {
-        t = (vdi >> 1);
-        vsi = v10 + 1;
+        err = (delx >> 1);
+        maxloop = dely + 1;
     }
-    if (vdi >= v10)
+    
+    if (delx >= dely)
     {
-        while (vsi)
+        while (maxloop)
         {
-            if (a1 >= 0 && a1 < 320 && a2 >= 0 && a2 < 200)
+            if (x >= 0 && x < 320 && y >= 0 && y < 200)
             {
-                displaybuffer[a1 + ylookup[a2]] = a5;
+                displaybuffer[x + ylookup[y]] = color;
             }
-            vsi--;
-            t += v10;
-            a1 += v18;
-            if (t > 0)
+            maxloop--;
+            err += dely;
+            x += addx;
+            
+            if (err > 0)
             {
-                t -= vdi;
-                a2 += v14;
+                err -= delx;
+                y += addy;
             }
         }
     }
     else
     {
-        while (vsi)
+        while (maxloop)
         {
-            if (a1 >= 0 && a1 <= 320 && a2 >= 0 && a2 < 200)
+            if (x >= 0 && x <= 320 && y >= 0 && y < 200)
             {
-                displaybuffer[a1 + ylookup[a2]] = a5;
+                displaybuffer[x + ylookup[y]] = color;
             }
-            vsi--;
-            t += vdi;
-            a2 += v14;
-            if (t > 0)
+            maxloop--;
+            err += delx;
+            y += addy;
+            
+            if (err > 0)
             {
-                t -= v10;
-                a1 += v18;
+                err -= dely;
+                x += addx;
             }
         }
     }
 }
 
-void GFX_Rectangle(int a1, int a2, int a3, int a4, int a5)
+/*************************************************************************
+   GFX_Rectangle () - sets a rectangular border to color
+ *************************************************************************/
+void 
+GFX_Rectangle(
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position
+    int lx,                // INPUT : width
+    int ly,                // INPUT : length
+    int color              // INPUT : fill color ( 0 - 255 )
+)
 {
-    if (a4 < 1 || a3 < 1)
+    if (ly < 1 || lx < 1)
         return;
-    GFX_HLine(a1, a2, a3, a5);
-    GFX_HLine(a1, a2 + a4 - 1, a3, a5);
-    GFX_VLine(a1, a2 + 1, a4 - 2, a5);
-    GFX_VLine(a1 + a3 - 1, a2 + 1, a4 - 2, a5);
+    
+    GFX_HLine(x, y, lx, color);
+    GFX_HLine(x, y + ly - 1, lx, color);
+    GFX_VLine(x, y + 1, ly - 2, color);
+    GFX_VLine(x + lx - 1, y + 1, ly - 2, color);
 }
 
-void GFX_ScalePic(texture_t *a1, int a2, int a3, int a4, int a5, int a6)
+/*************************************************************************
+   GFX_ScalePic () - Scales picture optionaly make color 0 see thru
+ *************************************************************************/
+void 
+GFX_ScalePic(
+    texture_t *buffin,     // INPUT : pointer to pic data
+    int x,                 // INPUT : x display position
+    int y,                 // INPUT : y display position
+    int new_lx,            // INPUT : new x length 
+    int new_ly,            // INPUT : new y length       
+    int see_thru           // INPUT : TRUE = see thru
+)
 {
-    char *p;
-    int v10, vdi, i;
-    char *v14 = a1->f_14;
-    int v20 = (a1->width<<16) / a4;
-    int v18 = (a1->height<<16) / a5;
-    v10 = 0;
-    vdi = 0;
-    if (!a1->f_0)
+    char *dest;
+    int accum_x, accum_y, i;
+    char *pic = buffin->charofs;
+    int addx = (buffin->width<<16) / new_lx;
+    int addy = (buffin->height<<16) / new_ly;
+    accum_x = 0;
+    accum_y = 0;
+    
+    if (!buffin->x)
     {
-        GFX_PutSprite(a1, a2, a3);
+        GFX_PutSprite(buffin, x, y);
         return;
     }
-    if (a2 < 0)
+    
+    if (x < 0)
     {
-        v10 = v20 * (-a2);
-        v14 += v10 >> 16;
-        v10 &= 0xffff;
-        a4 += a2;
-        a2 = 0;
+        accum_x = addx * (-x);
+        pic += accum_x >> 16;
+        accum_x &= 0xffff;
+        new_lx += x;
+        x = 0;
     }
-    if (a3 < 0)
+    
+    if (y < 0)
     {
-        vdi = v18 * (-a3);
-        v14 += (a1->width) * (vdi >> 16);
-        vdi &= 0xffff;
-        a5 += a3;
-        a3 = 0;
+        accum_y = addy * (-y);
+        pic += (buffin->width) * (accum_y >> 16);
+        accum_y &= 0xffff;
+        new_ly += y;
+        y = 0;
     }
-    if (a2 + a4 > 320)
+    
+    if (x + new_lx > SCREENWIDTH)
     {
-        a4 = 320 - a2;
+        new_lx = SCREENWIDTH - x;
     }
-    if (a3 + a5 > 200)
+    if (y + new_ly > SCREENHEIGHT)
     {
-        a5 = 200 - a3;
+        new_ly = SCREENHEIGHT - y;
     }
-    p = &displaybuffer[a2 + ylookup[a3]];
-    GFX_MarkUpdate(a2, a3, a4, a5);
-    tablelen = a4;
-    for (i = a4 - 1; i >= 0; i--)
+    
+    dest = &displaybuffer[x + ylookup[y]];
+    
+    GFX_MarkUpdate(x, y, new_lx, new_ly);
+    
+    tablelen = new_lx;
+    
+    for (i = new_lx - 1; i >= 0; i--)
     {
-        stable[i] = (v10 >> 16);
-        v10 += v20;
+        stable[i] = (accum_x >> 16);
+        accum_x += addx;
     }
-    if (a6)
+    
+    if (see_thru)
     {
-        while (a5--)
+        while (new_ly--)
         {
-            GFX_CScaleLine(p, v14 + a1->width * (vdi>>16));
-            vdi += v18;
-            p += 320;
+            GFX_CScaleLine(dest, pic + buffin->width * (accum_y>>16));
+            accum_y += addy;
+            dest += SCREENWIDTH;
         }
     }
     else
     {
-        while (a5--)
+        while (new_ly--)
         {
-            GFX_ScaleLine(p, v14 + a1->width * (vdi>>16));
-            vdi += v18;
-            p += 320;
+            GFX_ScaleLine(dest, pic + buffin->width * (accum_y>>16));
+            accum_y += addy;
+            dest += SCREENWIDTH;
         }
     }
 }
 
-
-
-void GFX_MarkUpdate(int a1, int a2, int a3, int a4)
+/*************************************************************************
+   GFX_MarkUpdate () Marks an area to be draw with GFX_DrawScreen()
+ *************************************************************************/
+void 
+GFX_MarkUpdate(
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position
+    int lx,                // INPUT : x length
+    int ly                 // INPUT : y length
+)
 {
-    int vbp = a1 + a3 - 1;
-    int vsi = a2 + a4 - 1;
-    int vbx = ud_x + ud_lx - 1;
-    int vcx = ud_y + ud_ly - 1;
+    int x2 = x + lx - 1;
+    int y2 = y + ly - 1;
+    int ud_x2 = ud_x + ud_lx - 1;
+    int ud_y2 = ud_y + ud_ly - 1;
+    
     if (update_start)
     {
-        if (a1 < ud_x)
-            ud_x = a1;
-        if (a2 < ud_y)
-            ud_y = a2;
-        if (vbp > vbx)
-            vbx = vbp;
-        if (vsi > vcx)
-            vcx = vsi;
+        if (x < ud_x)
+            ud_x = x;
+        
+        if (y < ud_y)
+            ud_y = y;
+        
+        if (x2 > ud_x2)
+            ud_x2 = x2;
+        if (y2 > ud_y2)
+            ud_y2 = y2;
     }
     else
     {
-        ud_x = a1;
-        ud_y = a2;
-        vbx = vbp;
-        vcx = vsi;
-        if (a3 + a4 > 0)
+        ud_x = x;
+        ud_y = y;
+        ud_x2 = x2;
+        ud_y2 = y2;
+        if (lx + ly > 0)
             update_start = 1;
     }
     if ((ud_x) & 3)
         ud_x = ud_x - (ud_x & 3);
+    
     if (ud_x < 0)
         ud_x = 0;
+    
     if (ud_y < 0)
         ud_y = 0;
-    ud_lx = (vbx - ud_x + 1);
-    ud_ly = (vcx - ud_y + 1);
+    
+    ud_lx = (ud_x2 - ud_x + 1);
+    ud_ly = (ud_y2 - ud_y + 1);
+    
     if ((ud_lx) & 3)
         ud_lx += 4 - (ud_lx & 3);
-    if (ud_x + ud_lx > 320)
-        ud_lx = 320 - ud_x;
-    if (ud_y + ud_ly > 200)
-        ud_ly = 200 - ud_y;
+    
+    if (ud_x + ud_lx > SCREENWIDTH)
+        ud_lx = SCREENWIDTH - ud_x;
+    if (ud_y + ud_ly > SCREENHEIGHT)
+        ud_ly = SCREENHEIGHT - ud_y;
 }
 
-void GFX_ForceUpdate(int a1, int a2, int a3, int a4)
+/*************************************************************************
+   GFX_ForceUpdate () Marks an area to be draw with GFX_DrawScreen()
+ *************************************************************************/
+void 
+GFX_ForceUpdate(
+    int x,                 // INPUT : x position    
+    int y,                 // INPUT : y position
+    int lx,                // INPUT : x length
+    int ly                 // INPUT : y length
+)
 {
-    ud_x = a1;
-    ud_y = a2;
-    ud_lx = a3;
-    ud_ly = a4;
-    o_ud_x = a1;
-    o_ud_y = a2;
-    o_ud_lx = a3;
-    o_ud_ly = a4;
+    ud_x = x;
+    ud_y = y;
+    ud_lx = lx;
+    ud_ly = ly;
+    o_ud_x = x;
+    o_ud_y = y;
+    o_ud_lx = lx;
+    o_ud_ly = ly;
 }
 
-void GFX_SetFrameHook(void (*a1)(void (*)(void)))
+/***************************************************************************
+   GFX_SetFrameHook () sets function to call before every screen update
+ ***************************************************************************/
+void 
+GFX_SetFrameHook(
+    void (*func)(void (*)(void))     // INPUT : pointer to function
+)
 {
-    framehook = a1;
+    framehook = func;
 }
 
-void GFX_WaitUpdate(int a1)
+/***************************************************************************
+   GFX_WaitUpdate () - Updates screen at specified frame rate
+ ***************************************************************************/
+void 
+GFX_WaitUpdate(
+    int count           // INPUT : frame rate ( MAX = 70 )     
+)
 {
     static int now;
-    int vsi, i;
-    if (a1 > 70)
-        a1 = 70;
-    else if (a1 < 1)
-        a1 = 70;
-    vsi = 70 / a1;
+    int get_count, loop;
+    
+    if (count > 70)
+        count = 70;
+    else if (count < 1)
+        count = 70;
+    
+    get_count = 70 / count;
+    
     GFX_MarkUpdate(o_ud_x, o_ud_y, o_ud_lx, o_ud_ly);
-    for (i = 0; i < vsi; i++)
+    
+    for (loop = 0; loop < get_count; loop++)
     {
         while (now == GFX_GetFrameCount())
         {
-            // if (DAT_00061c5c)
-            //     break;
         }
         now = GFX_GetFrameCount();
     }
+    
     if (update_start)
     {
         if (framehook)
@@ -885,25 +1303,35 @@ void GFX_WaitUpdate(int a1)
         else
             GFX_DisplayScreen();
     }
+    
     o_ud_x = ud_x;
     o_ud_y = ud_y;
     o_ud_lx = ud_lx;
     o_ud_ly = ud_ly;
+    
     I_FinishUpdate();
 }
 
-void GFX_DisplayUpdate(void)
+/***************************************************************************
+   GFX_DisplayUpdate () - Copys Marked areas to display
+ ***************************************************************************/
+void 
+GFX_DisplayUpdate(
+    void
+)
 {
-    static int DAT_00061c84;
+    static int hold;
+    
     I_GetEvent();
     GFX_UpdateTimer();
-    while (DAT_00061c84 == framecount)
+    
+    while (hold == framecount)
     {
         GFX_UpdateTimer();
-        //if (DAT_00061c5c)
-        //    break;
     }
+    
     GFX_MarkUpdate(o_ud_x, o_ud_y, o_ud_lx, o_ud_ly);
+    
     if (update_start)
     {
         if (framehook)
@@ -911,33 +1339,53 @@ void GFX_DisplayUpdate(void)
         else
             GFX_DisplayScreen();
     }
+    
     o_ud_x = ud_x;
     o_ud_y = ud_y;
     o_ud_lx = ud_lx;
     o_ud_ly = ud_ly;
-    DAT_00061c84 = framecount;
+    
+    hold = framecount;
+    
     I_FinishUpdate();
 }
 
-void GFX_PutImage(texture_t *a1, int a2, int a3, int a4)
+/***************************************************************************
+   GFX_PutImage() - places image in displaybuffer and performs cliping
+ ***************************************************************************/
+void 
+GFX_PutImage(
+    texture_t *image,      // INPUT : image data 
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position
+    int see_thru           // INPUT : true = masked, false = put block
+)
 {
-    char *v14;
-    gfx_lx = a1->width;
-    gfx_ly = a1->height;
-    if (a1->f_0 == 0)
+    char *get_image;
+    
+    gfx_lx = image->width;
+    gfx_ly = image->height;
+    
+    if (image->x == GSPRITE)
     {
-        GFX_PutSprite(a1, a2, a3);
+        GFX_PutSprite(image, x, y);
         return;
     }
-    v14 = a1->f_14;
-    if (!GFX_ClipLines(&v14, &a2, &a3, &gfx_lx, &gfx_ly))
+    
+    get_image = image->charofs;
+    
+    if (!GFX_ClipLines(&get_image, &x, &y, &gfx_lx, &gfx_ly))
         return;
-    GFX_MarkUpdate(a2, a3, gfx_lx, gfx_ly);
-    gfx_xp = a2;
-    gfx_yp = a3;
-    gfx_inmem = v14;
-    gfx_imga = a1->width;
-    if (a4 == 0)
+    
+    GFX_MarkUpdate(x, y, gfx_lx, gfx_ly);
+    
+    gfx_xp = x;
+    gfx_yp = y;
+    
+    gfx_inmem = get_image;
+    gfx_imga = image->width;
+    
+    if (see_thru == 0)
     {
         gfx_imga -= gfx_lx;
         GFX_PutPic();
@@ -946,159 +1394,259 @@ void GFX_PutImage(texture_t *a1, int a2, int a3, int a4)
         GFX_PutMaskPic();
 }
 
-void GFX_PutSprite(texture_t *a1, int a2, int a3)
+/***************************************************************************
+   GFX_PutSprite () -Puts a Sprite into display buffer
+ ***************************************************************************/
+void 
+GFX_PutSprite(
+    texture_t *inmem,      // INPUT : inmem
+    int x,                 // INPUT : x pos
+    int y                  // INPUT : y pos
+)
 {
-    char c;
-    char *vbp;
-    texture_t *v14;
-    char *v20;
-    int v24 = a2;
-    int v28 = a3;
-    int v2c = a1->width;
-    int v30 = a1->height;
-    c = GFX_ClipLines(NULL, &v24, &v28, &v2c, &v30);
-    if (!c)
+    char rval;
+    char *get_inmem;
+    texture_t *ah;
+    char *outline;
+    int ox = x;
+    int oy = y;
+    int lx = inmem->width;
+    int ly = inmem->height;
+    
+    rval = GFX_ClipLines(NULL, &ox, &oy, &lx, &ly);
+    
+    if (!rval)
         return;
-    switch (c)
+    
+    switch (rval)
     {
     case 1:
-        GFX_DrawSprite(&displaybuffer[v24 + ylookup[v28]], (texture_t*)a1->f_14);
+        GFX_DrawSprite(&displaybuffer[ox + ylookup[oy]], (texture_t*)inmem->charofs);
         break;
+    
     case 2:
-        v14 = (texture_t*)a1->f_14;
-        while (v14->f_8 != -1)
+        ah = (texture_t*)inmem->charofs;
+        while (ah->offset != -1)
         {
-            v24 = a2 + v14->f_0;
-            v28 = a3 + v14->f_4;
-            vbp = (char*)v14 + 16;
-            if (v28 > 200)
+            ox = x + ah->x;
+            oy = y + ah->y;
+            
+            get_inmem = (char*)ah + 16;
+            
+            if (oy > SCREENHEIGHT)
                 break;
-            v2c = v14->width;
-            v30 = 1;
-            v20 = vbp;
-            if (GFX_ClipLines(&v20, &v24, &v28, &v2c, &v30))
-                memcpy(&displaybuffer[v24 + ylookup[v28]], v20, v2c);
-            v14 = (texture_t*)(vbp + v14->width);
+            
+            lx = ah->width;
+            ly = 1;
+            
+            outline = get_inmem;
+            
+            if (GFX_ClipLines(&outline, &ox, &oy, &lx, &ly))
+                memcpy(&displaybuffer[ox + ylookup[oy]], outline, lx);
+            
+            ah = (texture_t*)(get_inmem + ah->width);
         }
         break;
     }
 }
 
-void GFX_OverlayImage(texture_t *a1, texture_t *a2, int a3, int a4)
+/***************************************************************************
+   GFX_OverlayImage() - places image in displaybuffer and performs cliping
+ ***************************************************************************/
+void 
+GFX_OverlayImage(
+    texture_t *baseimage,   // INPUT : base image data         
+    texture_t *overimage,   // INPUT : overlay image data
+    int x,                  // INPUT : x position
+    int y                   // INPUT : y position
+)
 {
-    char *vsi, *vdx;
-    int vbp, i, j;
-    int v14 = a3 + a2->width - 1;
-    int v10 = a4 + a2->height - 1;
-    if (a3 < 0 || a4 < 0)
+    char *get_baseimage, *get_overimage;
+    int addnum, loop, i;
+    int x2 = x + overimage->width - 1;
+    int y2 = y + overimage->height - 1;
+    
+    if (x < 0 || y < 0)
         return;
-    if (v14 >= a1->width || v10 >= a1->height)
+    
+    if (x2 >= baseimage->width || y2 >= baseimage->height)
         return;
-    vsi = &a1->f_14[a3 + a1->width * a4];
-    vbp = a2->width - a1->width;
-    vdx = a2->f_14;
-    for (i = 0; i < a2->height; i++)
+    
+    get_baseimage = &baseimage->charofs[x + baseimage->width * y];
+    addnum = overimage->width - baseimage->width;
+    get_overimage = overimage->charofs;
+    
+    for (loop = 0; loop < overimage->height; loop++)
     {
-        for (j = 0; j < a2->width; j++)
+        for (i = 0; i < overimage->width; i++)
         {
-            if (j != 255)
-                *vsi = *vdx;
-            vsi++;
-            vdx++;
+            if (i != 255)
+                *get_baseimage = *get_overimage;
+            
+            get_baseimage++;
+            get_overimage++;
         }
-        vsi += vbp;
+        get_baseimage += addnum;
     }
 }
 
-int fontspacing = 1;
-
-int GFX_StrPixelLen(font_t *a1, char *a2, int a3)
+/***************************************************************************
+   GFX_StrPixelLen() - Calculates the length of a GFX string
+ ***************************************************************************/
+int                        // RETURNS : pixel length
+GFX_StrPixelLen(
+    font_t *infont,        // INPUT : pointer to current font
+    char *instr,           // INPUT : pointer to string
+    int maxloop            // INPUT : length of string
+)
 {
-    int i;
-    int l = 0;
-    for (i = 0; i < a3; i++)
+    int loop;
+    int outlen = 0;
+    
+    for (loop = 0; loop < maxloop; loop++)
     {
-        l += a1->f_204[a2[i]] + fontspacing;
+        outlen += infont->width[instr[loop]] + fontspacing;
     }
-    return l;
+    
+    return outlen;
 }
 
-int GFX_PutChar(int a1, int a2, unsigned char a3, font_t* a4, int a5)
+/*--------------------------------------------------------------------------
+   GFX_PutChar () - Draws charater to displaybuffer and clips
+ --------------------------------------------------------------------------*/
+int 
+GFX_PutChar(
+    int x,                  // INPUT : x position     
+    int y,                  // INPUT : y position
+    unsigned char inchar,   // INPUT : char to print
+    font_t* font,           // INPUT : pointer to font
+    int basecolor           // INPUT : font base color
+)
 {
-    char *p;
-    int w = a4->f_204[a3];
-    int wo;
-    int h = a4->f_0;
-    char* v18 = &a4->f_304[a4->f_4[a3]];
-    wo = w;
-    if (!GFX_ClipLines(&v18, &a1, &a2, &w, &h))
+    char *dest;
+    int lx = font->width[inchar];
+    int addx;
+    int ly = font->height;
+    char* cdata = &font->charofs[font->offset[inchar]];
+    addx = lx;
+    
+    if (!GFX_ClipLines(&cdata, &x, &y, &lx, &ly))
         return 0;
-    p = &displaybuffer[a1 + ylookup[a2]];
-    GFX_MarkUpdate(a1, a2, w, h);
-    GFX_DrawChar(p, v18, w, h, wo - w, a5);
-    return w;
+    
+    dest = &displaybuffer[x + ylookup[y]];
+    
+    GFX_MarkUpdate(x, y, lx, ly);
+    
+    GFX_DrawChar(dest, cdata, lx, ly, addx - lx, basecolor);
+    
+    return lx;
 }
 
-int GFX_Print(int a1, int a2, char *a3, font_t* a4, int a5)
+/***************************************************************************
+   GFX_Print () - prints a string using specified font with basecolor
+ ***************************************************************************/
+int                           // RETURN: length of print
+GFX_Print(
+    int x,                    // INPUT : x position
+    int y,                    // INPUT : y position
+    char *str,                // INPUT : string to print
+    font_t* infont,           // INPUT : pointer to font
+    int basecolor             // INPUT : basecolor of font
+)
 {
-    unsigned char c;
-    int l, v10, w;
-    a5--;
-    l = strlen(a3);
-    v10 = 0;
-    if (!l)
+    unsigned char ch;
+    int length, lx, cwidth;
+    
+    basecolor--;
+    length = strlen(str);
+    lx = 0;
+    
+    if (!length)
         return 0;
-    while ((c = *a3++) != 0)
+    
+    while ((ch = *str++) != 0)
     {
-        if (a4->f_4[c] == -1)
+        if (infont->offset[ch] == -1)
             continue;
-        w = GFX_PutChar(a1, a2, c, a4, a5);
-        v10 += w + fontspacing;
-        a1 += a4->f_204[c] + fontspacing;
+        
+        cwidth = GFX_PutChar(x, y, ch, infont, basecolor);
+        lx += cwidth + fontspacing;
+        x += infont->width[ch] + fontspacing;
     }
-    return v10;
+    return lx;
 }
 
-void GFX_3D_SetView(int a1, int a2, int a3)
+/***************************************************************************
+   GFX_3D_SetView() Sets user view in 3d space
+ ***************************************************************************/
+void 
+GFX_3D_SetView(
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position
+    int z                  // INPUT : z position
+)
 {
-    G3D_viewx = a1;
-    G3D_viewy = a2;
-    G3D_viewz = a3;
+    G3D_viewx = x;
+    G3D_viewy = y;
+    G3D_viewz = z;
 }
 
-void GFX_3DPoint(void)
+/*--------------------------------------------------------------------------
+   GFX_3DPoint () plots a points in 3D space
+ --------------------------------------------------------------------------*/
+void 
+GFX_3DPoint(
+    void
+)
 {
     G3D_x -= G3D_viewx;
     G3D_y -= G3D_viewy;
     G3D_z -= G3D_viewz;
-    G3D_screenx = ((G3D_x * (200<<11)) / G3D_z) >> 11;
-    G3D_screeny = ((G3D_y * (200<<11)) / G3D_z) >> 11;
+    
+    G3D_screenx = ((G3D_x * (G3D_DIST<<11)) / G3D_z) >> 11;
+    G3D_screeny = ((G3D_y * (G3D_DIST<<11)) / G3D_z) >> 11;
+    
     G3D_screenx += G3D_viewx;
     G3D_screeny += G3D_viewy;
 }
 
-void GFX_3D_PutImage(texture_t *a1, int a2, int a3, int a4, int a5)
+/***************************************************************************
+   GFX_3D_PutImage() - places image in displaybuffer and performs cliping
+ ***************************************************************************/
+void 
+GFX_3D_PutImage(
+    texture_t *image,      // INPUT : image data
+    int x,                 // INPUT : x position
+    int y,                 // INPUT : y position
+    int z,                 // INPUT : z position ( distance )
+    int see_thru           // INPUT : true = masked, false = put block
+)
 {
-    int v10, v14, vd, vb;
-    if (a4 == 200)
+    int x1, y1, new_lx, new_ly;
+    
+    if (z == G3D_DIST)
     {
-        GFX_MarkUpdate(a2, a3, a1->width, a1->height);
-        GFX_PutImage(a1, a2, a3, a5);
+        GFX_MarkUpdate(x, y, image->width, image->height);
+        GFX_PutImage(image, x, y, see_thru);
         return;
     }
-    G3D_x = a2;
-    G3D_y = a3;
-    G3D_z = a4;
+    
+    G3D_x = x;
+    G3D_y = y;
+    G3D_z = z;
     GFX_3DPoint();
-    v10 = G3D_screenx;
-    v14 = G3D_screeny;
-    G3D_x = a2 + a1->width - 1;
-    G3D_y = a3 + a1->height - 1;
-    G3D_z = a4;
+    x1 = G3D_screenx;
+    y1 = G3D_screeny;
+    
+    G3D_x = x + image->width - 1;
+    G3D_y = y + image->height - 1;
+    G3D_z = z;
     GFX_3DPoint();
-    vd = G3D_screenx - v10;
-    vb = G3D_screeny - v14;
-    GFX_MarkUpdate(v10, v14, vd, vb);
-    GFX_ScalePic(a1, v10, v14, vd, vb, a5);
+    
+    new_lx = G3D_screenx - x1;
+    new_ly = G3D_screeny - y1;
+    
+    GFX_MarkUpdate(x1, y1, new_lx, new_ly);
+    GFX_ScalePic(image, x1, y1, new_lx, new_ly, see_thru);
 }
 

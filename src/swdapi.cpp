@@ -206,7 +206,7 @@ void SWD_FillText(font_t *a1, int a2, int a3, int a4, int a5, int a6, int a7)
         if (!textcmd_flag)
         {
             GFX_Print(textdraw_x, textdraw_y, textfill, a1, textcolor);
-            textdraw_y += a1->f_0 + 3;
+            textdraw_y += a1->height + 3;
         }
         if (vsi < vbp)
             vsi += SWD_GetLine(NULL);
@@ -234,7 +234,7 @@ void SWD_PutField(swd_t *a1, swdfield_t *a2)
     
     v50 = (font_t*)GLB_GetItem(a2->f_54);
     v24 = (char*)a2 + a2->f_8c;
-    v4c = v50->f_0;
+    v4c = v50->height;
     v34 = 0;
     vbp = a2->f_7c + a1->f_64;
     v38 = 0;
@@ -242,7 +242,7 @@ void SWD_PutField(swd_t *a1, swdfield_t *a2)
     vc1 = strlen(v24);
     vd = GFX_StrPixelLen(v50, v24, vc1);
     v20 = vbp + ((a2->f_84 - vd) >> 1);
-    v28 = v1c + ((a2->f_88 - v50->f_0) >> 1);
+    v28 = v1c + ((a2->f_88 - v50->height) >> 1);
     if (a2->f_1c == 2 && a2->f_0 != 6)
     {
         if (v20 > 0)
@@ -423,14 +423,14 @@ void SWD_PutField(swd_t *a1, swdfield_t *a2)
             tex = NULL;
         if (a2->f_1c == 2)
         {
-            if (tex && tex->f_0 == 0)
+            if (tex && tex->x == 0)
                 GFX_ShadeShape(0, tex, vbp, v1c);
             else
                 GFX_ShadeArea(0, vbp, v1c, a2->f_84, a2->f_88);
         }
         else if (a2->f_1c == 1)
         {
-            if (tex && tex->f_0 == 0)
+            if (tex && tex->x == 0)
                 GFX_ShadeShape(1, tex, vbp, v1c);
             else
                 GFX_ShadeArea(1, vbp, v1c, a2->f_84, a2->f_88);
@@ -1130,7 +1130,7 @@ int SWD_ShowAllFields(swd_t *a1)
             {
                 vs[i].f_90->width = (short)vs[i].f_84;
                 vs[i].f_90->height = (short)vs[i].f_88;
-                GFX_GetScreen(vs[i].f_90->f_14, vbp, v20, vs[i].f_84, vs[i].f_88);
+                GFX_GetScreen(vs[i].f_90->charofs, vbp, v20, vs[i].f_84, vs[i].f_88);
             }
             if (vs[i].f_74)
             {
