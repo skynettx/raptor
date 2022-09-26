@@ -4,117 +4,203 @@
 #include "common.h"
 #include "gfxapi.h"
 
-void GFX_ScaleLine(char *a1, char *a2)
+/*==========================================================================
+   GFX_ScaleLine() - Does the scale from scale table ( _stable )
+ ==========================================================================*/
+void 
+GFX_ScaleLine(
+    char *outmem, 
+    char *inmem
+)
 {
-    int i;
-    for (i = tablelen - 1; i >= 0; i--)
+    int loop;
+    
+    for (loop = tablelen - 1; loop >= 0; loop--)
     {
-        *a1 = *(a2 + stable[i]);
-        a1++;
+        *outmem = *(inmem + stable[loop]);
+        outmem++;
     }
 }
 
-void GFX_CScaleLine(char *a1, char *a2)
+/*==========================================================================
+   GFX_CScaleLine() - scale from scale table (_stable) color 0 transparent 
+ ==========================================================================*/
+void 
+GFX_CScaleLine(
+    char *outmem, 
+    char *inmem
+)
 {
-    int i;
-    for (i = tablelen - 1; i >= 0; i--)
+    int loop;
+    
+    for (loop = tablelen - 1; loop >= 0; loop--)
     {
-        char px = *(a2 + stable[i]);
+        char px = *(inmem + stable[loop]);
+        
         if (px)
-            *a1 = px;
-        a1++;
+            *outmem = px;
+        
+        outmem++;
     }
 }
 
-void GFX_DisplayScreen(void)
+/*==========================================================================
+   GFX_DisplayScreen() - Puts Display Buffer into Video memory
+ ==========================================================================*/
+void 
+GFX_DisplayScreen(
+    void
+)
 {
-    int i;
-    char *src = &displaybuffer[ud_y * 320 + ud_x];
-    char *dest = &displayscreen[ud_y * 320 + ud_x];
-    if (ud_lx == 320)
+    int loop;
+    char *src = &displaybuffer[ud_y * SCREENWIDTH + ud_x];
+    char *dest = &displayscreen[ud_y * SCREENWIDTH + ud_x];
+    
+    if (ud_lx == SCREENWIDTH)
     {
-        memcpy(dest, src, 320 * ud_ly);
+        memcpy(dest, src, SCREENWIDTH * ud_ly);
     }
     else
     {
-        for (i = 0; i < ud_ly; i++)
+        for (loop = 0; loop < ud_ly; loop++)
         {
             memcpy(dest, src, ud_lx);
-            dest += 320;
-            src += 320;
+            
+            dest += SCREENWIDTH;
+            
+            src += SCREENWIDTH;
         }
     }
+    
     update_start = 0;
 }
 
-void GFX_ShadeSprite(char *p, texture_t *t, char *s)
+/*==========================================================================
+   GFX_ShadeSprite() -
+ ==========================================================================*/
+void 
+GFX_ShadeSprite(
+    char *dest, 
+    texture_t *inmem, 
+    char *dtable
+)
 {
-    while ((int16_t)t->offset != -1)
+    while ((int16_t)inmem->offset != -1)
     {
-        char *d = p + (uint16_t)t->offset;
-        for (int i = 0; i < (uint16_t)t->width; i++, d++)
-            *d = s[(uint8_t)*d];
-        t = (texture_t*)((char*)&t->height + (uint16_t)t->width);
+        char *d = dest + (uint16_t)inmem->offset;
+        
+        for (int loop = 0; loop < (uint16_t)inmem->width; loop++, d++)
+            *d = dtable[(uint8_t)*d];
+        
+        inmem = (texture_t*)((char*)&inmem->height + (uint16_t)inmem->width);
     }
 }
 
-void GFX_DrawSprite(char *a1, texture_t *a2)
+/*==========================================================================
+   GFX_DrawSprite() -
+ ==========================================================================*/
+void 
+GFX_DrawSprite(
+    char *dest, 
+    texture_t *inmem
+)
 {
-    while ((int16_t)a2->offset != -1)
+    while ((int16_t)inmem->offset != -1)
     {
-        memcpy(a1 + (uint16_t)a2->offset, (char*)&a2->height, (uint16_t)a2->width);
-        a2 = (texture_t*)((char*)&a2->height + (uint16_t)a2->width);
+        memcpy(dest + (uint16_t)inmem->offset, (char*)&inmem->height, (uint16_t)inmem->width);
+        
+        inmem = (texture_t*)((char*)&inmem->height + (uint16_t)inmem->width);
     }
 }
 
-void GFX_DrawChar(char *a1, char *a2, int a3, int a4, int a5, int a6)
+/*==========================================================================
+   GFX_DrawChar() -
+ ==========================================================================*/
+void 
+GFX_DrawChar(
+    char *dest, 
+    char *inmem, 
+    int width, 
+    int height, 
+    int addx, 
+    int color
+)
 {
     do
     {
-        for (int i = 0; i < a3; i++)
+        for (int loop = 0; loop < width; loop++)
         {
-            if (*a2)
-                *a1 = a6 + *a2;
-            a1++;
-            a2++;
+            if (*inmem)
+                *dest = color + *inmem;
+            
+            dest++;
+            inmem++;
         }
-        a2 += a5;
-        a1 += 320 - a3;
-    } while (--a4);
+        
+        inmem += addx;
+        dest += SCREENWIDTH - width;
+    
+    } while (--height);
 }
 
-void GFX_Shade(char *a1, int a2, char *a3)
+/*==========================================================================
+   GFX_Shade() - Remaps Bytes according to shade table 
+ ==========================================================================*/
+void 
+GFX_Shade(
+    char *outmem, 
+    int maxlen, 
+    char *dtable
+)
 {
-    for (int i = 0; i < a2; i++)
+    for (int loop = 0; loop < maxlen; loop++)
     {
-        a1[i] = a3[(uint8_t)a1[i]];
+        outmem[loop] = dtable[(uint8_t)outmem[loop]];
     }
 }
 
-void GFX_PutPic(void)
+/*==========================================================================
+   GFX_PutPic() - Puts Picture into buffer 
+ ==========================================================================*/
+void 
+GFX_PutPic(
+    void
+)
 {
-    char *p = &displaybuffer[gfx_xp + gfx_yp * 320];
+    char *p = &displaybuffer[gfx_xp + gfx_yp * SCREENWIDTH];
     char *src = gfx_inmem;
-    for (int i = 0; i < gfx_ly; i++)
+    
+    for (int loop = 0; loop < gfx_ly; loop++)
     {
         memcpy(p, src, gfx_lx);
-        p += 320;
+        
+        p += SCREENWIDTH;
+        
         src += gfx_lx + gfx_imga;
     }
 }
 
-void GFX_PutMaskPic(void)
+/*==========================================================================
+   GFX_PutMaskPic() - Puts Picture into buffer with color 0 see thru
+ ==========================================================================*/
+void 
+GFX_PutMaskPic(
+    void
+)
 {
-    char *p = &displaybuffer[gfx_xp + gfx_yp * 320];
+    char *p = &displaybuffer[gfx_xp + gfx_yp * SCREENWIDTH];
     char *src = gfx_inmem;
-    for (int i = 0; i < gfx_ly; i++)
+    
+    for (int loop = 0; loop < gfx_ly; loop++)
     {
-        for (int j = 0; j < gfx_lx; j++)
+        for (int i = 0; i < gfx_lx; i++)
         {
-            if (src[j] != 0)
-                p[j] = src[j];
+            if (src[i] != 0)
+                p[i] = src[i];
         }
-        p += 320;
+        
+        p += SCREENWIDTH;
+        
         src += gfx_lx + gfx_imga;
     }
 }
