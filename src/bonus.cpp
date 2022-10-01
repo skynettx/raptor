@@ -8,7 +8,7 @@
 #include "fx.h"
 #include "fileids.h"
 
-bonus_t bons[12];
+bonus_t bons[MAX_BONUS];
 bonus_t first_bonus, last_bonus;
 bonus_t *free_bonus;
 static int energy_count;
@@ -22,167 +22,257 @@ static int ypos[16] = {
     -3, -3, -3, -2, -1, 0, 1, 2, 3, 3, 3, 2, 1, 0, -1, -2
 };
 
-void BONUS_Clear(void)
+/***************************************************************************
+BONUS_Clear () - Clears out All bonuses
+ ***************************************************************************/
+void 
+BONUS_Clear(
+    void
+)
 {
-    int v1c;
+    int loop;
+    
     energy_count = 0;
-    first_bonus.f_0 = NULL;
-    first_bonus.f_4 = &last_bonus;
-    last_bonus.f_0 = &first_bonus;
-    last_bonus.f_4 = NULL;
+    
+    first_bonus.prev = NULL;
+    first_bonus.next = &last_bonus;
+    
+    last_bonus.prev = &first_bonus;
+    last_bonus.next = NULL;
+    
     free_bonus = bons;
+    
     memset(bons, 0, sizeof(bons));
-    for (v1c = 0; v1c < 11; v1c++)
-        bons[v1c].f_4 = &bons[v1c + 1];
+    
+    for (loop = 0; loop < MAX_BONUS - 1; loop++)
+        bons[loop].next = &bons[loop + 1];
 }
 
-
-bonus_t *BONUS_Get(void)
+/*-------------------------------------------------------------------------*
+BONUS_Get () - Gets A Free BONUS from Link List
+ *-------------------------------------------------------------------------*/
+bonus_t 
+*BONUS_Get(
+    void
+)
 {
-    bonus_t *v1c;
+    bonus_t *newb;
+    
     if (!free_bonus)
         return NULL;
-    v1c = free_bonus;
-    free_bonus = free_bonus->f_4;
-    memset(v1c, 0, sizeof(bonus_t));
-    v1c->f_4 = &last_bonus;
-    v1c->f_0 = last_bonus.f_0;
-    last_bonus.f_0 = v1c;
-    v1c->f_0->f_4 = v1c;
-    return v1c;
+    
+    newb = free_bonus;
+    free_bonus = free_bonus->next;
+    
+    memset(newb, 0, sizeof(bonus_t));
+    
+    newb->next = &last_bonus;
+    newb->prev = last_bonus.prev;
+    last_bonus.prev = newb;
+    newb->prev->next = newb;
+    
+    return newb;
 }
 
-bonus_t *BONUS_Remove(bonus_t *a1)
+/*-------------------------------------------------------------------------*
+BONUS_Remove () Removes BONUS from Link List
+ *-------------------------------------------------------------------------*/
+bonus_t 
+*BONUS_Remove(
+    bonus_t *sh
+)
 {
-    bonus_t *v1c;
-    if (a1->f_38 == 23)
+    bonus_t *next;
+    
+    if (sh->type == S_ITEMBUY6)
         energy_count--;
-    v1c = a1->f_0;
-    a1->f_4->f_0 = a1->f_0;
-    a1->f_0->f_4 = a1->f_4;
-    memset(a1, 0, sizeof(bonus_t));
-    a1->f_4 = free_bonus;
-    free_bonus = a1;
-    return v1c;
+    
+    next = sh->prev;
+    
+    sh->next->prev = sh->prev;
+    sh->prev->next = sh->next;
+    
+    memset(sh, 0, sizeof(bonus_t));
+    
+    sh->next = free_bonus;
+    
+    free_bonus = sh;
+    
+    return next;
 }
 
-void BONUS_Init(void)
+/***************************************************************************
+BONUS_Init () - Sets up Bonus stuff
+ ***************************************************************************/
+void 
+BONUS_Init(
+    void
+)
 {
-    int v1c;
-    texture_t *v20;
+    int loop;
+    texture_t *h;
 
-    for (v1c = 0; v1c < 4; v1c++)
+    for (loop = 0; loop < 4; loop++)
     {
-        glow[v1c] = FILE125_ICNGLW_BLK + v1c;
+        glow[loop] = FILE125_ICNGLW_BLK + loop;
     }
-    v20 = (texture_t*)GLB_CacheItem(FILE125_ICNGLW_BLK);
-    glow_lx = v20->f_c;
-    glow_ly = v20->f_10;
+    
+    h = (texture_t*)GLB_CacheItem(FILE125_ICNGLW_BLK);
+    
+    glow_lx = h->width;
+    glow_ly = h->height;
+    
     GLB_CacheItem(FILE126_ICNGLW_BLK);
     GLB_CacheItem(FILE127_ICNGLW_BLK);
     GLB_CacheItem(FILE128_ICNGLW_BLK);
+    
     BONUS_Clear();
 }
 
-void BONUS_Add(int a1, int a2, int a3)
+/***************************************************************************
+BONUS_Add () - Adds A BONUS to Game so player can Try to pick it up
+ ***************************************************************************/
+void 
+BONUS_Add(
+    int type,              // INPUT : OBJECT TYPE
+    int x,                 // INPUT : X POSITION
+    int y                  // INPUT : Y POSITION
+)
 {
-    bonus_t *v14;
-    if (a1 >= 24)
+    bonus_t *cur;
+    
+    if (type >= S_LAST_OBJECT)
         return;
-    if (a1 == 23 && energy_count > 9)
+    
+    if (type == S_ITEMBUY6 && energy_count > MAX_MONEY)
         return;
-    v14 = BONUS_Get();
-    if (!v14)
+    
+    cur = BONUS_Get();
+    
+    if (!cur)
         return;
-    if (a1 == 23)
+    
+    if (type == S_ITEMBUY6)
         energy_count++;
-
-    v14->f_38 = a1;
-    v14->f_3c = OBJS_GetLib(a1);
-    v14->f_c = 0;
-    v14->f_14 = 16 + a2;
-    v14->f_18 = a3;
-    v14->f_2c = wrand() % 16;
+    
+    cur->type = type;
+    cur->lib = OBJS_GetLib(type);
+    cur->curframe = 0;
+    cur->x = MAP_LEFT + x;
+    cur->y = y;
+    cur->pos = wrand() % 16;
 }
 
-void BONUS_Think(void)
+/***************************************************************************
+BONUS_Think () - Does all BONUS Thinking
+ ***************************************************************************/
+void 
+BONUS_Think(
+    void
+)
 {
-    int v20, v24, v28, v2c;
-    bonus_t *v1c;
+    int x, y, x2, y2;
+    bonus_t *cur;
     static int gcnt;
 
-    v20 = playerx;
-    v24 = playery;
-    v28 = playerx + 32;
-    v2c = playery + 32;
-    for (v1c = first_bonus.f_4; &last_bonus != v1c; v1c = v1c->f_4)
+    x = playerx;
+    y = playery;
+    x2 = playerx + PLAYERWIDTH;
+    y2 = playery + PLAYERHEIGHT;
+    
+    for (cur = first_bonus.next; &last_bonus != cur; cur = cur->next)
     {
-        v1c->f_8 = v1c->f_3c->f_0 + v1c->f_c;
-        v1c->f_1c = v1c->f_14 - 8 + xpos[v1c->f_2c];
-        v1c->f_20 = v1c->f_18 - 8 + ypos[v1c->f_2c];
-        v1c->f_24 = v1c->f_14 - (glow_lx>>1) + xpos[v1c->f_2c];
-        v1c->f_28 = v1c->f_18 - (glow_ly>>1) + ypos[v1c->f_2c];
-        v1c->f_18++;
+        cur->item = cur->lib->item + cur->curframe;
+        
+        cur->bx = cur->x - (BONUS_WIDTH / 2) + xpos[cur->pos];
+        cur->by = cur->y - (BONUS_HEIGHT / 2) + ypos[cur->pos];
+        
+        cur->gx = cur->x - (glow_lx>>1) + xpos[cur->pos];
+        cur->gy = cur->y - (glow_ly>>1) + ypos[cur->pos];
+        
+        cur->y++;
+        
         if (gcnt & 1)
         {
-            v1c->f_2c++;
-            if (v1c->f_2c >= 16)
-                v1c->f_2c = 0;
-            v1c->f_c++;
-            if (v1c->f_c >= v1c->f_3c->f_4)
-                v1c->f_c = 0;
+            cur->pos++;
+            
+            if (cur->pos >= 16)
+                cur->pos = 0;
+            
+            cur->curframe++;
+            
+            if (cur->curframe >= cur->lib->numframes)
+                cur->curframe = 0;
         }
-        v1c->f_10++;
-        if (v1c->f_10 >= 4)
-            v1c->f_10 = 0;
-        if (v1c->f_14 > v20 && v1c->f_14 < v28 && v1c->f_18 > v24 && v1c->f_18 < v2c)
+        
+        cur->curglow++;
+        
+        if (cur->curglow >= 4)
+            cur->curglow = 0;
+        
+        if (cur->x > x && cur->x < x2 && cur->y > y && cur->y < y2)
         {
-            if (!v1c->f_30 && OBJS_GetAmt(16) > 0)
+            if (!cur->dflag && OBJS_GetAmt(S_ENERGY) > 0)
             {
-                SND_Patch(10, 127);
-                if (v1c->f_38 == 16)
-                    OBJS_AddEnergy(25);
+                SND_Patch(FX_BONUS, 127);
+                
+                if (cur->type == S_ENERGY)
+                    OBJS_AddEnergy(MAX_SHIELD / 4);
                 else
-                    OBJS_Add(v1c->f_38);
-                if (v1c->f_3c->pays)
+                    OBJS_Add(cur->type);
+                
+                if (cur->lib->moneyflag)
                 {
-                    v1c->f_30 = 1;
-                    v1c->f_34 = 50;
+                    cur->dflag = 1;
+                    cur->countdown = 50;
                 }
                 else
                 {
-                    v1c = BONUS_Remove(v1c);
+                    cur = BONUS_Remove(cur);
                     continue;
                 }
             }
         }
-        if (v1c->f_30)
+        
+        if (cur->dflag)
         {
-            v1c->f_34--;
-            if (v1c->f_34 <= 0)
+            cur->countdown--;
+            if (cur->countdown <= 0)
             {
-                v1c = BONUS_Remove(v1c);
+                cur = BONUS_Remove(cur);
                 continue;
             }
         }
-        if (v1c->f_28 > 200)
-            v1c = BONUS_Remove(v1c);
+        
+        if (cur->gy > 200)
+        {
+            cur = BONUS_Remove(cur);
+            continue;
+        }
     }
+    
     gcnt++;
 }
 
-void BONUS_Display(void)
+/***************************************************************************
+BONUS_Display () - Displays Active Bonuses in game
+ ***************************************************************************/
+void 
+BONUS_Display(
+    void
+)
 {
-    bonus_t *v1c;
-    for (v1c = first_bonus.f_4; &last_bonus != v1c; v1c = v1c->f_4)
+    bonus_t *cur;
+    
+    for (cur = first_bonus.next; &last_bonus != cur; cur = cur->next)
     {
-        if (!v1c->f_30)
+        if (!cur->dflag)
         {
-            GFX_PutSprite((texture_t*)GLB_GetItem(v1c->f_8), v1c->f_1c, v1c->f_20);
-            GFX_ShadeShape(1, (texture_t*)GLB_GetItem(glow[v1c->f_10]), v1c->f_24, v1c->f_28);
+            GFX_PutSprite((texture_t*)GLB_GetItem(cur->item), cur->bx, cur->by);
+            GFX_ShadeShape(1, (texture_t*)GLB_GetItem(glow[cur->curglow]), cur->gx, cur->gy);
         }
         else
-            GFX_PutSprite((texture_t*)GLB_GetItem(FILE10f_N$_PIC), v1c->f_1c, v1c->f_20);
+            GFX_PutSprite((texture_t*)GLB_GetItem(FILE10f_N$_PIC), cur->bx, cur->by);
     }
 }
 

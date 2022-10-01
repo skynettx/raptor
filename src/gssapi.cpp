@@ -24,20 +24,30 @@ int gss_volume;
 int gss_type;
 int gss_lastnote, gss_lastsmp;
 
-void GSS_Init(int device, int option)
+/***************************************************************************
+GSS_Init () - 
+ ***************************************************************************/
+void 
+GSS_Init(
+    int device, 
+    int option
+)
 {
     if (gss_init)
         return;
+    
     switch (device)
     {
     case CARD_NONE:
         gss_device = NULL;
         break;
+    
     case CARD_ADLIB:
     case CARD_MV:
     case CARD_BLASTER:
         gss_device = &mus_device_fm;
         break;
+    
     case CARD_MPU1:
     case CARD_MPU2:
     case CARD_MPU3:
@@ -62,28 +72,43 @@ void GSS_Init(int device, int option)
     gss_init = 1;
 }
 
-void GSS_DeInit(void)
+/***************************************************************************
+GSS_DeInit () -
+ ***************************************************************************/
+void 
+GSS_DeInit(
+    void
+)
 {
     if (!gss_init)
         return;
 
     if (gss_device && gss_device->DeInit)
         gss_device->DeInit();
+    
     gsshack = 0;
     gss_device = NULL;
     gss_init = 0;
 }
 
-void GSS_Service(void)
+/***************************************************************************
+GSS_Service () -
+ ***************************************************************************/
+void 
+GSS_Service(
+    void
+)
 {
     if (!gss_init)
         return;
+    
     switch (gss_type)
     {
     case 1:
     {
         gss1_t *gss = (gss1_t*)gss_ptr;
         int smp, note, bend;
+        
         if (gss_currentptr == 0)
         {
             // setup playback
@@ -91,6 +116,7 @@ void GSS_Service(void)
             {
                 if (gss_device && gss_device->KeyOffEvent)
                     gss_device->KeyOffEvent(14, gss_lastnote);
+                
                 gss_lastnote = 0;
             }
             if (gss_device && gss_device->ControllerEvent)
@@ -108,6 +134,7 @@ void GSS_Service(void)
             {
                 if (gss_device && gss_device->KeyOffEvent)
                     gss_device->KeyOffEvent(14, gss_lastnote);
+                
                 gss_lastnote = 0;
             }
             gss_type = 0;
@@ -115,26 +142,32 @@ void GSS_Service(void)
             break;
         }
         smp = gss->data[gss_currentptr++];
+        
         if (gss_lastsmp != smp)
         {
             if (smp == 0 && gss_lastnote)
             {
                 if (gss_device && gss_device->KeyOffEvent)
                     gss_device->KeyOffEvent(14, gss_lastnote);
+                
                 gss_lastnote = 0;
             }
             else
             {
                 note = 29 + ((smp - 1) >> 1);
                 bend = (smp & 1) ? 127 : 159;
+                
                 if (note != gss_lastnote)
                 {
                     if (gss_device && gss_device->KeyOffEvent)
                         gss_device->KeyOffEvent(14, gss_lastnote);
+                    
                     if (gss_device && gss_device->PitchBendEvent)
                         gss_device->PitchBendEvent(14, bend);
+                    
                     if (gss_device && gss_device->KeyOnEvent)
                         gss_device->KeyOnEvent(14, note, gss_volume);
+                    
                     gss_lastnote = note;
                 }
                 else
@@ -150,9 +183,17 @@ void GSS_Service(void)
     }
 }
 
-void GSS_Mix(int16_t *stream, int len)
+/***************************************************************************
+GSS_Mix () -
+ ***************************************************************************/
+void 
+GSS_Mix(
+    int16_t *stream, 
+    int len
+)
 {
     int i;
+    
     if (!gss_init)
         return;
 
@@ -163,6 +204,7 @@ void GSS_Mix(int16_t *stream, int len)
     {
         gss_device->Mix(stream, 1);
         gss_cnt += gssrate;
+        
         while (gss_cnt >= fx_freq)
         {
             gss_cnt -= fx_freq;
@@ -172,15 +214,23 @@ void GSS_Mix(int16_t *stream, int len)
     }
 }
 
-void GSS_Poll(void)
+/***************************************************************************
+GSS_Poll () -
+ ***************************************************************************/
+void 
+GSS_Poll(
+    void
+)
 {
     if (!gss_init || !gss_device || gss_device->Mix)
         return;
 
     int now = SDL_GetTicks();
+    
     while (gss_timer < now)
     {
         gss_cnt += gssrate;
+        
         if (gss_cnt >= 1000)
         {
             gss_cnt -= 1000;
@@ -190,10 +240,21 @@ void GSS_Poll(void)
     }
 }
 
-int GSS_PlayPatch(void *gss, int sep, int pitch, int volume, int priority)
+/***************************************************************************
+GSS_PlayPatch () -
+ ***************************************************************************/
+int 
+GSS_PlayPatch(
+    void *gss, 
+    int sep, 
+    int pitch, 
+    int volume, 
+    int priority
+)
 {
     int format = *(int16_t*)gss;
     int handle = (gss_handcnt++) & FXHAND_MASK;
+    
     if (format != 1 && format != 2)
         return -1;
 
@@ -207,12 +268,14 @@ int GSS_PlayPatch(void *gss, int sep, int pitch, int volume, int priority)
 
     if (gss_type == 0)
         gss_lastnote = 0;
+    
     gss_type = 0;
     gss_ptr = 0;
 
     gss_priority = priority;
     gss_sep = sep;
     gss_volume = volume;
+    
     switch (format)
     {
     case 1:
@@ -223,6 +286,7 @@ int GSS_PlayPatch(void *gss, int sep, int pitch, int volume, int priority)
         gss_type = 1;
         break;
     }
+    
     case 2:
         gss_currentptr = 0;
         gss_ptr = gss;
@@ -232,15 +296,25 @@ int GSS_PlayPatch(void *gss, int sep, int pitch, int volume, int priority)
     gss_handle = handle;
 
     SND_Unlock();
+    
     return handle | FXHAND_GSS1;
 }
 
-void GSS_StopPatch(int handle)
+/***************************************************************************
+GSS_StopPatch () -
+ ***************************************************************************/
+void 
+GSS_StopPatch(
+    int handle
+)
 {
     if (!gss_init)
         return;
+    
     handle &= FXHAND_MASK;
+    
     SND_Lock();
+    
     if (handle == gss_handle)
     {
         switch (gss_type)
@@ -255,15 +329,27 @@ void GSS_StopPatch(int handle)
     SND_Unlock();
 }
 
-int GSS_PatchIsPlaying(int handle)
+/***************************************************************************
+GSS_PatchIsPlaying () -
+ ***************************************************************************/
+int 
+GSS_PatchIsPlaying(
+    int handle
+)
 {
     int stat = 0;
+    
     if (!gss_init)
         return 0;
+    
     handle &= FXHAND_MASK;
+    
     SND_Lock();
+    
     if (handle == gss_handle && gss_type != 0)
         stat = 1;
+    
     SND_Unlock();
+    
     return stat;
 }

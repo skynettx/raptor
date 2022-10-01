@@ -13,14 +13,28 @@
 #include "input.h"
 #include "fileids.h"
 
+#define MAX_ESHOT 80
+
+enum LIB_PIC
+{
+    LIB_NORMAL,
+    LIB_ATPLAY,
+    LIB_MISSLE,
+    LIB_LASER,
+    LIB_MINES,
+    LIB_PLASMA,
+    LIB_COCO,
+    LIB_LASTPIC
+};
+
 int eshotnum, eshothigh;
 eshot_t first_eshot, last_eshot;
-eshot_t eshots[80];
+eshot_t eshots[MAX_ESHOT];
 eshot_t *free_eshot;
 
 texture_t *elaspow[4];
 
-plib_t plib[7];
+plib_t plib[LIB_LASTPIC];
 
 static int xpos[16] = {
     -1, 0, 1, 2, 3, 3, 3, 2, 1, 0, -1, -2, -3, -3, -3, -2
@@ -31,297 +45,378 @@ static int ypos[16] = {
 };
 
 static int monkeys[6] = {
-    1, 2, 3, 4, 5 ,6
+    FX_MON1, FX_MON2, FX_MON3, FX_MON4, FX_MON5, FX_MON6
 };
 
-void ESHOT_Clear(void)
+/***************************************************************************
+ESHOT_Clear () - Clears out ESHOT Linklist
+ ***************************************************************************/
+void 
+ESHOT_Clear(
+    void
+)
 {
-    int v1c;
+    int loop;
+    
     eshotnum = 0;
-    first_eshot.f_0 = NULL;
-    first_eshot.f_4 = &last_eshot;
-    last_eshot.f_0 = &first_eshot;
-    last_eshot.f_4 = NULL;
+    
+    first_eshot.prev = NULL;
+    first_eshot.next = &last_eshot;
+    
+    last_eshot.prev = &first_eshot;
+    last_eshot.next = NULL;
+    
     free_eshot = &eshots[0];
+    
     memset(eshots, 0, sizeof(eshots));
-    for (v1c = 0; v1c < 79; v1c++)
-        eshots[v1c].f_4 = &eshots[v1c + 1];
+    
+    for (loop = 0; loop < MAX_ESHOT - 1; loop++)
+        eshots[loop].next = &eshots[loop + 1];
 }
 
-eshot_t *ESHOT_Get(void)
+/*-------------------------------------------------------------------------*
+ESHOT_Get () - gets a Free ESHOT OBJECT from linklist
+ *-------------------------------------------------------------------------*/
+eshot_t 
+*ESHOT_Get(
+    void
+)
 {
-    eshot_t *v1c;
+    eshot_t *newes;
+    
     if (!free_eshot)
         return NULL;
+    
     eshotnum++;
     if (eshothigh < eshotnum)
         eshothigh = eshotnum;
-    v1c = free_eshot;
-    free_eshot = free_eshot->f_4;
-    memset(v1c, 0, sizeof(eshot_t));
-    v1c->f_4 = &last_eshot;
-    v1c->f_0 = last_eshot.f_0;
-    last_eshot.f_0 = v1c;
-    v1c->f_0->f_4 = v1c;
-    return v1c;
+    
+    newes = free_eshot;
+    free_eshot = free_eshot->next;
+    
+    memset(newes, 0, sizeof(eshot_t));
+    
+    newes->next = &last_eshot;
+    newes->prev = last_eshot.prev;
+    last_eshot.prev = newes;
+    newes->prev->next = newes;
+    
+    return newes;
 }
 
-eshot_t *ESHOT_Remove(eshot_t *a1)
+/*-------------------------------------------------------------------------*
+ESHOT_Remove () - Removes SHOT OBJECT from linklist
+ *-------------------------------------------------------------------------*/
+eshot_t 
+*ESHOT_Remove(
+    eshot_t *sh
+)
 {
-    eshot_t *v1c;
+    eshot_t *next;
+    
     eshotnum--;
-    v1c = a1->f_0;
-    a1->f_4->f_0 = a1->f_0;
-    a1->f_0->f_4 = a1->f_4;
-    memset(a1, 0, sizeof(eshot_t));
-    a1->f_4 = free_eshot;
-    free_eshot = a1;
-    return v1c;
+    
+    next = sh->prev;
+    
+    sh->next->prev = sh->prev;
+    sh->prev->next = sh->next;
+    
+    memset(sh, 0, sizeof(eshot_t));
+    
+    sh->next = free_eshot;
+    
+    free_eshot = sh;
+    
+    return next;
 }
 
-void ESHOT_Init(void)
+/***************************************************************************
+ESHOT_Init () - Inits ESHOT system and clears link list
+ ***************************************************************************/
+void 
+ESHOT_Init(
+    void
+)
 {
-    plib_t *v1c;
-    texture_t *v24;
-    int v20;
-    for (v20 = 0; v20 < 4; v20++)
-    elaspow[v20] = (texture_t*)GLB_LockItem(FILE145_ELASEPOW_BLK + v20);
+    plib_t *cur;
+    texture_t *h;
+    int loop;
+    
+    for (loop = 0; loop < 4; loop++)
+        elaspow[loop] = (texture_t*)GLB_LockItem(FILE145_ELASEPOW_BLK + loop);
     
     ESHOT_Clear();
+    
     memset(plib, 0, sizeof(plib));
-    v1c = &plib[0];                          //Lib Normal
-    v1c->f_40 = 2;
-    v1c->f_0 = FILE1d6_ESHOT_BLK;
-    v1c->f_2c = 2;
-    v1c->f_30 = 0;
-    v1c->f_34 = 6;
-    for (v20 = 0; v20 < v1c->f_2c; v20++)
-        v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
-    v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    
+    cur = &plib[LIB_NORMAL];                          
+    cur->hits = 2;
+    cur->item = FILE1d6_ESHOT_BLK;
+    cur->num_frames = 2;
+    cur->smokeflag = 0;
+    cur->speed = 6;
+    for (loop = 0; loop < cur->num_frames; loop++)
+        cur->pic[loop] = (texture_t*)GLB_LockItem(cur->item + loop);
+    h = cur->pic[0];
+    cur->xoff = h->width >> 1;
+    cur->yoff = h->height >> 1;
 
-    v1c = &plib[1];                          //Lib at play
-    v1c->f_40 = 1;
-    v1c->f_0 = FILE1d6_ESHOT_BLK;
-    v1c->f_2c = 2;
-    v1c->f_30 = 0;
-    v1c->f_34 = 6;
-    for (v20 = 0; v20 < v1c->f_2c; v20++)
-        v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
-    v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    cur = &plib[LIB_ATPLAY];                          
+    cur->hits = 1;
+    cur->item = FILE1d6_ESHOT_BLK;
+    cur->num_frames = 2;
+    cur->smokeflag = 0;
+    cur->speed = 6;
+    for (loop = 0; loop < cur->num_frames; loop++)
+        cur->pic[loop] = (texture_t*)GLB_LockItem(cur->item + loop);
+    h = cur->pic[0];
+    cur->xoff = h->width >> 1;
+    cur->yoff = h->height >> 1;
 
-    v1c = &plib[2];                         //Lib Missle
-    v1c->f_40 = 4;
-    v1c->f_0 = FILE1d4_EMISLE_BLK;
-    v1c->f_2c = 2;
-    v1c->f_30 = 1;
-    v1c->f_34 = 10;
-    for (v20 = 0; v20 < v1c->f_2c; v20++)
-        v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
-    v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    cur = &plib[LIB_MISSLE];                         
+    cur->hits = 4;
+    cur->item = FILE1d4_EMISLE_BLK;
+    cur->num_frames = 2;
+    cur->smokeflag = 1;
+    cur->speed = 10;
+    for (loop = 0; loop < cur->num_frames; loop++)
+        cur->pic[loop] = (texture_t*)GLB_LockItem(cur->item + loop);
+    h = cur->pic[0];
+    cur->xoff = h->width >> 1;
+    cur->yoff = h->height >> 1;
 
-    v1c = &plib[4];                        //Lib Mines
-    v1c->f_40 = 0x10;
-    v1c->f_0 = FILE1d1_MINE_BLK;
-    v1c->f_2c = 2;
-    v1c->f_30 = 0;
-    v1c->f_34 = 0;
-    for (v20 = 0; v20 < v1c->f_2c; v20++)
-        v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
-    v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    cur = &plib[LIB_MINES];                        
+    cur->hits = 0x10;
+    cur->item = FILE1d1_MINE_BLK;
+    cur->num_frames = 2;
+    cur->smokeflag = 0;
+    cur->speed = 0;
+    for (loop = 0; loop < cur->num_frames; loop++)
+        cur->pic[loop] = (texture_t*)GLB_LockItem(cur->item + loop);
+    h = cur->pic[0];
+    cur->xoff = h->width >> 1;
+    cur->yoff = h->height >> 1;
 
-    v1c = &plib[3];                        //Lib Laser 
-    v1c->f_40 = 0xc;
-    v1c->f_0 = FILE141_ELASER_BLK;
-    v1c->f_2c = 4;
-    v1c->f_30 = 0;
-    v1c->f_34 = 6;
-    for (v20 = 0; v20 < v1c->f_2c; v20++)
-        v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
-    v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    cur = &plib[LIB_LASER];                        
+    cur->hits = 0xc;
+    cur->item = FILE141_ELASER_BLK;
+    cur->num_frames = 4;
+    cur->smokeflag = 0;
+    cur->speed = 6;
+    for (loop = 0; loop < cur->num_frames; loop++)
+        cur->pic[loop] = (texture_t*)GLB_LockItem(cur->item + loop);
+    h = cur->pic[0];
+    cur->xoff = h->width >> 1;
+    cur->yoff = h->height >> 1;
 
-    v1c = &plib[5];                       //Lib Plasma
-    v1c->f_40 = 0xf;
-    v1c->f_0 = FILE151_EPLASMA_PIC;
-    v1c->f_2c = 1;
-    v1c->f_30 = 0;
-    v1c->f_34 = 10;
-    for (v20 = 0; v20 < v1c->f_2c; v20++)
-        v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
-    v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    cur = &plib[LIB_PLASMA];                       
+    cur->hits = 0xf;
+    cur->item = FILE151_EPLASMA_PIC;
+    cur->num_frames = 1;
+    cur->smokeflag = 0;
+    cur->speed = 10;
+    for (loop = 0; loop < cur->num_frames; loop++)
+        cur->pic[loop] = (texture_t*)GLB_LockItem(cur->item + loop);
+    h = cur->pic[0];
+    cur->xoff = h->width >> 1;
+    cur->yoff = h->height >> 1;
 
-    v1c = &plib[6];                       //Lib Coco
-    v1c->f_40 = 1;
-    v1c->f_0 = FILE14d_COCONUT_PIC;
-    v1c->f_2c = 4;
-    v1c->f_30 = 0;
-    v1c->f_34 = 6;
-    for (v20 = 0; v20 < v1c->f_2c; v20++)
-        v1c->f_4[v20] = (texture_t*)GLB_LockItem(v1c->f_0 + v20);
-    v24 = v1c->f_4[0];
-    v1c->f_38 = v24->f_c >> 1;
-    v1c->f_3c = v24->f_10 >> 1;
+    cur = &plib[LIB_COCO];                       
+    cur->hits = 1;
+    cur->item = FILE14d_COCONUT_PIC;
+    cur->num_frames = 4;
+    cur->smokeflag = 0;
+    cur->speed = 6;
+    for (loop = 0; loop < cur->num_frames; loop++)
+        cur->pic[loop] = (texture_t*)GLB_LockItem(cur->item + loop);
+    h = cur->pic[0];
+    cur->xoff = h->width >> 1;
+    cur->yoff = h->height >> 1;
 }
 
-void ESHOT_Shoot(enemy_t *a1, int a2)
+/***************************************************************************
+ESHOT_Shoot() - Shoots ENEMY GUNS
+ ***************************************************************************/
+void 
+ESHOT_Shoot(
+    enemy_t *enemy,        // INPUT : pointer to Enemy stuff
+    int gun_num            // INPUT : gun number to shoot
+)
 {
-    int v1c;
-    int v20;
-    int v2c;
-    eshot_t *v18;
-    v1c = a1->f_18 + a1->f_c->f_138[a2];
-    v20 = a1->f_1c + a1->f_c->f_168[a2];
+    int x;
+    int y;
+    int g_shoot_type;
+    eshot_t *cur;
     
-    if (((v1c >= 0) && (v1c < 320)) && ((v20 >= 0) && (v20 < 200)))
+    x = enemy->x + enemy->lib->shootx[gun_num];
+    y = enemy->y + enemy->lib->shooty[gun_num];
+    
+    if (((x >= 0) && (x < 320)) && ((y >= 0) && (y < 200)))
     {
-        v18 = ESHOT_Get();
-        if (!v18)
+        cur = ESHOT_Get();
+        
+        if (!cur)
             return;
-        v18->f_18.x = v1c;
-        v18->f_18.y = v20;
-        v18->f_5c = a1;
-        v18->f_60 = a2;
-        v2c = a1->f_c->f_78[a2];
-        switch (v2c)
+        
+        cur->move.x = x;
+        cur->move.y = y;
+        cur->en = enemy;
+        cur->gun_num = gun_num;
+        g_shoot_type = enemy->lib->shoot_type[gun_num];
+        
+        switch (g_shoot_type)
         {
         default:
             EXIT_Error("ESHOT_Shoot() - Invalid EShot type");
             break;
-        case 0:                                              //Atplayer
-            SND_3DPatch(28, v1c, v20);                      
-            v18->f_48 = &plib[1];
-            v18->f_18.x -= v18->f_48->f_38;
-            v18->f_18.y -= v18->f_48->f_3c;
-            v18->f_18.dirX = player_cx;
-            v18->f_18.dirY = player_cy;
-            v18->f_50 = 1;
-            v18->f_58 = 0;
+        
+        case ES_ATPLAYER:                                              
+            SND_3DPatch(FX_ENEMYSHOT, x, y);
+            cur->lib = &plib[LIB_ATPLAY];
+            cur->move.x -= cur->lib->xoff;
+            cur->move.y -= cur->lib->yoff;
+            cur->move.x2 = player_cx;
+            cur->move.y2 = player_cy;
+            cur->speed = 1;
+            cur->type = ES_ATPLAYER;
             break;
-        case 1:                                              //Atdown
-            SND_3DPatch(28, v1c, v20);
-            v18->f_48 = &plib[0];
-            v18->f_18.x -= v18->f_48->f_38;
-            v18->f_18.y -= v18->f_48->f_3c;
-            v18->f_18.dirX = v18->f_18.x;
-            v18->f_18.dirY = 200;
-            v18->f_50 = v18->f_48->f_34 >> 1;
-            v18->f_58 = 1;
+        
+        case ES_ATDOWN:                                             
+            SND_3DPatch(FX_ENEMYSHOT, x, y);
+            cur->lib = &plib[LIB_NORMAL];
+            cur->move.x -= cur->lib->xoff;
+            cur->move.y -= cur->lib->yoff;
+            cur->move.x2 = cur->move.x;
+            cur->move.y2 = 200;
+            cur->speed = cur->lib->speed >> 1;
+            cur->type = ES_ATDOWN;
             break;
-        case 2:                                              //Angleleft
-            SND_3DPatch(28, v1c, v20);
-            v18->f_48 = &plib[0];
-            v18->f_18.x -= v18->f_48->f_38;
-            v18->f_18.y -= v18->f_48->f_3c;
-            v18->f_18.dirX = v18->f_18.x - 32;
-            v18->f_18.dirY = v18->f_18.y + 32;
-            v18->f_50 = v18->f_48->f_34 >> 1;
-            v18->f_58 = 2;
+        
+        case ES_ANGLELEFT:                                              
+            SND_3DPatch(FX_ENEMYSHOT, x, y);
+            cur->lib = &plib[LIB_NORMAL];
+            cur->move.x -= cur->lib->xoff;
+            cur->move.y -= cur->lib->yoff;
+            cur->move.x2 = cur->move.x - 32;
+            cur->move.y2 = cur->move.y + 32;
+            cur->speed = cur->lib->speed >> 1;
+            cur->type = ES_ANGLELEFT;
             break;
-        case 3:                                              //Angleright
-            SND_3DPatch(28, v1c, v20);
-            v18->f_48 = &plib[0];
-            v18->f_18.x -= v18->f_48->f_38;
-            v18->f_18.y -= v18->f_48->f_3c;
-            v18->f_18.dirX = v18->f_18.x + 32;
-            v18->f_18.dirY = v18->f_18.y + 32;
-            v18->f_50 = v18->f_48->f_34 >> 1;
-            v18->f_58 = 3;
+        
+        case ES_ANGLERIGHT:                                              
+            SND_3DPatch(FX_ENEMYSHOT, x, y);
+            cur->lib = &plib[LIB_NORMAL];
+            cur->move.x -= cur->lib->xoff;
+            cur->move.y -= cur->lib->yoff;
+            cur->move.x2 = cur->move.x + 32;
+            cur->move.y2 = cur->move.y + 32;
+            cur->speed = cur->lib->speed >> 1;
+            cur->type = ES_ANGLERIGHT;
             break;
-        case 4:                                              //Missle
-            SND_3DPatch(30, v1c, v20);
-            v18->f_48 = &plib[2];
-            v18->f_18.x -= v18->f_48->f_38;
-            v18->f_18.dirX = v18->f_18.x;
-            v18->f_18.dirY = 200;
-            v18->f_50 = a1->f_b4 + 1;
-            v18->f_58 = 4;
+        
+        case ES_MISSLE:                                              
+            SND_3DPatch(FX_ENEMYMISSLE, x, y);
+            cur->lib = &plib[LIB_MISSLE];
+            cur->move.x -= cur->lib->xoff;
+            cur->move.x2 = cur->move.x;
+            cur->move.y2 = 200;
+            cur->speed = enemy->speed + 1;
+            cur->type = ES_MISSLE;
             break;
-        case 5:                                              //Laser
-            SND_3DPatch(29, v1c, v20);
-            v18->f_48 = &plib[3];
-            v18->f_18.x -= v18->f_48->f_38;
-            v18->f_18.dirX = v18->f_18.x;
-            v18->f_18.dirY = 200;
-            v18->f_50 = a1->f_b4;
-            v18->f_58 = 5;
+            
+        case ES_LASER:                                              
+            SND_3DPatch(FX_ENEMYLASER, x, y);
+            cur->lib = &plib[LIB_LASER];
+            cur->move.x -= cur->lib->xoff;
+            cur->move.x2 = cur->move.x;
+            cur->move.y2 = 200;
+            cur->speed = enemy->speed;
+            cur->type = ES_LASER;
             break;
-        case 6:                                              //Mines
-            SND_3DPatch(28, v1c, v20);
-            v18->f_48 = &plib[4];
-            v18->f_10 = v18->f_18.x;
-            v18->f_14 = v18->f_18.y;
-            v18->f_18.dirX = 320;
-            v18->f_18.dirY = 200;
-            v18->f_50 = 150;
-            v18->f_54 = wrand() % 16;
-            v18->f_58 = 6;
+        
+        case ES_MINES:                                              
+            SND_3DPatch(FX_ENEMYSHOT, x, y);
+            cur->lib = &plib[LIB_MINES];
+            cur->x = cur->move.x;
+            cur->y = cur->move.y;
+            cur->move.x2 = 320;
+            cur->move.y2 = 200;
+            cur->speed = 150;
+            cur->pos = wrand() % 16;
+            cur->type = ES_MINES;
             break;
-        case 7:                                              //Plasma
-            SND_3DPatch(31, v1c, v20);
-            v18->f_48 = &plib[5];
-            v18->f_18.x -= v18->f_48->f_38;
-            v18->f_18.dirX = v18->f_18.x;
-            v18->f_18.dirY = 200;
-            v18->f_50 = 8;
-            v18->f_58 = 7;
+        
+        case ES_PLASMA:                                              
+            SND_3DPatch(FX_ENEMYPLASMA, x, y);
+            cur->lib = &plib[LIB_PLASMA];
+            cur->move.x -= cur->lib->xoff;
+            cur->move.x2 = cur->move.x;
+            cur->move.y2 = 200;
+            cur->speed = 8;
+            cur->type = ES_PLASMA;
             break;
-        case 8:                                              //Coconut
-            SND_3DPatch(monkeys[wrand() % 6], v1c, v20);           
-            v18->f_48 = &plib[6];
-            v18->f_18.x -= v18->f_48->f_38;
-            v18->f_18.y -= v18->f_48->f_3c;
-            v18->f_18.dirX = player_cx;
-            v18->f_18.dirY = player_cy;
-            v18->f_50 = 1;
-            v18->f_58 = 8;
+        
+        case ES_COCONUTS:                                              
+            SND_3DPatch(monkeys[wrand() % 6], x, y);           
+            cur->lib = &plib[LIB_COCO];
+            cur->move.x -= cur->lib->xoff;
+            cur->move.y -= cur->lib->yoff;
+            cur->move.x2 = player_cx;
+            cur->move.y2 = player_cy;
+            cur->speed = 1;
+            cur->type = ES_COCONUTS;
             break;
         }
-        InitMobj(&v18->f_18);
-        MoveSobj(&v18->f_18, 1);
-        if (v18->f_18.x < 0 || v18->f_18.x >= 320)
-            v18->f_18.trigger = 1;
-        if (v18->f_18.y < 0 || v18->f_18.y >= 200)
-            v18->f_18.trigger = 1;
-        if (v18->f_18.trigger)
-            ESHOT_Remove(v18);
+        
+        InitMobj(&cur->move);
+        MoveSobj(&cur->move, 1);
+        
+        if (cur->move.x < 0 || cur->move.x >= 320)
+            cur->move.done = 1;
+        
+        if (cur->move.y < 0 || cur->move.y >= 200)
+            cur->move.done = 1;
+        
+        if (cur->move.done)
+            ESHOT_Remove(cur);
     }
 }
 
-void ESHOT_Think(void)
+/***************************************************************************
+ESHOT_Think () - Does All Thinking for shot system
+ ***************************************************************************/
+void 
+ESHOT_Think(
+    void
+)
 {
-    eshot_t *v1c;
-    plib_t *v20;
-    int v24, v28;
+    eshot_t *shot;
+    plib_t *lib;
+    int dx, dy;
 
-    for (v1c = first_eshot.f_4; v1c!=&last_eshot; v1c = v1c->f_4)
+    for (shot = first_eshot.next; shot!=&last_eshot; shot = shot->next)
     {
-        v20 = v1c->f_48;
-        v1c->f_8 = v20->f_4[v1c->f_c];
-        v1c->f_c++;
-        switch (v1c->f_58)
+        lib = shot->lib;
+        
+        shot->pic = lib->pic[shot->curframe];
+        
+        shot->curframe++;
+        
+        switch (shot->type)
         {
-        case 5:
-            if (v1c->f_5c && v1c->f_5c->f_c && v1c->f_c < v20->f_2c)
+        case ES_LASER:
+            if (shot->en && shot->en->lib && shot->curframe < lib->num_frames)
             {
-                v1c->f_10 = v1c->f_5c->f_18 + v1c->f_5c->f_c->f_138[v1c->f_60] - 4;
-                v1c->f_14 = v1c->f_5c->f_1c + v1c->f_5c->f_c->f_168[v1c->f_60];
-                v1c->f_18.dirY = 200;  
-                v24 = abs(v1c->f_10 - player_cx);
-                if (v24 < 16 && v1c->f_14 < player_cy)
+                shot->x = shot->en->x + shot->en->lib->shootx[shot->gun_num] - 4;
+                shot->y = shot->en->y + shot->en->lib->shooty[shot->gun_num];
+                shot->move.y2 = 200;  
+                
+                dx = abs(shot->x - player_cx);
+                
+                if (dx < (PLAYERWIDTH / 2) && shot->y < player_cy)
                 {
-                    v1c->f_18.dirY = player_cy + (wrand() % 4) - 2;
-                    OBJS_SubEnergy(v20->f_40);
+                    shot->move.y2 = player_cy + (wrand() % 4) - 2;
+                    OBJS_SubEnergy(lib->hits);
                     if ((haptic) && (control == 2))
                     {
                         IPT_CalJoyRumbleLow();                                            //Rumble when Laser eshot is hit
@@ -330,49 +425,60 @@ void ESHOT_Think(void)
             }
             else
             {
-                v1c->f_44 = 1;
+                shot->doneflag = 1;
             }
             break;
+        
         default:
-            if (v1c->f_c >= v20->f_2c)
-                v1c->f_c = 0;
-            if (v20->f_34)
+            if (shot->curframe >= lib->num_frames)
+                shot->curframe = 0;
+            
+            if (lib->speed)
             {
-                v1c->f_10 = v1c->f_18.x;
-                v1c->f_14 = v1c->f_18.y;
-                MoveSobj(&v1c->f_18, v1c->f_50);
-                if (v1c->f_50 < v20->f_34)
-                    v1c->f_50++;
+                shot->x = shot->move.x;
+                shot->y = shot->move.y;
+                
+                MoveSobj(&shot->move, shot->speed);
+                
+                if (shot->speed < lib->speed)
+                    shot->speed++;
             }
             else
             {
-                v1c->f_50--;
-                if (v1c->f_50)
+                shot->speed--;
+                
+                if (shot->speed)
                 {
-                    v1c->f_10 = v1c->f_18.x + xpos[v1c->f_54];
-                    v1c->f_14 = v1c->f_18.y + ypos[v1c->f_54];
-                    v1c->f_18.y++;
-                    v1c->f_54++;
-                    if (v1c->f_54 >= 16)
-                        v1c->f_54 = 0;
+                    shot->x = shot->move.x + xpos[shot->pos];
+                    shot->y = shot->move.y + ypos[shot->pos];
+                    shot->move.y++;
+                    
+                    shot->pos++;
+                    
+                    if (shot->pos >= 16)
+                        shot->pos = 0;
                 }
                 else
                 {
-                    v1c->f_44 = 1;
-                    ANIMS_StartAnim(6, v1c->f_10 + 4, v1c->f_14 + 4);
+                    shot->doneflag = 1;
+                    ANIMS_StartAnim(A_SMALL_AIR_EXPLO, shot->x + 4, shot->y + 4);
                 }
             }
-            if (v1c->f_14 >= 200 || v1c->f_14 < 0)
-                v1c->f_44 = 1;
-            if (v1c->f_10 >= 320 || v1c->f_10 < 0)
-                v1c->f_44 = 1;
-            v24 = abs(v1c->f_10 - player_cx);
-            v28 = abs(v1c->f_14 - player_cy);
-            if (v24 < 16 && v28 < 16)
+            
+            if (shot->y >= 200 || shot->y < 0)
+                shot->doneflag = 1;
+            
+            if (shot->x >= 320 || shot->x < 0)
+                shot->doneflag = 1;
+            
+            dx = abs(shot->x - player_cx);
+            dy = abs(shot->y - player_cy);
+            
+            if (dx < (PLAYERWIDTH / 2) && dy < (PLAYERWIDTH / 2))
             {
-                ANIMS_StartAnim(6, v1c->f_10, v1c->f_14);
-                v1c->f_44 = 1;
-                OBJS_SubEnergy(v20->f_40);
+                ANIMS_StartAnim(A_SMALL_AIR_EXPLO, shot->x, shot->y);
+                shot->doneflag = 1;
+                OBJS_SubEnergy(lib->hits);
                 if ((haptic) && (control == 2))
                 {
                     IPT_CalJoyRumbleLow();                                                                 //Rumble when eshot is hit
@@ -380,39 +486,53 @@ void ESHOT_Think(void)
             }
             break;
         }
-        if (v1c->f_44)
+        
+        if (shot->doneflag)
         {
-            v1c = ESHOT_Remove(v1c);
+            shot = ESHOT_Remove(shot);
             continue;
         }
-        v1c->f_4c++;
-        if (v20->f_30 && (v1c->f_4c & 1) != 0)
+        
+        shot->cnt++;
+        
+        if (lib->smokeflag && (shot->cnt & 1) != 0)
         {
-            ANIMS_StartAAnim(12, v1c->f_10 + v20->f_38, v1c->f_14);
+            ANIMS_StartAAnim(A_SMALL_SMOKE_UP, shot->x + lib->xoff, shot->y);
         }
     }
 }
 
-void ESHOT_Display(void)
+/***************************************************************************
+ESHOT_Display () - Displays All active Shots
+ ***************************************************************************/
+void 
+ESHOT_Display(
+    void
+)
 {
-    eshot_t *v1c;
-    int v20, v28;
-    texture_t *v24;
-    for (v1c = first_eshot.f_4; v1c !=&last_eshot; v1c = v1c->f_4)
+    eshot_t *shot;
+    int loop, y;
+    texture_t *h;
+    
+    for (shot = first_eshot.next; shot !=&last_eshot; shot = shot->next)
     {
-        if (v1c->f_58 == 5)
+        if (shot->type == ES_LASER)
         {
-            for (v20 = v1c->f_14; v20 < v1c->f_18.dirY; v20 += 3)
-            GFX_PutSprite(v1c->f_8, v1c->f_10, v20);
-            GFX_PutSprite(elaspow[v1c->f_c - 1], v1c->f_10, v1c->f_14);
-            v24 = lashit[v1c->f_c - 1];
-            v28 = v1c->f_18.dirY - 8;
-            if (v28 > 0 && v28 < 200)
+            for (loop = shot->y; loop < shot->move.y2; loop += 3)
+                GFX_PutSprite(shot->pic, shot->x, loop);
+            
+            GFX_PutSprite(elaspow[shot->curframe - 1], shot->x, shot->y);
+            
+            h = lashit[shot->curframe - 1];
+            
+            y = shot->move.y2 - 8;
+            
+            if (y > 0 && y < 200)
             {
-                GFX_PutSprite(v24, v1c->f_10 - (v24->f_c >> 2), v28);
+                GFX_PutSprite(h, shot->x - (h->width >> 2), y);
             }
         }
         else
-            GFX_PutSprite(v1c->f_8, v1c->f_10, v1c->f_14);
+            GFX_PutSprite(shot->pic, shot->x, shot->y);
     }
 }

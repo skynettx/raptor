@@ -5,85 +5,137 @@
 #include "gfxapi.h"
 #include "windows.h"
 
-char stmem[4096];
+#define MAX_SHADES 8
 
-static char *_stable[8];
+char stmem[MAX_SHADES * 512];
 
-void FLAME_Init(void)
+static char *_stable[MAX_SHADES];
+
+/***************************************************************************
+FLAME_Init () - Inits Flame Tables and stuff
+ ***************************************************************************/
+void 
+FLAME_Init(
+    void
+)
 {
-    int v1c;
-    for (v1c = 0; v1c < 8; v1c++)
+    int loop;
+    
+    for (loop = 0; loop < MAX_SHADES; loop++)
     {
-        _stable[v1c] = &stmem[v1c * 512];
-        _stable[v1c] = (char*)(((intptr_t)_stable[v1c] + 255) & ~255);
-        GFX_MakeLightTable(palette, _stable[v1c], (8 - v1c) * 2);
+        _stable[loop] = &stmem[loop * 512];
+        
+        _stable[loop] = (char*)(((intptr_t)_stable[loop] + 255) & ~255);
+        
+        GFX_MakeLightTable(palette, _stable[loop], (MAX_SHADES - loop) * 2);
     }
 }
 
-void FLAME_InitShades(void)
+/***************************************************************************
+FLAME_InitShades () - Inits shading stuff
+ ***************************************************************************/
+void 
+FLAME_InitShades(
+    void
+)
 {
-    int v1c;
-    for (v1c = 0; v1c < 8; v1c++)
+    int loop;
+    
+    for (loop = 0; loop < MAX_SHADES; loop++)
     {
-        GFX_MakeLightTable(palette, _stable[v1c], (8 - v1c) * 2);
+        GFX_MakeLightTable(palette, _stable[loop], (MAX_SHADES - loop) * 2);
     }
 }
 
-void FLAME_Up(int a1, int a2, int a3, int a4)
+/***************************************************************************
+FLAME_Up () - Shows Flame shooting upward
+ ***************************************************************************/
+void 
+FLAME_Up(
+    int ix,               // INPUT : x position
+    int iy,               // INPUT : y position
+    int width,            // INPUT : width of shade
+    int frame             // INPUT : frame
+)
 {
-    char *v14;
-    int v18, v10, v1c, v28;
-    unsigned int v20;
-    int v3c[2] = {
+    char *outbuf;
+    int y, addx, loop, num;
+    unsigned int curs;
+    int height[2] = {
         5, 10
     };
 
     if (opt_detail < 1)
         return;
 
-    a4 = a4 % 2;
-    a2 -= v3c[a4] - 1;
-    if (!GFX_ClipLines(0, &a1, &a2, &a3, &v3c[a4]))
+    frame = frame % 2;
+    
+    iy -= height[frame] - 1;
+    
+    if (!GFX_ClipLines(0, &ix, &iy, &width, &height[frame]))
         return;
 
-    v18 = a2;
-    v10 = 0x80000 / v3c[a4];
-    v20 = v10 * (v3c[a4] - 1);
-    for (v1c = 0; v1c < v3c[a4]; v1c++)
+    y = iy;
+    
+    addx = (MAX_SHADES << 16) / height[frame];
+    curs = addx * (height[frame] - 1);
+    
+    for (loop = 0; loop < height[frame]; loop++)
     {
-        v14 = displaybuffer + a1 + ylookup[v18];
-        v18++;
-        v28 = v20 >> 16;
-        if (v28 >= 8)
-            EXIT_Error("flame > 8 %u", v20);
+        outbuf = displaybuffer + ix + ylookup[y];
+        
+        y++;
+        
+        num = curs >> 16;
+        
+        if (num >= 8)
+            EXIT_Error("flame > 8 %u", curs >> 16);
 
-        if (v28 < 0)
+        if (num < 0)
             EXIT_Error("flame < 0");
 
-        GFX_Shade(v14, a3, _stable[v28]);
-        v20 -= v10;
+        GFX_Shade(outbuf, width, _stable[num]);
+        
+        curs -= addx;
     }
 }
 
-void FLAME_Down(int a1, int a2, int a3, int a4)
+/***************************************************************************
+FLAME_Down () - Shows Flame shooting downward
+ ***************************************************************************/
+void 
+FLAME_Down(
+    int ix,                // INPUT : x position
+    int iy,                // INPUT : y position
+    int width,             // INPUT : width of shade
+    int frame              // INPUT : frame
+)
 {
-    char *v14;
-    int v18, v1c, v10;
-    unsigned int v20;
-    int v38[2] = {
+    char *outbuf;
+    int y, loop, addx;
+    unsigned int curs;
+    int height[2] = {
         8, 12
     };
-    a4 %= 2;
-    if (!GFX_ClipLines(0, &a1, &a2, &a3, &v38[a4]))
+    
+    frame = frame % 2;
+    
+    if (!GFX_ClipLines(0, &ix, &iy, &width, &height[frame]))
         return;
-    v18 = a2;
-    v20 = 0;
-    v10 = 0x80000 / v38[a4];
-    for (v1c = 0; v1c < v38[a4]; v1c++)
+    
+    y = iy;
+    
+    curs = 0;
+    addx = (MAX_SHADES << 16) / height[frame];
+    
+    for (loop = 0; loop < height[frame]; loop++)
     {
-        v14 = displaybuffer + a1 + ylookup[v18];
-        v18++;
-        GFX_Shade(v14, a3, _stable[v20 >> 16]);
-        v20 += v10;
+        outbuf = displaybuffer + ix + ylookup[y];
+        
+        y++;
+        
+        GFX_Shade(outbuf, width, _stable[curs >> 16]);
+        
+        curs += addx;
     }
 }

@@ -31,133 +31,211 @@ int max_play;
 int demo_game;
 int demo_wave;
 
-void DEMO_MakePlayer(int a1)
+/***************************************************************************
+DEMO_MakePlayer() -
+ ***************************************************************************/
+void 
+DEMO_MakePlayer(
+    int game
+)
 {
     memset(&player, 0, sizeof(player));
 
-    player.currentWeapon = -1;
-    player.waveProgression[0] = 3;
-    player.waveProgression[1] = 3;
-    player.waveProgression[2] = 3;
-    player.pilotPicId = 0;
+    player.sweapon = -1;
+    player.diff[0] = DIFF_3;
+    player.diff[1] = DIFF_3;
+    player.diff[2] = DIFF_3;
+    player.id_pic = 0;
+    
     RAP_SetPlayerDiff();
-    OBJS_Add(0);
-    OBJS_Add(16);
-    OBJS_Add(16);
-    OBJS_Add(16);
-    OBJS_Add(16);
-    OBJS_Add(17);
-    player.money = 10000;
-    switch (a1)
+    
+    OBJS_Add(S_FORWARD_GUNS);
+    OBJS_Add(S_ENERGY);
+    OBJS_Add(S_ENERGY);
+    OBJS_Add(S_ENERGY);
+    OBJS_Add(S_ENERGY);
+    OBJS_Add(S_DETECT);
+    player.score = 10000;
+    
+    switch (game)
     {
     default:
     case 0:
-        OBJS_Add(2);
-        OBJS_Add(11);
-        OBJS_Add(4);
-        OBJS_Add(7);
-        OBJS_Add(5);
-        OBJS_Add(14);
+        OBJS_Add(S_MICRO_MISSLE);
+        OBJS_Add(S_MEGA_BOMB);
+        OBJS_Add(S_MINI_GUN);
+        OBJS_Add(S_AIR_MISSLE);
+        OBJS_Add(S_TURRET);
+        OBJS_Add(S_DEATH_RAY);
         break;
+    
     case 1:
-        OBJS_Add(11);
-        OBJS_Add(11);
-        OBJS_Add(11);
-        OBJS_Add(11);
-        OBJS_Add(15);
-        OBJS_Add(1);
-        OBJS_Add(2);
-        OBJS_Add(5);
-        OBJS_Add(8);
-        player.money += 0x50003;
+        OBJS_Add(S_MEGA_BOMB);
+        OBJS_Add(S_MEGA_BOMB);
+        OBJS_Add(S_MEGA_BOMB);
+        OBJS_Add(S_MEGA_BOMB);
+        OBJS_Add(S_SUPER_SHIELD);
+        OBJS_Add(S_PLASMA_GUNS);
+        OBJS_Add(S_MICRO_MISSLE);
+        OBJS_Add(S_TURRET);
+        OBJS_Add(S_GRD_MISSLE);
+        player.score += 0x50003;
         break;
+    
     case 2:
-        OBJS_Add(11);
-        OBJS_Add(11);
-        OBJS_Add(11);
-        OBJS_Add(11);
-        OBJS_Add(15);
-        OBJS_Add(1);
-        OBJS_Add(2);
-        OBJS_Add(13);
-        OBJS_Add(8);
-        player.money += 0xd5fff;
+        OBJS_Add(S_MEGA_BOMB);
+        OBJS_Add(S_MEGA_BOMB);
+        OBJS_Add(S_MEGA_BOMB);
+        OBJS_Add(S_MEGA_BOMB);
+        OBJS_Add(S_SUPER_SHIELD);
+        OBJS_Add(S_PLASMA_GUNS);
+        OBJS_Add(S_MICRO_MISSLE);
+        OBJS_Add(S_FORWARD_LASER);
+        OBJS_Add(S_GRD_MISSLE);
+        player.score += 0xd5fff;
         break;
     }
+    
     OBJS_GetNext();
 }
 
-void DEMO_DisplayStats(void)
+/***************************************************************************
+DEMO_DisplayStats (
+ ***************************************************************************/
+void 
+DEMO_DisplayStats(
+    void
+)
 {
-    char buf[84];
-    if (demo_mode == 1)
-    {
-        sprintf(buf, "REC %d", 0xaf0 - cur_play);
-        GFX_Print(21, 20, buf, (font_t*)GLB_GetItem(FILE104_FONT2_FNT), 84);
-    }
+    char temp[81];
+    
+    if (demo_mode != DEMO_RECORD)
+        return;
+    
+    sprintf(temp, "REC %d", MAX_DEMO - cur_play);
+    GFX_Print(MAP_LEFT + 5, 20, temp, (font_t*)GLB_GetItem(FILE104_FONT2_FNT), 84);
+    
 }
 
-void DEMO_StartRec(void)
+/***************************************************************************
+DEMO_StartRec (
+ ***************************************************************************/
+void 
+DEMO_StartRec(
+    void
+)
 {
-    SND_Patch(10, 127);
+    SND_Patch(FX_BONUS, 127);
     memset(playback, 0, sizeof(playback));
-    demo_mode = 1;
+    demo_mode = DEMO_RECORD;
     cur_play = 1;
 }
 
-void DEMO_StartPlayback(void)
+/***************************************************************************
+DEMO_StartPlayback (
+ ***************************************************************************/
+void 
+DEMO_StartPlayback(
+    void
+)
 {
-    demo_mode = 2;
+    demo_mode = DEMO_PLAYBACK;
     cur_play = 1;
 }
 
-void DEMO_SetFileName(const char *a1)
+/***************************************************************************
+DEMO_SetFileName ()
+ ***************************************************************************/
+void 
+DEMO_SetFileName(
+    const char *in_name
+)
 {
-    strcpy(demo_name, a1);
+    strcpy(demo_name, in_name);
 }
 
-void DEMO_GLBFile(int a1)
+/***************************************************************************
+DEMO_GLBFile (
+ ***************************************************************************/
+void 
+DEMO_GLBFile(
+    int item
+)
 {
-    char *demo = GLB_GetItem(a1);
-    int size = GLB_GetItemSize(a1);
-    if (demo)
-    {
-        memcpy(playback, demo, size);
-        cur_play = 1;
-        max_play = playback[0].f_8;
-        demo_game = playback[0].f_4;
-        demo_wave = playback[0].f_6;
-        GLB_FreeItem(a1);
-    }
+    char *mem = GLB_GetItem(item);
+    int size = GLB_GetItemSize(item);
+    
+    if (!mem)
+        return;
+    
+    memcpy(playback, mem, size);
+        
+    cur_play = 1;
+    
+    max_play = playback[0].playerpic;
+    demo_game = playback[0].px;
+    demo_wave = playback[0].py;
+        
+    GLB_FreeItem(item);
 }
 
-void DEMO_LoadFile(void)
+/***************************************************************************
+DEMO_LoadFile()
+ ***************************************************************************/
+void 
+DEMO_LoadFile(
+    void
+)
 {
-    GLB_ReadFile(demo_name, 0);
+    int filesize;
+
+    filesize = GLB_ReadFile(demo_name, 0);
     GLB_ReadFile(demo_name, (char*)playback);
+    
     cur_play = 1;
-    max_play = playback[0].f_8;
-    demo_game = playback[0].f_4;
-    demo_wave = playback[0].f_6;
+    
+    max_play = playback[0].playerpic;
+    demo_game = playback[0].px;
+    demo_wave = playback[0].py;
 }
 
-void DEMO_SaveFile(void)
+/***************************************************************************
+DEMO_SaveFile (
+ ***************************************************************************/
+void 
+DEMO_SaveFile(
+    void
+)
 {
     if (cur_play < 2)
         return;
-    playback[0].f_4 = cur_game;
-    playback[0].f_6 = game_wave[cur_game];
-    playback[0].f_8 = cur_play;
+    
+    playback[0].px = cur_game;
+    playback[0].py = game_wave[cur_game];
+    playback[0].playerpic = cur_play;
+    
     GLB_SaveFile(demo_name, (char*)playback, cur_play * sizeof(demo_t));
 }
 
-int DEMO_Play(void)
+/***************************************************************************
+DEMO_Play() - Demo playback routine
+ ***************************************************************************/
+int        // TRUE=Aborted, FALSE = timeout
+DEMO_Play( 
+    void
+)
 {
-    int v1c;
+    int rval;
+
+    rval = 0;
+
     DEMO_StartPlayback();
+    
     cur_game = demo_game;
     game_wave[cur_game] = demo_wave;
+    
     DEMO_MakePlayer(demo_game);
+    
     switch (cur_game)
     {
     case 0:
@@ -175,67 +253,83 @@ int DEMO_Play(void)
     WIN_LoadComp();
     RAP_LoadMap();
     retraceflag = 0;
-    v1c = Do_Game();
+    
+    rval = Do_Game();
+    
     retraceflag = 1;
-    if (!v1c)
+    
+    if (!rval)
     {
-        if (OBJS_GetAmt(16) <= 0)
+        if (OBJS_GetAmt(S_ENERGY) <= 0)
         {
-            SND_PlaySong(93, 1, 1);
+            SND_PlaySong(FILE05d_RAP5_MUS, 1, 1);
             INTRO_Death();
         }
         else
             INTRO_Landing();
     }
+    
     RAP_ClearPlayer();
-    demo_mode = 0;
-    return v1c;
+    
+    demo_mode = DEMO_OFF;
+    
+    return rval;
 }
 
-int DEMO_Think(void)
+/***************************************************************************
+DEMO_Think (
+ ***************************************************************************/
+int 
+DEMO_Think(
+    void
+)
 {
-    int v1c;
+    int rval;
 
-    v1c = 0;
+    rval = 0;
+
     switch (demo_mode)
     {
     default:
     case 0:
-        v1c = 0;
+        rval = 0;
         break;
-    case 2:
-        buttons[0] = playback[cur_play].f_0;
-        buttons[1] = playback[cur_play].f_1;
-        buttons[2] = playback[cur_play].f_2;
-        buttons[3] = playback[cur_play].f_3;
-        playerx = playback[cur_play].f_4;
-        playery = playback[cur_play].f_6;
+    
+    case DEMO_PLAYBACK:
+        buttons[0] = playback[cur_play].b1;
+        buttons[1] = playback[cur_play].b2;
+        buttons[2] = playback[cur_play].b3;
+        buttons[3] = playback[cur_play].b4;
+        playerx = playback[cur_play].px;
+        playery = playback[cur_play].py;
         player_cx = playerx + 16;
         player_cy = playery + 16;
-        playerpic = playback[cur_play].f_8;
+        playerpic = playback[cur_play].playerpic;
         cur_play++;
         if (cur_play > max_play)
         {
-            demo_mode = 0;
-            v1c = 1;
+            demo_mode = DEMO_OFF;
+            rval = 1;
         }
         break;
-    case 1:
-        playback[cur_play].f_0 = buttons[0];
-        playback[cur_play].f_1 = buttons[1];
-        playback[cur_play].f_2 = buttons[2];
-        playback[cur_play].f_3 = buttons[3];
-        playback[cur_play].f_4 = playerx;
-        playback[cur_play].f_6 = playery;
-        playback[cur_play].f_8 = playerpic;
+    
+    case DEMO_RECORD:
+        playback[cur_play].b1 = buttons[0];
+        playback[cur_play].b2 = buttons[1];
+        playback[cur_play].b3 = buttons[2];
+        playback[cur_play].b4 = buttons[3];
+        playback[cur_play].px = playerx;
+        playback[cur_play].py = playery;
+        playback[cur_play].playerpic = playerpic;
         cur_play++;
-        if (cur_play == 2800)
+        if (cur_play == MAX_DEMO)
         {
-            SND_Patch(10, 127);
+            SND_Patch(FX_BONUS, 127);
             demo_mode = 0;
-            v1c = 1;
+            rval = 1;
         }
         break;
     }
-    return v1c;
+    
+    return rval;
 }

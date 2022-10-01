@@ -9,6 +9,47 @@ enum {
     FXHAND_TMASK = 0xc000,
 };
 
+enum DEFX
+{
+    FX_THEME,
+    FX_MON1,
+    FX_MON2,
+    FX_MON3,
+    FX_MON4,
+    FX_MON5,
+    FX_MON6,
+    FX_DAVE,
+    FX_AIREXPLO,
+    FX_AIREXPLO2,
+    FX_BONUS,
+    FX_CRASH,
+    FX_DOOR,
+    FX_FLYBY,
+    FX_EGRAB,
+    FX_GEXPLO,
+    FX_GUN,
+    FX_JETSND,
+    FX_LASER,
+    FX_MISSLE,
+    FX_SWEP,
+    FX_TURRET,
+    FX_WARNING,
+    FX_BOSS1,
+    FX_IJETSND,
+    FX_EJETSND,
+    FX_INTROHIT,
+    FX_INTROGUN,
+    FX_ENEMYSHOT,
+    FX_ENEMYLASER,
+    FX_ENEMYMISSLE,
+    FX_ENEMYPLASMA,
+    FX_SHIT,
+    FX_HIT,
+    FX_NOSHOOT,
+    FX_PULSE,
+    FX_LAST_SND
+};
+
 extern int music_volume;
 extern int fx_volume;
 extern int dig_flag;

@@ -311,12 +311,12 @@ void PTR_SetPic(texture_t *a1)
     {
         for (i = 0; i < 256; i++)
         {
-            cursorpic[i] = a1->f_14[i];
-            if ((uint8_t)a1->f_14[i] == 255)
+            cursorpic[i] = a1->charofs[i];
+            if ((uint8_t)a1->charofs[i] == 255)
             {
                 cursoroffsetx = i % 16;
                 cursoroffsety = i / 16;
-                cursorpic[i] = a1->f_14[i + 1];
+                cursorpic[i] = a1->charofs[i + 1];
             }
         }
         if (cursoroffsetx > 16)

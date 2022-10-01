@@ -2,27 +2,33 @@
 
 #include "objects.h"
 
+#define MAX_BONUS 12
+#define BONUS_WIDTH 16
+#define BONUS_HEIGHT 16
+
+#define MAX_MONEY ( MAX_BONUS - 3 )
+
 struct bonus_t {
-    bonus_t *f_0;
-    bonus_t *f_4;
-    int f_8;
-    int f_c;
-    int f_10;
-    int f_14;
-    int f_18;
-    int f_1c;
-    int f_20;
-    int f_24;
-    int f_28;
-    int f_2c;
-    int f_30;
-    int f_34;
-    int f_38;
-    objlib_t *f_3c;
+    bonus_t *prev;                    // LINK LIST PREV
+    bonus_t *next;                    // LINK LIST NEXT
+    int item;                         // GLB item
+    int curframe;                     // CURRENT ANIM FRAME
+    int curglow;                      // CURRENT GLOW FRAME
+    int x;                            // X POSITION
+    int y;                            // Y POSITION
+    int bx;                           // BONUS X POSITION
+    int by;                           // BONUS Y POSITION
+    int gx;                           // GLOW X POSITION
+    int gy;                           // GLOW Y POSITION
+    int pos;                          // POS IN CIRCLE
+    int dflag;                        // DONEFLAG
+    int countdown;                    // COUNTDOWN TO REMOVE
+    int type;                         // OBJECT TYPE 
+    objlib_t *lib;                    // POINTER TO OBJECT LIBRARY
 };
 
 void BONUS_Clear(void);
 void BONUS_Think(void);
 void BONUS_Display(void);
 void BONUS_Init(void);
-void BONUS_Add(int a1, int a2, int a3);
+void BONUS_Add(int type, int x, int y);

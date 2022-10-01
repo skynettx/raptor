@@ -272,79 +272,79 @@ void Rot_Color(char *a1, int a2, int a3)
 
 void InitMobj(mobj_t *m)
 {
-    m->trigger = 0;
-    m->dir_x = 1;
-    m->dir_y = 1;
-    m->max_x = m->dirX - m->x;
-    m->max_y = m->dirY - m->y;
-    if (m->max_x < 0)
+    m->done = 0;
+    m->addx = 1;
+    m->addy = 1;
+    m->delx = m->x2 - m->x;
+    m->dely = m->y2 - m->y;
+    if (m->delx < 0)
     {
-        m->max_x = -m->max_x;
-        m->dir_x = -m->dir_x;
+        m->delx = -m->delx;
+        m->addx = -m->addx;
     }
-    if (m->max_y < 0)
+    if (m->dely < 0)
     {
-        m->max_y = -m->max_y;
-        m->dir_y = -m->dir_y;
+        m->dely = -m->dely;
+        m->addy = -m->addy;
     }
-    if (m->max_x >= m->max_y)
+    if (m->delx >= m->dely)
     {
-        m->f_24 = -(m->max_y >> 1);
-        m->triggerDelay = m->max_x + 1;
+        m->err = -(m->dely >> 1);
+        m->maxloop = m->delx + 1;
     }
     else
     {
-        m->f_24 = m->max_x >> 1;
-        m->triggerDelay = m->max_y + 1;
+        m->err = m->delx >> 1;
+        m->maxloop = m->dely + 1;
     }
 }
 
 void MoveMobj(mobj_t *m)
 {
-    if (m->triggerDelay == 0)
+    if (m->maxloop == 0)
     {
-        m->trigger = 1;
+        m->done = 1;
         return;
     }
-    if (m->max_x >= m->max_y)
+    if (m->delx >= m->dely)
     {
-        m->x += m->dir_x;
-        m->f_24 += m->max_y;
-        if (m->f_24 > 0)
+        m->x += m->addx;
+        m->err += m->dely;
+        if (m->err > 0)
         {
-            m->y += m->dir_y;
-            m->f_24 -= m->max_x;
+            m->y += m->addy;
+            m->err -= m->delx;
         }
     }
     else
     {
-        m->y += m->dir_y;
-        m->f_24 += m->max_x;
-        if (m->f_24 > 0)
+        m->y += m->addy;
+        m->err += m->delx;
+        if (m->err > 0)
         {
-            m->x += m->dir_x;
-            m->f_24 -= m->max_y;
+            m->x += m->addx;
+            m->err -= m->dely;
         }
     }
-    m->triggerDelay--;
+    m->maxloop--;
 }
 
 int MoveSobj(mobj_t *m, int a2)
 {
     if (a2 == 0)
         return 0;
-    if (m->max_x >= m->max_y)
+    if (m->delx >= m->dely)
     {
         while (a2)
         {
             a2--;
-            m->triggerDelay--;
-            m->x += m->dir_x;
-            m->f_24 += m->max_y;
-            if (m->f_24 > 0)
+            m->maxloop--;
+            m->x += m->addx;
+            m->err += m->dely;
+            if (m->err > 0)
             {
-                m->y += m->dir_y;
-                m->f_24 -= m->max_x;
+                m->y += m->addy;
+                m->err -= m->delx;
             }
         }
     }
@@ -353,18 +353,18 @@ int MoveSobj(mobj_t *m, int a2)
         while (a2)
         {
             a2--;
-            m->triggerDelay--;
-            m->y += m->dir_y;
-            m->f_24 += m->max_x;
-            if (m->f_24 > 0)
+            m->maxloop--;
+            m->y += m->addy;
+            m->err += m->delx;
+            if (m->err > 0)
             {
-                m->x += m->dir_x;
-                m->f_24 -= m->max_y;
+                m->x += m->addx;
+                m->err -= m->dely;
             }
         }
     }
-    if (m->triggerDelay < 1)
-        m->trigger = 1;
+    if (m->maxloop < 1)
+        m->done = 1;
     return a2;
 }
 
@@ -503,23 +503,23 @@ void RAP_DisplayStats(void)
             if (damage)
             {
                 v2c = v34 = (texture_t*)GLB_GetItem(FILE111_WEPDEST_PIC);
-                GFX_PutSprite(v34, (320 - v2c->f_c) >> 1, 0xad);
+                GFX_PutSprite(v34, (320 - v2c->width) >> 1, 0xad);
             }
             if (startendwave == -1)
                 SND_Patch(22, 127);
             v2c = v34 = (texture_t*)GLB_GetItem(FILE110_SHLDLOW_PIC);
-            GFX_PutSprite(v34, (320 - v2c->f_c) >> 1, 0xb6);
+            GFX_PutSprite(v34, (320 - v2c->width) >> 1, 0xb6);
         }
     }
     g_oldshield = v20;
     OBJS_DisplayStats();
-    sprintf(v4c, "%08u", player.money);
+    sprintf(v4c, "%08u", player.score);
     RAP_PrintNum(0x77, 2, v4c);
     if (demo_mode == 1)
         DEMO_DisplayStats();
     if (debugflag)
     {
-        sprintf(v4c, "%02u", player.waveProgression[cur_game]);
+        sprintf(v4c, "%02u", player.diff[cur_game]);
         RAP_PrintNum(0x12, 2, v4c);
         v1c = 32;
         for (i = 0; i < 16; i++)
@@ -681,7 +681,7 @@ int Do_Game(void)
     if (demo_flag == 1)
         DEMO_StartRec();
 
-    v30 = player.money;
+    v30 = player.score;
     IMS_StartAck();
     memset(buttons, 0, sizeof(buttons));
     do
@@ -793,8 +793,8 @@ int Do_Game(void)
             OBJS_Use(1);
             OBJS_Use(2);
             buttons[0] = 0;
-            if (player.currentWeapon != -1)
-                OBJS_Use(player.currentWeapon);
+            if (player.sweapon != -1)
+                OBJS_Use(player.sweapon);
         }
         if (buttons[1])
         {
@@ -912,7 +912,7 @@ int Do_Game(void)
             OBJS_Add(16);
             OBJS_Add(16);
             OBJS_Add(16);
-            player.money = 0;
+            player.score = 0;
         }
         if (v28)
         {
@@ -950,7 +950,7 @@ int Do_Game(void)
                 RAP_ClearSides();
                 if (WIN_AskBool("Abort Mission ?"))
                 {
-                    player.money = v30;
+                    player.score = v30;
                     v2c = 1;
                     break;
                 }

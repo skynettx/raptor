@@ -3,12 +3,12 @@
 #include "rap.h"
 
 struct csprite_t {
-    int f_0;
-    int f_4;
-    int f_8;
-    int f_c;
-    int f_10;
-    int f_14;
+    int link;
+    int slib;
+    int x;
+    int y;
+    int game;
+    int level;
 };
 
 struct maptile_t {
@@ -19,7 +19,7 @@ struct maptile_t {
 typedef struct _map_t {
     int f_0;
     int f_4;
-    int f_8;
+    int numsprites;
     maptile_t f_c[1350];
 } map_t;
 
