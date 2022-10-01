@@ -1226,7 +1226,7 @@ void SWD_PutWin(int a1)
             wdlg.f_14 = vs->f_18;
             wdlg.f_18 = vs->f_1c;
             wdlg.f_0 = active_window;
-            wdlg.f_4 = active_field;
+            wdlg.field = active_field;
             winfuncs[a1](&wdlg);
         }
     }
@@ -1901,12 +1901,12 @@ void SWD_Dialog(wdlg_t *a1)
     }
     old_field = active_field;
     a1->f_0 = active_window;
-    a1->f_4 = active_field;
+    a1->field = active_field;
     a1->f_14 = vc->f_18;
     a1->f_18 = vc->f_1c;
-    a1->f_8 = cur_act;
-    a1->f_c = cur_cmd;
-    a1->f_10 = g_key;
+    a1->cur_act = cur_act;
+    a1->cur_cmd = cur_cmd;
+    a1->keypress = g_key;
     switch (cur_act)
     {
     case 1:

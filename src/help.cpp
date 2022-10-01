@@ -16,101 +16,137 @@ static int startitem;
 static int curpage;
 static int maxpages;
 
-void HELP_Init(void)
+/***************************************************************************
+HELP_Init() - inits the help stuff
+ ***************************************************************************/
+void 
+HELP_Init(
+    void
+)
 {
-    int v1c;
+    int enditem;
+    
     startitem = GLB_GetItemID("STARTHELP");
-    v1c = GLB_GetItemID("ENDHELP");
+    enditem = GLB_GetItemID("ENDHELP");
+    
     if (!reg_flag)
         startitem += 2;
-    maxpages = v1c - startitem - 1;
+    
+    maxpages = enditem - startitem - 1;
+    
     startitem++;
+    
     curpage = 0;
 }
 
-void HELP_Win(const char *a1)
+/***************************************************************************
+HELP_Win() - Displays the help window at the specified page
+ ***************************************************************************/
+void 
+HELP_Win(
+    const char *strpage        // INPUT : GLB string item
+)
 {
-    wdlg_t v84;
-    char v3c[20];
-    int v1c, v20, v24;
+    wdlg_t dlg;
+    char temp[20];
+    int update, item, window;
 
-    v1c = 1;
-    v20 = GLB_GetItemID(a1);
-    if (v20 == -1)
+    update = 1;
+    item = GLB_GetItemID(strpage);
+    
+    if (item == -1)
         EXIT_Error("HELP() - Invalid Page");
 
-    curpage = v20 - startitem;
+    curpage = item - startitem;
 
     KBD_Clear();
-    v24 = SWD_InitWindow(FILE138_HELP_SWD);
-    SND_Patch(12, 127);
+    window = SWD_InitWindow(FILE138_HELP_SWD);
+    
+    SND_Patch(FX_DOOR, 127);
+    
     while (1)
     {
-        if (v1c)
+        if (update)
         {
-            v1c = 0;
+            update = 0;
+            
             if (curpage >= 0)
                 curpage = curpage % maxpages;
             else
                 curpage += maxpages;
-            SWD_SetFieldItem(v24, 8, startitem + curpage);
-            sprintf(v3c, "PAGE : %02u", curpage + 1);
-            SWD_SetFieldText(v24, 9, v3c);
+            
+            SWD_SetFieldItem(window, HELP_TEXT, startitem + curpage);
+            
+            sprintf(temp, "PAGE : %02u", curpage + 1);
+            SWD_SetFieldText(window, HELP_HEADER, temp);
+            
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
         }
-        SWD_Dialog(&v84);
-        switch (v84.f_10)
+        
+        SWD_Dialog(&dlg);
+        
+        switch (dlg.keypress)
         {
-        case 0x47:
-            v1c = 1;
+        case SC_HOME:
+            update = 1;
             curpage = 0;
             break;
-        case 0x3b:
-            v1c = 1;
+        
+        case SC_F1:
+            update = 1;
             curpage = 1;
             break;
-        case 0x4f:
-            v1c = 1;
+        
+        case SC_END:
+            update = 1;
             curpage = maxpages - 1;
             break;
-        case 0x50:
-        case 0x51:
-        case 0x4d:
-            v1c = 1;
+        
+        case SC_DOWN:
+        case SC_RIGHT:
+        case SC_PAGEDN:
+            update = 1;
             curpage++;
             break;
-        case 0x48:
-        case 0x49:
-        case 0x4b:
-            v1c = 1;
+        
+        case SC_UP:
+        case SC_LEFT:
+        case SC_PAGEUP:
+            update = 1;
             curpage--;
             break;
         }
-        if ((KBD_IsKey(1)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))    //Fixed ptr input
+        
+        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))
             break;
-        if (keyboard[45] && keyboard[56])
+        
+        if (keyboard[SC_X] && keyboard[SC_ALT])
             WIN_AskExit();
 
-        if (v84.f_8 == 1 && v84.f_c == 10)
+        if (dlg.cur_act == S_FLD_COMMAND && dlg.cur_cmd == F_SELECT)
         {
-            switch (v84.f_4)
+            switch (dlg.field)
             {
-            case 7:
-                goto LAB_0002325c;
-            case 6:
-                v1c = 1;
+            case HELP_DONE:
+                goto func_exit;
+            
+            case HELP_DOWN:
+                update = 1;
                 curpage++;
                 break;
-            case 5:
-                v1c = 1;
+            
+            case HELP_UP:
+                update = 1;
                 curpage--;
                 break;
             }
         }
     }
-LAB_0002325c:
-    SWD_DestroyWindow(v24);
+
+func_exit:
+    
+    SWD_DestroyWindow(window);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
 }

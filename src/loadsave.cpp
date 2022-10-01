@@ -353,7 +353,7 @@ int RAP_LoadWin(void)
             if (XButton)                                                                                                                        //Input Erase Savestate
             {
                 JOY_IsKey(XButton);
-                vb0.f_10 = 0x53;
+                vb0.keypress = 0x53;
             }
         }
         if ((KBD_IsKey(1)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))                                      //Abort Load Window
@@ -412,31 +412,31 @@ int RAP_LoadWin(void)
             GFX_DisplayUpdate();
             SND_Patch(20, 127);
             }
-        switch (vb0.f_10)
+        switch (vb0.keypress)
         {
         case 0x50:
         case 0x51:
         case 0x4b:
-            vb0.f_8 = 1;
-            vb0.f_c = 10;
-            vb0.f_4 = 2;
+            vb0.cur_act = 1;
+            vb0.cur_cmd = 10;
+            vb0.field = 2;
             break;
         case 0x48:
         case 0x49:
         case 0x4d:
-            vb0.f_8 = 1;
-            vb0.f_c = 10;
-            vb0.f_4 = 3;
+            vb0.cur_act = 1;
+            vb0.cur_cmd = 10;
+            vb0.field = 3;
             break;
         case 0x53:
-            vb0.f_8 = 1;
-            vb0.f_c = 10;
-            vb0.f_4 = 4;
+            vb0.cur_act = 1;
+            vb0.cur_cmd = 10;
+            vb0.field = 4;
             break;
         }
-        if (vb0.f_8 == 1 && vb0.f_c == 10)
+        if (vb0.cur_act == 1 && vb0.cur_cmd == 10)
         {
-            switch (vb0.f_4)
+            switch (vb0.field)
             {
             case 2:
                 v20++;
