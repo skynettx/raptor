@@ -57,7 +57,7 @@ void WIN_WinGame(int a1)
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
     GFX_FadeIn(palette, 16);
-    IMS_WaitTimedSwd(30);
+    IMS_WaitTimed(30);
     SWD_DestroyWindow(v1c);
     GFX_DisplayUpdate();
 }
@@ -71,7 +71,7 @@ void WIN_Msg(const char *a1)
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
     SND_Patch(20, 127);
-    IMS_WaitTimedSwd(10);
+    IMS_WaitTimed(10);
     SWD_DestroyWindow(v1c);
     GFX_DisplayUpdate();
     KBD_Clear();
@@ -366,7 +366,7 @@ void WIN_Order(void)
         SWD_ShowAllWindows();
         GFX_DisplayUpdate();
         GFX_FadeIn(palette, 16);
-        IMS_WaitTimedSwd(15);
+        IMS_WaitTimed(15);
         GFX_FadeOut(0, 0, 0, 16);
         SWD_DestroyWindow(v1c);
         memset(displaybuffer, 0, 64000);
@@ -394,7 +394,7 @@ int WIN_Credits(void)
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
     GFX_FadeIn(palette, 16);
-    v1c = IMS_WaitTimedSwd(25);
+    v1c = IMS_WaitTimed(25);
     GFX_FadeOut(0, 0, 0, 16);
     SWD_DestroyWindow(v20);
     memset(displaybuffer, 0, 64000);

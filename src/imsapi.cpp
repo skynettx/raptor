@@ -6,9 +6,16 @@
 #include "kbdapi.h"
 #include "joyapi.h"
 
-void IMS_StartAck(void)
+/***************************************************************************
+IMS_StartAck () - Starts up checking for a happening
+ ***************************************************************************/
+void 
+IMS_StartAck(
+    void
+)
 {
     KBD_Clear();
+    
     mouse_b1_ack = 0;
     mouse_b2_ack = 0;
     mouse_b3_ack = 0;
@@ -16,67 +23,100 @@ void IMS_StartAck(void)
     joy_ack = 0;
 }
 
-int IMS_CheckAck(void)                                 //Check Input Activity
+/***************************************************************************
+IMS_CheckAck () - Tells if something has happend since last IMS_StartAck
+ ***************************************************************************/
+int 
+IMS_CheckAck(
+    void
+)                                 
 {
     I_GetEvent();
-    int va;
-    va = 0;
+    int rval;
+    rval = 0;
+    
     if (mouse_b1_ack)
-        va = 1;
+        rval = 1;
+    
     if (mouse_b2_ack)
-        va = 1;
+        rval = 1;
+    
     if (kbd_ack)
-        va = 1;
+        rval = 1;
+    
     if (joy_ack)
-        va = 1;
-    return va;
+        rval = 1;
+    
+    return rval;
 }
 
-int IMS_IsAck(void)
+/***************************************************************************
+IMS_IsAck() - Returns TRUE if ptr button or key pressed
+ ***************************************************************************/
+int 
+IMS_IsAck(
+    void
+)
 {
     I_GetEvent();
+    
     if (Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
     {
         return 1;
     }
+    
     if (lastscan)
     {
         lastscan = 0;
         return 1;
     }
+    
     if (mouseb1 || mouseb2 || mouseb3)
         return 1;
+    
     return 0;
 }
 
-int IMS_WaitTimedSwd(int a1)
+/***************************************************************************
+IMS_WaitTimed() - Wait for aprox secs
+ ***************************************************************************/
+int                        // RETURN: keypress (lastscan)
+IMS_WaitTimed(
+    int secs               // INPUT : seconds to wait
+)
 {
-    int i, v10, vb;
-    vb = 0;
+    int loop, hold, rval;
+    rval = 0;
     lastscan = 0;
+    
     IMS_StartAck();
-    while (a1 > 0)
+    
+    while (secs > 0)
     {
-        for (i = 0; i < 55; i++)
+        for (loop = 0; loop < 55; loop++)
         {
-            v10 = GFX_GetFrameCount();
-            while (GFX_GetFrameCount() == v10)
+            hold = GFX_GetFrameCount();
+            while (GFX_GetFrameCount() == hold)
             {
             }
+            
             if (IMS_CheckAck())
             {
-                vb = 1;
-                goto _LABEL1;
+                rval = 1;
+                goto end_func;
             }
         }
-        a1--;
+        secs--;
     }
-_LABEL1:
-    i = 100;
+
+end_func:
+    loop = 100;
     while (IMS_IsAck())
     {
-        i--;
+        loop--;
     }
+    
     IMS_StartAck();
-    return vb;
+    
+    return rval;
 }

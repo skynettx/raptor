@@ -19,9 +19,6 @@
 #define PATH_MAX MAX_PATH
 #endif
 
-
-
-
 char demo_name[PATH_MAX];
 int cur_play;
 

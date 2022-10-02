@@ -155,8 +155,8 @@ void Harrold(int a1)
     SWD_SetFieldItem(window, 7, a1);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
-    IMS_WaitTimedSwd(10);
-    IMS_WaitTimedSwd(10);
+    IMS_WaitTimed(10);
+    IMS_WaitTimed(10);
     SWD_SetFieldItem(window, 7, -1);
     SWD_SetFieldItem(window, 2, v1c);
     SWD_SetFieldItem(window, 3, v20);
