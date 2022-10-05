@@ -11,6 +11,9 @@
 #include "i_video.h"
 #include "joyapi.h"
 
+#define MAX_ADDX 10
+#define MAX_ADDY 8
+
 int control = 1;
 int haptic;
 int joy_ipt_MenuNew;
@@ -35,44 +38,65 @@ int g_addx, g_addy;
 int ipt_start;
 int control_pause;
 
-void IPT_GetButtons(void)
+/*------------------------------------------------------------------------
+   IPT_GetButtons () - Reads in Joystick and Keyboard game buttons
+  ------------------------------------------------------------------------*/
+void 
+IPT_GetButtons(
+    void
+)
 {
     static int lasttick;
     int now = SDL_GetTicks();
+    
     if (now - lasttick < 1000 / 26)
         return;
+    
     lasttick += 1000 / 26;
+    
     if (!ipt_start)
         return;
 
 #if 0
-    int v1c;
-    if (control == 2)
+    int num;
+    
+    if (control == I_JOYSTICK)
     {
-        v1c = inp(0x2);
-        v1c >>= 4;
-        if ((v1c & 1) == 0)
+        num = inp(0x2);
+        
+        num >>= 4;
+        
+        if ((num & 1) == 0)
             buttons[j_lookup[0]] = 1;
-        if ((v1c & 2) == 0)
+        if ((num & 2) == 0)
             buttons[j_lookup[1]] = 1;
-        if ((v1c & 4) == 0)
+        if ((num & 4) == 0)
             buttons[j_lookup[2]] = 1;
-        if ((v1c & 8) == 0)
+        if ((num & 8) == 0)
             buttons[j_lookup[3]] = 1;
     }
 #endif
     
     if (keyboard[k_Fire])
         buttons[0] = 1;
+    
     if (keyboard[k_FireSp])
         buttons[1] = 1;
+    
     if (keyboard[k_ChangeSp])
         buttons[2] = 1;
+    
     if (keyboard[k_Mega])
         buttons[3] = 1;
 }
 
-void IPT_GetJoyStick(void)
+/*------------------------------------------------------------------------
+IPT_GetJoyStick()
+  ------------------------------------------------------------------------*/
+void 
+IPT_GetJoyStick(
+    void
+)
 {
     //Get Button
     
@@ -87,6 +111,7 @@ void IPT_GetJoyStick(void)
         if (AButtonconvert == j_lookup[3])                        //Mega
             buttons[3] = 1;
     }
+    
     if (BButton)
     {
         if (BButtonconvert == j_lookup[0])                        //Fire
@@ -98,6 +123,7 @@ void IPT_GetJoyStick(void)
         if (BButtonconvert == j_lookup[3])                        //Mega
             buttons[3] = 1;
     }
+    
     if (XButton)
     {
         if (XButtonconvert == j_lookup[0])                        //Fire
@@ -109,6 +135,7 @@ void IPT_GetJoyStick(void)
         if (XButtonconvert == j_lookup[3])                        //Mega
             buttons[3] = 1;
     }
+    
     if (YButton)
     {
         if (YButtonconvert == j_lookup[0])                        //Fire
@@ -120,6 +147,7 @@ void IPT_GetJoyStick(void)
         if (YButtonconvert == j_lookup[3])                        //Mega
             buttons[3] = 1;
     }
+    
     if (TriggerRight > 0)                                         //Fire
         buttons[0] = 1;
     if (TriggerLeft > 0)                                          //Fire Special
@@ -136,37 +164,38 @@ void IPT_GetJoyStick(void)
         if (g_addx >= 0)
             g_addx = -1;
         g_addx--;
-        if (-g_addx > 10)
-            g_addx = -10;
+        if (-g_addx > MAX_ADDX)
+            g_addx = -MAX_ADDX;
     }
     else if (Right)
     {
              if (g_addx <= 0)
                  g_addx = 1;
              g_addx++;
-             if (g_addx > 10)
-                 g_addx = 10;
+             if (g_addx > MAX_ADDX)
+                 g_addx = MAX_ADDX;
     }
     else
     {
         if (g_addx)
             g_addx /= 2;
     }
+    
     if (Up)
     {
         if (g_addy >= 0)
             g_addy = -1;
         g_addy--;
-        if (-g_addy > 8)
-            g_addy = -8;
+        if (-g_addy > MAX_ADDY)
+            g_addy = -MAX_ADDY;
     }
     else if (Down)
     {
              if (g_addy <= 0)
                  g_addy = 1;
              g_addy++;
-             if (g_addy > 8)
-                 g_addy = 8;
+             if (g_addy > MAX_ADDY)
+                 g_addy = MAX_ADDY;
     }
     else
     {
@@ -180,29 +209,36 @@ void IPT_GetJoyStick(void)
     {
         if (StickX > 0)
             StickX *= 2;
-        if (StickX > 10)
-            StickX = 10;
+        if (StickX > MAX_ADDX)
+            StickX = MAX_ADDX;
         if (StickX < 0)
             StickX *= 2;
-        if (StickX < -10)
-            StickX = -10;
+        if (StickX < -MAX_ADDX)
+            StickX = -MAX_ADDX;
         g_addx = StickX;
     }
+    
     if (StickY != 0)
     {
         if (StickY > 0)
             StickY *= 2;
-        if (StickY > 8)
-            StickY = 8;
+        if (StickY > MAX_ADDY)
+            StickY = MAX_ADDY;
         if (StickY < 0)
             StickY *= 2;
-        if (StickY < -8)
-            StickY = -8;
+        if (StickY < -MAX_ADDY)
+            StickY = -MAX_ADDY;
         g_addy = StickY;
     }
 }
 
-void IPT_GetKeyBoard(void)
+/*------------------------------------------------------------------------
+IPT_GetKeyBoard (
+  ------------------------------------------------------------------------*/
+void 
+IPT_GetKeyBoard(
+    void
+)
 {
     if (keyboard[k_Left] || keyboard[k_Right])
     {
@@ -211,16 +247,16 @@ void IPT_GetKeyBoard(void)
             if (g_addx >= 0)
                 g_addx = -1;
             g_addx--;
-            if (-g_addx > 10)
-                g_addx = -10;
+            if (-g_addx > MAX_ADDX)
+                g_addx = -MAX_ADDX;
         }
         else if (keyboard[k_Right])
         {
             if (g_addx <= 0)
                 g_addx = 1;
             g_addx++;
-            if (g_addx > 10)
-                g_addx = 10;
+            if (g_addx > MAX_ADDX)
+                g_addx = MAX_ADDX;
         }
     }
     else
@@ -228,6 +264,7 @@ void IPT_GetKeyBoard(void)
         if (g_addx)
             g_addx /= 2;
     }
+    
     if (keyboard[k_Up] || keyboard[k_Down])
     {
         if (keyboard[k_Up])
@@ -235,16 +272,16 @@ void IPT_GetKeyBoard(void)
             if (g_addy >= 0)
                 g_addy = -1;
             g_addy--;
-            if (-g_addy > 8)
-                g_addy = -8;
+            if (-g_addy > MAX_ADDY)
+                g_addy = -MAX_ADDY;
         }
         else if (keyboard[k_Down])
         {
             if (g_addy <= 0)
                 g_addy = 1;
             g_addy++;
-            if (g_addy > 8)
-                g_addy = 8;
+            if (g_addy > MAX_ADDY)
+                g_addy = MAX_ADDY;
         }
     }
     else
@@ -254,18 +291,29 @@ void IPT_GetKeyBoard(void)
     }
 }
 
-void IPT_GetMouse(void)
+/*------------------------------------------------------------------------
+IPT_GetMouse (
+  ------------------------------------------------------------------------*/
+void 
+IPT_GetMouse(
+    void
+)
 {
-    int v1c, v20, v24, v28;
-    v1c = playerx + 16;
-    v20 = playery + 16;
-    v24 = cur_mx;
-    v28 = cur_my;
-    xm = v24 - v1c;
-    ym = v28 - v20;
+    int plx, ply, ptrx, ptry;
+    
+    plx = playerx + (PLAYERWIDTH / 2);
+    ply = playery + (PLAYERHEIGHT / 2);
+    
+    ptrx = cur_mx;
+    ptry = cur_my;
+    
+    xm = ptrx - plx;
+    ym = ptry - ply;
+    
     if (xm)
     {
         xm >>= 3;
+        
         if (!xm)
             xm = 1;
         else if (xm > 10)
@@ -273,9 +321,11 @@ void IPT_GetMouse(void)
         else if (xm < -10)
             xm = -10;
     }
+    
     if (ym)
     {
         ym >>= 3;
+        
         if (!ym)
             ym = 1;
         else if (ym > 10)
@@ -283,22 +333,38 @@ void IPT_GetMouse(void)
         else if (ym < -10)
             ym = -10;
     }
+    
     g_addx = xm;
     g_addy = ym;
+    
     if (mouseb1)
         buttons[m_lookup[0]] = 1;
+    
     if (mouseb2)
         buttons[m_lookup[1]] = 1;
+    
     if (mouseb3)
         buttons[m_lookup[2]] = 1;
 }
 
-bool IPT_MouseGrab(void)
+/*------------------------------------------------------------------------
+IPT_MouseGrab (
+  ------------------------------------------------------------------------*/
+bool 
+IPT_MouseGrab(
+    void
+)
 {
     return ipt_start;
 }
 
-void IPT_Init(void)
+/***************************************************************************
+IPT_Init () - Initializes INPUT system
+ ***************************************************************************/
+void 
+IPT_Init(
+    void
+)
 {
     
     I_SetGrabMouseCallback(IPT_MouseGrab);
@@ -306,12 +372,24 @@ void IPT_Init(void)
     IPT_CalJoy();
 }
 
-void IPT_DeInit(void)
+/***************************************************************************
+IPT_DeInit() - Freeze up resources used by INPUT system
+ ***************************************************************************/
+void 
+IPT_DeInit(
+    void
+)
 {
     // TSM_DelService(ipt_tsm);
 }
 
-void IPT_Start(void)
+/***************************************************************************
+IPT_Start() - Tranfers control from PTRAPI stuff to IPT stuff
+ ***************************************************************************/
+void 
+IPT_Start(
+    void
+)
 {
     PTR_DrawCursor(0);
     PTR_Pause(1);
@@ -319,7 +397,13 @@ void IPT_Start(void)
     // TSM_ResumeService(ipt_tsm);
 }
 
-void IPT_End(void)
+/***************************************************************************
+IPT_End() - Tranfers control from IPT stuff to PTR stuff
+ ***************************************************************************/
+void 
+IPT_End(
+    void
+)
 {
     ipt_start = 0;
     // TSM_PauseService(ipt_tsm);
@@ -327,65 +411,81 @@ void IPT_End(void)
     PTR_DrawCursor(0);
 }
 
-void IPT_MovePlayer(void)
+/***************************************************************************
+IPT_MovePlayer() - Perform player movement for current input device
+ ***************************************************************************/
+void 
+IPT_MovePlayer(
+    void
+)
 {
-    static int oldx = 144;
-    int v1c;
-    if (demo_mode == 2)
+    static int oldx = PLAYERINITX;
+    int delta;
+    
+    if (demo_mode == DEMO_PLAYBACK)
         return;
+    
     if (!control_pause)
     {
         switch (control)
         {
-        case 0:
+        case I_KEYBOARD:
         default:
             IPT_GetKeyBoard();
             break;
-        case 2:
+        
+        case I_JOYSTICK:
             IPT_GetJoyStick();
             break;
-        case 1:
+
+        case I_MOUSE:
             IPT_GetMouse();
             break;
         }
     }
+    
     playerx += g_addx;
     playery += g_addy;
+    
     if (startendwave == -1)
     {
-        if (playery < 0)
+        if (playery < MINPLAYERY)
         {
-            playery = 0;
+            playery = MINPLAYERY;
             g_addy = 0;
         }
-        else if (playery > 160)
+        else if (playery > MAXPLAYERY)
         {
-            playery = 160;
+            playery = MAXPLAYERY;
             g_addy = 0;
         }
-        if (playerx < 5)
+        
+        if (playerx < PLAYERMINX)
         {
-            playerx = 5;
+            playerx = PLAYERMINX;
             g_addx = 0;
         }
-        else if (playerx + 32 > 314)
+        else if (playerx + PLAYERWIDTH > PLAYERMAXX)
         {
-            playerx = 314 - 32;
+            playerx = PLAYERMAXX - PLAYERWIDTH;
             g_addx = 0;
         }
     }
-    v1c = abs(playerx - oldx);
-    v1c >>= 2;
-    if (v1c > 3)
-        v1c = 3;
+    
+    delta = abs(playerx - oldx);
+    delta >>= 2;
+    
+    if (delta > 3)
+        delta = 3;
+    
     if (playerx < oldx)
     {
-        if (playerbasepic + v1c > playerpic)
+        if (playerbasepic + delta > playerpic)
             playerpic++;
     }
     else if (playerx > oldx)
     {
-        if (playerbasepic - v1c < playerpic)
+        if (playerbasepic - delta < playerpic)
             playerpic--;
     }
     else
@@ -395,40 +495,65 @@ void IPT_MovePlayer(void)
         else if (playerpic < playerbasepic)
             playerpic++;
     }
+    
     oldx = playerx;
-    player_cx = playerx + 16;
-    player_cy = playery + 16;
+    
+    player_cx = playerx + (PLAYERWIDTH / 2);
+    player_cy = playery + (PLAYERHEIGHT / 2);
 }
 
-void IPT_PauseControl(int a1)
+/***************************************************************************
+IPT_PauseControl() - Lets routines run without letting user control anyting
+ ***************************************************************************/
+void 
+IPT_PauseControl(
+    int flag
+)
 {
-    control_pause = a1;
+    control_pause = flag;
 }
 
-void IPT_FMovePlayer(int a1, int a2)
+/***************************************************************************
+IPT_FMovePlayer() - Forces player to move addx/addy
+ ***************************************************************************/
+void 
+IPT_FMovePlayer(
+    int addx,              // INPUT : add to x pos
+    int addy               // INPUT : add to y pos
+)
 {
-    g_addx = a1;
-    g_addy = a2;
+    g_addx = addx;
+    g_addy = addy;
+    
     IPT_MovePlayer();
 }
 
-void IPT_LoadPrefs(void)
+/***************************************************************************
+IPT_LoadPrefs() - Load Input Prefs from setup.ini
+ ***************************************************************************/
+void 
+IPT_LoadPrefs(
+    void
+)
 {
     opt_detail = INI_GetPreferenceLong("Setup", "Detail", 1);
     control = INI_GetPreferenceLong("Setup", "Control", 0);
     haptic = INI_GetPreferenceLong("Setup", "Haptic", 1);
     joy_ipt_MenuNew = INI_GetPreferenceLong("Setup", "joy_ipt_MenuNew", 0);
-    k_Up = INI_GetPreferenceLong("Keyboard", "MoveUp", 0x48);
-    k_Down = INI_GetPreferenceLong("Keyboard", "MoveDn", 0x50);
-    k_Left = INI_GetPreferenceLong("Keyboard", "MoveLeft", 0x4b);
-    k_Right = INI_GetPreferenceLong("Keyboard", "MoveRight", 0x4d);
-    k_Fire = INI_GetPreferenceLong("Keyboard", "Fire", 0x1d);
-    k_FireSp = INI_GetPreferenceLong("Keyboard", "FireSp", 0x38);
-    k_ChangeSp = INI_GetPreferenceLong("Keyboard", "ChangeSp", 0x39);
-    k_Mega = INI_GetPreferenceLong("Keyboard", "MegaFire", 0x36);
+    
+    k_Up = INI_GetPreferenceLong("Keyboard", "MoveUp", SC_UP);
+    k_Down = INI_GetPreferenceLong("Keyboard", "MoveDn", SC_DOWN);
+    k_Left = INI_GetPreferenceLong("Keyboard", "MoveLeft", SC_LEFT);
+    k_Right = INI_GetPreferenceLong("Keyboard", "MoveRight", SC_RIGHT);
+    k_Fire = INI_GetPreferenceLong("Keyboard", "Fire", SC_CTRL);
+    k_FireSp = INI_GetPreferenceLong("Keyboard", "FireSp", SC_ALT);
+    k_ChangeSp = INI_GetPreferenceLong("Keyboard", "ChangeSp", SC_SPACE);
+    k_Mega = INI_GetPreferenceLong("Keyboard", "MegaFire", SC_RIGHT_SHIFT);
+    
     m_lookup[0] = INI_GetPreferenceLong("Mouse", "Fire", 0);
     m_lookup[1] = INI_GetPreferenceLong("Mouse", "FireSp", 1);
     m_lookup[2] = INI_GetPreferenceLong("Mouse", "ChangeSp", 2);
+    
     j_lookup[0] = INI_GetPreferenceLong("JoyStick", "Fire", 0);
     j_lookup[1] = INI_GetPreferenceLong("JoyStick", "FireSp", 1);
     j_lookup[2] = INI_GetPreferenceLong("JoyStick", "ChangeSp", 2);
