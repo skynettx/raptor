@@ -39,22 +39,22 @@ int MOVIE_Play(movie_t *a1, int a2, char *a3)
     while (1)
     {
         I_GetEvent();
-        v1c = (char *)GLB_GetItem(v24->f_c);
+        v1c = (char *)GLB_GetItem(v24->item);
         if (v18)
         {
             v14 = v1c[0];
             memset(displaybuffer, v14, 64000);
             v1c++;
         }
-        switch (v24->f_10)
+        switch (v24->startf)
         {
         case 0:
         default:
             MOVIE_ShowFrame((movanim_t*)v1c);
-            GFX_WaitUpdate(v24->f_4);
+            GFX_WaitUpdate(v24->framerate);
             break;
         case 2:
-            GFX_FadeOut(v24->f_20, v24->f_24, v24->f_28, v24->f_14);
+            GFX_FadeOut(v24->red, v24->green, v24->blue, v24->startsteps);
             [[fallthrough]];
         case 4:
             memset(displaybuffer, 0, 64000);
@@ -68,13 +68,13 @@ int MOVIE_Play(movie_t *a1, int a2, char *a3)
                 v18 = 0;
             }
             MOVIE_ShowFrame((movanim_t*)v1c);
-            GFX_WaitUpdate(v24->f_4);
-            GFX_FadeIn(a3, v24->f_14);
+            GFX_WaitUpdate(v24->framerate);
+            GFX_FadeIn(a3, v24->startsteps);
             break;
         }
-        if (v24->f_2c)
+        if (v24->holdframe)
         {
-            for (i = 0; i < v24->f_2c; i++)
+            for (i = 0; i < v24->holdframe; i++)
             {
                 v28 = GFX_GetFrameCount();
                 while (GFX_GetFrameCount() == v28)
@@ -92,11 +92,11 @@ int MOVIE_Play(movie_t *a1, int a2, char *a3)
                     SND_Patch(back_patch, 127);
             }
         }
-        if (v24->f_3c != -1)
+        if (v24->soundfx != -1)
         {
-            SND_Patch(v24->f_3c, v24->f_44);
+            SND_Patch(v24->soundfx, v24->fx_xpos);
         }
-        switch (v24->f_18)
+        switch (v24->endf)
         {
         case 4:
             memset(displaybuffer, 0, 64000);
@@ -104,17 +104,17 @@ int MOVIE_Play(movie_t *a1, int a2, char *a3)
             GFX_DisplayUpdate();
             break;
         case 2:
-            GFX_FadeOut(v24->f_20, v24->f_24, v24->f_28, v24->f_1c);
+            GFX_FadeOut(v24->red, v24->green, v24->blue, v24->endsteps);
             break;
         case 1:
-            GFX_FadeIn(a3, v24->f_14);
+            GFX_FadeIn(a3, v24->startsteps);
             break;
         case 3:
             GFX_SetPalette(a3, 0);
             break;
         }
-        GLB_FreeItem(v24->f_c);
-        if (!v24->f_8)
+        GLB_FreeItem(v24->item);
+        if (!v24->numframes)
         {
             if (--a2)
             {
