@@ -217,7 +217,7 @@ INTRO_Explosion(
     cur->green = 28;
     cur->blue = 3;
     cur->endsteps = 60;
-    //cur++;
+    cur++;
 
     if (MOVIE_Play(frm, 1, palette) == K_SKIPALL)
         return 1;
@@ -389,7 +389,7 @@ INTRO_Landing(
         cur++;
     }
     
-    cur = frm;
+    cur--;
     cur->startf = M_FADEOUT;
     cur->startsteps = 64;
     cur->endf = M_PALETTE;
@@ -756,7 +756,7 @@ INTRO_Taiwan(
     pic1 = (texture_t*)GLB_GetItem(FILE12f_TAIWARN_PIC);
     pal1 = GLB_GetItem(FILE130_TAIPAL_DAT);
     
-    //GFX_FadeOut(0, 0, 0, 5);
+    GFX_FadeOut(0, 0, 0, 5);
 
     GFX_PutImage(pic1, 0, 0, 0);
     GFX_DisplayUpdate();
