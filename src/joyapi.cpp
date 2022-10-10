@@ -113,7 +113,7 @@ I_HandleJoystickEvent(
 			StickY = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY) / 8000;
 			TriggerLeft = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERLEFT) / 8000;
 			TriggerRight = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / 8000;
-	    }
+		}
 		
 		if (sdlevent->type == SDL_CONTROLLERBUTTONUP) 
 			joy_ack = 0;
@@ -169,7 +169,7 @@ GetJoyButtonMapping(
 }
 
 /***************************************************************************
-IPT_CalJoyRumbleLow() - Gamecontroller rumbles slightly
+IPT_CalJoyRumbleLow() - Gamecontroller rumbles low
  ***************************************************************************/
 void 
 IPT_CalJoyRumbleLow(
@@ -181,8 +181,8 @@ IPT_CalJoyRumbleLow(
 		++ControllerIndex)
 	{
 		if (ControllerHandles[ControllerIndex])
-            SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0x3fff, 0x3fff, 1000);
-    }
+			SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0x3fff, 0x3fff, 1000);
+	}
 }
 
 /***************************************************************************
@@ -215,8 +215,8 @@ IPT_CalJoyRumbleHigh(
 		++ControllerIndex)
 	{
 		if (ControllerHandles[ControllerIndex])
-		    SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0xbffd, 0xbffd, 1000);
-    }
+			SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0xbffd, 0xbffd, 1000);
+	}
 }
 
 /***************************************************************************
