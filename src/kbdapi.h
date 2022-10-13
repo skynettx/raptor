@@ -97,8 +97,13 @@ extern int lastascii;
 extern int kbd_ack;
 extern int capslock;
 
+#define KBD_Key(c) keyboard[c]
+#define KBD_ISCAPS (capslock+keyboard[SC_LEFT_SHIFT]+keyboard[SC_RIGHT_SHIFT])
+#define KBD_LASTSCAN  lastscan
+#define KBD_LASTASCII lastascii
+
 void KBD_Clear(void);
 void KBD_Install(void);
 void KBD_End(void);
-int KBD_IsKey(int a1);
-void KBD_Wait(int a1);
+int KBD_IsKey(int scancode);
+void KBD_Wait(int scancode);
