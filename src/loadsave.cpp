@@ -46,7 +46,7 @@ int map_item = -1;
 int curplr_diff = 2;
 
 static const char *fmt = "CHAR%04u.FIL";
-static const char *cdfmt = "CHAR%04u.FIL";
+static const char* cdfmt = "%s\\CHAR%04u.FIL";
 
 map_t *mapmem;
 csprite_t *csprite;
@@ -399,16 +399,18 @@ RAP_LoadMap(
     ml = GLB_LockItem(map_item);
     
     mapmem = (map_t*)ml;
-    csprite = (csprite_t*)(ml + 0x1524);
-    
+    csprite = (csprite_t*)(ml + sizeof(map_t));
+
     ENEMY_LoadLib();
     SND_CacheGFX();
     BONUS_Init();
     WIN_SetLoadLevel(20);
     OBJS_CachePics();
-    WIN_SetLoadLevel(0x3c);
+    WIN_SetLoadLevel(40);
+    ANIMS_CachePics();
+    WIN_SetLoadLevel(60);
     ENEMY_LoadSprites();
-    WIN_SetLoadLevel(0x50);
+    WIN_SetLoadLevel(80);
     TILE_CacheLevel();
     WIN_SetLoadLevel(100);
     WIN_EndLoad();
@@ -491,14 +493,14 @@ RAP_LoadWin(
         
         if (joy_ipt_MenuNew)
         {
-            if (XButton)                                                                                                                        //Input Erase Savestate
+            if (XButton)                                                                                                                        
             {
                 JOY_IsKey(XButton);
-                dlg.keypress = 0x53;
+                dlg.keypress = SC_DELETE;
             }
         }
         
-        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))                                      //Abort Load Window
+        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))                                      
         {
             rval = 0;
             goto load_exit;
@@ -586,6 +588,12 @@ RAP_LoadWin(
             dlg.cur_act = S_FLD_COMMAND;
             dlg.cur_cmd = F_SELECT;
             dlg.field = LOAD_DEL;
+            break;
+
+        case SC_ENTER:
+            dlg.cur_act = S_FLD_COMMAND;
+            dlg.cur_cmd = F_SELECT;
+            dlg.field = LOAD_LOAD;
             break;
         }
         
