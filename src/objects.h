@@ -61,7 +61,7 @@ struct objlib_t {
 
 struct object_t {
     object_t* f_0;
-    object_t* f_4;
+    object_t* next;                       // LINK LIST NEXT
     int f_8;
     int f_c;
     objlib_t *f_10;
