@@ -52,6 +52,6 @@ struct movie_t {
     int fx_xpos;               // SOUND FX XPOS
 };
 
-void ANIM_Render(movanim_t *a1);
-void MOVIE_BPatch(int a1);
-int MOVIE_Play(movie_t *a1, int a2, char *a3);
+void ANIM_Render(movanim_t *inmem);
+void MOVIE_BPatch(int soundfx);
+int MOVIE_Play(movie_t *frame, int numplay, char *palette);
