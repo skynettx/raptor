@@ -169,20 +169,20 @@ void TILE_CacheLevel(void)
     memset(tdead, 0, sizeof(tdead));
     for (i = 0; i < 1350; i++)
     {
-        v1c = mapmem->f_c[i].f_2;
+        v1c = mapmem->map[i].fgame;
         v20 = flatlib[v1c];
-        money[i] = v20[mapmem->f_c[i].f_0].f_6;
+        money[i] = v20[mapmem->map[i].flats].f_6;
         v24 = startflat[v1c];
-        v24 += mapmem->f_c[i].f_0;
+        v24 += mapmem->map[i].flats;
         titems[i] = v24;
         GLB_CacheItem(v24);
         v24 = startflat[v1c];
-        v24 += v20[mapmem->f_c[i].f_0].f_0;
+        v24 += v20[mapmem->map[i].flats].f_0;
         eitems[i] = v24;
         if (eitems[i] != titems[i])
             GLB_CacheItem(v24);
         if (eitems[i] != titems[i])
-            hits[i] = v20[mapmem->f_c[i].f_0].f_4;
+            hits[i] = v20[mapmem->map[i].flats].f_4;
         else
             hits[i] = 1;
     }

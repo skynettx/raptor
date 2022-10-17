@@ -34,269 +34,395 @@
 #define PATH_MAX MAX_PATH
 #endif
 
-char g_data_path[PATH_MAX];
-char g_setup_path[PATH_MAX];
+#define MAX_SAVE  10
 
-int hasdatapath = 0;
+char cdpath[PATH_MAX];
+char g_setup_ini[PATH_MAX];
+
+int cdflag = 0;
 
 int filepos = -1;
 int map_item = -1;
 int curplr_diff = 2;
 
 static const char *fmt = "CHAR%04u.FIL";
-static const char *fmt2 = "CHAR%04u.FIL";
+static const char* cdfmt = "%s\\CHAR%04u.FIL";
 
 map_t *mapmem;
 csprite_t *csprite;
 char *ml;
 
-void RAP_SetPlayerDiff(void)
+/***************************************************************************
+RAP_SetPlayerDiff () - Set Player Difficulty
+ ***************************************************************************/
+void 
+RAP_SetPlayerDiff(
+    void
+)
 {
     cur_diff = 0;
+    
     curplr_diff = player.diff[cur_game];
+    
     switch (curplr_diff)
     {
-    case 0:
-        cur_diff |= 8;
+    case DIFF_0:
+        cur_diff |= EB_EASY_LEVEL;
         break;
-    case 1:
-        cur_diff |= 8;
+    
+    case DIFF_1:
+        cur_diff |= EB_EASY_LEVEL;
         break;
     default:
-    case 2:
-        cur_diff |= 8;
-        cur_diff |= 16;
+    case DIFF_2:
+        cur_diff |= EB_EASY_LEVEL;
+        cur_diff |= EB_MED_LEVEL;
         break;
-    case 3:
-        cur_diff |= 8;
-        cur_diff |= 16;
-        cur_diff |= 32;
+    
+    case DIFF_3:
+        cur_diff |= EB_EASY_LEVEL;
+        cur_diff |= EB_MED_LEVEL;
+        cur_diff |= EB_HARD_LEVEL;
         break;
     }
 }
 
-void RAP_ClearPlayer(void)
+/***************************************************************************
+RAP_ClearPlayer () - Clear Player stuff
+ ***************************************************************************/
+void 
+RAP_ClearPlayer(
+    void
+)
 {
     OBJS_Clear();
     filepos = -1;
     memset(&player, 0, sizeof(player));
     player.sweapon = -1;
-    player.diff[0] = 2;
-    player.diff[1] = 2;
-    player.diff[2] = 2;
-    player.diff[3] = 2;
+    player.diff[0] = DIFF_2;
+    player.diff[1] = DIFF_2;
+    player.diff[2] = DIFF_2;
+    player.diff[3] = DIFF_2;
     player.fintrain = 0;
     cur_game = 0;
     memset(game_wave, 0, sizeof(game_wave));
 }
 
-int RAP_IsPlayer(void)
+/***************************************************************************
+RAP_IsPlayer () - Returns TRUE if a player is defined
+ ***************************************************************************/
+int 
+RAP_IsPlayer(
+    void
+)
 {
     if (filepos != -1)
         return 1;
+    
     return 0;
 }
 
-int RAP_AreSavedFiles(void)
+/***************************************************************************
+RAP_AreSavedFiles() - Returns TRUE if thier are previously saved game files
+ ***************************************************************************/
+int 
+RAP_AreSavedFiles(
+    void
+)
 {
-    char v4c[PATH_MAX];
-    int v1c;
-    for (v1c = 0; v1c < 10; v1c++)
+    char temp[PATH_MAX];
+    int loop;
+    
+    for (loop = 0; loop < MAX_SAVE; loop++)
     {
-        if (hasdatapath)
-            sprintf(v4c, fmt2, g_data_path, v1c);
+        if (cdflag)
+            sprintf(temp, cdfmt, cdpath, loop);
         else
-            sprintf(v4c, fmt, v1c);
-        if (!access(v4c, 0))
+            sprintf(temp, fmt, loop);
+        
+        if (!access(temp, 0))
             return 1;
     }
+    
     return 0;
 }
 
-int RAP_ReadFile(const char *a1, void *a2, int a3)
+/***************************************************************************
+RAP_ReadFile() - Reads file into buffer for sizerec and DECRYTES
+ ***************************************************************************/
+int                                 // RETURN: size of record
+RAP_ReadFile(
+    const char *name,               // INPUT : filename
+    void *buffer,                   // OUTPUT: pointer to buffer
+    int sizerec                     // INPUT : number of bytes to read
+)
 {
-    FILE *v14;
-    v14 = fopen(a1, "rb");
-    if (!v14)
+    FILE *handle;
+    handle = fopen(name, "rb");
+    
+    if (!handle)
     {
         WIN_Msg("File open Error");
         return 0;
     }
-    fread(a2, 1, a3, v14);
-    GLB_DeCrypt(gdmodestr, a2, a3);
-    fclose(v14);
-    return a3;
+    
+    fread(buffer, 1, sizerec, handle);
+    
+    GLB_DeCrypt(gdmodestr, buffer, sizerec);
+    
+    fclose(handle);
+    
+    return sizerec;
 }
 
-int RAP_FFSaveFile(void)
+/***************************************************************************
+RAP_FFSaveFile() - Finds a filename to use
+ ***************************************************************************/
+int 
+RAP_FFSaveFile(
+    void
+)
 {
-    char v50[PATH_MAX];
-    int v1c, v20;
-    v1c = 0;
+    char temp[PATH_MAX];
+    int rval, loop;
+    rval = 0;
+    
     filepos = -1;
-    for (v20 = 0; v20 < 10; v20++)
+    
+    for (loop = 0; loop < MAX_SAVE; loop++)
     {
-        if (hasdatapath)
-            sprintf(v50, fmt2, g_data_path, v20);
+        if (cdflag)
+            sprintf(temp, cdfmt, cdpath, loop);
         else
-            sprintf(v50, fmt, v20);
-        if (access(v50, 0) != 0)
+            sprintf(temp, fmt, loop);
+        
+        if (access(temp, 0) != 0)
         {
             RAP_ClearPlayer();
-            filepos = v20;
-            v1c = 1;
+            filepos = loop;
+            rval = 1;
             break;
         }
     }
-    return v1c;
+    
+    return rval;
 }
 
-int RAP_IsSaveFile(player_t *a1)
+/***************************************************************************
+RAP_IsSaveFile() - Returns True if thier is a sopt to save a character
+ ***************************************************************************/
+int 
+RAP_IsSaveFile(
+    player_t *in_plr
+)
 {
-    player_t vb0;
-    char v58[PATH_MAX];
-    int v1c, v24;
-    FILE *v20;
-    v1c = 0;
-    for (v24 = 0; v24 < 10; v24++)
+    player_t tp;
+    char temp[PATH_MAX];
+    int rval, loop;
+    FILE *handle;
+    rval = 0;
+    
+    for (loop = 0; loop < MAX_SAVE; loop++)
     {
-        if (hasdatapath)
-            sprintf(v58, fmt2, g_data_path, v24);
+        if (cdflag)
+            sprintf(temp, cdfmt, cdpath, loop);
         else
-            sprintf(v58, fmt, v24);
-        v20 = fopen(v58, "rb");
-        if (v20)
+            sprintf(temp, fmt, loop);
+        
+        handle = fopen(temp, "rb");
+        
+        if (handle)
         {
-            fread(&vb0, 1, sizeof(vb0), v20);
-            fclose(v20);
-            if (!strcmp(vb0.name, a1->name) && !strcmp(vb0.callsign, a1->callsign))
+            fread(&tp, 1, sizeof(tp), handle);
+            fclose(handle);
+            if (!strcmp(tp.name, in_plr->name) && !strcmp(tp.callsign, in_plr->callsign))
             {
-                v1c = 1;
+                rval = 1;
                 break;
             }
         }
     }
-    return v1c;
+    
+    return rval;
 }
 
-int RAP_LoadPlayer(void)
+/***************************************************************************
+RAP_LoadPlayer () - Loads player from disk
+ ***************************************************************************/
+int 
+RAP_LoadPlayer(
+    void
+)
 {
-    char v6c[PATH_MAX];
-    int v1c, v24;
-    FILE *v20;
-    object_t v40;
+    char filename[PATH_MAX];
+    int rval, loop;
+    FILE *handle;
+    object_t inobj;
 
-    v1c = 0;
+    rval = 0;
+    
     if (filepos == -1)
         return 0;
+    
+    // == Clear Player =======================
     OBJS_Clear();
     memset(&player, 0, sizeof(player));
-    if (hasdatapath)
-        sprintf(v6c, fmt2, g_data_path, filepos);
+    
+    if (cdflag)
+        sprintf(filename, cdfmt, cdpath, filepos);
     else
-        sprintf(v6c, fmt, filepos);
-    v20 = fopen(v6c, "rb");
-    if (!v20)
+        sprintf(filename, fmt, filepos);
+    
+    handle = fopen(filename, "rb");
+    
+    if (!handle)
     {
         WIN_Msg("Load Player Error");
         return 0;
     }
-    fread(&player, 1, sizeof(player), v20);
+    
+    fread(&player, 1, sizeof(player), handle);
     GLB_DeCrypt(gdmodestr, &player, sizeof(player));
-    for (v24 = 0; v24 < player.numobjs; v24++)
+    
+    for (loop = 0; loop < player.numobjs; loop++)
     {
-        fread(&v40, 1, sizeof(v40), v20);
-        GLB_DeCrypt(gdmodestr, &v40, sizeof(v40));
-        if (!OBJS_Load(&v40))
+        fread(&inobj, 1, sizeof(inobj), handle);
+        GLB_DeCrypt(gdmodestr, &inobj, sizeof(inobj));
+        
+        if (!OBJS_Load(&inobj))
             break;
     }
-    fclose(v20);
+    
+    fclose(handle);
+    
     cur_game = player.cur_game;
     game_wave[0] = player.game_wave[0];
     game_wave[1] = player.game_wave[1];
     game_wave[2] = player.game_wave[2];
+    
     if (!OBJS_IsEquip(player.sweapon))
         OBJS_GetNext();
-    if (OBJS_GetAmt(16) <= 0)
+    
+    if (OBJS_GetAmt(S_ENERGY) <= 0)
         EXIT_Error("RAP_LoadPLayer() - Loaded DEAD player");
-    v1c = 1;
+    
+    rval = 1;
     RAP_SetPlayerDiff();
-    return v1c;
+    
+    return rval;
 }
 
-int RAP_SavePlayer(void)
+/***************************************************************************
+RAP_SavePlayer() - Saves player data to filename
+ ***************************************************************************/
+int 
+RAP_SavePlayer(
+    void
+)
 {
-    int v1c;
-    char v5c[PATH_MAX];
-    FILE *v20;
-    object_t *v28;
+    int rval;
+    char filename[PATH_MAX];
+    FILE *handle;
+    object_t *cur;
 
-    v1c = 0;
+    rval = 0;
+    
     if (filepos == -1)
         EXIT_Error("RAP_Save() ERR: Try to Save Invalid Player");
-    if (OBJS_GetAmt(16) <= 0)
+    
+    if (OBJS_GetAmt(S_ENERGY) <= 0)
         EXIT_Error("RAP_Save() ERR: Try to save Dead player");
-    if (hasdatapath)
-        sprintf(v5c, fmt2, g_data_path, filepos);
+    
+    if (cdflag)
+        sprintf(filename, cdfmt, cdpath, filepos);
     else
-        sprintf(v5c, fmt, filepos);
+        sprintf(filename, fmt, filepos);
 
-    v20 = fopen(v5c, "wb");
-    if (!v20)
+    handle = fopen(filename, "wb");
+    
+    if (!handle)
     {
         WIN_Msg("Save Player Error !!!");
         return 0;
     }
+    
     player.cur_game = cur_game;
     player.game_wave[0] = game_wave[0];
     player.game_wave[1] = game_wave[1];
     player.game_wave[2] = game_wave[2];
     player.numobjs = 0;
-    for (v28 = first_objs.f_4; &last_objs != v28; v28 = v28->f_4)
+    
+    for (cur = first_objs.next; &last_objs != cur; cur = cur->next)
     {
         player.numobjs++;
     }
+    
     GLB_EnCrypt(gdmodestr, &player, sizeof(player));
-    fwrite(&player, 1, sizeof(player), v20);
+    fwrite(&player, 1, sizeof(player), handle);
     GLB_DeCrypt(gdmodestr, &player, sizeof(player));
-    for (v28 = first_objs.f_4; &last_objs != v28; v28 = v28->f_4)
+    
+    for (cur = first_objs.next; &last_objs != cur; cur = cur->next)
     {
-        GLB_EnCrypt(gdmodestr, v28, sizeof(object_t));
-        fwrite(v28, 1, sizeof(object_t), v20);
-        GLB_DeCrypt(gdmodestr, v28, sizeof(object_t));
+        GLB_EnCrypt(gdmodestr, cur, sizeof(object_t));
+        fwrite(cur, 1, sizeof(object_t), handle);
+        GLB_DeCrypt(gdmodestr, cur, sizeof(object_t));
     }
-    v1c = 1;
-    fclose(v20);
-    return v1c;
+    
+    rval = 1;
+    
+    fclose(handle);
+    
+    return rval;
 }
 
-void RAP_LoadMap(void)
+/***************************************************************************
+ RAP_LoadMap () - Loads A level Map
+ ***************************************************************************/
+void 
+RAP_LoadMap(
+    void
+)
 {
-    char v44[44];
+    char temp[44];
+    
     if (!gameflag[cur_game])
         EXIT_Error("Loading Invalid map game %d", cur_game);
+    
     GLB_FreeAll();
-    sprintf(v44, "MAP%uG%u_MAP", game_wave[cur_game] + 1, cur_game + 1);
-    map_item = GLB_GetItemID(v44);
+    
+    sprintf(temp, "MAP%uG%u_MAP", game_wave[cur_game] + 1, cur_game + 1);
+    map_item = GLB_GetItemID(temp);
+    
     if (map_item == -1)
-        EXIT_Error("RAP_LoadMap() - Invalid MAP.(%s)", v44);
+        EXIT_Error("RAP_LoadMap() - Invalid MAP.(%s)", temp);
+    
     ml = GLB_LockItem(map_item);
+    
     mapmem = (map_t*)ml;
-    csprite = (csprite_t*)(ml + 0x1524);
+    csprite = (csprite_t*)(ml + sizeof(map_t));
+
     ENEMY_LoadLib();
     SND_CacheGFX();
     BONUS_Init();
     WIN_SetLoadLevel(20);
     OBJS_CachePics();
-    WIN_SetLoadLevel(0x3c);
+    WIN_SetLoadLevel(40);
+    ANIMS_CachePics();
+    WIN_SetLoadLevel(60);
     ENEMY_LoadSprites();
-    WIN_SetLoadLevel(0x50);
+    WIN_SetLoadLevel(80);
     TILE_CacheLevel();
     WIN_SetLoadLevel(100);
     WIN_EndLoad();
 }
 
-void RAP_FreeMap(void)
+/***************************************************************************
+RAP_FreeMap() - Frees up cached map stuff
+ ***************************************************************************/
+void 
+RAP_FreeMap(
+    void
+)
 {
     if (map_item != -1)
     {
@@ -305,184 +431,243 @@ void RAP_FreeMap(void)
         ANIMS_FreePics();
         OBJS_FreePics();
         SND_FreeFX();
+        
+        // FREE MAP ========================
+        
         GLB_FreeItem(map_item);
+        
         map_item = -1;
     }
+    
     GLB_FreeAll();
     SND_CacheIFX();
 }
 
-int RAP_LoadWin(void)
+/***************************************************************************
+RAP_LoadWin() -
+ ***************************************************************************/
+int                        // RETURN : -1 = no FIles, 0=cancel, 1=loaded
+RAP_LoadWin(
+    void
+)
 {
-    char v254[10][PATH_MAX];
-    char v68[PATH_MAX];
-    int v30, v20, v24, v3c, v38, v1c, v2c, v28;
-    player_t v108;
-    wdlg_t vb0;
-    v30 = 1;
-    v20 = -1;
-    v24 = -2;
-    v3c = 0;
-    v38 = 0;
-    memset(v254, 0, sizeof(v254));
-    for (v1c = 0; v1c < 10; v1c++)
+    char filenames[MAX_SAVE][PATH_MAX];
+    char temp[PATH_MAX];
+    int update, pos, oldpos, fndflag, rval, loop, window, addnum;
+    player_t tplr;
+    wdlg_t dlg;
+    update = 1;
+    pos = -1;
+    oldpos = -2;
+    fndflag = 0;
+    rval = 0;
+    
+    memset(filenames, 0, sizeof(filenames));
+    for (loop = 0; loop < MAX_SAVE; loop++)
     {
-        if (hasdatapath)
-            sprintf(v68, fmt2, g_data_path, v1c);
+        if (cdflag)
+            sprintf(temp, cdfmt, cdpath, loop);
         else
-            sprintf(v68, fmt, v1c);
-        if (!access(v68, 0))
+            sprintf(temp, fmt, loop);
+        
+        if (!access(temp, 0))
         {
-            if (v20 == -1)
-                v20= v1c;
-            strncpy(v254[v1c], v68, PATH_MAX);
+            if (pos == -1)
+                pos = loop;
+            strncpy(filenames[loop], temp, PATH_MAX);
         }
     }
-    if (v20 == -1)
+    
+    if (pos == -1)
         return-1;
-    RAP_ReadFile(v254[v20], &v108, sizeof(v108));
+    
+    RAP_ReadFile(filenames[pos], &tplr, sizeof(tplr));
     KBD_Clear();
-    v2c = SWD_InitWindow(FILE139_LOAD_SWD);
-    SWD_SetActiveField(v2c, 5);
-    SND_Patch(20, 127);
+    window = SWD_InitWindow(FILE139_LOAD_SWD);
+    SWD_SetActiveField(window, LOAD_LOAD);
+    SND_Patch(FX_SWEP, 127);
+    
     while (1)
     {
-        SWD_Dialog(&vb0);
+        SWD_Dialog(&dlg);
+        
         if (joy_ipt_MenuNew)
         {
-            if (XButton)                                                                                                                        //Input Erase Savestate
+            if (XButton)                                                                                                                        
             {
                 JOY_IsKey(XButton);
-                vb0.keypress = 0x53;
+                dlg.keypress = SC_DELETE;
             }
         }
-        if ((KBD_IsKey(1)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))                                      //Abort Load Window
+        
+        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))                                      
         {
-            v38 = 0;
-            goto LAB_00022ecd;
+            rval = 0;
+            goto load_exit;
         }
-        if (keyboard[45] && keyboard[56])
+        
+        if (KBD_Key(SC_X) && KBD_Key(SC_ALT))
             WIN_AskExit();
-        if (v30)
+        
+        if (update)
         {
-            v30 = 0;
-            if (v20 != v24)
+            update = 0;
+            if (pos != oldpos)
             {
-                if (v20 < v24)
-                    v28 = -1;
+                if (pos < oldpos)
+                    addnum = -1;
                 else
-                    v28 = 1;
-                if (v20 >= 0)
-                    v20 %= 10;
+                    addnum = 1;
+                
+                if (pos >= 0)
+                    pos %= MAX_SAVE;
                 else
-                    v20 += 10;
-                if (v20 < 0)
+                    pos += MAX_SAVE;
+                
+                if (pos < 0)
                     EXIT_Error("Help");
-                v3c = 0;
-                for (v1c = 0; v1c < 10; v1c++)
+                
+                fndflag = 0;
+                for (loop = 0; loop < MAX_SAVE; loop++)
                 {
-                    if (v254[v20][0] == 0)
+                    if (filenames[pos][0] == 0)
                     {
-                        v20 += v28;
-                        if (v20 >= 0)
-                            v20 %= 10;
+                        pos += addnum;
+                        
+                        if (pos >= 0)
+                            pos %= MAX_SAVE;
                         else
-                            v20 += 10;
+                            pos += MAX_SAVE;
                     }
                     else
                     {
-                        v3c = 1;
+                        fndflag = 1;
                         break;
                     }
                 }
-                if (v3c == 0)
+                
+                if (fndflag == 0)
                 {
-                    v38 = -1;
-                    goto LAB_00022ecd;
+                    rval = -1;
+                    goto load_exit;
                 }
-                RAP_ReadFile(v254[v20], &v108, sizeof(v108));
-                v24 = v20;
+                
+                RAP_ReadFile(filenames[pos], &tplr, sizeof(tplr));
+                oldpos = pos;
             }
-            SWD_SetFieldItem(v2c, 1, id_pics[v108.id_pic]);
-            SWD_SetFieldText(v2c, 9, v108.name);
-            SWD_SetFieldText(v2c, 10, v108.callsign);
-            sprintf(v68, "%07u", v108.score);
-            SWD_SetFieldText(v2c, 11, v68);
+            
+            SWD_SetFieldItem(window, LOAD_IDPIC, id_pics[tplr.id_pic]);
+            SWD_SetFieldText(window, LOAD_NAME, tplr.name);
+            SWD_SetFieldText(window, LOAD_CALL, tplr.callsign);
+            sprintf(temp, "%07u", tplr.score);
+            SWD_SetFieldText(window, LOAD_CREDITS, temp);
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
-            SND_Patch(20, 127);
+            SND_Patch(FX_SWEP, 127);
             }
-        switch (vb0.keypress)
+        
+        switch (dlg.keypress)
         {
-        case 0x50:
-        case 0x51:
-        case 0x4b:
-            vb0.cur_act = 1;
-            vb0.cur_cmd = 10;
-            vb0.field = 2;
+        case SC_LEFT:
+        case SC_PAGEDN:
+        case SC_DOWN:
+            dlg.cur_act = S_FLD_COMMAND;
+            dlg.cur_cmd = F_SELECT;
+            dlg.field = LOAD_NEXT;
             break;
-        case 0x48:
-        case 0x49:
-        case 0x4d:
-            vb0.cur_act = 1;
-            vb0.cur_cmd = 10;
-            vb0.field = 3;
+        
+        case SC_RIGHT:
+        case SC_PAGEUP:
+        case SC_UP:
+            dlg.cur_act = S_FLD_COMMAND;
+            dlg.cur_cmd = F_SELECT;
+            dlg.field = LOAD_PREV;
             break;
-        case 0x53:
-            vb0.cur_act = 1;
-            vb0.cur_cmd = 10;
-            vb0.field = 4;
+        
+        case SC_DELETE:
+            dlg.cur_act = S_FLD_COMMAND;
+            dlg.cur_cmd = F_SELECT;
+            dlg.field = LOAD_DEL;
+            break;
+
+        case SC_ENTER:
+            dlg.cur_act = S_FLD_COMMAND;
+            dlg.cur_cmd = F_SELECT;
+            dlg.field = LOAD_LOAD;
             break;
         }
-        if (vb0.cur_act == 1 && vb0.cur_cmd == 10)
+        
+        if (dlg.cur_act == S_FLD_COMMAND && dlg.cur_cmd == F_SELECT)
         {
-            switch (vb0.field)
+            switch (dlg.field)
             {
-            case 2:
-                v20++;
-                v30 = 1;
+            case LOAD_NEXT:
+                pos++;
+                update = 1;
                 break;
-            case 3:
-                v20--;
-                v30 = 1;
+            
+            case LOAD_PREV:
+                pos--;
+                update = 1;
                 break;
-            case 4:
-                v30 = 1;
-                sprintf(v68, "Delete Pilot %s ?", v108.callsign);
-                if (WIN_AskBool(v68))
+            
+            case LOAD_DEL:
+                update = 1;
+                sprintf(temp, "Delete Pilot %s ?", tplr.callsign);
+                if (WIN_AskBool(temp))
                 {
-                    remove(v254[v20]);
+                    remove(filenames[pos]);
                     WIN_Msg("Pilot Removed !");
-                    v254[v20][0] = 0;
-                    v20++;
+                    filenames[pos][0] = 0;
+                    pos++;
                 }
                 break;
-            case 6:
-                goto LAB_00022ecd;
-            case 5:
-                filepos = v20;
+            
+            case LOAD_CANCEL:
+                goto load_exit;
+            
+            case LOAD_LOAD:
+                filepos = pos;
                 RAP_LoadPlayer();
-                v38 = 1;
-                goto LAB_00022ecd;
+                rval = 1;
+                goto load_exit;
             }
         }
     }
-LAB_00022ecd:
-    SWD_DestroyWindow(v2c);
+
+load_exit:
+    
+    SWD_DestroyWindow(window);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
-    return v38;
+    
+    return rval;
 }
 
-const char *RAP_DataPath(void)
+/***************************************************************************
+RAP_InitLoadSave() - Inits the load and save path stuff
+ ***************************************************************************/
+const char*
+RAP_InitLoadSave(
+    void
+)
 {
-    memset(g_data_path, 0, sizeof(g_data_path));
-    hasdatapath = 0;
-    strcpy(g_setup_path, "SETUP.INI");
-    return g_data_path;
+    memset(cdpath, 0, sizeof(cdpath));
+    
+    cdflag = 0;
+    
+    strcpy(g_setup_ini, "SETUP.INI");
+    
+    return cdpath;
 }
 
-const char *RAP_GetSetupPath(void)
+/***************************************************************************
+RAP_SetupFilename() - Gets current setup.ini path and name
+ ***************************************************************************/
+const char*
+RAP_SetupFilename(
+    void
+)
 {
-    return g_setup_path;
+    return g_setup_ini;
 }

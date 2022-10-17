@@ -24,14 +24,14 @@ void OBJS_Clear(void)
     int v1c;
     obj_cnt = 0;
     first_objs.f_0 = NULL;
-    first_objs.f_4 = &last_objs;
+    first_objs.next = &last_objs;
     last_objs.f_0 = &first_objs;
-    last_objs.f_4 = NULL;
+    last_objs.next = NULL;
     free_objs = objs;
     memset(objs, 0, sizeof(objs));
     memset(p_objs, 0, sizeof(p_objs));
     for (v1c = 0; v1c < 19; v1c++)
-        objs[v1c].f_4 = &objs[v1c + 1];
+        objs[v1c].next = &objs[v1c + 1];
 }
 
 object_t *OBJS_Get(void)
@@ -40,12 +40,12 @@ object_t *OBJS_Get(void)
     if (!free_objs)
         return 0;
     v1c = free_objs;
-    free_objs = free_objs->f_4;
+    free_objs = free_objs->next;
     memset(v1c, 0, sizeof(object_t));
-    v1c->f_4 = &last_objs;
+    v1c->next = &last_objs;
     v1c->f_0 = last_objs.f_0;
     last_objs.f_0 = v1c;
-    v1c->f_0->f_4 = v1c;
+    v1c->f_0->next = v1c;
     obj_cnt++;
     return v1c;
 }
@@ -54,10 +54,10 @@ object_t *OBJS_Remove(object_t *a1)
 {
     object_t *v1c;
     v1c = a1->f_0;
-    a1->f_4->f_0 = a1->f_0;
-    a1->f_0->f_4 = a1->f_4;
+    a1->next->f_0 = a1->f_0;
+    a1->f_0->next = a1->next;
     memset(a1, 0, sizeof(object_t));
-    a1->f_4 = free_objs;
+    a1->next = free_objs;
     free_objs = a1;
     obj_cnt--;
     return v1c;
@@ -542,7 +542,7 @@ void OBJS_DisplayStats(void)
 int OBJS_Equip(int a1)
 {
     object_t *v1c;
-    for (v1c = first_objs.f_4; &last_objs != v1c; v1c = v1c->f_4)
+    for (v1c = first_objs.next; &last_objs != v1c; v1c = v1c->next)
     {
         if (v1c->f_c == a1 && !p_objs[a1])
         {
@@ -589,7 +589,7 @@ int OBJS_Add(int a1)
         return 0;
     if (v20->f_20)
     {
-        for (v1c = first_objs.f_4; &last_objs != v1c; v1c = v1c->f_4)
+        for (v1c = first_objs.next; &last_objs != v1c; v1c = v1c->next)
         {
             if (v1c->f_c == a1)
             {
@@ -776,7 +776,7 @@ int OBJS_GetTotal(int a1)
     object_t *v1c;
 
     v20 = 0;
-    for (v1c = first_objs.f_4; &last_objs != v1c; v1c = v1c->f_4)
+    for (v1c = first_objs.next; &last_objs != v1c; v1c = v1c->next)
     {
         if (a1 == v1c->f_c)
             v20++;

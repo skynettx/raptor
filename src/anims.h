@@ -68,6 +68,7 @@ struct anim_t {
 void ANIMS_Clear(void);
 anim_t *ANIMS_Remove(anim_t *anim);
 void ANIMS_Init(void);
+void ANIMS_CachePics(void);
 void ANIMS_FreePics(void);
 void ANIMS_StartAnim(int handle, int x, int y);
 void ANIMS_StartGAnim(int handle, int x, int y);

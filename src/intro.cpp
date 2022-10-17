@@ -13,615 +13,815 @@
 
 movie_t frm[90];
 
-int INTRO_City(void)
+/***************************************************************************
+INTRO_City () - Shows City with planes flying into it
+ ***************************************************************************/
+int 
+INTRO_City(
+    void
+)
 {
-    int i;
-    int v20 = 30;
-    int v24 = v20 - 1;
-    movie_t *v28 = frm;
-    for (i = 0; i < v20; i++, v28++)
+    int loop;
+    int maxframes = 30;
+    int framecnt = maxframes - 1;
+    movie_t *cur = frm;
+    
+    for (loop = 0; loop < maxframes; loop++, cur++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 8;
-        v28->f_8 = v24--;
-        v28->f_c = FILE141_CHASE_AGX + i;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        v28->f_40 = 0;
-        v28->f_44 = 127;
-        if (i == 4)
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 8;
+        cur->numframes = framecnt--;
+        cur->item = FILE141_CHASE_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        cur->fx_vol = 0;
+        cur->fx_xpos = 127;
+        
+        if (loop == 4)
         {
-            v28->f_3c = 13;
-            v28->f_44 = 210;
+            cur->soundfx = FX_FLYBY;
+            cur->fx_xpos = 210;
         }
-        if (i == 9)
+        
+        if (loop == 9)
         {
-            v28->f_3c = 13;
-            v28->f_44 = 100;
+            cur->soundfx = FX_FLYBY;
+            cur->fx_xpos = 100;
         }
     }
-    v28 = frm;
-    v28->f_10 = 1;
-    v28->f_14 = 128;
-    if (MOVIE_Play(frm, 1, palette) == 2)
+    
+    cur = frm;
+    
+    cur->startf = M_FADEIN;
+    cur->startsteps = 128;
+    
+    if (MOVIE_Play(frm, 1, palette) == K_SKIPALL)
         return 1;
+    
     SND_StopPatches();
+    
     return 0;
 }
 
-int INTRO_Side1(void)
+/***************************************************************************
+INTRO_Side1 () - Show Side OF Player ship going thru city
+ ***************************************************************************/
+int 
+INTRO_Side1(
+    void
+)
 {
-    int i;
-    int v20 = 20;
-    int v24 = v20 - 1;
-    movie_t *v28 = frm;
-    MOVIE_BPatch(17);
-    for (i = 0; i < v20; i++, v28++)
+    int loop;
+    int maxframes = 20;
+    int framecnt = maxframes - 1;
+    movie_t *cur = frm;
+    
+    MOVIE_BPatch(FX_JETSND);
+    
+    for (loop = 0; loop < maxframes; loop++, cur++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 18;
-        v28->f_8 = v24--;
-        v28->f_c = FILE15f_SHIPSD1_AGX + i;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_40 = 127;
-        v28->f_44 = 127;
-        v28->f_3c = -1;
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 18;
+        cur->numframes = framecnt--;
+        cur->item = FILE15f_SHIPSD1_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->fx_vol = 127;
+        cur->fx_xpos = 127;
+        cur->soundfx = -1;
     }
-    if (MOVIE_Play(frm, 2, palette) == 2)
+    
+    if (MOVIE_Play(frm, 2, palette) == K_SKIPALL)
         return 1;
+    
     return 0;
 }
 
-int INTRO_Pilot(void)
+/***************************************************************************
+INTRO_Pilot () - Shows Pilots Face with lights moving thru
+ ***************************************************************************/
+int 
+INTRO_Pilot(
+    void
+)
 {
-    int i;
-    int v20 = 21;
-    int v24 = v20 - 1;
-    movie_t *v28 = frm;
-    MOVIE_BPatch(24);
-    for (i = 0; i < v20; i++, v28++)
+    int loop;
+    int maxframes = 21;
+    int framecnt = maxframes - 1;
+    movie_t *cur = frm;
+    
+    MOVIE_BPatch(FX_IJETSND);
+    
+    for (loop = 0; loop < maxframes; loop++, cur++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 10;
-        v28->f_8 = v24--;
-        v28->f_c = FILE173_PILOT_AGX + i;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        v28->f_40 = 127;
-        v28->f_44 = 127;
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 10;
+        cur->numframes = framecnt--;
+        cur->item = FILE173_PILOT_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        cur->fx_vol = 127;
+        cur->fx_xpos = 127;
     }
-    if (MOVIE_Play(frm, 1, palette) == 2)
+    
+    if (MOVIE_Play(frm, 1, palette) == K_SKIPALL)
         return 1;
+    
     return 0;
 }
 
-int INTRO_Explosion(void)
+/***************************************************************************
+INTRO_Explosion () - Bad Guy Blowing UP
+ ***************************************************************************/
+int 
+INTRO_Explosion(
+    void
+)
 {
-    int i;
-    int v20 = 22;
-    int v24 = v20 - 1;
-    movie_t *v28 = frm;
-    MOVIE_BPatch(25);
-    for (i = 0; i < v20; i++, v28++)
+    int loop;
+    int maxframes = 22;
+    int framecnt = maxframes - 1;
+    movie_t *cur = frm;
+    
+    MOVIE_BPatch(FX_EJETSND);
+    
+    for (loop = 0; loop < maxframes; loop++, cur++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 12;
-        v28->f_8 = v24--;
-        v28->f_c = FILE19c_EXPLO_AGX + i;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        v28->f_40 = 127;
-        v28->f_44 = 127;
-        if (i >= 2 && i < 10)
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 12;
+        cur->numframes = framecnt--;
+        cur->item = FILE19c_EXPLO_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        cur->fx_vol = 127;
+        cur->fx_xpos = 127;
+        
+        if (loop >= 2 && loop < 10)
         {
-            v28->f_3c = 26;
-            v28->f_44 = 0x6e + (wrand() % 40);
+            cur->soundfx = FX_INTROHIT;
+            cur->fx_xpos = 0x6e + (wrand() % 40);
         }
-        if (i >= 8)
+        
+        if (loop >= 8)
         {
-            if (i & 1)
+            if (loop & 1)
             {
-                v28->f_3c = 8;
+                cur->soundfx = FX_AIREXPLO;
             }
         }
     }
-    v28--;
-    v28->f_3c = 8;
-    v28->f_18 = 2;
-    v28->f_20 = 63;
-    v28->f_24 = 28;
-    v28->f_28 = 3;
-    v28->f_1c = 60;
-    if (MOVIE_Play(frm, 1, palette) == 2)
+    
+    cur--;
+    cur->soundfx = FX_AIREXPLO;
+    cur->endf = M_FADEOUT;
+    cur->red = 63;
+    cur->green = 28;
+    cur->blue = 3;
+    cur->endsteps = 60;
+    cur++;
+
+    if (MOVIE_Play(frm, 1, palette) == K_SKIPALL)
         return 1;
+    
     return 0;
 }
 
-int INTRO_Side2(void)
+/***************************************************************************
+INTRO_Side2 () - Player Side flying thru city Shooting
+ ***************************************************************************/
+int 
+INTRO_Side2(
+    void
+)
 {
-    int i, r;
-    int v20 = 20;
-    int v24 = v20 - 1;
-    movie_t *v28 = frm;
-    MOVIE_BPatch(17);
-    for (i = 0; i < v20; i++, v28++)
+    int loop, opt;
+    int maxframes = 20;
+    int framecnt = maxframes - 1;
+    movie_t *cur = frm;
+    
+    MOVIE_BPatch(FX_JETSND);
+    
+    for (loop = 0; loop < maxframes; loop++, cur++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 18;
-        v28->f_8 = v24--;
-        v28->f_c = FILE15f_SHIPSD1_AGX + i;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        v28->f_40 = 50;
-        v28->f_44 = 127;
-        v28->f_3c = -1;
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 18;
+        cur->numframes = framecnt--;
+        cur->item = FILE15f_SHIPSD1_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        cur->fx_vol = 50;
+        cur->fx_xpos = 127;
+        cur->soundfx = -1;
     }
-    r = MOVIE_Play(frm, 1, palette);
-    if (r == 2)
+    
+    opt = MOVIE_Play(frm, 1, palette);
+    
+    if (opt == K_SKIPALL)
         return 1;
-    if (r == 1)
+    
+    if (opt == K_NEXTFRAME)
         return 0;
-    v24 = v20 - 1;
-    v28 = frm;
-    for (i = 0; i < v20; i++, v28++)
+    
+    framecnt = maxframes - 1;
+    cur = frm;
+    
+    for (loop = 0; loop < maxframes; loop++, cur++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 18;
-        v28->f_8 = v24--;
-        v28->f_c = FILE188_SHIPSD2_AGX + i;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        v28->f_44 = 127;
-        if (i > 1)
-            v28->f_3c = 27;
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 18;
+        cur->numframes = framecnt--;
+        cur->item = FILE188_SHIPSD2_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        cur->fx_xpos = 127;
+        if (loop > 1)
+            cur->soundfx = FX_INTROGUN;
     }
-    if (MOVIE_Play(frm, 1, palette) == 2)
+    
+    if (MOVIE_Play(frm, 1, palette) == K_SKIPALL)
         return 1;
+    
     SND_StopPatches();
+    
     return 0;
 }
 
-int INTRO_Base(void)
+/***************************************************************************
+INTRO_Base() - Base Landing at sunset
+ ***************************************************************************/
+int 
+INTRO_Base(
+    void
+)
 {
-    int v1c, v20, v24;
-    movie_t *v28;
-    v20 = 30;
-    v24 = v20 - 1;
-    v28 = frm;
-    if (!gameflag[1])
+    int loop, maxframes, framecnt;
+    movie_t *cur;
+    maxframes = 30;
+    framecnt = maxframes - 1;
+    cur = frm;
+    
+    if (!GAME2)
         return 1;
-    for (v1c = 0; v1c < v20; v1c++)
+    
+    for (loop = 0; loop < maxframes; loop++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 10;
-        v28->f_8 = v24--;
-        v28->f_c = FILE20e_BASE_AGX + v1c;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        v28++;
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 10;
+        cur->numframes = framecnt--;
+        cur->item = FILE20e_BASE_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        cur++;
     }
-    v28 = frm;
-    v28->f_10 = 1;
-    v28->f_14 = 128;
-    if (MOVIE_Play(frm, 1, palette) == 2)
+    
+    cur = frm;
+    
+    cur->startf = M_FADEIN;
+    cur->startsteps = 128;
+    
+    if (MOVIE_Play(frm, 1, palette) == K_SKIPALL)
         return 1;
+    
     return 0;
 }
 
-int INTRO_Landing(void)
+/***************************************************************************
+INTRO_Landing () - Ship Landing on Base
+ ***************************************************************************/
+int 
+INTRO_Landing(
+    void
+)
 {
-    int v1c, v20, v24;
-    movie_t *v28;
-    v20 = 33;
-    v24 = v20 - 1;
-    v28 = frm;
-    for (v1c = 0; v1c < v20; v1c++)
+    int loop, maxframes, framecnt;
+    movie_t *cur;
+    maxframes = 33;
+    framecnt = maxframes - 1;
+    cur = frm;
+    
+    for (loop = 0; loop < maxframes; loop++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 10;
-        v28->f_8 = v24--;
-        v28->f_c = FILE1bd_LANDING_AGX + v1c;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        v28++;
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 10;
+        cur->numframes = framecnt--;
+        cur->item = FILE1bd_LANDING_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        cur++;
     }
-    v28 = frm;
-    v28->f_10 = 1;
-    v28->f_14 = 64;
-    v28->f_18 = 3;
-    v28->f_1c = 64;
-    if (MOVIE_Play(frm, 1, palette) == 2)
+    
+    cur--;
+    cur->startf = M_FADEOUT;
+    cur->startsteps = 64;
+    cur->endf = M_PALETTE;
+    cur->endsteps = 64;
+    
+    if (MOVIE_Play(frm, 1, palette) == K_SKIPALL)
         return 1;
+    
     return 0;
 }
 
-int INTRO_Death2(void)
+/***************************************************************************
+INTRO_Death2 () - Ground Death Scene
+ ***************************************************************************/
+int 
+INTRO_Death2(
+    void
+)
 {
-    int v1c, v20, v24;
-    movie_t *v28;
-    v20 = 6;
-    v24 = v20 - 1;
-    v28 = frm;
-    for (v1c = 0; v1c < v20; v1c++)
+    int loop, maxframes, framecnt;
+    movie_t *cur;
+    maxframes = 6;
+    framecnt = maxframes - 1;
+    cur = frm;
+    
+    for (loop = 0; loop < maxframes; loop++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 3;
-        v28->f_8 = v24--;
-        v28->f_c = FILE1b2_SDEATH_AGX + v1c;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        v28++;
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 3;
+        cur->numframes = framecnt--;
+        cur->item = FILE1b2_SDEATH_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        cur++;
     }
-    if (MOVIE_Play(frm, 8, palette) == 2)
+    
+    if (MOVIE_Play(frm, 8, palette) == K_SKIPALL)
         return 1;
+    
     GFX_FadeOut(0, 0, 0, 100);
+    
     memset(displaybuffer, 0, 64000);
     GFX_MarkUpdate(0, 0, 320, 200);
     GFX_DisplayUpdate();
+    
     return 0;
 }
 
-int INTRO_Death1(void)
+/***************************************************************************
+INTRO_Death1 () - Air Death Scene
+ ***************************************************************************/
+int 
+INTRO_Death1(
+    void
+)
 {
-    int v1c, v20, v24;
-    movie_t* v28;
-    v20 = 30;
-    v24 = v20 - 1;
-    v28 = frm;
-    for (v1c = 0; v1c < v20; v1c++)
+    int loop, maxframes, framecnt;
+    movie_t* cur;
+    maxframes = 30;
+    framecnt = maxframes - 1;
+    cur = frm;
+    
+    for (loop = 0; loop < maxframes; loop++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 11;
-        v28->f_8 = v24--;
-        v28->f_c = FILE1de_DOWN_AGX + v1c;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        v28++;
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 11;
+        cur->numframes = framecnt--;
+        cur->item = FILE1de_DOWN_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        cur++;
     }
-    if (MOVIE_Play(frm, 1, palette) == 2)
+    
+    if (MOVIE_Play(frm, 1, palette) == K_SKIPALL)
         return 1;
+    
     return 0;
 }
 
-int INTRO_Death(void)
+/***************************************************************************
+INTRO_Death () - Death Scene
+ ***************************************************************************/
+int 
+INTRO_Death(
+    void
+)
 {
     if (INTRO_Death1())
         return 1;
+    
     if (INTRO_Death2())
         return 1;
+    
     return 0;
 }
 
-int INTRO_Game1End(void)
+/***************************************************************************
+INTRO_Game1End () - Game 1 Victory
+ ***************************************************************************/
+int 
+INTRO_Game1End(
+    void
+)
 {
-    int v1c, v20, v24;
-    movie_t* v28;
-    v20 = 5;
-    v24 = v20 - 1;
-    v28 = frm;
-    for (v1c = 0; v1c < v20; v1c++)
+    int loop, maxframes, framecnt;
+    movie_t* cur;
+    maxframes = 5;
+    framecnt = maxframes - 1;
+    cur = frm;
+    
+    for (loop = 0; loop < maxframes; loop++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 4;
-        v28->f_8 = v24--;
-        v28->f_c = FILE1b8_GAME1END_AGX + v1c;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        v28++;
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 4;
+        cur->numframes = framecnt--;
+        cur->item = FILE1b8_GAME1END_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        cur++;
     }
-    if (MOVIE_Play(frm, 8, palette) == 2)
+    
+    if (MOVIE_Play(frm, 8, palette) == K_SKIPALL)
         return 1;
+    
     GFX_FadeOut(0, 0, 0, 120);
+    
     memset(displaybuffer, 0, 64000);
     GFX_MarkUpdate(0, 0, 320, 200);
     GFX_DisplayUpdate();
+    
     GFX_SetPalette(palette, 0);
+    
     return 0;
 }
 
-int INTRO_Game2End(void)
+/***************************************************************************
+INTRO_Game2End () - Game 2 Victory
+ ***************************************************************************/
+int 
+INTRO_Game2End(
+    void
+)
 {
-    int v1c, v20, v24;
-    movie_t* v28;
-    v20 = 25;
-    v24 = v20 - 1;
-    v28 = frm;
-    for (v1c = 0; v1c < v20; v1c++)
+    int loop, maxframes, framecnt;
+    movie_t* cur;
+    maxframes = 25;
+    framecnt = maxframes - 1;
+    cur = frm;
+    
+    for (loop = 0; loop < maxframes; loop++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 4;
-        v28->f_8 = v24--;
-        v28->f_c = FILE22c_GAME2END_AGX + v1c;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        if (v1c == 22)
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 4;
+        cur->numframes = framecnt--;
+        cur->item = FILE22c_GAME2END_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        
+        if (loop == 22)
         {
-            v28->f_3c = 8;
-            v28->f_44 = 127;
+            cur->soundfx = FX_AIREXPLO;
+            cur->fx_xpos = 127;
         }
-        if (v1c == 24)
+        
+        if (loop == 24)
         {
-            v28->f_3c = 8;
-            v28->f_44 = 127;
+            cur->soundfx = FX_AIREXPLO;
+            cur->fx_xpos = 127;
         }
-        v28++;
+        cur++;
     }
-    if (MOVIE_Play(frm, 1, palette) == 2)
+    
+    if (MOVIE_Play(frm, 1, palette) == K_SKIPALL)
         return 1;
+    
     GFX_FadeOut(0, 0, 0, 120);
+    
     memset(displaybuffer, 0, 64000);
     GFX_MarkUpdate(0, 0, 320, 200);
     GFX_DisplayUpdate();
+    
     GFX_SetPalette(palette, 0);
+    
     return 0;
 }
 
-int INTRO_Game3End(void)
+/***************************************************************************
+INTRO_Game3End () - Game 3 Victory
+ ***************************************************************************/
+int 
+INTRO_Game3End(
+    void
+)
 {
-    int v1c, v20, v24;
-    movie_t* v28;
-    v20 = 39;
-    v24 = v20 - 1;
-    v28 = frm;
-    MOVIE_BPatch(17);
-    for (v1c = 0; v1c < v20; v1c++)
+    int loop, maxframes, framecnt;
+    movie_t* cur;
+    maxframes = 39;
+    framecnt = maxframes - 1;
+    cur = frm;
+    
+    MOVIE_BPatch(FX_JETSND);
+    
+    for (loop = 0; loop < maxframes; loop++)
     {
-        v28->f_2c = 0;
-        v28->f_0 = 0;
-        v28->f_4 = 8;
-        v28->f_8 = v24--;
-        v28->f_c = FILE3c5_GAME3END_AGX + v1c;
-        v28->f_10 = 0;
-        v28->f_14 = 0;
-        v28->f_18 = 0;
-        v28->f_1c = 0;
-        v28->f_20 = 0;
-        v28->f_24 = 0;
-        v28->f_28 = 0;
-        v28->f_30 = -1;
-        v28->f_34 = 0;
-        v28->f_38 = 0;
-        v28->f_3c = -1;
-        if (v1c == 30)
+        cur->holdframe = 0;
+        cur->opt = M_ANIM;
+        cur->framerate = 8;
+        cur->numframes = framecnt--;
+        cur->item = FILE3c5_GAME3END_AGX + loop;
+        cur->startf = M_NORM;
+        cur->startsteps = 0;
+        cur->endf = M_NORM;
+        cur->endsteps = 0;
+        cur->red = 0;
+        cur->green = 0;
+        cur->blue = 0;
+        cur->songid = -1;
+        cur->songopt = S_PLAY;
+        cur->songstep = 0;
+        cur->soundfx = -1;
+        
+        if (loop == 30)
         {
-            v28->f_3c = 8;
-            v28->f_44 = 100;
+            cur->soundfx = FX_AIREXPLO;
+            cur->fx_xpos = 100;
         }
-        if (v1c == 32)
+        
+        if (loop == 32)
         {
-            v28->f_3c = 8;
-            v28->f_44 = 100;
+            cur->soundfx = FX_AIREXPLO;
+            cur->fx_xpos = 100;
         }
-        v28++;
+        cur++;
     }
-    if (MOVIE_Play(frm, 1, palette) == 2)
+    
+    if (MOVIE_Play(frm, 1, palette) == K_SKIPALL)
         return 1;
+    
     GFX_FadeOut(0, 0, 0, 120);
+    
     memset(displaybuffer, 0, 64000);
     GFX_MarkUpdate(0, 0, 320, 200);
     GFX_DisplayUpdate();
+    
     GFX_SetPalette(palette, 0);
+    
     return 0;
 }
 
-void INTRO_EndGame(int a1)
+/***************************************************************************
+INTRO_EndGame() - Ends the current game anims
+ ***************************************************************************/
+void 
+INTRO_EndGame(
+    int game
+)
 {
     IMS_StartAck();
-    if (!gameflag[a1])
+    
+    if (!gameflag[game])
         return;
-    if (a1 > 2)
-        a1 = 2;
+    
+    if (game > 2)
+        game = 2;
+    
     while (IMS_IsAck())
     {
     }
     IMS_StartAck();
-    switch (a1)
+    
+    switch (game)
     {
     default:
     case 0:
         INTRO_Game1End();
         break;
+    
     case 1:
         INTRO_Game2End();
         break;
+    
     case 2:
         INTRO_Game3End();
         break;
     }
+    
     while (IMS_IsAck())
     {
     }
     IMS_StartAck();
     INTRO_Base();
+    
     while (IMS_IsAck())
     {
     }
     IMS_StartAck();
     INTRO_Landing();
+    
     while (IMS_IsAck())
     {
     }
     IMS_StartAck();
-    WIN_WinGame(a1);
-    if (a1 < 1)
+    WIN_WinGame(game);
+    
+    if (game < 1)
         WIN_Order();
 }
 
-void INTRO_Taiwan(void)
+/***************************************************************************
+INTRO_Taiwan (
+ ***************************************************************************/
+void 
+INTRO_Taiwan(
+    void
+)
 {
-    int v28, v1c;
-    texture_t *v24;
-    char *v20;
-    v28 = GFX_GetFrameCount();
+    int local_cnt, loop;
+    texture_t *pic1;
+    char *pal1;
+    local_cnt = GFX_GetFrameCount();
+    
     framecount = 0;
-    v24 = (texture_t*)GLB_GetItem(FILE12f_TAIWARN_PIC);
-    v20 = GLB_GetItem(FILE130_TAIPAL_DAT);
-    GFX_PutImage(v24, 0, 0, 0);
+    
+    pic1 = (texture_t*)GLB_GetItem(FILE12f_TAIWARN_PIC);
+    pal1 = GLB_GetItem(FILE130_TAIPAL_DAT);
+    
+    GFX_FadeOut(0, 0, 0, 5);
+
+    GFX_PutImage(pic1, 0, 0, 0);
     GFX_DisplayUpdate();
-    GFX_FadeIn(v20, 64);
-    for (v1c = 0; v1c < 0x2d; v1c++)
+    
+    GFX_FadeIn(pal1, 64);
+    
+    for (loop = 0; loop < 0x2d; loop++)
     {
-        v28 = GFX_GetFrameCount();
+        local_cnt = GFX_GetFrameCount();
         if (IMS_IsAck())
             break;
-        while (GFX_GetFrameCount() - v28 < 4)
+        while (GFX_GetFrameCount() - local_cnt < 4)
         {
         }
     }
+    
     GFX_FadeOut(0, 0, 0, 63);
+    
     GLB_FreeItem(FILE130_TAIPAL_DAT);
     GLB_FreeItem(FILE12f_TAIWARN_PIC);
 }
 
-int INTRO_Credits(void)
+/***************************************************************************
+INTRO_Credits() - Credits Screen
+ ***************************************************************************/
+int 
+INTRO_Credits(
+    void
+)
 {
-    texture_t *apogee, *cyg;
-    char *apogeepal, *cygpal;
-    int now, i;
-    now = GFX_GetFrameCount();
+    texture_t *pic1, *pic2;
+    char *pal1, *pal2;
+    int local_cnt, loop;
+    local_cnt = GFX_GetFrameCount();
+    
     framecount = 0;
-    apogee = (texture_t*)GLB_GetItem(FILE12b_APOGEE_PIC);
-    apogeepal = GLB_GetItem(FILE12c_POGPAL_DAT);
+    
+    pic1 = (texture_t*)GLB_GetItem(FILE12b_APOGEE_PIC);
+    pal1 = GLB_GetItem(FILE12c_POGPAL_DAT);
+    
     GFX_FadeOut(0, 0, 0, 5);
-    GFX_PutImage(apogee, 0, 0, 0);
+    
+    GFX_PutImage(pic1, 0, 0, 0);
     GFX_DisplayUpdate();
-    GFX_FadeIn(apogeepal, 64);
+    
+    GFX_FadeIn(pal1, 64);
+    
     if (bday_num != -1 && dig_flag)
-        SND_Patch(0, 127);
+        SND_Patch(FX_THEME, 127);
     else
-        SND_PlaySong(97, 0, 0);
-    for (i = 0; i < 30; i++)
+        SND_PlaySong(FILE061_APOGEE_MUS, 0, 0);
+    
+    for (loop = 0; loop < 30; loop++)
     {
-        now = GFX_GetFrameCount();
+        local_cnt = GFX_GetFrameCount();
         if (IMS_IsAck())
             break;
-        while (GFX_GetFrameCount() - now < 4)
+        while (GFX_GetFrameCount() - local_cnt < 4)
         {
         }
     }
+    
     if (bday_num != -1 && dig_flag)
     {
-        while (SND_IsPatchPlaying(0)) {
+        while (SND_IsPatchPlaying(FX_THEME)) {
             I_GetEvent();
         }
     }
@@ -631,55 +831,86 @@ int INTRO_Credits(void)
             I_GetEvent();
         }
     }
+    
     GFX_FadeOut(0, 0, 0, 63);
+    
     GLB_FreeItem(FILE12c_POGPAL_DAT);
     GLB_FreeItem(FILE12b_APOGEE_PIC);
+    
     SND_PlaySong(-1, 0, 1);
+    
     memset(displayscreen, 0, 64000);
     memset(displaybuffer, 0, 64000);
-    cyg = (texture_t*)GLB_GetItem(FILE12d_CYGNUS_PIC);
-    cygpal = GLB_GetItem(FILE12e_CYGPAL_DAT);
-    GFX_PutImage(cyg, 0, 0, 0);
+    
+    pic2 = (texture_t*)GLB_GetItem(FILE12d_CYGNUS_PIC);
+    pal2 = GLB_GetItem(FILE12e_CYGPAL_DAT);
+    
+    GFX_PutImage(pic2, 0, 0, 0);
     GFX_DisplayUpdate();
-    GFX_FadeIn(cygpal, 64); //??
-    GLB_CacheItem(0x56);
-    for (i = 0; i < 65; i++)
+    
+    GFX_FadeIn(pal2, 64); 
+    
+    GLB_CacheItem(FILE056_RINTRO_MUS);
+    
+    for (loop = 0; loop < 65; loop++)
     {
-        if (IMS_IsAck() && i > 0)
+        if (IMS_IsAck() && loop > 0)
             break;
-        if (i == 1 || i == 40)
-            SND_Patch(23, 127);
-        if (i == 45)
-            SND_PlaySong(0x56, 1, 1);
-        if (keyboard[1])
+        
+        if (loop == 1 || loop == 40)
+            SND_Patch(FX_BOSS1, 127);
+        
+        if (loop == 45)
+            SND_PlaySong(FILE056_RINTRO_MUS, 1, 1);
+        
+        if (keyboard[SC_ESC])
             break;
-        now = GFX_GetFrameCount();
-        while (GFX_GetFrameCount() - now < 3)
+        local_cnt = GFX_GetFrameCount();
+        while (GFX_GetFrameCount() - local_cnt < 3)
         {
         }
     }
+    
     GFX_FadeOut(0, 0, 0, 63);
+    
     memset(displaybuffer, 0, 64000);
     GFX_MarkUpdate(0, 0, 320, 200);
     GFX_DisplayUpdate();
+    
     GFX_SetPalette(palette, 0);
+    
     GLB_FreeItem(FILE12e_CYGPAL_DAT);
     GLB_FreeItem(FILE12d_CYGNUS_PIC);
+    
     IMS_StartAck();
+    
     return 0;
 }
 
-void INTRO_BaseLanding(void)
+/***************************************************************************
+INTRO_BaseLanding() - BaseLanding PLays all needed MOVES
+ ***************************************************************************/
+void 
+INTRO_BaseLanding(
+    void
+)
 {
-    if (!gameflag[1])
+    if (!GAME2)
         return;
+    
     if (INTRO_Base())
         return;
     if (INTRO_Landing())
         return;
 }
 
-int INTRO_PlayMain(void)
+/***************************************************************************
+INTRO_PlayMain() - Plays Main Intro
+ ***************************************************************************/
+int 
+INTRO_PlayMain(
+    void
+)
 {
     if (INTRO_City())
         return 1;
@@ -691,6 +922,7 @@ int INTRO_PlayMain(void)
         return 1;
     if (INTRO_Explosion())
         return 1;
+    
     return 0;
 }
 

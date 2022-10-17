@@ -1,5 +1,6 @@
 #include <string.h>
 #include "common.h"
+#include "rap.h"
 #include "movie.h"
 #include "fx.h"
 #include "gfxapi.h"
@@ -10,74 +11,103 @@
 
 int back_patch = -1;
 
-void MOVIE_BPatch(int a1)
+/*************************************************************************
+MOVIE_BPatch() Plays Sound FX in background for one anim
+ *************************************************************************/
+void 
+MOVIE_BPatch(
+    int soundfx
+)
 {
-    back_patch = a1;
+    back_patch = soundfx;
     SND_Patch(back_patch, 127);
 }
 
-void MOVIE_ShowFrame(movanim_t *a1)
+/*************************************************************************
+ MOVIE_ShowFrame () - Shows an animation frame
+ *************************************************************************/
+void 
+MOVIE_ShowFrame(
+    movanim_t *inpic       // INPUT : pointer to animpic
+)
 {
-    if (a1)
+    if (inpic)
     {
-        ANIM_Render(a1);
+        ANIM_Render(inpic);
         GFX_MarkUpdate(0, 0, 320, 200);
     }
 }
 
-int MOVIE_Play(movie_t *a1, int a2, char *a3)
+/*************************************************************************
+ MOVIE_Play () - Playes an Animation
+ *************************************************************************/
+int 
+MOVIE_Play(
+    movie_t *frame,         // INPUT : pointer to array of frame defs     
+    int numplay,            // INPUT : number of times to play
+    char *palette           // INPUT : pointer to palette
+)
 {
-    int i, v28;
-    int v18 = 1;
-    int v20 = 0;
-    char v14;
-    char *v1c;
-    movie_t *v24;
+    int loop, hold;
+    int flag = 1;
+    int opt = K_OK;
+    char fill;
+    char *pic;
+    movie_t *curfld;
+    
     memset(displaybuffer, 0, 64000);
-    v24 = a1;
+    
+    curfld = frame;
+    
     IMS_StartAck();
+    
     while (1)
     {
         I_GetEvent();
-        v1c = (char *)GLB_GetItem(v24->f_c);
-        if (v18)
+        pic = (char *)GLB_GetItem(curfld->item);
+        
+        if (flag)
         {
-            v14 = v1c[0];
-            memset(displaybuffer, v14, 64000);
-            v1c++;
+            fill = pic[0];
+            memset(displaybuffer, fill, 64000);
+            pic++;
         }
-        switch (v24->f_10)
+        
+        switch (curfld->startf)
         {
-        case 0:
+        case M_NORM:
         default:
-            MOVIE_ShowFrame((movanim_t*)v1c);
-            GFX_WaitUpdate(v24->f_4);
+            MOVIE_ShowFrame((movanim_t*)pic);
+            GFX_WaitUpdate(curfld->framerate);
             break;
-        case 2:
-            GFX_FadeOut(v24->f_20, v24->f_24, v24->f_28, v24->f_14);
+        
+        case M_FADEOUT:
+            GFX_FadeOut(curfld->red, curfld->green, curfld->blue, curfld->startsteps);
             [[fallthrough]];
-        case 4:
+        case M_ERASE:
             memset(displaybuffer, 0, 64000);
             GFX_MarkUpdate(0, 0, 320, 200);
             GFX_DisplayUpdate();
             break;
-        case 1:
-            if (v18)
+        
+        case M_FADEIN:
+            if (flag)
             {
                 GFX_FadeOut(0, 0, 0, 2);
-                v18 = 0;
+                flag = 0;
             }
-            MOVIE_ShowFrame((movanim_t*)v1c);
-            GFX_WaitUpdate(v24->f_4);
-            GFX_FadeIn(a3, v24->f_14);
+            MOVIE_ShowFrame((movanim_t*)pic);
+            GFX_WaitUpdate(curfld->framerate);
+            GFX_FadeIn(palette, curfld->startsteps);
             break;
         }
-        if (v24->f_2c)
+        
+        if (curfld->holdframe)
         {
-            for (i = 0; i < v24->f_2c; i++)
+            for (loop = 0; loop < curfld->holdframe; loop++)
             {
-                v28 = GFX_GetFrameCount();
-                while (GFX_GetFrameCount() == v28)
+                hold = GFX_GetFrameCount();
+                while (GFX_GetFrameCount() == hold)
                 {
                     if (!SND_IsPatchPlaying(back_patch))
                         SND_Patch(back_patch, 127);
@@ -92,35 +122,42 @@ int MOVIE_Play(movie_t *a1, int a2, char *a3)
                     SND_Patch(back_patch, 127);
             }
         }
-        if (v24->f_3c != -1)
+        
+        if (curfld->soundfx != -1)
         {
-            SND_Patch(v24->f_3c, v24->f_44);
+            SND_Patch(curfld->soundfx, curfld->fx_xpos);
         }
-        switch (v24->f_18)
+        
+        switch (curfld->endf)
         {
-        case 4:
+        case M_ERASE:
             memset(displaybuffer, 0, 64000);
             GFX_MarkUpdate(0, 0, 320, 200);
             GFX_DisplayUpdate();
             break;
-        case 2:
-            GFX_FadeOut(v24->f_20, v24->f_24, v24->f_28, v24->f_1c);
+        
+        case M_FADEOUT:
+            GFX_FadeOut(curfld->red, curfld->green, curfld->blue, curfld->endsteps);
             break;
-        case 1:
-            GFX_FadeIn(a3, v24->f_14);
+        
+        case M_FADEIN:
+            GFX_FadeIn(palette, curfld->startsteps);
             break;
-        case 3:
-            GFX_SetPalette(a3, 0);
+        
+        case M_PALETTE:
+            GFX_SetPalette(palette, 0);
             break;
         }
-        GLB_FreeItem(v24->f_c);
-        if (!v24->f_8)
+        
+        GLB_FreeItem(curfld->item);
+        
+        if (!curfld->numframes)
         {
-            if (--a2)
+            if (--numplay)
             {
                 memset(displaybuffer, 0, 64000);
-                v24 = a1;
-                v18 = 1;
+                curfld = frame;
+                flag = 1;
             }
             else
                 break;
@@ -130,26 +167,31 @@ int MOVIE_Play(movie_t *a1, int a2, char *a3)
             if (IMS_CheckAck())
             {
                 IMS_StartAck();
-                v20 = 2;
+                opt = K_SKIPALL;
                 break;
             }
-            v18 = 0;
-            v24++;
+            
+            flag = 0;
+            
+            curfld++;
         }
     }
-    if (v20)
+    
+    if (opt)
     {
         KBD_Clear();
         GFX_FadeOut(0, 0, 0, 16);
         memset(displaybuffer, 0, 64000);
         GFX_MarkUpdate(0, 0, 320, 200);
         GFX_DisplayUpdate();
-        GFX_SetPalette(a3, 0);
+        GFX_SetPalette(palette, 0);
     }
+    
     if (back_patch != -1)
     {
         SND_StopPatch(back_patch);
         back_patch = -1;
     }
-    return v20;
+    
+    return opt;
 }

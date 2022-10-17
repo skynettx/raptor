@@ -12,15 +12,15 @@ struct csprite_t {
 };
 
 struct maptile_t {
-    short f_0;
-    short f_2;
+    short flats;
+    short fgame;
 };
 
 typedef struct _map_t {
-    int f_0;
-    int f_4;
+    int sizerec;
+    int spriteoff;
     int numsprites;
-    maptile_t f_c[1350];
+    maptile_t map[MAP_SIZE];
 } map_t;
 
 extern int curplr_diff;
@@ -28,11 +28,11 @@ extern int curplr_diff;
 extern map_t *mapmem;
 extern csprite_t *csprite;
 
-const char* RAP_DataPath(void);
-const char* RAP_GetSetupPath(void);
+const char* RAP_InitLoadSave(void);
+const char* RAP_SetupFilename(void);
 
 void RAP_ClearPlayer(void);
-int RAP_IsSaveFile(player_t *a1);
+int RAP_IsSaveFile(player_t *in_plr);
 int RAP_FFSaveFile(void);
 void RAP_SetPlayerDiff(void);
 int RAP_SavePlayer(void);

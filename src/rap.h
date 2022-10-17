@@ -72,6 +72,10 @@ struct player_t {
 #define  DIFF_2   2  // NORMAL MODE
 #define  DIFF_3   3  // HARD MODE
 
+#define GAME1 ( gameflag[0] )
+#define GAME2 ( gameflag[1] )
+#define GAME3 ( gameflag[2] + gameflag[3] )
+
 #define PLAYERWIDTH  32
 #define PLAYERHEIGHT 32
 #define PLAYERMINX   5
@@ -135,6 +139,14 @@ enum EXP_TYPE
     EXP_ENERGY,    // 8 ENERGY SHIP BLOWING UP
     EXP_PLATOON,   // 9 ONE LITTLE PERSON BLWING UP
     EXP_AIRSMALL2  // 10  
+};
+
+enum KEYOPTS
+{
+    K_OK,
+    K_NEXTFRAME,
+    K_SKIPALL,
+    K_EXITDOS
 };
 
 struct flat_t {

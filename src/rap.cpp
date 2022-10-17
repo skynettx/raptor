@@ -1008,8 +1008,8 @@ int main(int argc, char *argv[])
 
     InitScreen();
 
-    RAP_DataPath();
-    if (access(RAP_GetSetupPath(), 0))
+    RAP_InitLoadSave();
+    if (access(RAP_SetupFilename(), 0))
     {
         printf("\n\n** You must run SETUP first! **\n");
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
@@ -1110,10 +1110,10 @@ int main(int argc, char *argv[])
     if (bday_num != -1)
         printf("Birthday() = %s\n", bday[bday_num].f_c);
 
-    if (access(RAP_GetSetupPath(), 0))
+    if (access(RAP_SetupFilename(), 0))
         EXIT_Error("You Must run SETUP.EXE First !!");
 
-    if (!INI_InitPreference(RAP_GetSetupPath()))
+    if (!INI_InitPreference(RAP_SetupFilename()))
         EXIT_Error("SETUP Error");
 
     fflush(stdout);

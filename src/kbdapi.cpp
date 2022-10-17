@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include "SDL.h"
 #include "common.h"
+#include "kbdapi.h"
 #include "i_video.h"
 
 int kbd_ack;
@@ -141,32 +142,45 @@ int ScanCodeMap[] = {
     0x53,
 };
 
-void I_HandleKeyboardEvent(SDL_Event *sdlevent)
+/***************************************************************************
+I_HandleKeyboardEvent() - Get current key status
+ ***************************************************************************/
+void 
+I_HandleKeyboardEvent(
+    SDL_Event *sdlevent
+)
 {
     int key = 0;
+    
     if (sdlevent->type != SDL_KEYDOWN && sdlevent->type != SDL_KEYUP)
         return;
+    
     switch (sdlevent->key.keysym.scancode)
     {
     case SDL_SCANCODE_LCTRL:
     case SDL_SCANCODE_RCTRL:
         key = 0x1d;
         break;
+    
     case SDL_SCANCODE_LSHIFT:
         key = 0x2a;
         break;
+    
     case SDL_SCANCODE_RSHIFT:
         key = 0x36;
         break;
+    
     case SDL_SCANCODE_LALT:
     case SDL_SCANCODE_RALT:
         key = 0x38;
         break;
+    
     default:
         if (sdlevent->key.keysym.scancode >= 0 && sdlevent->key.keysym.scancode < 100)
             key = ScanCodeMap[sdlevent->key.keysym.scancode];
         break;
     }
+    
     if (!key)
         return;
 
@@ -174,7 +188,7 @@ void I_HandleKeyboardEvent(SDL_Event *sdlevent)
     {
         kbd_ack = 0;
         keyboard[key] = 0;
-        if (key == 0x3a)
+        if (key == SC_CAPS_LOCK)
             capslock = 0;
     }
     else
@@ -182,64 +196,111 @@ void I_HandleKeyboardEvent(SDL_Event *sdlevent)
         kbd_ack = 1;
         lastscan = key;
         keyboard[key] = 1;
-        if (key && capslock + keyboard[42] + keyboard[54] != 0)
+        if (key && KBD_ISCAPS != 0)
             lastascii = ASCIINames[128 + key];
         else
             lastascii = ASCIINames[key];
-        if (key == 0x3a)
+        if (key == SC_CAPS_LOCK)
             capslock = 1;
     }
 }
 
-void KBD_Clear(void)
+/***************************************************************************
+   KBD_Clear() - Resets all flags
+ ***************************************************************************/
+void 
+KBD_Clear(
+    void
+)
 {
-    lastscan = 0;
+    lastscan = SC_NONE;
     memset(keyboard, 0, sizeof(keyboard));
 }
 
-void KBD_SetKeyboardHook(void (*hook)(void))
+/***************************************************************************
+ KBD_SetKeyboardHook() - Sets User function to call from keyboard handler
+ ***************************************************************************/
+void                       // RETURN: none
+KBD_SetKeyboardHook(
+    void (*hook)(void)     // INPUT : pointer to function
+)
 {
     kbdhook = hook;
 }
 
-int KBD_Ascii2Scan(int a1)
+/***************************************************************************
+   KBD_Ascii2Scan () - converts most ASCII chars to keyboard scan code
+ ***************************************************************************/
+int                       // RETURN: scan code
+KBD_Ascii2Scan(
+    int ascii             // INPUT : ASCII character
+)
 {
-    int i;
-    a1 = tolower(a1);
-    for (i = 0; i < 100; i++)
+    int loop;
+    
+    ascii = tolower(ascii);
+    
+    for (loop = 0; loop < 100; loop++)
     {
-        if (ASCIINames[i] == a1)
-            return i;
+        if (ASCIINames[loop] == ascii)
+            return loop;
     }
+    
     return 0;
 }
 
-void KBD_Wait(int a1)
+/***************************************************************************
+KBD_Wait() - Waits for Key to be released
+ ***************************************************************************/
+void 
+KBD_Wait(
+    int scancode           // SCANCODE see kbdapi.h
+)
 {
-    while (keyboard[a1])
+    while (KBD_Key(scancode))
     {
         I_GetEvent();
     }
-    lastscan = 0;
-    lastascii = 0;
+    
+    lastscan = SC_NONE;
+    lastascii = SC_NONE;
 }
 
-int KBD_IsKey(int a1)
+/***************************************************************************
+KBD_IsKey() - Tests to see if key is down if so waits for release
+ ***************************************************************************/
+int 
+KBD_IsKey(
+    int scancode          // SCANCODE see kbdapi.h
+)
 {
-    if (keyboard[a1])
+    if (KBD_Key(scancode))
     {
-        KBD_Wait(a1);
+        KBD_Wait(scancode);
         return 1;
     }
+    
     return 0;
 }
 
-void KBD_Install(void)
+/***************************************************************************
+   KBD_Install() - Sets up keyboard system
+ ***************************************************************************/
+void 
+KBD_Install(
+    void
+)
 {
     memset(keyboard, 0, sizeof(keyboard));
 }
 
-void KBD_End(void)
+/***************************************************************************
+   KBD_End() - Shuts down KBD system
+ ***************************************************************************/
+void 
+KBD_End(
+    void
+)
 {
 
 }

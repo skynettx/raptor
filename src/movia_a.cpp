@@ -3,14 +3,23 @@
 #include "movie.h"
 #include "gfxapi.h"
 
-void ANIM_Render(movanim_t *a1)
+/*************************************************************************
+ANIM_Render () - Renders an ANIM FRAME
+ *************************************************************************/
+void 
+ANIM_Render(
+	movanim_t *inmem
+)
 {
-	while (a1->f_0)
+	while (inmem->f_0)
 	{
-		int l = a1->f_6;
-		int p = a1->f_4;
-		a1++;
-		memcpy(&displaybuffer[p], a1, l);
-		a1 = (movanim_t*)((char*)a1 + l);
+		int l = inmem->f_6;
+		int p = inmem->f_4;
+		
+		inmem++;
+		
+		memcpy(&displaybuffer[p], inmem, l);
+		
+		inmem = (movanim_t*)((char*)inmem + l);
 	}
 }

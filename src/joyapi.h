@@ -20,11 +20,11 @@ void IPT_CalJoyRumbleLow(void);
 void IPT_CalJoyRumbleMedium(void);
 void IPT_CalJoyRumbleHigh(void);
 
-int JOY_IsKey(int a1);
-void JOY_Wait(int a1);
-int JOY_IsKeyInGameStart(int a1);
-int JOY_IsKeyInGameBack(int a1);
-int JOY_IsKeyMenu(int a1);
+int JOY_IsKey(int button);
+void JOY_Wait(int button);
+int JOY_IsKeyInGameStart(int button);
+int JOY_IsKeyInGameBack(int button);
+int JOY_IsKeyMenu(int button);
 
 void GetJoyButtonMapping(void);
-int JOY_IsScroll(int a1);
+int JOY_IsScroll(int scrollflag);
