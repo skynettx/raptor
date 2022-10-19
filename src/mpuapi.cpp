@@ -4,10 +4,6 @@
 #include "musapi.h"
 #include <windows.h>
 #include <mmsystem.h>
-#include <windows.h>
-#include <mmsystem.h>
-
-
 
 HMIDISTRM mpu_stream;
 UINT mpu_device;
@@ -15,7 +11,13 @@ int mpu_init;
 int mpu_initcnt;
 int mpu_timer;
 
-int MPU_Init(int device)
+/***************************************************************************
+MPU_Init() -
+ ***************************************************************************/
+int 
+MPU_Init(
+    int device
+)
 {
     MIDIOUTCAPS caps;
 
@@ -34,13 +36,21 @@ int MPU_Init(int device)
 
     mpu_timer = SDL_GetTicks();
     mpu_init = 1;
+    
     return 1;
 }
 
-void MPU_DeInit(void)
+/***************************************************************************
+MPU_DeInit() -
+ ***************************************************************************/
+void 
+MPU_DeInit(
+    void
+)
 {
     if (--mpu_initcnt != 0)
         return;
+    
     if (!mpu_init)
         return;
 
@@ -50,19 +60,35 @@ void MPU_DeInit(void)
     mpu_init = 0;
 }
 
-static unsigned int MPU_MapChannel(unsigned chan)
+/***************************************************************************
+MPU_MapChannel() -
+ ***************************************************************************/
+static unsigned int 
+MPU_MapChannel(
+    unsigned chan
+)
 {
     if (chan < 9)
         return chan;
+    
     if (chan == 15)
         return 9;
+    
     return chan + 1;
 }
 
-static void KeyOffEvent(unsigned int chan, unsigned int key)
+/***************************************************************************
+KeyOffEvent() -
+ ***************************************************************************/
+static void 
+KeyOffEvent(
+    unsigned int chan, 
+    unsigned int key
+)
 {
     if (!mpu_init)
         return;
+    
     uint32_t data = 0;
 
     data = 0x80 | MPU_MapChannel(chan);
@@ -72,10 +98,19 @@ static void KeyOffEvent(unsigned int chan, unsigned int key)
     midiOutShortMsg((HMIDIOUT)mpu_stream, data);
 }
 
-static void KeyOnEvent(int chan, unsigned int key, unsigned int volume)
+/***************************************************************************
+KeyOnEvent() -
+ ***************************************************************************/
+static void 
+KeyOnEvent(
+    int chan, 
+    unsigned int key, 
+    unsigned int volume
+)
 {
     if (!mpu_init)
         return;
+    
     uint32_t data = 0;
 
     data = 0x90 | MPU_MapChannel(chan);
@@ -85,10 +120,19 @@ static void KeyOnEvent(int chan, unsigned int key, unsigned int volume)
     midiOutShortMsg((HMIDIOUT)mpu_stream, data);
 }
 
-static void ControllerEvent(unsigned int chan, unsigned int controller, unsigned int param)
+/***************************************************************************
+ControllerEvent() -
+ ***************************************************************************/
+static void 
+ControllerEvent(
+    unsigned int chan, 
+    unsigned int controller, 
+    unsigned int param
+)
 {
     if (!mpu_init)
         return;
+    
     static int event_map[] = {
         0, 0, 1, 7, 10, 11, 91, 93, 64, 67, 120, 123, -1, -1, 121, -1
     };
@@ -96,6 +140,7 @@ static void ControllerEvent(unsigned int chan, unsigned int controller, unsigned
 
     if (event_map[controller] == -1)
         return;
+    
     data = 0xb0 | MPU_MapChannel(chan);
     data |= event_map[controller] << 8;
     data |= param << 16;
@@ -103,11 +148,20 @@ static void ControllerEvent(unsigned int chan, unsigned int controller, unsigned
     midiOutShortMsg((HMIDIOUT)mpu_stream, data);
 }
 
-static void PitchBendEvent(unsigned int chan, int bend)
+/***************************************************************************
+PitchBendEvent() -
+ ***************************************************************************/
+static void 
+PitchBendEvent(
+    unsigned int chan, 
+    int bend
+)
 {
     if (!mpu_init)
         return;
+    
     uint32_t data = 0;
+    
     bend <<= 6;
 
     data = 0xe0 | MPU_MapChannel(chan);
@@ -117,9 +171,18 @@ static void PitchBendEvent(unsigned int chan, int bend)
     midiOutShortMsg((HMIDIOUT)mpu_stream, data);
 }
 
-void ProgramEvent(unsigned int chan, unsigned int param){
+/***************************************************************************
+ProgramEvent() -
+ ***************************************************************************/
+void 
+ProgramEvent(
+    unsigned int chan, 
+    unsigned int param
+)
+{
     if (!mpu_init)
         return;
+    
     uint32_t data = 0;
 
     data = 0xc0 | MPU_MapChannel(chan);
@@ -128,9 +191,18 @@ void ProgramEvent(unsigned int chan, unsigned int param){
     midiOutShortMsg((HMIDIOUT)mpu_stream, data);
 }
 
-void AllNotesOffEvent(unsigned int chan, unsigned int param){
+/***************************************************************************
+AllNotesOffEvent() -
+ ***************************************************************************/
+void 
+AllNotesOffEvent(
+    unsigned int chan, 
+    unsigned int param
+)
+{
     if (!mpu_init)
         return;
+    
     uint32_t data = 0;
 
     data = 0xB0 | MPU_MapChannel(chan);
