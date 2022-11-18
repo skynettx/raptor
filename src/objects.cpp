@@ -10,952 +10,1265 @@
 #include "fileids.h"
 
 int obj_cnt;
-object_t first_objs, last_objs, objs[20];
+object_t first_objs, last_objs, objs[MAX_OBJS];
 object_t *free_objs;
-object_t *p_objs[24];
+object_t *p_objs[S_LAST_OBJECT];
 
-objlib_t obj_lib[24];
+objlib_t obj_lib[S_LAST_OBJECT];
 
 int objuse_flag;
 int think_cnt;
 
-void OBJS_Clear(void)
+#define  CHARGE_SHIELD  ( 24 * 4 )
+
+/***************************************************************************
+OBJS_Clear () - Clears out All Objects
+ ***************************************************************************/
+void 
+OBJS_Clear(
+    void
+)
 {
-    int v1c;
+    int loop;
+    
     obj_cnt = 0;
-    first_objs.f_0 = NULL;
+    
+    first_objs.prev = NULL;
     first_objs.next = &last_objs;
-    last_objs.f_0 = &first_objs;
+    
+    last_objs.prev = &first_objs;
     last_objs.next = NULL;
+    
     free_objs = objs;
+    
     memset(objs, 0, sizeof(objs));
     memset(p_objs, 0, sizeof(p_objs));
-    for (v1c = 0; v1c < 19; v1c++)
-        objs[v1c].next = &objs[v1c + 1];
+    
+    for (loop = 0; loop < MAX_OBJS - 1; loop++)
+        objs[loop].next = &objs[loop + 1];
 }
 
-object_t *OBJS_Get(void)
+/*-------------------------------------------------------------------------*
+OBJS_Get () - Gets A Free OBJ from Link List
+ *-------------------------------------------------------------------------*/
+object_t 
+*OBJS_Get(
+    void
+)
 {
-    object_t *v1c;
+    object_t *newo;
+    
     if (!free_objs)
         return 0;
-    v1c = free_objs;
+    
+    newo = free_objs;
     free_objs = free_objs->next;
-    memset(v1c, 0, sizeof(object_t));
-    v1c->next = &last_objs;
-    v1c->f_0 = last_objs.f_0;
-    last_objs.f_0 = v1c;
-    v1c->f_0->next = v1c;
+    
+    memset(newo, 0, sizeof(object_t));
+    
+    newo->next = &last_objs;
+    newo->prev = last_objs.prev;
+    last_objs.prev = newo;
+    newo->prev->next = newo;
+    
     obj_cnt++;
-    return v1c;
+    
+    return newo;
 }
 
-object_t *OBJS_Remove(object_t *a1)
+/*-------------------------------------------------------------------------*
+OBJS_Remove () Removes OBJ from Link List
+ *-------------------------------------------------------------------------*/
+object_t 
+*OBJS_Remove(
+    object_t *sh
+)
 {
-    object_t *v1c;
-    v1c = a1->f_0;
-    a1->next->f_0 = a1->f_0;
-    a1->f_0->next = a1->next;
-    memset(a1, 0, sizeof(object_t));
-    a1->next = free_objs;
-    free_objs = a1;
+    object_t *next;
+    
+    next = sh->prev;
+    
+    sh->next->prev = sh->prev;
+    sh->prev->next = sh->next;
+    
+    memset(sh, 0, sizeof(object_t));
+    
+    sh->next = free_objs;
+    
+    free_objs = sh;
+    
     obj_cnt--;
-    return v1c;
+    
+    return next;
 }
 
-void OBJS_CachePics(void)
+/***************************************************************************
+OBJS_CachePics () - PreLoad bonus/object pictures
+ ***************************************************************************/
+void 
+OBJS_CachePics(
+    void
+)
 {
-    int v20 , v24;
-    objlib_t *v1c;
-    for (v20 = 0; v20 < 24; v20++)
+    int loop, i;
+    objlib_t *lib;
+    
+    for (loop = 0; loop < S_LAST_OBJECT; loop++)
     {
-        v1c = &obj_lib[v20];
-        if (v1c && v1c->item != -1)
+        lib = &obj_lib[loop];
+        
+        if (lib && lib->item != -1)
         {
-            for (v24 = 0; v24 < v1c->numframes; v24++)
+            for (i = 0; i < lib->numframes; i++)
             {
-                GLB_CacheItem(v1c->item + v24);
+                GLB_CacheItem(lib->item + i);
             }
         }
     }
+    
     GLB_CacheItem(FILE1e0_SMSHIELD_PIC);
     GLB_CacheItem(FILE1df_SMBOMB_PIC);
 }
 
-void OBJS_FreePics(void)
+/***************************************************************************
+OBJS_FreePics () - Free bonus/object pictures
+ ***************************************************************************/
+void 
+OBJS_FreePics(
+    void
+)
 {
-    int v20, v24;
-    objlib_t* v1c;
-    for (v20 = 0; v20 < 24; v20++)
+    int loop, i;
+    objlib_t* lib;
+    
+    for (loop = 0; loop < S_LAST_OBJECT; loop++)
     {
-        v1c = &obj_lib[v20];
-        if (v1c && v1c->item != -1)
+        lib = &obj_lib[loop];
+        
+        if (lib && lib->item != -1)
         {
-            for (v24 = 0; v24 < v1c->numframes; v24++)
+            for (i = 0; i < lib->numframes; i++)
             {
-                GLB_FreeItem(v1c->item + v24);
+                GLB_FreeItem(lib->item + i);
             }
         }
     }
+    
     GLB_FreeItem(FILE1e0_SMSHIELD_PIC);
     GLB_FreeItem(FILE1df_SMBOMB_PIC);
 }
 
-void OBJS_Init(void)
+/***************************************************************************
+OBJS_Init () - Sets up object stuff
+ ***************************************************************************/
+void 
+OBJS_Init(
+    void
+)
 {
-    objlib_t *v1c;
+    objlib_t *lib;
+    
     OBJS_Clear();
+    
     memset(obj_lib, 0, sizeof(obj_lib));
     memset(p_objs, 0, sizeof(p_objs));
-    v1c = &obj_lib[0];
-    v1c->item = FILE1b0_BONUS00_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0x2ee0;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x10;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 0;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    
+    // == FORWARD GUNS ===  *
+    lib = &obj_lib[S_FORWARD_GUNS];
+    lib->item = FILE1b0_BONUS00_PIC;
+    lib->numframes = 1;
+    lib->cost = 12000;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_GUN;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 0;
+    lib->specialw = 0;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-//Plasma Cannon
-    v1c = &obj_lib[1];
-    v1c->item = FILE1b1_BONUS01_PIC;
-    v1c->numframes = 2;
-    v1c->payAmount = 0x133d0;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x10;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == PLASMA GUNS ===  *
+    lib = &obj_lib[S_PLASMA_GUNS];
+    lib->item = FILE1b1_BONUS01_PIC;
+    lib->numframes = 2;
+    lib->cost = 78800;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_GUN;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 0;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
+    // == MICRO MISSLES ===  *
+    lib = &obj_lib[S_MICRO_MISSLE];
+    lib->item = FILE1b3_BONUS02_PIC;
+    lib->numframes = 2;
+    lib->cost = 175600;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_GUN;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 0;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[2];
-    v1c->item = FILE1b3_BONUS02_PIC;
-    v1c->numframes = 2;
-    v1c->payAmount = 0x2adf0;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x10;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == DUMB MISSLES === *
+    lib = &obj_lib[S_DUMB_MISSLE];
+    lib->item = FILE1b5_BONUS03_PIC;
+    lib->numframes = 1;
+    lib->cost = 145200;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_MISSLE;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 1;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    //Dumbfire Missile
-    v1c = &obj_lib[3];
-    v1c->item = FILE1b5_BONUS03_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0x23730;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x13;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 1;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == MINI GUN ===
+    lib = &obj_lib[S_MINI_GUN];
+    lib->item = FILE1b6_BONUS04_PIC;
+    lib->numframes = 4;
+    lib->cost = 250650;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_GUN;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 1;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[4];
-    v1c->item = FILE1b6_BONUS04_PIC;
-    v1c->numframes = 4;
-    v1c->payAmount = 0x3d31a;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x10;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 1;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == LASER TURRET ===
+    lib = &obj_lib[S_TURRET];
+    lib->item = FILE1ba_BONUS05_PIC;
+    lib->numframes = 4;
+    lib->cost = 512850;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_LASER;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 1;
+    lib->moneyflag = 0;
+    lib->game1flag = 0;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[5];
-    v1c->item = FILE1ba_BONUS05_PIC;
-    v1c->numframes = 4;
-    v1c->payAmount = 0x7d352;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x12;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 1;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 0;
-    v1c->f_34 = 1;
+    // == MISSLE PODS ===
+    lib = &obj_lib[S_MISSLE_PODS];
+    lib->item = FILE1be_BONUS06_PIC;
+    lib->numframes = 1;
+    lib->cost = 204950;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_GUN;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 1;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[6];
-    v1c->item = FILE1be_BONUS06_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0x32096;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x10;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 1;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == AIR TO AIR MISSLES === *
+    lib = &obj_lib[S_AIR_MISSLE];
+    lib->item = FILE1bf_BONUS07_PIC;
+    lib->numframes = 1;
+    lib->cost = 63500;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_MISSLE;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 1;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    //Air/Air Missile
-    v1c = &obj_lib[7];
-    v1c->item = FILE1bf_BONUS07_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0xf80c;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x13;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 1;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == AIR TO GROUND MISSLES === *
+    lib = &obj_lib[S_GRD_MISSLE];
+    lib->item = FILE1c0_BONUS08_PIC;
+    lib->numframes = 1;
+    lib->cost = 110000;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_MISSLE;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 1;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    //AIR/Ground Missile
-    v1c = &obj_lib[8];
-    v1c->item = FILE1c0_BONUS08_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 110000;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x13;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 1;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == GROUND BOMB ===
+    lib = &obj_lib[S_BOMB];
+    lib->item = FILE1da_BONUS21_PIC;
+    lib->numframes = 1;
+    lib->cost = 98200;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_MISSLE;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 1;
+    lib->moneyflag = 0;
+    lib->game1flag = 0;
+    lib->shieldflag = 1;
 
-    //Bomb
-    v1c = &obj_lib[9];
-    v1c->item = FILE1da_BONUS21_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0x17f98;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x13;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 1;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 0;
-    v1c->f_34 = 1;
+    // == ENERGY GRAB ===
+    lib = &obj_lib[S_ENERGY_GRAB];
+    lib->item = FILE1c1_BONUS09_PIC;
+    lib->numframes = 4;
+    lib->cost = 300750;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_GUN;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 1;
+    lib->moneyflag = 0;
+    lib->game1flag = 0;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[10];
-    v1c->item = FILE1c1_BONUS09_PIC;
-    v1c->numframes = 4;
-    v1c->payAmount = 0x496ce;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x10;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 1;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 0;
-    v1c->f_34 = 1;
+    // == MEGA BOMB === *
+    lib = &obj_lib[S_MEGA_BOMB];
+    lib->item = FILE1c5_BONUS10_PIC;
+    lib->numframes = 1;
+    lib->cost = 32250;
+    lib->start_cnt = 1;
+    lib->max_cnt = 5;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_GUN;
+    lib->forever = 0;
+    lib->onlyflag = 1;
+    lib->loseit = 1;
+    lib->specialw = 0;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    //Megabomb
-    v1c = &obj_lib[11];
-    v1c->item = FILE1c5_BONUS10_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0x07dfa;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 5;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x10;
-    v1c->f_1c = 0;
-    v1c->f_20 = 1;
-    v1c->f_24 = 1;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == PULSE CANNON ===
+    lib = &obj_lib[S_PULSE_CANNON];
+    lib->item = FILE1c6_BONUS11_PIC;
+    lib->numframes = 2;
+    lib->cost = 725000;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_GUN;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 1;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[12];
-    v1c->item = FILE1c6_BONUS11_PIC;
-    v1c->numframes = 2;
-    v1c->payAmount = 0xb1008;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x10;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 1;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == FORWARD LASER ===
+    lib = &obj_lib[S_FORWARD_LASER];
+    lib->item = FILE1c8_BONUS12_PIC;
+    lib->numframes = 4;
+    lib->cost = 1750000;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_LASER;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 1;
+    lib->moneyflag = 0;
+    lib->game1flag = 0;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[13];
-    v1c->item = FILE1c8_BONUS12_PIC;
-    v1c->numframes = 4;
-    v1c->payAmount = 0x1ab3f0;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x12;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 1;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 0;
-    v1c->f_34 = 1;
+    // == DEATH RAY ===
+    lib = &obj_lib[S_DEATH_RAY];
+    lib->item = FILE1cc_BONUS13_PIC;
+    lib->numframes = 4;
+    lib->cost = 950000;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->actf = SHOTS_PlayerShoot;
+    lib->fxtype = FX_LASER;
+    lib->forever = 1;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 1;
+    lib->moneyflag = 0;
+    lib->game1flag = 0;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[14];
-    v1c->item = FILE1cc_BONUS13_PIC;
-    v1c->numframes = 4;
-    v1c->payAmount = 950000;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_14 = SHOTS_PlayerShoot;
-    v1c->f_18 = 0x12;
-    v1c->f_1c = 1;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 1;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 0;
-    v1c->f_34 = 1;
+    // == SUPER SHIELD ===
+    lib = &obj_lib[S_SUPER_SHIELD];
+    lib->item = FILE1d0_BONUS14_PIC;
+    lib->numframes = 1;
+    lib->cost = 78500;
+    lib->start_cnt = MAX_SHIELD;
+    lib->max_cnt = MAX_SHIELD;
+    lib->fxtype = -1;
+    lib->forever = 0;
+    lib->onlyflag = 0;
+    lib->loseit = 0;
+    lib->specialw = 0;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[15];
-    v1c->item = FILE1d0_BONUS14_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0x132a4;
-    v1c->resaleAmount = 100;
-    v1c->f_10 = 100;
-    v1c->f_18 = -1;
-    v1c->f_1c = 0;
-    v1c->f_20 = 0;
-    v1c->f_24 = 0;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == SHIP NORM ENERGY ===
+    lib = &obj_lib[S_ENERGY];
+    lib->item = FILE1d1_BONUS15_PIC;
+    lib->numframes = 4;
+    lib->cost = 400;
+    lib->start_cnt = MAX_SHIELD / 4;
+    lib->max_cnt = MAX_SHIELD;
+    lib->fxtype = -1;
+    lib->forever = 1;
+    lib->onlyflag = 1;
+    lib->loseit = 0;
+    lib->specialw = 0;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[16];
-    v1c->item = FILE1d1_BONUS15_PIC;
-    v1c->numframes = 4;
-    v1c->payAmount = 400;
-    v1c->resaleAmount = 0x19;
-    v1c->f_10 = 100;
-    v1c->f_18 = -1;
-    v1c->f_1c = 1;
-    v1c->f_20 = 1;
-    v1c->f_24 = 0;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == ENEMY DAMAGE DETECTOR ===
+    lib = &obj_lib[S_DETECT];
+    lib->item = FILE1d5_BONUS16_PIC;
+    lib->numframes = 1;
+    lib->cost = 10000;
+    lib->start_cnt = 1;
+    lib->max_cnt = 1;
+    lib->fxtype = -1;
+    lib->forever = 0;
+    lib->onlyflag = 1;
+    lib->loseit = 0;
+    lib->specialw = 0;
+    lib->moneyflag = 0;
+    lib->game1flag = 1;
+    lib->shieldflag = 0;
 
-    //Ion Scanner
-    v1c = &obj_lib[17];
-    v1c->item = FILE1d5_BONUS16_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0x02710;
-    v1c->resaleAmount = 1;
-    v1c->f_10 = 1;
-    v1c->f_18 = -1;
-    v1c->f_1c = 0;
-    v1c->f_20 = 1;
-    v1c->f_24 = 0;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 0;
-    v1c->f_30 = 1;
-    v1c->f_34 = 0;
+    // == BUY ITEM 1 ===
+    lib = &obj_lib[S_ITEMBUY1];
+    lib->item = FILE1d5_BONUS16_PIC;
+    lib->numframes = 1;
+    lib->cost = 93800;
+    lib->start_cnt = lib->cost;
+    lib->max_cnt = lib->cost;
+    lib->fxtype = -1;
+    lib->forever = 0;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 0;
+    lib->moneyflag = 1;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[18];
-    v1c->item = FILE1d5_BONUS16_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0x16e68;
-    v1c->resaleAmount = 0x16e68;
-    v1c->f_10 = 0x16e68;
-    v1c->f_18 = -1;
-    v1c->f_1c = 0;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 1;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == BUY ITEM 2 ===
+    lib = &obj_lib[S_ITEMBUY2];
+    lib->item = FILE1d6_BONUS17_PIC;
+    lib->numframes = 1;
+    lib->cost = 76000;
+    lib->start_cnt = lib->cost;
+    lib->max_cnt = lib->cost;
+    lib->fxtype = -1;
+    lib->forever = 0;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 0;
+    lib->moneyflag = 1;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[19];
-    v1c->item = FILE1d6_BONUS17_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 76000;
-    v1c->resaleAmount = 76000;
-    v1c->f_10 = 76000;
-    v1c->f_18 = -1;
-    v1c->f_1c = 0;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 1;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == BUY ITEM 3 ===
+    lib = &obj_lib[S_ITEMBUY3];
+    lib->item = FILE1d7_BONUS18_PIC;
+    lib->numframes = 1;
+    lib->cost = 55700;
+    lib->start_cnt = lib->cost;
+    lib->max_cnt = lib->cost;
+    lib->fxtype = -1;
+    lib->forever = 0;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 0;
+    lib->moneyflag = 1;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[20];
-    v1c->item = FILE1d7_BONUS18_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0xd994;
-    v1c->resaleAmount = 0xd994;
-    v1c->f_10 = 0xd994;
-    v1c->f_18 = -1;
-    v1c->f_1c = 0;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 1;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == BUY ITEM 4 ===
+    lib = &obj_lib[S_ITEMBUY4];
+    lib->item = FILE1d8_BONUS19_PIC;
+    lib->numframes = 1;
+    lib->cost = 35200;
+    lib->start_cnt = lib->cost;
+    lib->max_cnt = lib->cost;
+    lib->fxtype = -1;
+    lib->forever = 0;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 0;
+    lib->moneyflag = 1;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[21];
-    v1c->item = FILE1d8_BONUS19_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0x8980;
-    v1c->resaleAmount = 0x8980;
-    v1c->f_10 = 0x8980;
-    v1c->f_18 = -1;
-    v1c->f_1c = 0;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 1;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
+    // == BUY ITEM 5 ===
+    lib = &obj_lib[S_ITEMBUY5];
+    lib->item = FILE1d9_BONUS20_PIC;
+    lib->numframes = 1;
+    lib->cost = 122500;
+    lib->start_cnt = lib->cost;
+    lib->max_cnt = lib->cost;
+    lib->fxtype = -1;
+    lib->forever = 0;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 0;
+    lib->moneyflag = 1;
+    lib->game1flag = 1;
+    lib->shieldflag = 1;
 
-    v1c = &obj_lib[22];
-    v1c->item = FILE1d9_BONUS20_PIC;
-    v1c->numframes = 1;
-    v1c->payAmount = 0x1de84;
-    v1c->resaleAmount = 0x1de84;
-    v1c->f_10 = 0x1de84;
-    v1c->f_18 = -1;
-    v1c->f_1c = 0;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 1;
-    v1c->f_30 = 1;
-    v1c->f_34 = 1;
-
-    v1c = &obj_lib[23];
-    v1c->item = FILE1db_BONUS22_PIC;
-    v1c->numframes = 4;
-    v1c->payAmount = 0x32;
-    v1c->resaleAmount = 0x32;
-    v1c->f_10 = 0x32;
-    v1c->f_18 = -1;
-    v1c->f_1c = 0;
-    v1c->f_20 = 0;
-    v1c->f_24 = 1;
-    v1c->f_28 = 0;
-    v1c->moneyflag = 1;
-    v1c->f_30 = 1;
-    v1c->f_34 = 0;
+    // == BUY ITEM 6 ===
+    lib = &obj_lib[S_ITEMBUY6];
+    lib->item = FILE1db_BONUS22_PIC;
+    lib->numframes = 4;
+    lib->cost = 50;
+    lib->start_cnt = lib->cost;
+    lib->max_cnt = lib->cost;
+    lib->fxtype = -1;
+    lib->forever = 0;
+    lib->onlyflag = 0;
+    lib->loseit = 1;
+    lib->specialw = 0;
+    lib->moneyflag = 1;
+    lib->game1flag = 1;
+    lib->shieldflag = 0;
 }
 
-
-void OBJS_DisplayStats(void)
+/***************************************************************************
+OBJS_DisplayStats() - Display game screen object stuff
+ ***************************************************************************/
+void 
+OBJS_DisplayStats(
+    void
+)
 {
-    int v1c;
-    int v20, v24, v28;
+    int item;
+    int loop, x, maxloop;
     static int dpos;
-    if (p_objs[17])
+    
+    if (p_objs[S_DETECT])
     {
-        v20 = ENEMY_GetBaseDamage();
-        if (v20 > 0)
+        loop = ENEMY_GetBaseDamage();
+        if (loop > 0)
         {
-            GFX_ColorBox(0x6d, 0xbf, 0x66, 8, 0x4a);
-            GFX_ColorBox(0x6e, 0xc0, v20, 6, 0x44);
+            GFX_ColorBox(109, MAP_BOTTOM + 9, 102, 8, 74);
+            GFX_ColorBox(110, MAP_BOTTOM + 10, loop, 6, 68);
         }
         else
         {
-            GFX_VLine(dpos + 0x6e, 0xbe, 3, 0x44);
-            GFX_VLine(0xd1 - dpos, 0xbe, 3, 0x44);
+            GFX_VLine(dpos + 110, MAP_BOTTOM + 8, 3, 68);
+            GFX_VLine(209 - dpos, MAP_BOTTOM + 8, 3, 68);
             dpos++;
             dpos %= 50;
         }
     }
+    
     if (player.sweapon != -1)
     {
-        v1c = obj_lib[player.sweapon].item;
-        GFX_PutSprite((texture_t*)GLB_GetItem(v1c), 0x11e, 2);
+        item = obj_lib[player.sweapon].item;
+        GFX_PutSprite((texture_t*)GLB_GetItem(item), MAP_RIGHT - 18, MAP_TOP);
     }
-    if (p_objs[15])
+    
+    if (p_objs[S_SUPER_SHIELD])
     {
-        v24 = 18;
-        v28 = OBJS_GetTotal(15);
-        for (v20 = 0; v20 < v28; v20++)
+        x = MAP_LEFT + 2;
+        maxloop = OBJS_GetTotal(S_SUPER_SHIELD);
+        for (loop = 0; loop < maxloop; loop++)
         {
-            GFX_PutSprite((texture_t*)GLB_GetItem(FILE1e0_SMSHIELD_PIC), v24, 1);
-            v24 += 13;
+            GFX_PutSprite((texture_t*)GLB_GetItem(FILE1e0_SMSHIELD_PIC), x, 1);
+            x += 13;
         }
     }
-    if (p_objs[11])
+    
+    if (p_objs[S_MEGA_BOMB])
     {
-        v24 = 18;
-        for (v20 = 0; v20 < p_objs[11]->f_8; v20++)
+        x = MAP_LEFT + 2;
+        for (loop = 0; loop < p_objs[S_MEGA_BOMB]->num; loop++)
         {
-            GFX_PutSprite((texture_t*)GLB_GetItem(FILE1df_SMBOMB_PIC), v24, 0xba);
-            v24 += 13;
+            GFX_PutSprite((texture_t*)GLB_GetItem(FILE1df_SMBOMB_PIC), x, 186);
+            x += 13;
         }
     }
 }
 
-int OBJS_Equip(int a1)
+/*-------------------------------------------------------------------------*
+OBJS_Equip () - Equips an OBJ to be used by Player
+ *-------------------------------------------------------------------------*/
+int                        // RETURN: TRUE/FALSE
+OBJS_Equip(
+    int type               // INPUT: OBJ type
+)
 {
-    object_t *v1c;
-    for (v1c = first_objs.next; &last_objs != v1c; v1c = v1c->next)
+    object_t *cur;
+    
+    for (cur = first_objs.next; &last_objs != cur; cur = cur->next)
     {
-        if (v1c->f_c == a1 && !p_objs[a1])
+        if (cur->type == type && !p_objs[type])
         {
-            v1c->f_14 = 1;
-            p_objs[a1] = v1c;
+            cur->inuse = 1;
+            p_objs[type] = cur;
             return 1;
         }
     }
+    
     return 0;
 }
 
-int OBJS_Load(object_t *a1)
+/***************************************************************************
+OBJS_Load () - Adds new OBJ from OBJ
+ ***************************************************************************/
+int 
+OBJS_Load(
+    object_t *inobj         // INPUT : pointer to OBJ     
+)
 {
-    object_t *v1c;
+    object_t *cur;
 
-    v1c = OBJS_Get();
-    if (!v1c)
+    cur = OBJS_Get();
+    if (!cur)
         return 0;
 
-    v1c->f_8 = a1->f_8;
-    v1c->f_c = a1->f_c;
-    v1c->f_10 = &obj_lib[a1->f_c];
-    v1c->f_14 = a1->f_14;
-    if (v1c->f_14)
-        p_objs[a1->f_c] = v1c;
+    cur->num = inobj->num;
+    cur->type = inobj->type;
+    cur->lib = &obj_lib[inobj->type];
+    cur->inuse = inobj->inuse;
+    
+    if (cur->inuse)
+        p_objs[inobj->type] = cur;
+    
     return 1;
 }
 
-int OBJS_Add(int a1)
+/***************************************************************************
+OBJS_Add () - Adds OBJ ( type ) to players possesions
+ ***************************************************************************/
+int 
+OBJS_Add(
+    int type                // INPUT : OBJ type
+)
 {
-    objlib_t *v20;
-    object_t *v1c;
-    if (a1 >= 24)
-        return 3;
+    objlib_t *lib;
+    object_t *cur;
+    
+    if (type >= S_LAST_OBJECT)
+        return OBJ_ERROR;
+    
     g_oldsuper = -1;
     g_oldshield = -1;
-    v20 = &obj_lib[a1];
-    if (v20->moneyflag)
+    
+    lib = &obj_lib[type];
+    
+    if (lib->moneyflag)
     {
-        player.score += v20->payAmount;
-        return 0;
+        player.score += lib->cost;
+        return OBJ_GOTIT;
     }
-    if (!reg_flag && !v20->f_30)
-        return 0;
-    if (v20->f_20)
+    
+    if (!reg_flag && !lib->game1flag)
+        return OBJ_GOTIT;
+    
+    if (lib->onlyflag)
     {
-        for (v1c = first_objs.next; &last_objs != v1c; v1c = v1c->next)
+        for (cur = first_objs.next; &last_objs != cur; cur = cur->next)
         {
-            if (v1c->f_c == a1)
+            if (cur->type == type)
             {
-                if (v1c->f_8 >= v20->f_10)
-                    return 2;
-                v1c->f_8 += v20->resaleAmount;
-                if (v1c->f_8 > v20->f_10)
-                    v1c->f_8 = v20->f_10;
-                return 0;
+                if (cur->num >= lib->max_cnt)
+                    return OBJ_SHIPFULL;
+                
+                cur->num += lib->start_cnt;
+                if (cur->num > lib->max_cnt)
+                    cur->num = lib->max_cnt;
+                
+                return OBJ_GOTIT;
             }
         }
     }
-    v1c = OBJS_Get();
-    if (!v1c)
-        return 2;
-    v1c->f_8 = v20->resaleAmount;
-    v1c->f_c = a1;
-    v1c->f_10 = v20;
-    if (!p_objs[a1])
+    
+    cur = OBJS_Get();
+    if (!cur)
+        return OBJ_SHIPFULL;
+    
+    cur->num = lib->start_cnt;
+    cur->type = type;
+    cur->lib = lib;
+    
+    // == equip item if needed =====
+    if (!p_objs[type])
     {
-        v1c->f_14 = 1;
-        p_objs[a1] = v1c;
-        if (player.sweapon == -1 && v20->f_28)
+        cur->inuse = 1;
+        p_objs[type] = cur;
+        if (player.sweapon == -1 && lib->specialw)
         {
-            player.sweapon = a1;
+            player.sweapon = type;
         }
     }
-    return 0;
+    
+    return OBJ_GOTIT;
 }
 
-void OBJS_Del(int a1)
+/***************************************************************************
+OBJS_Del () - Removes Object From User Posession
+ ***************************************************************************/
+void 
+OBJS_Del(
+    int type               //INPUT : OBJ type
+)
 {
-    object_t *v1c;
-    v1c = p_objs[a1];
-    if (v1c)
+    object_t *cur;
+    cur = p_objs[type];
+    
+    if (cur)
     {
-        OBJS_Remove(v1c);
-        p_objs[a1] = NULL;
-        OBJS_Equip(a1);
-        if (a1 == player.sweapon)
+        OBJS_Remove(cur);
+        p_objs[type] = NULL;
+        OBJS_Equip(type);
+        
+        if (type == player.sweapon)
             OBJS_GetNext();
     }
 }
 
-void OBJS_GetNext(void)
+/***************************************************************************
+OBJS_GetNext () - Sets plr.sweapon to next available weapon
+ ***************************************************************************/
+void 
+OBJS_GetNext(
+    void
+)
 {
-    int v1c, v20, v24;
-    object_t *v28;
+    int loop, pos, setval;
+    object_t *cur;
 
-    v24 = -1;
-    if (player.sweapon < 3)
-        v20 = 3;
+    setval = -1;
+    
+    if (player.sweapon < S_DUMB_MISSLE)
+        pos = S_DUMB_MISSLE;
     else
-        v20 = player.sweapon + 1;
-    for (v1c = 3; v1c <= 14; v1c++)
+        pos = player.sweapon + 1;
+    
+    for (loop = FIRST_SPECIAL; loop <= LAST_WEAPON; loop++)
     {
-        if (v20 > 14)
-            v20 = 3;
-        v28 = p_objs[v20];
-        if (v28 && v28->f_8 && v28->f_10->f_28)
+        if (pos > LAST_WEAPON)
+            pos = FIRST_SPECIAL;
+        
+        cur = p_objs[pos];
+        
+        if (cur && cur->num && cur->lib->specialw)
         {
-            v24 = v20;
+            setval = pos;
             break;
         }
-        v20++;
+        pos++;
     }
-    player.sweapon = v24;
+    
+    player.sweapon = setval;
 }
 
-void OBJS_Use(int a1)
+/***************************************************************************
+OBJS_Use () - Player Use An Object
+ ***************************************************************************/
+void 
+OBJS_Use(
+    int type              //INPUT : OBJ type 
+)
 {
-    object_t *v1c;
-    objlib_t *v20;
+    object_t *cur;
+    objlib_t *lib;
 
-    v1c = p_objs[a1];
-    v20 = &obj_lib[a1];
-    if (v1c)
+    cur = p_objs[type];
+    lib = &obj_lib[type];
+    
+    if (cur)
     {
         objuse_flag = 1;
         think_cnt = 0;
-        if (v20->f_14(a1) && !v20->f_1c)
+        
+        if (lib->actf(type) && !lib->forever)
         {
-            v1c->f_8--;
+            cur->num--;
         }
-        if (v1c->f_8 <= 0 && !v20->f_1c)
+        
+        if (cur->num <= 0 && !lib->forever)
         {
-            OBJS_Remove(v1c);
-            p_objs[a1] = NULL;
-            OBJS_Equip(a1);
-            if (player.sweapon == a1)
+            OBJS_Remove(cur);
+            p_objs[type] = NULL;
+            OBJS_Equip(type);
+            if (player.sweapon == type)
                 OBJS_GetNext();
         }
     }
 }
 
-int OBJS_Sell(int a1)
+/***************************************************************************
+OBJS_Sell () - Sell Object from player posesion
+ ***************************************************************************/
+int                         // RETRUN: amount left
+OBJS_Sell(
+    int type                // INPUT : OBJ type
+)
 {
-    object_t *v1c;
-    objlib_t *v20;
-    int v24;
-    v1c = p_objs[a1];
-    v20 = &obj_lib[a1];
-    if (!v1c)
+    object_t *cur;
+    objlib_t *lib;
+    int rval;
+    
+    cur = p_objs[type];
+    lib = &obj_lib[type];
+    
+    if (!cur)
         return 0;
-    player.score += OBJS_GetResale(a1);
-    if (a1 == 17)
+    
+    player.score += OBJS_GetResale(type);
+    
+    if (type == S_DETECT)
     {
-        p_objs[a1] = NULL;
+        p_objs[type] = NULL;
         return 0;
     }
-    if (v20->f_20)
+    
+    if (lib->onlyflag)
     {
-        v1c->f_8 -= v20->resaleAmount;
-        if (v1c->f_8 <= 0)
+        cur->num -= lib->start_cnt;
+        
+        if (cur->num <= 0)
         {
-            v24 = 0;
-            v1c->f_8 = 0;
-            if (!v20->f_1c)
+            rval = 0;
+            cur->num = 0;
+            if (!lib->forever)
             {
-                OBJS_Remove(v1c);
-                p_objs[a1] = NULL;
-                OBJS_Equip(a1);
-                if (player.sweapon == a1)
+                OBJS_Remove(cur);
+                p_objs[type] = NULL;
+                OBJS_Equip(type);
+                if (player.sweapon == type)
                     OBJS_GetNext();
             }
         }
         else
-            v24 = v1c->f_8;
+            rval = cur->num;
     }
     else
     {
-        OBJS_Del(a1);
-        v24 = OBJS_GetTotal(a1);
+        OBJS_Del(type);
+        
+        rval = OBJS_GetTotal(type);
     }
-    return v24;
+    
+    return rval;
 }
 
-int OBJS_Buy(unsigned int a1)
+/***************************************************************************
+OBJS_Buy () - Add Amount from TYPE that is equiped ( BUY )
+ ***************************************************************************/
+int                        // RETURN: see BUYSTUFF
+OBJS_Buy(
+    unsigned int type      // INPUT : OBJ type
+)
 {
-    int v1c, v20;
+    int rval, num;
 
-    v1c = 1;
-    if (a1 == 15)
+    rval = OBJ_NOMONEY;
+    
+    if (type == S_SUPER_SHIELD)
     {
-        v20 = OBJS_GetTotal(15);
-        if (v20 >= 5)
-            return 2;
+        num = OBJS_GetTotal(S_SUPER_SHIELD);
+        if (num >= 5)
+            return OBJ_SHIPFULL;
     }
-    if ((unsigned int)OBJS_GetCost(a1) <= player.score)
+    
+    if ((unsigned int)OBJS_GetCost(type) <= player.score)
     {
-        v1c = OBJS_Add(a1);
-        if (!v1c)
-            player.score -= OBJS_GetCost(a1);
+        rval = OBJS_Add(type);
+        
+        if (!rval)
+            player.score -= OBJS_GetCost(type);
     }
-    return v1c;
+    
+    return rval;
 }
 
-int FUN_0001b169(int a1, int a2)
+/***************************************************************************
+OBJS_SubAmt () - Subtract Amount From Equiped Item
+ ***************************************************************************/
+int                        // RETURN: return nums in OBJ
+OBJS_SubAmt(
+    int type,              // INPUT : OBJ type
+    int amt                // INPUT : amount to subtract
+)
 {
-    object_t* v18;
+    object_t* cur;
 
-    v18 = p_objs[a1];
-    if (!v18)
+    cur = p_objs[type];
+    
+    if (!cur)
         return 0;
-    v18->f_8 -= a2;
-    if (v18->f_8 < 0)
-        v18->f_8 = 0;
-    return v18->f_8;
+    
+    cur->num -= amt;
+    
+    if (cur->num < 0)
+        cur->num = 0;
+    
+    return cur->num;
 }
 
-int OBJS_GetAmt(int a1)
+/***************************************************************************
+OBJS_GetAmt() - Returns number of items within TYPE in Equiped Items
+ ***************************************************************************/
+int                        // RETURN: return nums in OBJ
+OBJS_GetAmt(
+    int type               // INPUT : OBJ type
+)
 {
-    object_t* v1c;
+    object_t* cur;
 
-    v1c = p_objs[a1];
-    if (!v1c)
+    cur = p_objs[type];
+    
+    if (!cur)
         return 0;
-    return v1c->f_8;
+    
+    return cur->num;
 }
 
-int OBJS_GetTotal(int a1)
+/***************************************************************************
+OBJS_GetTotal() - Returns number of items within TYPE in all OBJS
+ ***************************************************************************/
+int                        // RETURN: return nums in OBJ
+OBJS_GetTotal(
+    int type               // INPUT : OBJ type
+)
 {
-    int v20;
-    object_t *v1c;
+    int total;
+    object_t *cur;
 
-    v20 = 0;
-    for (v1c = first_objs.next; &last_objs != v1c; v1c = v1c->next)
+    total = 0;
+    
+    for (cur = first_objs.next; &last_objs != cur; cur = cur->next)
     {
-        if (a1 == v1c->f_c)
-            v20++;
+        if (type == cur->type)
+            total++;
     }
-    return v20;
+    
+    return total;
 }
 
-int OBJS_IsOnly(int a1)
+/***************************************************************************
+OBJS_IsOnly () - Is Onlyflag set
+ ***************************************************************************/
+int                        // RETURN: TRUE/FALSE
+OBJS_IsOnly(
+    int type               // INPUT : OBJ type
+)
 {
-    objlib_t *v1c;
+    objlib_t *lib;
 
-    v1c = &obj_lib[a1];
-    return v1c->f_20;
+    lib = &obj_lib[type];
+    
+    return lib->onlyflag;
 }
 
-int OBJS_GetCost(int a1)
+/***************************************************************************
+OBJS_GetCost () - Returns The game COST of an object
+ ***************************************************************************/
+int                        // RETURN: cost of object
+OBJS_GetCost(
+    int type               // INPUT : OBJ type
+)
 {
-    objlib_t* v1c;
-    int v20;
+    objlib_t* lib;
+    int cost;
 
-    v1c = &obj_lib[a1];
-    if (!v1c)
+    lib = &obj_lib[type];
+    
+    if (!lib)
         return 99999999;
-    if (v1c->f_20)
-        v20 = v1c->payAmount * v1c->resaleAmount;
+    
+    if (lib->onlyflag)
+        cost = lib->cost * lib->start_cnt;
     else
-        v20 = v1c->payAmount;
-    return v20;
+        cost = lib->cost;
+    
+    return cost;
 }
 
-int OBJS_GetResale(int a1)
+/***************************************************************************
+OBJS_GetResale () - Returns The game Resale Value of an object
+ ***************************************************************************/
+int                          // RETURN: cost of object
+OBJS_GetResale(
+    int type                 // INPUT : OBJ type
+)
 {
-    object_t *v1c;
-    objlib_t* v20;
-    int v24;
+    object_t *cur;
+    objlib_t* lib;
+    int cost;
 
-    v1c = p_objs[a1];
-    v20 = &obj_lib[a1];
-    if (!v1c)
+    cur = p_objs[type];
+    lib = &obj_lib[type];
+    
+    if (!cur)
         return 0;
-    if (v20->f_20)
-        v24 = v20->payAmount * v20->resaleAmount;
+    
+    if (lib->onlyflag)
+        cost = lib->cost * lib->start_cnt;
     else
-        v24 = v20->payAmount;
-    return v24 >> 1;
+        cost = lib->cost;
+    
+    return cost >> 1;
 }
 
-int OBJS_CanBuy(int a1)
+/***************************************************************************
+OBJS_CanBuy() - Returns TRUE if player can buy object
+ ***************************************************************************/
+int 
+OBJS_CanBuy(
+    int type               // INPUT : OBJ type
+)
 {
-    int v20;
-    objlib_t *v1c;
-    v1c = &obj_lib[a1];
-    if (a1 >= 24)
+    int cost;
+    objlib_t *lib;
+    
+    lib = &obj_lib[type];
+    
+    if (type >= S_LAST_OBJECT)
         return 0;
-    if (a1 == 0 && OBJS_IsEquip(a1))
+    
+    if (type == S_FORWARD_GUNS && OBJS_IsEquip(type))
         return 0;
 
-    if (!reg_flag && !v1c->f_30)
+    if (!reg_flag && !lib->game1flag)
         return 0;
 
-    v20 = OBJS_GetCost(a1);
-    if (!v20)
+    cost = OBJS_GetCost(type);
+    
+    if (!cost)
         return 0;
+    
     return 1;
 }
 
-int OBJS_CanSell(int a1)
+/***************************************************************************
+OBJS_CanSell() - Returns TRUE if player can Sell object
+ ***************************************************************************/
+int 
+OBJS_CanSell(
+    int type               // INPUT : OBJ type
+)
 {
-    object_t *v1c;
-    objlib_t* v20;
-    v1c = p_objs[a1];
-    v20 = &obj_lib[a1];
-    if (a1 >= 24)
+    object_t *cur;
+    objlib_t *lib;
+    
+    cur = p_objs[type];
+    lib = &obj_lib[type];
+    
+    if (type >= S_LAST_OBJECT)
         return 0;
-    if (!v1c)
+    
+    if (!cur)
         return 0;
-    if (v20->f_20 && a1 == 16 && v1c->f_8 <= v20->resaleAmount)
+    
+    if (lib->onlyflag && type == S_ENERGY && cur->num <= lib->start_cnt)
         return 0;
-    if (v1c->f_8 < v20->resaleAmount)
+    
+    if (cur->num < lib->start_cnt)
         return 0;
+    
     return 1;
 }
 
-int OBJS_GetNum(void)
+/***************************************************************************
+OBJS_GetNum () - Returns number of Objects that player has
+ ***************************************************************************/
+int                        // RETURN: number of objects                     
+OBJS_GetNum(
+    void
+)
 {
     return obj_cnt;
 }
 
-objlib_t* OBJS_GetLib(int a1)
+/***************************************************************************
+OBJS_GetLib () - Returns Pointer to Lib Object
+ ***************************************************************************/
+objlib_t 
+*OBJS_GetLib(
+    int type               // INPUT : OBJ type
+)
 {
-    objlib_t *v1c;
-    v1c = &obj_lib[a1];
-    return v1c;
+    objlib_t *lib;
+    
+    lib = &obj_lib[type];
+    
+    return lib;
 }
 
-int OBJS_IsEquip(int a1)
+/***************************************************************************
+OBJS_IsEquip() - Returns TRUE if item is Equiped
+ ***************************************************************************/
+int                        // RETURN: return nums in OBJ
+OBJS_IsEquip(
+    int type               // INPUT : OBJ type
+)
 {
-    //if (p_objs[a1])
-    if (a1 >= 0) if (p_objs[a1])
-     return 1;
+    if (p_objs[type])
+        return 1;
+    
     return 0;
 }
 
-int OBJS_SubEnergy(int a1)
+/***************************************************************************
+OBJS_SubEnergy()
+ ***************************************************************************/
+int                            // RETURN: return nums in OBJ
+OBJS_SubEnergy(
+    int amt                    // INPUT : amount to subtract
+)
 {
-    object_t* v1c;
+    object_t *cur;
 
     if (godmode)
         return 0;
+    
     if (startendwave != -1)
         return 0;
 
-    v1c = p_objs[15];
-    if (curplr_diff == 0 && a1 > 1)
-        a1 >>= 1;
-    if (v1c)
+    cur = p_objs[S_SUPER_SHIELD];
+    
+    if (curplr_diff == DIFF_0 && amt > 1)
+        amt >>= 1;
+    
+    if (cur)
     {
-        ANIMS_StartAnim(20, 0, 0);
-        SND_Patch(32, 127);
-        v1c->f_8 -= a1;
-        if (v1c->f_8 < 0)
-            OBJS_Del(15);
+        ANIMS_StartAnim(A_SUPER_SHIELD, 0, 0);
+        
+        SND_Patch(FX_SHIT, 127);
+        
+        cur->num -= amt;
+        
+        if (cur->num < 0)
+            OBJS_Del(S_SUPER_SHIELD);
     }
     else
     {
-        v1c = p_objs[16];
-        if (!v1c)
+        cur = p_objs[S_ENERGY];
+        if (!cur)
             return 0;
-        SND_Patch(33, 127);
-        v1c->f_8 -= a1;
-        if (v1c->f_8 < 0)
-            v1c->f_8 = 0;
+        
+        SND_Patch(FX_HIT, 127);
+        
+        cur->num -= amt;
+        
+        if (cur->num < 0)
+            cur->num = 0;
     }
-    return v1c->f_8;
+    
+    return cur->num;
 }
 
-int OBJS_AddEnergy(int a1)
+/***************************************************************************
+OBJS_AddEnergy()
+ ***************************************************************************/
+int                           // RETURN: return nums in OBJ
+OBJS_AddEnergy(
+    int amt                   // INPUT : amount to add
+)
 {
-    object_t *v1c;
-    v1c = p_objs[16];
-    if (!v1c)
+    object_t *cur;
+    
+    cur = p_objs[S_ENERGY];
+    
+    if (!cur)
         return 0;
-    if (v1c->f_8 < v1c->f_10->f_10)
+    
+    if (cur->num < cur->lib->max_cnt)
     {
-        v1c = p_objs[16];
-        if (!v1c)
+        cur = p_objs[S_ENERGY];
+        
+        if (!cur)
             return 0;
-        v1c->f_8 += a1;
-        if (v1c->f_8 > v1c->f_10->f_10)
-            v1c->f_8 = v1c->f_10->f_10;
+        
+        cur->num += amt;
+        
+        if (cur->num > cur->lib->max_cnt)
+            cur->num = cur->lib->max_cnt;
     }
     else
     {
-        v1c = p_objs[15];
-        if (!v1c)
+        cur = p_objs[S_SUPER_SHIELD];
+        
+        if (!cur)
             return 0;
-        if (!v1c->f_8)
+        
+        if (!cur->num)
             return 0;
-        v1c->f_8 += (a1 >> 2);
-        if (v1c->f_8 > v1c->f_10->f_10)
-            v1c->f_8 = v1c->f_10->f_10;
+        
+        cur->num += (amt >> 2);
+        
+        if (cur->num > cur->lib->max_cnt)
+            cur->num = cur->lib->max_cnt;
     }
-    return v1c->f_8;
+    
+    return cur->num;
 }
 
-int OBJS_LoseObj(void)
+/***************************************************************************
+OBJS_LoseObj() - Lose random object
+ ***************************************************************************/
+int 
+OBJS_LoseObj(
+    void
+)
 {
-    int v24, v20;
-    objlib_t *v1c;
-    v24 = 1;
+    int rval, type;
+    objlib_t *lib;
+    rval = 1;
+    
     if (player.sweapon == -1)
     {
-        for (v20 = 23; v20 >= 0; v20--)
+        for (type = S_LAST_OBJECT - 1; type >= 0; type--)
         {
-            v1c = &obj_lib[v20];
-            if (p_objs[v20] && v1c->f_24)
+            lib = &obj_lib[type];
+            if (p_objs[type] && lib->loseit)
             {
-                OBJS_Del(v20);
-                v24 = 1;
+                OBJS_Del(type);
+                rval = 1;
                 break;
             }
         }
@@ -963,21 +1276,29 @@ int OBJS_LoseObj(void)
     else
     {
         OBJS_Del(player.sweapon);
-        v24 = 1;
+        rval = 1;
     }
-    return v24;
+    
+    return rval;
 }
 
-void OBJS_Think(void)
+/***************************************************************************
+OBJS_Think () - Does all in game thinking ( recharing )
+ ***************************************************************************/
+void 
+OBJS_Think(
+    void
+)
 {
-    if (curplr_diff < 3)
+    if (curplr_diff < DIFF_3)
     {
         if (objuse_flag)
             objuse_flag = 0;
         else
         {
             think_cnt++;
-            if (think_cnt > 96)
+            
+            if (think_cnt > CHARGE_SHIELD)
             {
                 if (startendwave == -1)
                     OBJS_AddEnergy(1);
@@ -987,20 +1308,31 @@ void OBJS_Think(void)
     }
 }
 
-int OBJS_MakeSpecial(int a1)
+/***************************************************************************
+OBJS_MakeSpecial() - Makes the selected weapon the current special
+ ***************************************************************************/
+int 
+OBJS_MakeSpecial(
+    int type               // INPUT : OBJ type
+)
 {
-    object_t *v1c;
-    objlib_t *v20;
+    object_t *cur;
+    objlib_t *lib;
 
-    v1c = p_objs[a1];
-    v20 = &obj_lib[a1];
-    if (a1 >= 24)
+    cur = p_objs[type];
+    lib = &obj_lib[type];
+    
+    if (type >= S_LAST_OBJECT)
         return 0;
-    if (!v1c)
+    
+    if (!cur)
         return 0;
-    if (!v20->f_28)
+    
+    if (!lib->specialw)
         return 0;
-    player.sweapon = a1;
+    
+    player.sweapon = type;
+    
     return 1;
 }
 

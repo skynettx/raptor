@@ -46,14 +46,27 @@ static void ( *MidiCallBack)(void) = 0;
 
 static char soundBankName[PATH_MAX+1] = "";
 
-static void _ASS_MessageOutputString(const char *str)
+/***************************************************************************
+_ASS_MessageOutputString() -
+ ***************************************************************************/
+static void 
+_ASS_MessageOutputString(
+    const char *str
+)
 {
    fputs(str, stderr);
 }
 
 void (*ASS_MessageOutputString)(const char *) = _ASS_MessageOutputString;
 
-void ASS_Message(const char *fmt, ...)
+/***************************************************************************
+ASS_Message() -
+ ***************************************************************************/
+void 
+ASS_Message(
+    const char *fmt, 
+    ...
+)
 {
     char text[256];
     va_list va;
@@ -71,7 +84,13 @@ if ((result = (fcall)) != noErr) {\
     return CAErr_Error;\
 }
 
-void CoreAudioDrv_PCM_Unlock(void)
+/***************************************************************************
+CoreAudioDrv_PCM_Unlock() -
+ ***************************************************************************/
+void 
+CoreAudioDrv_PCM_Unlock(
+    void
+)
 {
     if (!(Initialised & CASystem_pcm)) {
         return;
@@ -80,7 +99,13 @@ void CoreAudioDrv_PCM_Unlock(void)
     pthread_mutex_unlock(&pcmmutex);
 }
 
-void CoreAudioDrv_PCM_Lock(void)
+/***************************************************************************
+CoreAudioDrv_PCM_Lock() -
+ ***************************************************************************/
+void 
+CoreAudioDrv_PCM_Lock(
+    void
+)
 {
     if (!(Initialised & CASystem_pcm)) {
         return;
@@ -89,7 +114,13 @@ void CoreAudioDrv_PCM_Lock(void)
     pthread_mutex_lock(&pcmmutex);
 }
 
-void CoreAudioDrv_MIDI_Lock(void)
+/***************************************************************************
+CoreAudioDrv_MIDI_Lock() -
+ ***************************************************************************/
+void 
+CoreAudioDrv_MIDI_Lock(
+    void
+)
 {
     if (!(Initialised & CASystem_midi)) {
         return;
@@ -98,7 +129,13 @@ void CoreAudioDrv_MIDI_Lock(void)
     pthread_mutex_lock(&midimutex);
 }
 
-void CoreAudioDrv_MIDI_Unlock(void)
+/***************************************************************************
+CoreAudioDrv_MIDI_Unlock() -
+ ***************************************************************************/
+void 
+CoreAudioDrv_MIDI_Unlock(
+    void
+)
 {
     if (!(Initialised & CASystem_midi)) {
         return;
@@ -107,13 +144,18 @@ void CoreAudioDrv_MIDI_Unlock(void)
     pthread_mutex_unlock(&midimutex);
 }
 
-static OSStatus pcmService(
-                    void                         *inRefCon,
-                    AudioUnitRenderActionFlags   *inActionFlags,
-                    const AudioTimeStamp         *inTimeStamp,
-                    UInt32                       inBusNumber,
-                    UInt32                       inNumberFrames,
-                    AudioBufferList              *ioData)
+/***************************************************************************
+pcmService() -
+ ***************************************************************************/
+static 
+OSStatus pcmService(
+    void *inRefCon,
+    AudioUnitRenderActionFlags *inActionFlags,
+    const AudioTimeStamp *inTimeStamp,
+    UInt32 inBusNumber,
+    UInt32 inNumberFrames,
+    AudioBufferList *ioData
+)
 {
     UInt32 remaining, len, bufn;
     char *ptr, *sptr;
@@ -159,13 +201,18 @@ static OSStatus pcmService(
     return noErr;
 }
 
-static OSStatus midiService(
-                            void                        *inRefCon,
-                            AudioUnitRenderActionFlags  *ioActionFlags,
-                            const AudioTimeStamp        *inTimeStamp,
-                            UInt32                      inBusNumber,
-                            UInt32                      inNumberFrames,
-                            AudioBufferList             *ioData)
+/***************************************************************************
+midiService() -
+ ***************************************************************************/
+static 
+OSStatus midiService(
+    void *inRefCon,
+    AudioUnitRenderActionFlags *ioActionFlags,
+    const AudioTimeStamp *inTimeStamp,
+    UInt32 inBusNumber,
+    UInt32 inNumberFrames,
+    AudioBufferList *ioData
+)
 {
     int secondsThisCall = (inNumberFrames << 16) / 44100;
 
@@ -188,10 +235,15 @@ static OSStatus midiService(
     return noErr;
 }
 
-
-int CORE_Init (int subsystem)
+/***************************************************************************
+CORE_Init() -
+ ***************************************************************************/
+int 
+CORE_Init(
+    int subsystem
+)
 {
-OSStatus result;
+    OSStatus result;
     AudioComponentDescription desc;
     AURenderCallbackStruct callback;
     AudioStreamBasicDescription pcmDesc;
@@ -326,7 +378,13 @@ OSStatus result;
     return CAErr_Ok;
 }
 
-void CORE_DeInit(void)
+/***************************************************************************
+CORE_DeInit() -
+ ***************************************************************************/
+void 
+CORE_DeInit(
+    void
+)
 {
     OSStatus result;
 
@@ -345,16 +403,31 @@ void CORE_DeInit(void)
     pthread_mutex_destroy(&midimutex);
 }
 
-static unsigned int MPU_MapChannel(unsigned chan)
+/***************************************************************************
+MPU_MapChannel() -
+ ***************************************************************************/
+static unsigned int 
+MPU_MapChannel(
+    unsigned chan
+)
 {
     if (chan < 9)
         return chan;
+    
     if (chan == 15)
         return 9;
+    
     return chan +1;
 }
 
-static void KeyOffEvent(unsigned int chan, unsigned int key)
+/***************************************************************************
+KeyOffEvent() -
+ ***************************************************************************/
+static void 
+KeyOffEvent(
+    unsigned int chan, 
+    unsigned int key
+)
 {
     MusicDeviceMIDIEvent(synthunit,
                          0x80 | MPU_MapChannel(chan),
@@ -363,7 +436,15 @@ static void KeyOffEvent(unsigned int chan, unsigned int key)
                          MidiFrameOffset);
 }
 
-static void KeyOnEvent(int chan, unsigned int key, unsigned int volume)
+/***************************************************************************
+KeyOnEvent() -
+ ***************************************************************************/
+static void 
+KeyOnEvent(
+    int chan, 
+    unsigned int key, 
+    unsigned int volume
+)
 {
     MusicDeviceMIDIEvent(synthunit,
                          0x90 | MPU_MapChannel(chan),
@@ -372,7 +453,14 @@ static void KeyOnEvent(int chan, unsigned int key, unsigned int volume)
                          MidiFrameOffset);
 }
 
-static void ProgramEvent(unsigned int chan, unsigned int param) 
+/***************************************************************************
+ProgramEvent() -
+ ***************************************************************************/
+static void 
+ProgramEvent(
+    unsigned int chan, 
+    unsigned int param
+) 
 {
     MusicDeviceMIDIEvent(synthunit,
                          0xC0 | MPU_MapChannel(chan),
@@ -381,8 +469,14 @@ static void ProgramEvent(unsigned int chan, unsigned int param)
                          MidiFrameOffset);
 }
 
-
-static void PitchBendEvent(unsigned int chan, int bend)
+/***************************************************************************
+PitchBendEvent() -
+ ***************************************************************************/
+static void 
+PitchBendEvent(
+    unsigned int chan, 
+    int bend
+)
 {
     int lsb;
     int msb;
@@ -402,7 +496,14 @@ static void PitchBendEvent(unsigned int chan, int bend)
                          MidiFrameOffset);
 }
 
-static void AllNotesOffEvent(unsigned int chan, unsigned int param)
+/***************************************************************************
+AllNotesOffEvent() -
+ ***************************************************************************/
+static void 
+AllNotesOffEvent(
+    unsigned int chan, 
+    unsigned int param
+)
 {
     MusicDeviceMIDIEvent(synthunit,
                          0x7B | chan,
@@ -411,7 +512,15 @@ static void AllNotesOffEvent(unsigned int chan, unsigned int param)
                          MidiFrameOffset);
 }
 
-static void ControllerEvent(unsigned int chan, unsigned int controller, unsigned int param)
+/***************************************************************************
+ControllerEvent() -
+ ***************************************************************************/
+static void 
+ControllerEvent(
+    unsigned int chan, 
+    unsigned int controller, 
+    unsigned int param
+)
 {
     static int event_map[] = {
       0, 0, 1, 7, 10, 11, 91, 93, 64, 67, 120, 123, -1, -1, 121, -1
