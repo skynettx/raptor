@@ -2,56 +2,94 @@
 #include "common.h"
 #include "ptrapi.h"
 
+#define CURSORHEIGHT  16
+#define CURSORWIDTH   16
+
 extern char *cursorsave;
 extern char *displaypic;
 extern char *cursorstart;
 extern int cursorloopx, cursorloopy;
 
-void PTR_Save(void)
+/*------------------------------------------------------------------------
+PTR_Save() - Saves screen before a cursor draw
+  ------------------------------------------------------------------------*/
+void 
+PTR_Save(
+    void
+)
 {
-    int i;
-    for (i = 0; i < 16; i++)
+    int loop;
+    
+    for (loop = 0; loop < CURSORHEIGHT; loop++)
     {
-        memcpy(&cursorsave[i * 16], &cursorstart[i * 320], 16);
+        memcpy(&cursorsave[loop * CURSORWIDTH], &cursorstart[loop * SCREENWIDTH], CURSORWIDTH);
     }
 }
 
-void PTR_ClipSave(void)
+/*------------------------------------------------------------------------
+PTR_ClipSave() - Saves screen before a cursor draw
+  ------------------------------------------------------------------------*/
+void 
+PTR_ClipSave(
+    void
+)
 {
-    int i;
-    for (i = 0; i < cursorloopy; i++)
+    int loop;
+    
+    for (loop = 0; loop < cursorloopy; loop++)
     {
-        memcpy(&cursorsave[i * 16], &cursorstart[i * 320], 16);
+        memcpy(&cursorsave[loop * CURSORWIDTH], &cursorstart[loop * SCREENWIDTH], CURSORWIDTH);
     }
 }
 
-void PTR_Erase(void)
+/*------------------------------------------------------------------------
+PTR_Erase() - Erases cursor with stuff from PTR_Save()
+  ------------------------------------------------------------------------*/
+void 
+PTR_Erase(
+    void
+)
 {
-    int i;
-    for (i = 0; i < 16; i++)
+    int loop;
+    
+    for (loop = 0; loop < CURSORHEIGHT; loop++)
     {
-        memcpy(&cursorstart[i * 320], &cursorsave[i * 16], 16);
+        memcpy(&cursorstart[loop * SCREENWIDTH], &cursorsave[loop * CURSORWIDTH], CURSORWIDTH);
     }
 }
 
-void PTR_ClipErase(void)
+/*------------------------------------------------------------------------
+PTR_ClipErase() - Erases cursor and clips edges of screen
+  ------------------------------------------------------------------------*/
+void 
+PTR_ClipErase(
+    void
+)
 {
-    int i;
-    for (i = 0; i < cursorloopy; i++)
+    int loop;
+    
+    for (loop = 0; loop < cursorloopy; loop++)
     {
-        memcpy(&cursorstart[i * 320], &cursorsave[i * 16], cursorloopx);
+        memcpy(&cursorstart[loop * SCREENWIDTH], &cursorsave[loop * CURSORWIDTH], cursorloopx);
     }
 }
 
-void PTR_Draw(void)
+/*------------------------------------------------------------------------
+PTR_Draw() - Draws Cursor
+  ------------------------------------------------------------------------*/
+void 
+PTR_Draw(
+    void
+)
 {
-    int i, j;
-    for (i = 0; i < cursorloopy; i++)
+    int loop, i;
+    
+    for (loop = 0; loop < cursorloopy; loop++)
     {
-        for (j = cursorloopx - 1; j >= 0; j--)
+        for (i = cursorloopx - 1; i >= 0; i--)
         {
-            if (displaypic[i * 16 + j])
-                cursorstart[i * 320 + j] = displaypic[i * 16 + j];
+            if (displaypic[loop * CURSORWIDTH + i])
+                cursorstart[loop * SCREENWIDTH + i] = displaypic[loop * CURSORWIDTH + i];
         }
     }
 }
