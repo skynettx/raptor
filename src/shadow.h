@@ -5,7 +5,7 @@ extern int num_shadows;
 
 void SHADOW_Init(void);
 void SHADOW_MakeShades(void);
-void SHADOW_GAdd(int a1, int a2, int a3);
-void SHADOW_Add(int a1, int a2, int a3);
+void SHADOW_GAdd(int item, int x, int y);
+void SHADOW_Add(int item, int x, int y);
 void SHADOW_DisplayGround();
 void SHADOW_DisplaySky();

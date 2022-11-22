@@ -9,142 +9,227 @@ char sdtablemem[516];
 char *sdtable;
 
 struct shad_t {
-    int f_0;
-    int f_4;
-    int f_8;
+    int item;
+    int x;
+    int y;
 };
 
-shad_t shads[50];
-shad_t gshads[25];
+#define MAX_SHADOWS 50
+#define MAX_GSHADOWS 25
+
+shad_t shads[MAX_SHADOWS];
+shad_t gshads[MAX_GSHADOWS];
 int num_shadows, num_gshadows;
 
-void SHADOW_Draw(char *a1, int a2, int a3)
-{
-    texture_t *v14;
-    texture_t *v20;
-    int v18, v1c, v40, v24, v28, v2c, v30, v34, v38, v3c, v44;
+#define MAXZ  1280;
 
-    v14 = (texture_t*)a1;
-    a2 -= 10;
-    a3 += 20;
-    v3c = v40 = -1;
-    G3D_x = a2;
-    G3D_y = a3;
-    G3D_z = 0x500;
+/***************************************************************************
+SHADOW_Draw () - Draws AIR shadows in 3D perspective
+ ***************************************************************************/
+void 
+SHADOW_Draw(
+    char *pic,             // INPUT : pointer to sprite data
+    int x,                 // INPUT : x position of sprite
+    int y                  // INPUT : y position of sprite
+)
+{
+    texture_t *h;
+    texture_t *ah;
+    int lx, ly, oldsy, sx, sy, ox, oy, x2, y2, oldy, drawflag;
+
+    h = (texture_t*)pic;
+    x -= 10;
+    y += 20;
+    
+    oldy = oldsy = -1;
+    
+    G3D_x = x;
+    G3D_y = y;
+    G3D_z = MAXZ;
     GFX_3DPoint();
-    v2c = G3D_screenx;
-    v30 = G3D_screeny;
-    G3D_x = v2c + v14->width - 1;
-    G3D_y = v30 + v14->height - 1;
-    G3D_z = 0x500;
+    ox = G3D_screenx;
+    oy = G3D_screeny;
+    
+    G3D_x = ox + h->width - 1;
+    G3D_y = oy + h->height - 1;
+    G3D_z = MAXZ;
     GFX_3DPoint();
-    v18 = G3D_screenx - v2c + 1;
-    v1c = G3D_screenx - v30 + 1;
-    if (!GFX_ClipLines(0, &v2c, &v30, &v18, &v1c))
+    lx = G3D_screenx - ox + 1;
+    ly = G3D_screenx - oy + 1;
+    
+    if (!GFX_ClipLines(0, &ox, &oy, &lx, &ly))
         return;
-    a1 += 0x14;
-    v20 = (texture_t*)a1;
-    while (v20->offset != -1)
+    
+    pic += 0x14;
+    
+    ah = (texture_t*)pic;
+    
+    while (ah->offset != -1)
     {
-        a1 += 16;
-        v2c = v20->x + a2;
-        v30 = v20->y + a3;
-        v34 = v2c + v20->width - 1;
-        v38 = v30 + 1;
-        G3D_x = v2c;
-        G3D_y = v30;
-        G3D_z = 0x500;
+        pic += 16;
+        
+        ox = ah->x + x;
+        oy = ah->y + y;
+        
+        x2 = ox + ah->width - 1;
+        y2 = oy + 1;
+        
+        G3D_x = ox;
+        G3D_y = oy;
+        G3D_z = MAXZ;
         GFX_3DPoint();
-        v24 = G3D_screenx;
-        v28 = G3D_screeny;
-        G3D_x = v34;
-        G3D_y = v38;
-        G3D_z = 0x500;
+        sx = G3D_screenx;
+        sy = G3D_screeny;
+        
+        G3D_x = x2;
+        G3D_y = y2;
+        G3D_z = MAXZ;
         GFX_3DPoint();
-        v18 = G3D_screenx - v24 + 1;
-        if (v28 > 200)
+        lx = G3D_screenx - sx + 1;
+        
+        if (sy > SCREENHEIGHT)
             return;
-        v44 = 1;
-        if (v20->y != v3c && v40 == v28)
-            v44 = 0;
-        if (v44)
+        
+        drawflag = 1;
+        
+        if (ah->y != oldy && oldsy == sy)
+            drawflag = 0;
+        
+        if (drawflag)
         {
-            if (GFX_ClipLines(0, &v24, &v28, &v18, &v1c))
-                GFX_Shade(displaybuffer + v24 + ylookup[v28], v18, sdtable);
-            v3c = v20->y;
+            ly = 1;
+            
+            if (GFX_ClipLines(0, &sx, &sy, &lx, &ly))
+                GFX_Shade(displaybuffer + sx + ylookup[sy], lx, sdtable);
+            
+            oldy = ah->y;
         }
-        v40 = v28;
-        a1 += v20->width;
-        v20 = (texture_t*)a1;
+        
+        oldsy = sy;
+        
+        pic += ah->width;
+        
+        ah = (texture_t*)pic;
     }
 }
 
-void SHADOW_Init(void)
+/***************************************************************************
+SHADOW_Init() - Allocate memory and set 3D view
+ ***************************************************************************/
+void 
+SHADOW_Init(
+    void
+)
 {
     sdtable = sdtablemem;
     sdtable = (char*)(((intptr_t)sdtable + 255) & ~255);
+    
     GFX_3D_SetView(160, 100, 1000);
 }
 
-void SHADOW_MakeShades(void)
+/***************************************************************************
+SHADOW_MakeShades() - Make shade tables
+ ***************************************************************************/
+void 
+SHADOW_MakeShades(
+    void
+)
 {
     GFX_MakeLightTable(palette, sdtable, -6);
 }
 
-void SHADOW_Add(int a1, int a2, int a3)
+/***************************************************************************
+SHADOW_Add() - Add a Air ship shadow
+ ***************************************************************************/
+void 
+SHADOW_Add(
+    int item,               // INPUT : GLB item
+    int x,                  // INPUT : x position
+    int y                   // INPUT : y position
+)
 {
-    shad_t *v14;
-    v14 = &shads[num_shadows];
-    if (num_shadows < 50)
+    shad_t *cur;
+    cur = &shads[num_shadows];
+    
+    if (num_shadows < MAX_SHADOWS)
     {
-        v14->f_0 = a1;
-        v14->f_4 = a2;
-        v14->f_8 = a3;
+        cur->item = item;
+        cur->x = x;
+        cur->y = y;
+        
         num_shadows++;
     }
 }
 
-void SHADOW_GAdd(int a1, int a2, int a3)
+/***************************************************************************
+SHADOW_GAdd() - Adds Ground shadow
+ ***************************************************************************/
+void 
+SHADOW_GAdd(
+    int item,              // INPUT : GLB item
+    int x,                 // INPUT : x position
+    int y                  // INPUT : y position
+)
 {
-    shad_t *v14;
-    v14 = &gshads[num_gshadows];
-    if (num_gshadows < 25)
+    shad_t *cur;
+    cur = &gshads[num_gshadows];
+    
+    if (num_gshadows < MAX_GSHADOWS)
     {
-        v14->f_0 = a1;
-        v14->f_4 = a2 - 3;
-        v14->f_8 = a3 + 4;
+        cur->item = item;
+        cur->x = x - 3;
+        cur->y = y + 4;
+        
         num_gshadows++;
     }
 }
 
-void SHADOW_DisplaySky(void)
+/***************************************************************************
+SHADOW_DisplaySky () - Display Sky Shadows
+ ***************************************************************************/
+void 
+SHADOW_DisplaySky(
+    void
+)
 {
-    char *v20;
-    shad_t *v1c;
-    v1c = shads;
+    char *pic;
+    shad_t *cur;
+    cur = shads;
+    
     if (opt_detail < 1)
         return;
+    
     while (--num_shadows != -1)
     {
-        v20 = GLB_GetItem(v1c->f_0);
-        SHADOW_Draw(v20, v1c->f_4, v1c->f_8);
-        v1c++;
+        pic = GLB_GetItem(cur->item);
+        SHADOW_Draw(pic, cur->x, cur->y);
+        cur++;
     }
+    
     num_shadows = 0;
 }
 
-void SHADOW_DisplayGround(void)
+/***************************************************************************
+SHADOW_DisplayGround() - Display Ground Shadows
+ ***************************************************************************/
+void 
+SHADOW_DisplayGround(
+    void
+)
 {
-    char *v20;
-    shad_t *v1c;
-    v1c = gshads;
+    char *pic;
+    shad_t *cur;
+    cur = gshads;
+    
     if (opt_detail < 1)
         return;
+    
     while (--num_gshadows != -1)
     {
-        v20 = GLB_GetItem(v1c->f_0);
-        GFX_ShadeShape(0, (texture_t*)v20, v1c->f_4, v1c->f_8);
-        v1c++;
+        pic = GLB_GetItem(cur->item);
+        GFX_ShadeShape(DARK, (texture_t*)pic, cur->x, cur->y);
+        cur++;
     }
+    
     num_gshadows = 0;
 }
