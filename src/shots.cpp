@@ -8,9 +8,10 @@
 #include "anims.h"
 #include "tile.h"
 #include "eshot.h"
+#include "objects.h"
 #include "fileids.h"
 
-shot_t shots[70];
+shot_t shots[MAX_SHOTS];
 
 shot_t first_shots, last_shots;
 
@@ -23,499 +24,563 @@ texture_t *detpow[4];
 texture_t *laspow[4];
 texture_t *lashit[4];
 
-shot_lib_t shot_lib[15];
+shot_lib_t shot_lib[LAST_WEAPON + 1];
 
-void SHOTS_Clear(void)
+/***************************************************************************
+SHOTS_Clear () * Clears out SHOTS Linklist
+ ***************************************************************************/
+void 
+SHOTS_Clear(
+    void
+)
 {
-    int i;
+    int loop;
+    
     shotnum = 0;
-    first_shots.f_0 = NULL;
-    first_shots.f_4 = &last_shots;
-    last_shots.f_0 = &first_shots;
-    last_shots.f_4 = NULL;
+    
+    first_shots.prev = NULL;
+    first_shots.next = &last_shots;
+    
+    last_shots.prev = &first_shots;
+    last_shots.next = NULL;
+    
     free_shots = shots;
+    
     memset(shots, 0, sizeof(shots));
 
-    for (i = 0; i < 70; i++)
+    for (loop = 0; loop < MAX_SHOTS; loop++)
     {
-        if (i == 69) // FIXME
+        if (loop == 69) // FIXME
         {
-            shots[i].f_4 = &first_shots;
+            shots[loop].next = &first_shots;
             continue;
         }
-        shots[i].f_4 = &shots[i + 1];
+        
+        shots[loop].next = &shots[loop + 1];
     }
 }
 
-shot_t *SHOTS_Get(void)
+/*-------------------------------------------------------------------------*
+SHOTS_Get () - gets a Free SHOT OBJECT from linklist
+ *-------------------------------------------------------------------------*/
+shot_t 
+*SHOTS_Get(
+    void
+)
 {
-    shot_t *v1c;
+    shot_t *news;
+    
     if (!free_shots)
         return NULL;
+    
     shotnum++;
     if (shotnum > shothigh)
         shothigh = shotnum;
-    v1c = free_shots;
-    free_shots = free_shots->f_4;
-    memset(v1c, 0, sizeof(shot_t));
-    v1c->f_4 = &last_shots;
-    v1c->f_0 = last_shots.f_0;
-    last_shots.f_0 = v1c;
-    v1c->f_0->f_4 = v1c;
-    return v1c;
+    
+    news = free_shots;
+    free_shots = free_shots->next;
+    
+    memset(news, 0, sizeof(shot_t));
+    
+    news->next = &last_shots;
+    news->prev = last_shots.prev;
+    last_shots.prev = news;
+    news->prev->next = news;
+    
+    return news;
 }
 
-shot_t *SHOTS_Remove(shot_t *a1)
+/*-------------------------------------------------------------------------*
+SHOTS_Remove () - Removes SHOT OBJECT from linklist
+ *-------------------------------------------------------------------------*/
+shot_t 
+*SHOTS_Remove(
+    shot_t *sh
+)
 {
-    shot_t *v1c;
+    shot_t *next;
+    
     shotnum--;
-    v1c = a1->f_0;
-    a1->f_4->f_0 = a1->f_0;
-    a1->f_0->f_4 = a1->f_4;
-    memset(a1, 0, sizeof(shot_t));
-    a1->f_4 = free_shots;
-    free_shots = a1;
-    return v1c;
+    
+    next = sh->prev;
+    
+    sh->next->prev = sh->prev;
+    sh->prev->next = sh->next;
+    
+    memset(sh, 0, sizeof(shot_t));
+    
+    sh->next = free_shots;
+    
+    free_shots = sh;
+    
+    return next;
 }
 
-void SHOTS_Init(void)
+/***************************************************************************
+SHOTS_Init () - Inits SHOTS system and clears link list
+ ***************************************************************************/
+void 
+SHOTS_Init(
+    void
+)
 {
-    int i, v24;
-    shot_lib_t *v1c;
+    int i, item;
+    shot_lib_t *slib;
+    
     SHOTS_Clear();
+    
     for (i = 0; i < 4; i++)
     {
         detpow[i] = (texture_t*)GLB_LockItem(FILE139_DETHPOW_BLK + i);
     }
+    
     for (i = 0; i < 4; i++)
     {
         laspow[i] = (texture_t*)GLB_LockItem(FILE13d_LASERPOW_BLK + i);
     }
+    
     for (i = 0; i < 4; i++)
     {
         lashit[i] = (texture_t*)GLB_LockItem(FILE1f1_DRAYHIT_BLK + i);
     }
+    
     memset(shot_lib, 0, sizeof(shot_lib));
-    v1c = &shot_lib[0];
-    v1c->f_0 = FILE1c3_NMSHOT_BLK;
-    v1c->f_2c = 0;
-    v1c->removeType = 0;
-    v1c->damageAmount = 1;
-    v1c->startSpeed = 8;
-    v1c->maxSpeedY = 0x10;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 4;
-    v1c->offsetX = 0;
-    v1c->offsetY = 2;
-    v1c->y = 0;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    
+    // == FORWARD_GUNS =====================================
+    slib = &shot_lib[S_FORWARD_GUNS];
+    slib->lumpnum = FILE1c3_NMSHOT_BLK;
+    slib->shadow = 0;
+    slib->type = S_FORWARD_GUNS;
+    slib->hits = 1;
+    slib->speed = 8;
+    slib->maxspeed = 16;
+    slib->startframe = 0;
+    slib->numframes = 4;
+    slib->delayflag = 0;
+    slib->shoot_rate = 2;
+    slib->cur_shoot = 0;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 0;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_ALL;
 
-    v1c = &shot_lib[1];
-    v1c->f_0 = 65999;
-    v1c->f_2c = 0;
-    v1c->removeType = 1;
-    v1c->damageAmount = 2;
-    v1c->startSpeed = 4;
-    v1c->maxSpeedY = 8;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 2;
-    v1c->offsetX = 0;
-    v1c->offsetY = 10;
-    v1c->y = 0;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == PLASMA_GUNS =====================================
+    slib = &shot_lib[S_PLASMA_GUNS];
+    slib->lumpnum = FILE1cf_PLASMA_BLK;
+    slib->shadow = 0;
+    slib->type = S_PLASMA_GUNS;
+    slib->hits = 2;
+    slib->speed = 4;
+    slib->maxspeed = 8;
+    slib->startframe = 0;
+    slib->numframes = 2;
+    slib->delayflag = 0;
+    slib->shoot_rate = 10;
+    slib->cur_shoot = 0;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 1;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_AIR;
 
-    v1c = &shot_lib[2];
-    v1c->f_0 = FILE1c1_MICROM_BLK;
-    v1c->f_2c = 0;
-    v1c->removeType = 2;
-    v1c->damageAmount = 2;
-    v1c->startSpeed = 2;
-    v1c->maxSpeedY = 8;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 2;
-    v1c->offsetX = 0;
-    v1c->offsetY = 4;
-    v1c->y = 0;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == MICRO_MISSLE =====================================
+    slib = &shot_lib[S_MICRO_MISSLE];
+    slib->lumpnum = FILE1c1_MICROM_BLK;
+    slib->shadow = 0;
+    slib->type = S_MICRO_MISSLE;
+    slib->hits = 2;
+    slib->speed = 2;
+    slib->maxspeed = 8;
+    slib->startframe = 0;
+    slib->numframes = 2;
+    slib->delayflag = 0;
+    slib->shoot_rate = 4;
+    slib->cur_shoot = 0;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 3;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_GRALL;
 
-    v1c = &shot_lib[3];
-    v1c->f_0 = FILE1ba_MISDUM_BLK;
-    v1c->f_2c = 1;
-    v1c->removeType = 3;
-    v1c->damageAmount = 4;
-    v1c->startSpeed = 2;
-    v1c->maxSpeedY = 0xc;
-    v1c->frameResetPoint = 1;
-    v1c->numberOfFrames = 3;
-    v1c->offsetX = 1;
-    v1c->offsetY = 10;
-    v1c->y = 0;
-    v1c->f_58 = 1;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == DUMB_MISSLE =====================================
+    slib = &shot_lib[S_DUMB_MISSLE];
+    slib->lumpnum = FILE1ba_MISDUM_BLK;
+    slib->shadow = 1;
+    slib->type = S_DUMB_MISSLE;
+    slib->hits = 4;
+    slib->speed = 2;
+    slib->maxspeed = 12;
+    slib->startframe = 1;
+    slib->numframes = 3;
+    slib->delayflag = 1;
+    slib->shoot_rate = 10;
+    slib->cur_shoot = 0;
+    slib->use_plot = 1;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 0;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_ALL;
 
-    v1c = &shot_lib[4];
-    v1c->f_0 = FILE1c3_NMSHOT_BLK;
-    v1c->f_2c = 1;
-    v1c->removeType = 4;
-    v1c->damageAmount = 1;
-    v1c->startSpeed = 8;
-    v1c->maxSpeedY = 10;
-    v1c->frameResetPoint = 1;
-    v1c->numberOfFrames = 4;
-    v1c->offsetX = 0;
-    v1c->offsetY = 1;
-    v1c->y = 0;
-    v1c->f_58 = 1;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == MINI_GUN =====================================
+    slib = &shot_lib[S_MINI_GUN];
+    slib->lumpnum = FILE1c3_NMSHOT_BLK;
+    slib->shadow = 1;
+    slib->type = S_MINI_GUN;
+    slib->hits = 1;
+    slib->speed = 8;
+    slib->maxspeed = 10;
+    slib->startframe = 1;
+    slib->numframes = 4;
+    slib->delayflag = 0;
+    slib->shoot_rate = 1;
+    slib->cur_shoot = 0;
+    slib->use_plot = 1;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 3;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_GRALL;
 
-    v1c = &shot_lib[5];
-    v1c->f_0 = -1;
-    v1c->f_2c = 0;
-    v1c->removeType = 5;
-    v1c->damageAmount = 5;
-    v1c->startSpeed = 0;
-    v1c->maxSpeedY = 0;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 0;
-    v1c->offsetX = 0;
-    v1c->offsetY = 6;
-    v1c->y = 0;
-    v1c->f_58 = 0;
-    v1c->f_5c = 0;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 1;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == LASER TURRET =====================================
+    slib = &shot_lib[S_TURRET];
+    slib->lumpnum = -1;
+    slib->shadow = 0;
+    slib->type = S_TURRET;
+    slib->hits = 5;
+    slib->speed = 0;
+    slib->maxspeed = 0;
+    slib->startframe = 0;
+    slib->numframes = 0;
+    slib->delayflag = 0;
+    slib->shoot_rate = 6;
+    slib->cur_shoot = 0;
+    slib->use_plot = 0;
+    slib->move_flag = 0;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_LINE;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    // v1c->f_78 = v1c->f_74->f_c >> 1;
-    // v1c->f_7c = v1c->f_74->f_10 >> 1;
-    v1c->damageType = 0;
+    slib->h = slib->pic[0];
+    // slib->f_78 = slib->f_74->f_c >> 1;
+    // slib->f_7c = slib->f_74->f_10 >> 1;
+    slib->ht = S_ALL;
 
-    v1c = &shot_lib[6];
-    v1c->f_0 = FILE1bd_MISRAT_BLK;
-    v1c->f_2c = 0;
-    v1c->removeType = 6;
-    v1c->damageAmount = 4;
-    v1c->startSpeed = 1;
-    v1c->maxSpeedY = 0x10;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 2;
-    v1c->offsetX = 0;
-    v1c->offsetY = 5;
-    v1c->y = 0;
-    v1c->hasAnimation = 1;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == MISSLE_PODS =====================================
+    slib = &shot_lib[S_MISSLE_PODS];
+    slib->lumpnum = FILE1bd_MISRAT_BLK;
+    slib->shadow = 0;
+    slib->type = S_MISSLE_PODS;
+    slib->hits = 4;
+    slib->speed = 1;
+    slib->maxspeed = 16;
+    slib->startframe = 0;
+    slib->numframes = 2;
+    slib->delayflag = 0;
+    slib->shoot_rate = 5;
+    slib->cur_shoot = 0;
+    slib->smoke = 1;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 1;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_AIR;
 
-    v1c = &shot_lib[7];
-    v1c->f_0 = FILE1bd_MISRAT_BLK;
-    v1c->f_2c = 0;
-    v1c->removeType = 6;
-    v1c->damageAmount = 4;
-    v1c->startSpeed = 1;
-    v1c->maxSpeedY = 0xc;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 2;
-    v1c->offsetX = 0;
-    v1c->offsetY = 10;
-    v1c->y = 0;
-    v1c->hasAnimation = 1;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == AIR TO AIR =====================================
+    slib = &shot_lib[S_AIR_MISSLE];
+    slib->lumpnum = FILE1bd_MISRAT_BLK;
+    slib->shadow = 0;
+    slib->type = S_MISSLE_PODS;
+    slib->hits = 4;
+    slib->speed = 1;
+    slib->maxspeed = 12;
+    slib->startframe = 0;
+    slib->numframes = 2;
+    slib->delayflag = 0;
+    slib->shoot_rate = 10;
+    slib->cur_shoot = 0;
+    slib->smoke = 1;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 1;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_AIR;
 
-    v1c = &shot_lib[8];
-    v1c->f_0 = FILE1bf_MISGRD_BLK;
-    v1c->f_2c = 0;
-    v1c->removeType = 8;
-    v1c->damageAmount = 0x14;
-    v1c->startSpeed = 1;
-    v1c->maxSpeedY = 6;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 2;
-    v1c->offsetX = 0;
-    v1c->offsetY = 0x14;
-    v1c->y = 0;
-    v1c->hasAnimation = 1;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == AIR TO GROUND =====================================
+    slib = &shot_lib[S_GRD_MISSLE];
+    slib->lumpnum = FILE1bf_MISGRD_BLK;
+    slib->shadow = 0;
+    slib->type = S_GRD_MISSLE;
+    slib->hits = 20;
+    slib->speed = 1;
+    slib->maxspeed = 6;
+    slib->startframe = 0;
+    slib->numframes = 2;
+    slib->delayflag = 0;
+    slib->shoot_rate = 20;
+    slib->cur_shoot = 0;
+    slib->smoke = 1;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 2;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_GROUND;
 
-    v1c = &shot_lib[9];
-    v1c->f_0 = FILE1d3_BLDGBOMB_PIC;
-    v1c->f_2c = 0;
-    v1c->removeType = 9;
-    v1c->damageAmount = 0x32;
-    v1c->startSpeed = 1;
-    v1c->maxSpeedY = 4;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 1;
-    v1c->offsetX = 0;
-    v1c->offsetY = 0x1e;
-    v1c->y = 0;
-    v1c->hasAnimation = 0;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == GROUND BOMB =====================================
+    slib = &shot_lib[S_BOMB];
+    slib->lumpnum = FILE1d3_BLDGBOMB_PIC;
+    slib->shadow = 0;
+    slib->type = S_BOMB;
+    slib->hits = 50;
+    slib->speed = 1;
+    slib->maxspeed = 4;
+    slib->startframe = 0;
+    slib->numframes = 1;
+    slib->delayflag = 0;
+    slib->shoot_rate = 30;
+    slib->cur_shoot = 0;
+    slib->smoke = 0;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 4;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_GTILE;
 
-    v1c = &shot_lib[10];
-    v1c->f_0 = FILE11d_POWDIS_BLK;
-    v1c->f_2c = 0;
-    v1c->removeType = 10;
-    v1c->damageAmount = 3;
-    v1c->startSpeed = 4;
-    v1c->maxSpeedY = 8;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 6;
-    v1c->offsetX = 0;
-    v1c->offsetY = 2;
-    v1c->y = 0;
-    v1c->hasAnimation = 0;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == ENERGY GRAB =====================================
+    slib = &shot_lib[S_ENERGY_GRAB];
+    slib->lumpnum = FILE11d_POWDIS_BLK;
+    slib->shadow = 0;
+    slib->type = S_ENERGY_GRAB;
+    slib->hits = 3;
+    slib->speed = 4;
+    slib->maxspeed = 8;
+    slib->startframe = 0;
+    slib->numframes = 6;
+    slib->delayflag = 0;
+    slib->shoot_rate = 2;
+    slib->cur_shoot = 0;
+    slib->smoke = 0;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 5;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_SUCK;
 
-    v1c = &shot_lib[11];
-    v1c->f_0 = FILE1cb_MEGABM_BLK;
-    v1c->f_2c = 1;
-    v1c->removeType = 0xb;
-    v1c->damageAmount = 0x32;
-    v1c->startSpeed = 2;
-    v1c->maxSpeedY = 2;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 4;
-    v1c->offsetX = 0;
-    v1c->offsetY = 0x3c;
-    v1c->y = 0;
-    v1c->hasAnimation = 0;
-    v1c->f_58 = 1;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 1;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == MEGA BOMB =====================================
+    slib = &shot_lib[S_MEGA_BOMB];
+    slib->lumpnum = FILE1cb_MEGABM_BLK;
+    slib->shadow = 1;
+    slib->type = S_MEGA_BOMB;
+    slib->hits = 50;
+    slib->speed = 2;
+    slib->maxspeed = 2;
+    slib->startframe = 0;
+    slib->numframes = 4;
+    slib->delayflag = 0;
+    slib->shoot_rate = 60;
+    slib->cur_shoot = 0;
+    slib->smoke = 0;
+    slib->use_plot = 1;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 1;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 0;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_ALL;
 
-    v1c = &shot_lib[12];
-    v1c->f_0 = FILE123_SHOKWV_BLK;
-    v1c->f_2c = 0;
-    v1c->removeType = 0xc;
-    v1c->damageAmount = 5;
-    v1c->startSpeed = 8;
-    v1c->maxSpeedY = 8;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 2;
-    v1c->offsetX = 0;
-    v1c->offsetY = 3;
-    v1c->y = 0;
-    v1c->hasAnimation = 0;
-    v1c->f_58 = 0;
-    v1c->f_5c = 1;
-    v1c->offsetPlayerX = 0;
-    v1c->offsetPlayerY = 0;
-    v1c->skipDamage = 0;
-    v1c->shotType = 0;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == PULSE CANNON =====================================
+    slib = &shot_lib[S_PULSE_CANNON];
+    slib->lumpnum = FILE123_SHOKWV_BLK;
+    slib->shadow = 0;
+    slib->type = S_PULSE_CANNON;
+    slib->hits = 5;
+    slib->speed = 8;
+    slib->maxspeed = 8;
+    slib->startframe = 0;
+    slib->numframes = 2;
+    slib->delayflag = 0;
+    slib->shoot_rate = 3;
+    slib->cur_shoot = 0;
+    slib->smoke = 0;
+    slib->use_plot = 0;
+    slib->move_flag = 1;
+    slib->fplrx = 0;
+    slib->fplry = 0;
+    slib->meffect = 0;
+    slib->beam = S_SHOOT;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 0;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_ALL;
 
-    v1c = &shot_lib[13];
-    v1c->f_0 = FILE135_FRNTLAS_BLK;
-    v1c->f_2c = 0;
-    v1c->removeType = 0xd;
-    v1c->damageAmount = 10;
-    v1c->startSpeed = 0;
-    v1c->maxSpeedY = 0;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 4;
-    v1c->offsetX = 0;
-    v1c->offsetY = 7;
-    v1c->y = 0;
-    v1c->hasAnimation = 0;
-    v1c->f_58 = 0;
-    v1c->f_5c = 0;
-    v1c->offsetPlayerX = 1;
-    v1c->offsetPlayerY = 1;
-    v1c->skipDamage = 1;
-    v1c->shotType = 2;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == FORWARD LASER =====================================
+    slib = &shot_lib[S_FORWARD_LASER];
+    slib->lumpnum = FILE135_FRNTLAS_BLK;
+    slib->shadow = 0;
+    slib->type = S_FORWARD_LASER;
+    slib->hits = 10;
+    slib->speed = 0;
+    slib->maxspeed = 0;
+    slib->startframe = 0;
+    slib->numframes = 4;
+    slib->delayflag = 0;
+    slib->shoot_rate = 7;
+    slib->cur_shoot = 0;
+    slib->smoke = 0;
+    slib->use_plot = 0;
+    slib->move_flag = 0;
+    slib->fplrx = 1;
+    slib->fplry = 1;
+    slib->meffect = 1;
+    slib->beam = S_BEAM;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 1;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_AIR;
 
-    v1c = &shot_lib[14];
-    v1c->f_0 = FILE131_DETHRY_BLK;
-    v1c->f_2c = 0;
-    v1c->removeType = 0xe;
-    v1c->damageAmount = 6;
-    v1c->startSpeed = 0;
-    v1c->maxSpeedY = 0;
-    v1c->frameResetPoint = 0;
-    v1c->numberOfFrames = 4;
-    v1c->offsetX = 0;
-    v1c->offsetY = 7;
-    v1c->y = 0;
-    v1c->hasAnimation = 0;
-    v1c->f_58 = 0;
-    v1c->f_5c = 0;
-    v1c->offsetPlayerX = 1;
-    v1c->offsetPlayerY = 1;
-    v1c->skipDamage = 1;
-    v1c->shotType = 2;
-    for (i = 0; i < v1c->numberOfFrames; i++)
+    // == DEATH RAY =====================================
+    slib = &shot_lib[S_DEATH_RAY];
+    slib->lumpnum = FILE131_DETHRY_BLK;
+    slib->shadow = 0;
+    slib->type = S_DEATH_RAY;
+    slib->hits = 6;
+    slib->speed = 0;
+    slib->maxspeed = 0;
+    slib->startframe = 0;
+    slib->numframes = 4;
+    slib->delayflag = 0;
+    slib->shoot_rate = 7;
+    slib->cur_shoot = 0;
+    slib->smoke = 0;
+    slib->use_plot = 0;
+    slib->move_flag = 0;
+    slib->fplrx = 1;
+    slib->fplry = 1;
+    slib->meffect = 1;
+    slib->beam = S_BEAM;
+    for (i = 0; i < slib->numframes; i++)
     {
-        v24 = v1c->f_0 + i;
-        v1c->f_4[i] = (texture_t*)GLB_LockItem(v24);
+        item = slib->lumpnum + i;
+        slib->pic[i] = (texture_t*)GLB_LockItem(item);
     }
-    v1c->TexturePtr = v1c->f_4[0];
-    v1c->texWidthX2 = v1c->TexturePtr->width >> 1;
-    v1c->texHeightX2 = v1c->TexturePtr->height >> 1;
-    v1c->damageType = 3;
+    slib->h = slib->pic[0];
+    slib->hlx = slib->h->width >> 1;
+    slib->hly = slib->h->height >> 1;
+    slib->ht = S_GRALL;
 }
 
 int SHOTS_PlayerShoot(int a1)
@@ -527,9 +592,9 @@ int SHOTS_PlayerShoot(int a1)
     v20 = &shot_lib[a1];
     if (a1 == -1)
         EXIT_Error("SHOTS_PlayerShoot() type = EMPTY  ");
-    if (v20->y)
+    if (v20->cur_shoot)
         return 0;
-    v20->y = v20->offsetY;
+    v20->cur_shoot = v20->shoot_rate;
     v1c = SHOTS_Get();
     if (!v1c)
         return 0;
@@ -542,10 +607,10 @@ int SHOTS_PlayerShoot(int a1)
         if (!fx_gus)
             SND_Patch(16, 127);
         g_flash = 7;
-        v1c->currentFrame = (wrand() % v20->numberOfFrames);
+        v1c->currentFrame = (wrand() % v20->numframes);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
 
         v1c->x = player_cx + o_gun1[playerpic];
         v1c->y = player_cy;
@@ -560,10 +625,10 @@ int SHOTS_PlayerShoot(int a1)
         v1c = SHOTS_Get();
         if (!v1c)
             return 0;
-        v1c->currentFrame = (wrand() % v20->numberOfFrames);
+        v1c->currentFrame = (wrand() % v20->numframes);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
 
         v1c->x = player_cx - o_gun1[playerpic] - 1;
         v1c->y = player_cy;
@@ -580,9 +645,9 @@ int SHOTS_PlayerShoot(int a1)
         if (!fx_gus)
             SND_Patch(16, 127);
         v1c->shotLib = &shot_lib[a1];
-        v1c->currentFrame = wrand() % v20->numberOfFrames;
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->currentFrame = wrand() % v20->numframes;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx;
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -597,8 +662,8 @@ int SHOTS_PlayerShoot(int a1)
             SND_Patch(16, 127);
         g_flash = 7;
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx + o_gun3[playerpic];
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -611,8 +676,8 @@ int SHOTS_PlayerShoot(int a1)
         if (!v1c)
             return 0;
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx - o_gun3[playerpic];
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -626,8 +691,8 @@ int SHOTS_PlayerShoot(int a1)
         if (!fx_gus)
             SND_Patch(19, 127);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx;
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -641,8 +706,8 @@ int SHOTS_PlayerShoot(int a1)
         if (!v1c)
             return 0;
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx;
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -661,10 +726,10 @@ int SHOTS_PlayerShoot(int a1)
         {
             if (!fx_gus)
                 SND_Patch(16, 127);
-            v1c->currentFrame = wrand() % v20->numberOfFrames;
+            v1c->currentFrame = wrand() % v20->numframes;
             v1c->shotLib = &shot_lib[a1];
-            v1c->f_4c = v20->offsetX;
-            v1c->speedY = v20->startSpeed;
+            v1c->f_4c = v20->delayflag;
+            v1c->speedY = v20->speed;
             v1c->x = player_cx;
             v1c->y = player_cy;
             v1c->mobj.x = v1c->x;
@@ -687,10 +752,10 @@ int SHOTS_PlayerShoot(int a1)
         {
             SND_Patch(21, 127);
             v1c->shotLib = &shot_lib[a1];
-            v24->hits -= v20->damageAmount;
+            v24->hits -= v20->hits;
             v1c->currentFrame = 0;
-            v1c->f_4c = v20->offsetX;
-            v1c->speedY = v20->startSpeed;
+            v1c->f_4c = v20->delayflag;
+            v1c->speedY = v20->speed;
             v1c->x = player_cx;
             v1c->y = player_cy;
             v1c->mobj.x = (wrand() % v24->width) + v24->mobj.x - 1;
@@ -706,8 +771,8 @@ int SHOTS_PlayerShoot(int a1)
     case 6:
         SND_Patch(16, 127);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx + o_gun2[playerpic];
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -721,8 +786,8 @@ int SHOTS_PlayerShoot(int a1)
         if (!v1c)
             return 0;
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx - o_gun2[playerpic];
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -736,8 +801,8 @@ int SHOTS_PlayerShoot(int a1)
     case 7:
         SND_Patch(19, 127);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx + o_gun2[playerpic];
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -750,8 +815,8 @@ int SHOTS_PlayerShoot(int a1)
         if (!v1c)
             return 0;
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx - o_gun2[playerpic];
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -764,8 +829,8 @@ int SHOTS_PlayerShoot(int a1)
     case 8:
         SND_Patch(19, 127);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx + o_gun2[playerpic];
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -778,8 +843,8 @@ int SHOTS_PlayerShoot(int a1)
         if (!v1c)
             return 0;
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx - o_gun2[playerpic];
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -792,8 +857,8 @@ int SHOTS_PlayerShoot(int a1)
     case 9:
         SND_Patch(19, 127);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx;
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -806,8 +871,8 @@ int SHOTS_PlayerShoot(int a1)
     case 10:
         SND_Patch(16, 127);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx - 4;
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -820,8 +885,8 @@ int SHOTS_PlayerShoot(int a1)
     case 11:
         SND_Patch(16, 127);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx;
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -835,8 +900,8 @@ int SHOTS_PlayerShoot(int a1)
     case 12:
         SND_Patch(35, 127);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx;
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -849,8 +914,8 @@ int SHOTS_PlayerShoot(int a1)
     case 13:
         SND_Patch(18, 127);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx + o_gun3[playerpic];
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -863,8 +928,8 @@ int SHOTS_PlayerShoot(int a1)
         if (!v1c)
             return 0;
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx - o_gun3[playerpic];
         v1c->y = player_cy;
         v1c->mobj.x = v1c->x;
@@ -877,8 +942,8 @@ int SHOTS_PlayerShoot(int a1)
     case 14:
         SND_Patch(18, 127);
         v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->offsetX;
-        v1c->speedY = v20->startSpeed;
+        v1c->f_4c = v20->delayflag;
+        v1c->speedY = v20->speed;
         v1c->x = player_cx;
         v1c->y = player_cy - 24;
         v1c->mobj.x = v1c->x;
@@ -903,41 +968,41 @@ void SHOTS_Think(void)
     v1c = shot_lib;
     for (i = 0; i <= 14; i++, v1c++)
     {
-        if (v1c->y > 0)
-            v1c->y--;
+        if (v1c->cur_shoot > 0)
+            v1c->cur_shoot--;
     }
 
-    for (v20 = first_shots.f_4; &last_shots != v20; v20 = v20->f_4)
+    for (v20 = first_shots.next; &last_shots != v20; v20 = v20->next)
     {
         v1c = v20->shotLib;
-        switch (v1c->shotType)
+        switch (v1c->beam)
         {
         default:
             EXIT_Error("SHOTS_Think()");
             break;
         case 0:
-            v20->TexturePtr = v1c->f_4[v20->currentFrame];
-            v20->x = v20->mobj.x - v1c->texWidthX2;
-            if (v1c->f_5c)
-                v20->y = v20->mobj.y - v1c->texHeightX2;
+            v20->TexturePtr = v1c->pic[v20->currentFrame];
+            v20->x = v20->mobj.x - v1c->hlx;
+            if (v1c->move_flag)
+                v20->y = v20->mobj.y - v1c->hly;
             else
                 v20->y = v20->mobj.y;
-            if (v1c->hasAnimation)
-                ANIMS_StartAnim(11, v20->x + v1c->texWidthX2, v20->y + v1c->texHeightX2 * 2);
+            if (v1c->smoke)
+                ANIMS_StartAnim(11, v20->x + v1c->hlx, v20->y + v1c->hly * 2);
             break;
         case 1:
             v20->x = v20->mobj.x;
             v20->y = v20->mobj.y;
             break;
         case 2:
-            v20->TexturePtr = v1c->f_4[v20->currentFrame];
-            v20->x = v20->mobj.x - v1c->texWidthX2;
+            v20->TexturePtr = v1c->pic[v20->currentFrame];
+            v20->x = v20->mobj.x - v1c->hlx;
             v20->y = v20->mobj.y;
             for (v24 = first_enemy.next; &last_enemy != v24; v24 = v24->next)
             {
                 if (v20->x > v24->x && v20->x < v24->x2 && v24->y < player_cy && v24->y > -30)
                 {
-                    v24->hits -= v1c->damageAmount;
+                    v24->hits -= v1c->hits;
                     if (v24->hits != -1)
                     {
                         v20->mobj.y2 = v24->y + v24->hly;
@@ -947,14 +1012,14 @@ void SHOTS_Think(void)
             }
             break;
         }
-        if (v1c->offsetPlayerX)
+        if (v1c->fplrx)
             v20->x += player_cx - v20->f_50;
-        if (v1c->offsetPlayerY)
+        if (v1c->fplry)
             v20->y += player_cy - v20->f_54;
         //if (v20->f_10 + 16 < 0 || v20->f_c < 0 && v20->f_c > 320 && v20->f_10 > 200)
         if ((v20->y + 16 < 0) || (v20->x < 0) || (v20->x > 320) || (v20->y > 200))
         {
-            if (v1c->f_5c)
+            if (v1c->move_flag)
             {
                 v20->mobj.done = 1;
                 goto LAB_00015d11;
@@ -963,13 +1028,13 @@ void SHOTS_Think(void)
         
         if (v20->f_4c == 0)
         {
-            if (v20->speedY < v1c->maxSpeedY)
+            if (v20->speedY < v1c->maxspeed)
                 v20->speedY++;
             v20->currentFrame++;
-            if (v20->currentFrame >= v1c->numberOfFrames)
+            if (v20->currentFrame >= v1c->numframes)
             {
-                if (v1c->f_5c)
-                    v20->currentFrame = v1c->frameResetPoint;
+                if (v1c->move_flag)
+                    v20->currentFrame = v1c->startframe;
                 else
                 {
                     v20->mobj.done = 1;
@@ -982,12 +1047,12 @@ void SHOTS_Think(void)
             v20->mobj.done = 1;
             goto LAB_00015d11;
         }
-        if (v1c->skipDamage)
+        if (v1c->meffect)
             goto LAB_00015d11;
-        switch (v1c->damageType)
+        switch (v1c->ht)
         {
         default:
-            v24 = ENEMY_DamageEnergy(v20->x, v20->y, v1c->damageAmount);
+            v24 = ENEMY_DamageEnergy(v20->x, v20->y, v1c->hits);
             if (v24)
             {
                 v20->f_48 = 1;
@@ -996,7 +1061,7 @@ void SHOTS_Think(void)
             }
             break;
         case 3:
-            if (ENEMY_DamageAll(v20->x, v20->y, v1c->damageAmount))
+            if (ENEMY_DamageAll(v20->x, v20->y, v1c->hits))
             {
                 v20->f_48 = 1;
                 if ((wrand() % 2) != 0)
@@ -1006,7 +1071,7 @@ void SHOTS_Think(void)
             }
             break;
         case 0:
-            if (ENEMY_DamageAll(v20->x, v20->y, v1c->damageAmount))
+            if (ENEMY_DamageAll(v20->x, v20->y, v1c->hits))
             {
                 v20->f_48 = 1;
                 if ((wrand() % 2) != 0)
@@ -1016,14 +1081,14 @@ void SHOTS_Think(void)
             }
             else
             {
-                if (TILE_IsHit(v1c->damageAmount, v20->x, v20->y))
+                if (TILE_IsHit(v1c->hits, v20->x, v20->y))
                 {
                     v20->mobj.done = 1;
                 }
             }
             break;
         case 1:
-            if (ENEMY_DamageAir(v20->x, v20->y, v1c->damageAmount))
+            if (ENEMY_DamageAir(v20->x, v20->y, v1c->hits))
             {
                 v20->f_48 = 1;
                 if ((wrand() % 2) != 0)
@@ -1033,21 +1098,21 @@ void SHOTS_Think(void)
             }
             break;
         case 2:
-            if (ENEMY_DamageGround(v20->x, v20->y, v1c->damageAmount))
+            if (ENEMY_DamageGround(v20->x, v20->y, v1c->hits))
             {
                 v20->f_48 = 1;
                 ANIMS_StartAnim(15, v20->x, v20->y);
             }
             else
             {
-                if (TILE_IsHit(v1c->damageAmount, v20->x, v20->y))
+                if (TILE_IsHit(v1c->hits, v20->x, v20->y))
                 {
                     v20->mobj.done = 1;
                 }
             }
             break;
         case 4:
-            if (TILE_Bomb(v1c->damageAmount, v20->x, v20->y))
+            if (TILE_Bomb(v1c->hits, v20->x, v20->y))
             {
                 v20->mobj.done = 1;
             }
@@ -1071,14 +1136,14 @@ void SHOTS_Think(void)
             }
             else
             {
-                switch (v1c->removeType)
+                switch (v1c->type)
                 {
                 case 11:
                     ESHOT_Clear();
                     TILE_DamageAll();
                     for (v24 = first_enemy.next; &last_enemy != v24; v24 = v24->next)
                     {
-                        v24->hits -= v1c->damageAmount;
+                        v24->hits -= v1c->hits;
                     }
                     startfadeflag = 1;
                     ANIMS_StartAnim(20, 0, 0);
@@ -1092,9 +1157,9 @@ void SHOTS_Think(void)
                 }
             }
         }
-        if (v1c->f_5c)
+        if (v1c->move_flag)
         {
-            if (v1c->f_58)
+            if (v1c->use_plot)
             {
                 MoveSobj(&v20->mobj, v20->speedY);
             }
@@ -1116,9 +1181,9 @@ void SHOTS_Display(void)
     int v20, v24, v28;
     shot_t *v1c;
     texture_t * v2c;
-    for (v1c = first_shots.f_4; v1c != &last_shots; v1c = v1c->f_4)
+    for (v1c = first_shots.next; v1c != &last_shots; v1c = v1c->next)
     {
-        switch (v1c->shotLib->shotType)
+        switch (v1c->shotLib->beam)
         {
         default:
             EXIT_Error("SHOTS_Display()");
@@ -1137,7 +1202,7 @@ void SHOTS_Display(void)
             {
                 GFX_PutSprite(v1c->TexturePtr, v1c->x, v20);
             }
-            if (v1c->shotLib->removeType == 14)
+            if (v1c->shotLib->type == 14)
                 GFX_PutSprite(detpow[v1c->f_5c], v1c->x - 4, v1c->y);
             else
                 GFX_PutSprite(laspow[v1c->f_5c], v1c->x, v1c->y);
