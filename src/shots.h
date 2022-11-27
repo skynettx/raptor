@@ -51,23 +51,23 @@ struct shot_lib_t {
 struct shot_t {
     shot_t* prev;                           // Link List Prev
     shot_t* next;                           // Link List Next
-    texture_t *TexturePtr;
-    int x;
-    int y;
-    mobj_t mobj;
-    int speedY;
-    int currentFrame;
-    int f_48;
-    int f_4c;
-    int f_50;
-    int f_54;
-    shot_lib_t *shotLib;
-    int f_5c;
+    texture_t *pic;                         // pointer to cur frame pic
+    int x;                                  // cur shot center x
+    int y;                                  // cur shot center y
+    mobj_t move;                            // MOVE stuff
+    int speed;                              // cur speed
+    int curframe;                           // current anim frame
+    int doneflag;                           // shot done = TRUE
+    int delayflag;                          // DEALAYED ANIM START
+    int startx;                             // PLAYER X OFFSET;
+    int starty;                             // PLAYER Y OFFSET;
+    shot_lib_t *lib;
+    int cnt;
 };
 
 extern texture_t *lashit[4];
 
-int SHOTS_PlayerShoot(int a1);
+int SHOTS_PlayerShoot(int type);
 void SHOTS_Clear(void);
 void SHOTS_Think(void);
 void SHOTS_Display(void);

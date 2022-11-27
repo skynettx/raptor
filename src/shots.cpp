@@ -583,636 +583,723 @@ SHOTS_Init(
     slib->ht = S_GRALL;
 }
 
-int SHOTS_PlayerShoot(int a1)
+/***************************************************************************
+SHOTS_PlayerShoot() - Shoots the specified weapon
+ ***************************************************************************/
+int 
+SHOTS_PlayerShoot(
+    int type               // INPUT : OBJECT TYPE
+)
 {
-    shot_lib_t *v20;
-    shot_t *v1c;
-    enemy_t *v24;
+    shot_lib_t *lib;
+    shot_t *cur;
+    enemy_t *enemy;
 
-    v20 = &shot_lib[a1];
-    if (a1 == -1)
+    lib = &shot_lib[type];
+    
+    if (type == -1)
         EXIT_Error("SHOTS_PlayerShoot() type = EMPTY  ");
-    if (v20->cur_shoot)
+    
+    if (lib->cur_shoot)
         return 0;
-    v20->cur_shoot = v20->shoot_rate;
-    v1c = SHOTS_Get();
-    if (!v1c)
+    
+    lib->cur_shoot = lib->shoot_rate;
+    
+    cur = SHOTS_Get();
+    
+    if (!cur)
         return 0;
-    switch (a1)
+    
+    switch (type)
     {
     default:
         EXIT_Error("SHOTS_PlayerShoot() - Invalid Shot type");
         break;
-    case 0:
+    
+    case S_FORWARD_GUNS:
         if (!fx_gus)
-            SND_Patch(16, 127);
+            SND_Patch(FX_GUN, 127);
         g_flash = 7;
-        v1c->currentFrame = (wrand() % v20->numframes);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-
-        v1c->x = player_cx + o_gun1[playerpic];
-        v1c->y = player_cy;
+        cur->curframe = (wrand() % lib->numframes);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx + o_gun1[playerpic];
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        ANIMS_StartAnim(A_PLAYER_SHOOT, o_gun1[playerpic], 0);
         
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        ANIMS_StartAnim(16, o_gun1[playerpic], 0);
-        v1c = SHOTS_Get();
-        if (!v1c)
+        cur = SHOTS_Get();
+        if (!cur)
             return 0;
-        v1c->currentFrame = (wrand() % v20->numframes);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-
-        v1c->x = player_cx - o_gun1[playerpic] - 1;
-        v1c->y = player_cy;
-
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        ANIMS_StartAnim(16, -o_gun1[playerpic] - 1, 0);
+        
+        cur->curframe = (wrand() % lib->numframes);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx - o_gun1[playerpic] - 1;
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        ANIMS_StartAnim(A_PLAYER_SHOOT, -o_gun1[playerpic] - 1, 0);
         break;
-    case 1:
+    
+    case S_PLASMA_GUNS:
         if (!fx_gus)
-            SND_Patch(16, 127);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->currentFrame = wrand() % v20->numframes;
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx;
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
+            SND_Patch(FX_GUN, 127);
+        cur->lib = &shot_lib[type];
+        cur->curframe = wrand() % lib->numframes;
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx;
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
         break;
-    case 2:
+    
+    case S_MICRO_MISSLE:
         if (!fx_gus)
-            SND_Patch(16, 127);
+            SND_Patch(FX_GUN, 127);
         g_flash = 7;
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx + o_gun3[playerpic];
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        v1c = SHOTS_Get();
-        if (!v1c)
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx + o_gun3[playerpic];
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        
+        cur = SHOTS_Get();
+        if (!cur)
             return 0;
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx - o_gun3[playerpic];
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
+        
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx - o_gun3[playerpic];
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
         break;
-    case 3:
+    
+    case S_DUMB_MISSLE:
         if (!fx_gus)
-            SND_Patch(19, 127);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx;
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x + (wrand() % 16) + 10;
-        v1c->mobj.y2 = v1c->y + 5;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        InitMobj(&v1c->mobj);
-        v1c = SHOTS_Get();
-        if (!v1c)
+            SND_Patch(FX_MISSLE, 127);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx;
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x + (wrand() % 16) + 10;
+        cur->move.y2 = cur->y + 5;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        InitMobj(&cur->move);
+        
+        cur = SHOTS_Get();
+        if (!cur)
             return 0;
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx;
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x - (wrand() % 16) - 10;
-        v1c->mobj.y2 = v1c->y + 5;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        InitMobj(&v1c->mobj);
+        
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx;
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x - (wrand() % 16) - 10;
+        cur->move.y2 = cur->y + 5;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        InitMobj(&cur->move);
         break;
-    case 4:
-        v24 = ENEMY_GetRandom();
-        if (!v24)
-            SHOTS_Remove(v1c);
+    
+    case S_MINI_GUN:
+        enemy = ENEMY_GetRandom();
+        if (!enemy)
+            SHOTS_Remove(cur);
         else
         {
             if (!fx_gus)
-                SND_Patch(16, 127);
-            v1c->currentFrame = wrand() % v20->numframes;
-            v1c->shotLib = &shot_lib[a1];
-            v1c->f_4c = v20->delayflag;
-            v1c->speedY = v20->speed;
-            v1c->x = player_cx;
-            v1c->y = player_cy;
-            v1c->mobj.x = v1c->x;
-            v1c->mobj.y = v1c->y;
-            v1c->mobj.x2 = (wrand() % v24->width) + v24->x - 1;
-            v1c->mobj.y2 = (wrand() % v24->height) + v24->hly + v24->y - 1;
-            v1c->f_50 = player_cx;
-            v1c->f_54 = player_cy;
-            InitMobj(&v1c->mobj);
+                SND_Patch(FX_GUN, 127);
+            cur->curframe = wrand() % lib->numframes;
+            cur->lib = &shot_lib[type];
+            cur->delayflag = lib->delayflag;
+            cur->speed = lib->speed;
+            cur->x = player_cx;
+            cur->y = player_cy;
+            cur->move.x = cur->x;
+            cur->move.y = cur->y;
+            cur->move.x2 = (wrand() % enemy->width) + enemy->x - 1;
+            cur->move.y2 = (wrand() % enemy->height) + enemy->hly + enemy->y - 1;
+            cur->startx = player_cx;
+            cur->starty = player_cy;
+            InitMobj(&cur->move);
         }
         break;
-    case 5:
-        v24 = ENEMY_GetRandomAir();
-        if (!v24)
+    
+    case S_TURRET:
+        enemy = ENEMY_GetRandomAir();
+        if (!enemy)
         {
-            SHOTS_Remove(v1c);
-            SND_Patch(34, 127);
+            SHOTS_Remove(cur);
+            SND_Patch(FX_NOSHOOT, 127);
         }
         else
         {
-            SND_Patch(21, 127);
-            v1c->shotLib = &shot_lib[a1];
-            v24->hits -= v20->hits;
-            v1c->currentFrame = 0;
-            v1c->f_4c = v20->delayflag;
-            v1c->speedY = v20->speed;
-            v1c->x = player_cx;
-            v1c->y = player_cy;
-            v1c->mobj.x = (wrand() % v24->width) + v24->mobj.x - 1;
-            v1c->mobj.y = (wrand() % v24->height) + v24->mobj.y - 1;
-            v1c->mobj.x2 = player_cx;
-            v1c->mobj.y2 = player_cy;
-            v1c->f_50 = player_cx;
-            v1c->f_54 = player_cy;
-            InitMobj(&v1c->mobj);
-            ANIMS_StartAnim(9, v1c->mobj.x, v1c->mobj.y);
+            SND_Patch(FX_TURRET, 127);
+            cur->lib = &shot_lib[type];
+            enemy->hits -= lib->hits;
+            cur->curframe = 0;
+            cur->delayflag = lib->delayflag;
+            cur->speed = lib->speed;
+            cur->x = player_cx;
+            cur->y = player_cy;
+            cur->move.x = (wrand() % enemy->width) + enemy->move.x - 1;
+            cur->move.y = (wrand() % enemy->height) + enemy->move.y - 1;
+            cur->move.x2 = player_cx;
+            cur->move.y2 = player_cy;
+            cur->startx = player_cx;
+            cur->starty = player_cy;
+            InitMobj(&cur->move);
+            ANIMS_StartAnim(A_LASER_BLAST, cur->move.x, cur->move.y);
         }
         break;
-    case 6:
-        SND_Patch(16, 127);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx + o_gun2[playerpic];
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        ANIMS_StartAnim(16, o_gun2[playerpic], 1);
-        v1c = SHOTS_Get();
-        if (!v1c)
+    
+    case S_MISSLE_PODS:
+        SND_Patch(FX_GUN, 127);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx + o_gun2[playerpic];
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        ANIMS_StartAnim(A_PLAYER_SHOOT, o_gun2[playerpic], 1);
+        
+        cur = SHOTS_Get();
+        if (!cur)
             return 0;
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx - o_gun2[playerpic];
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        ANIMS_StartAnim(16, -o_gun2[playerpic] - 1, 1);
+        
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx - o_gun2[playerpic];
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        ANIMS_StartAnim(A_PLAYER_SHOOT, -o_gun2[playerpic] - 1, 1);
         break;
-    case 7:
-        SND_Patch(19, 127);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx + o_gun2[playerpic];
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        v1c = SHOTS_Get();
-        if (!v1c)
+    
+    case S_AIR_MISSLE:
+        SND_Patch(FX_MISSLE, 127);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx + o_gun2[playerpic];
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        
+        cur = SHOTS_Get();
+        if (!cur)
             return 0;
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx - o_gun2[playerpic];
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
+        
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx - o_gun2[playerpic];
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
         break;
-    case 8:
-        SND_Patch(19, 127);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx + o_gun2[playerpic];
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        v1c = SHOTS_Get();
-        if (!v1c)
+    
+    case S_GRD_MISSLE:
+        SND_Patch(FX_MISSLE, 127);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx + o_gun2[playerpic];
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        
+        cur = SHOTS_Get();
+        if (!cur)
             return 0;
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx - o_gun2[playerpic];
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
+        
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx - o_gun2[playerpic];
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
         break;
-    case 9:
-        SND_Patch(19, 127);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx;
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
+    
+    case S_BOMB:
+        SND_Patch(FX_MISSLE, 127);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx;
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
         break;
-    case 10:
-        SND_Patch(16, 127);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx - 4;
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
+    
+    case S_ENERGY_GRAB:
+        SND_Patch(FX_GUN, 127);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx - 4;
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
         break;
-    case 11:
-        SND_Patch(16, 127);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx;
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = 160;
-        v1c->mobj.y2 = 75;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        InitMobj(&v1c->mobj);
+    
+    case S_MEGA_BOMB:
+        SND_Patch(FX_GUN, 127);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx;
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = 160;
+        cur->move.y2 = 75;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        InitMobj(&cur->move);
         break;
-    case 12:
-        SND_Patch(35, 127);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx;
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = 0;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
+    
+    case S_PULSE_CANNON:
+        SND_Patch(FX_PULSE, 127);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx;
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = 0;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
         break;
-    case 13:
-        SND_Patch(18, 127);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx + o_gun3[playerpic];
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = -24;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        v1c = SHOTS_Get();
-        if (!v1c)
+    
+    case S_FORWARD_LASER:
+        SND_Patch(FX_LASER, 127);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx + o_gun3[playerpic];
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = -24;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        
+        cur = SHOTS_Get();
+        if (!cur)
             return 0;
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx - o_gun3[playerpic];
-        v1c->y = player_cy;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = -24;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
+        
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx - o_gun3[playerpic];
+        cur->y = player_cy;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = -24;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
         break;
-    case 14:
-        SND_Patch(18, 127);
-        v1c->shotLib = &shot_lib[a1];
-        v1c->f_4c = v20->delayflag;
-        v1c->speedY = v20->speed;
-        v1c->x = player_cx;
-        v1c->y = player_cy - 24;
-        v1c->mobj.x = v1c->x;
-        v1c->mobj.y = v1c->y;
-        v1c->f_50 = player_cx;
-        v1c->f_54 = player_cy;
-        v1c->mobj.x2 = v1c->x;
-        v1c->mobj.y2 = -24;
+    
+    case S_DEATH_RAY:
+        SND_Patch(FX_LASER, 127);
+        cur->lib = &shot_lib[type];
+        cur->delayflag = lib->delayflag;
+        cur->speed = lib->speed;
+        cur->x = player_cx;
+        cur->y = player_cy - 24;
+        cur->move.x = cur->x;
+        cur->move.y = cur->y;
+        cur->startx = player_cx;
+        cur->starty = player_cy;
+        cur->move.x2 = cur->x;
+        cur->move.y2 = -24;
         break;
     }
+    
     return 1;
 }
 
-
-void SHOTS_Think(void)
+/***************************************************************************
+SHOTS_Think () - Does All Thinking for shot system
+ ***************************************************************************/
+void 
+SHOTS_Think(
+    void
+)
 {
-    shot_lib_t *v1c;
-    shot_t *v20;
-    enemy_t *v24;
+    shot_lib_t *lib;
+    shot_t *shot;
+    enemy_t *enemy;
     int i;
 
-    v1c = shot_lib;
-    for (i = 0; i <= 14; i++, v1c++)
+    lib = shot_lib;
+    for (i = 0; i <= LAST_WEAPON; i++, lib++)
     {
-        if (v1c->cur_shoot > 0)
-            v1c->cur_shoot--;
+        if (lib->cur_shoot > 0)
+            lib->cur_shoot--;
     }
 
-    for (v20 = first_shots.next; &last_shots != v20; v20 = v20->next)
+    for (shot = first_shots.next; &last_shots != shot; shot = shot->next)
     {
-        v1c = v20->shotLib;
-        switch (v1c->beam)
+        lib = shot->lib;
+        
+        switch (lib->beam)
         {
         default:
             EXIT_Error("SHOTS_Think()");
             break;
-        case 0:
-            v20->TexturePtr = v1c->pic[v20->currentFrame];
-            v20->x = v20->mobj.x - v1c->hlx;
-            if (v1c->move_flag)
-                v20->y = v20->mobj.y - v1c->hly;
+        
+        case S_SHOOT:
+            shot->pic = lib->pic[shot->curframe];
+            shot->x = shot->move.x - lib->hlx;
+            if (lib->move_flag)
+                shot->y = shot->move.y - lib->hly;
             else
-                v20->y = v20->mobj.y;
-            if (v1c->smoke)
-                ANIMS_StartAnim(11, v20->x + v1c->hlx, v20->y + v1c->hly * 2);
+                shot->y = shot->move.y;
+            if (lib->smoke)
+                ANIMS_StartAnim(A_SMALL_SMOKE_DOWN, shot->x + lib->hlx, shot->y + lib->hly * 2);
             break;
-        case 1:
-            v20->x = v20->mobj.x;
-            v20->y = v20->mobj.y;
+        
+        case S_LINE:
+            shot->x = shot->move.x;
+            shot->y = shot->move.y;
             break;
-        case 2:
-            v20->TexturePtr = v1c->pic[v20->currentFrame];
-            v20->x = v20->mobj.x - v1c->hlx;
-            v20->y = v20->mobj.y;
-            for (v24 = first_enemy.next; &last_enemy != v24; v24 = v24->next)
+        
+        case S_BEAM:
+            shot->pic = lib->pic[shot->curframe];
+            shot->x = shot->move.x - lib->hlx;
+            shot->y = shot->move.y;
+            
+            for (enemy = first_enemy.next; &last_enemy != enemy; enemy = enemy->next)
             {
-                if (v20->x > v24->x && v20->x < v24->x2 && v24->y < player_cy && v24->y > -30)
+                if (shot->x > enemy->x && shot->x < enemy->x2 && enemy->y < player_cy && enemy->y > -30)
                 {
-                    v24->hits -= v1c->hits;
-                    if (v24->hits != -1)
+                    enemy->hits -= lib->hits;
+                    
+                    if (enemy->hits != -1)
                     {
-                        v20->mobj.y2 = v24->y + v24->hly;
+                        shot->move.y2 = enemy->y + enemy->hly;
                         break;
                     }
                 }
             }
             break;
         }
-        if (v1c->fplrx)
-            v20->x += player_cx - v20->f_50;
-        if (v1c->fplry)
-            v20->y += player_cy - v20->f_54;
-        //if (v20->f_10 + 16 < 0 || v20->f_c < 0 && v20->f_c > 320 && v20->f_10 > 200)
-        if ((v20->y + 16 < 0) || (v20->x < 0) || (v20->x > 320) || (v20->y > 200))
+        
+        if (lib->fplrx)
+            shot->x += player_cx - shot->startx;
+        
+        if (lib->fplry)
+            shot->y += player_cy - shot->starty;
+        
+        if ((shot->y + 16 < 0) || (shot->x < 0) || (shot->x > 320) || (shot->y > 200))
         {
-            if (v1c->move_flag)
+            if (lib->move_flag)
             {
-                v20->mobj.done = 1;
-                goto LAB_00015d11;
+                shot->move.done = 1;
+                goto shot_done;
             }
         }
         
-        if (v20->f_4c == 0)
+        if (shot->delayflag == 0)
         {
-            if (v20->speedY < v1c->maxspeed)
-                v20->speedY++;
-            v20->currentFrame++;
-            if (v20->currentFrame >= v1c->numframes)
+            if (shot->speed < lib->maxspeed)
+                shot->speed++;
+            
+            shot->curframe++;
+            
+            if (shot->curframe >= lib->numframes)
             {
-                if (v1c->move_flag)
-                    v20->currentFrame = v1c->startframe;
+                if (lib->move_flag)
+                    shot->curframe = lib->startframe;
                 else
                 {
-                    v20->mobj.done = 1;
-                    goto LAB_00015d11;
+                    shot->move.done = 1;
+                    goto shot_done;
                 }
             }
         }
-        if (v20->f_48)
+        
+        if (shot->doneflag)
         {
-            v20->mobj.done = 1;
-            goto LAB_00015d11;
+            shot->move.done = 1;
+            goto shot_done;
         }
-        if (v1c->meffect)
-            goto LAB_00015d11;
-        switch (v1c->ht)
+        
+        if (lib->meffect)
+            goto shot_done;
+        
+        switch (lib->ht)
         {
         default:
-            v24 = ENEMY_DamageEnergy(v20->x, v20->y, v1c->hits);
-            if (v24)
+            enemy = ENEMY_DamageEnergy(shot->x, shot->y, lib->hits);
+            if (enemy)
             {
-                v20->f_48 = 1;
-                ANIMS_StartAnim(14, v20->x, v20->y);
-                ANIMS_StartEAnim(v24, 19, v24->hlx, v24->hly);
+                shot->doneflag = 1;
+                
+                ANIMS_StartAnim(A_BLUE_SPARK, shot->x, shot->y);
+                ANIMS_StartEAnim(enemy, A_ENERGY_GRAB, enemy->hlx, enemy->hly);
             }
             break;
-        case 3:
-            if (ENEMY_DamageAll(v20->x, v20->y, v1c->hits))
+        
+        case S_GRALL:
+            if (ENEMY_DamageAll(shot->x, shot->y, lib->hits))
             {
-                v20->f_48 = 1;
+                shot->doneflag = 1;
+                
                 if ((wrand() % 2) != 0)
-                    ANIMS_StartAnim(14, v20->x, v20->y);
+                    ANIMS_StartAnim(A_BLUE_SPARK, shot->x, shot->y);
                 else
-                    ANIMS_StartAnim(15, v20->x, v20->y);
+                    ANIMS_StartAnim(A_ORANGE_SPARK, shot->x, shot->y);
             }
             break;
-        case 0:
-            if (ENEMY_DamageAll(v20->x, v20->y, v1c->hits))
+        
+        case S_ALL:
+            if (ENEMY_DamageAll(shot->x, shot->y, lib->hits))
             {
-                v20->f_48 = 1;
+                shot->doneflag = 1;
+                
                 if ((wrand() % 2) != 0)
-                    ANIMS_StartAnim(14, v20->x, v20->y);
+                    ANIMS_StartAnim(A_BLUE_SPARK, shot->x, shot->y);
                 else
-                    ANIMS_StartAnim(15, v20->x, v20->y);
+                    ANIMS_StartAnim(A_ORANGE_SPARK, shot->x, shot->y);
             }
             else
             {
-                if (TILE_IsHit(v1c->hits, v20->x, v20->y))
+                if (TILE_IsHit(lib->hits, shot->x, shot->y))
                 {
-                    v20->mobj.done = 1;
+                    shot->move.done = 1;
                 }
             }
             break;
-        case 1:
-            if (ENEMY_DamageAir(v20->x, v20->y, v1c->hits))
+        
+        case S_AIR:
+            if (ENEMY_DamageAir(shot->x, shot->y, lib->hits))
             {
-                v20->f_48 = 1;
+                shot->doneflag = 1;
+                
                 if ((wrand() % 2) != 0)
-                    ANIMS_StartAnim(14, v20->x, v20->y);
+                    ANIMS_StartAnim(A_BLUE_SPARK, shot->x, shot->y);
                 else
-                    ANIMS_StartAnim(15, v20->x, v20->y);
+                    ANIMS_StartAnim(A_ORANGE_SPARK, shot->x, shot->y);
             }
             break;
-        case 2:
-            if (ENEMY_DamageGround(v20->x, v20->y, v1c->hits))
+        
+        case S_GROUND:
+            if (ENEMY_DamageGround(shot->x, shot->y, lib->hits))
             {
-                v20->f_48 = 1;
-                ANIMS_StartAnim(15, v20->x, v20->y);
+                shot->doneflag = 1;
+                
+                ANIMS_StartAnim(A_ORANGE_SPARK, shot->x, shot->y);
             }
             else
             {
-                if (TILE_IsHit(v1c->hits, v20->x, v20->y))
+                if (TILE_IsHit(lib->hits, shot->x, shot->y))
                 {
-                    v20->mobj.done = 1;
+                    shot->move.done = 1;
                 }
             }
             break;
-        case 4:
-            if (TILE_Bomb(v1c->hits, v20->x, v20->y))
+        
+        case S_GTILE:
+            if (TILE_Bomb(lib->hits, shot->x, shot->y))
             {
-                v20->mobj.done = 1;
+                shot->move.done = 1;
             }
-            if (ENEMY_DamageGround(v20->x, v20->y, 5))
+            if (ENEMY_DamageGround(shot->x, shot->y, 5))
             {
-                v20->f_48 = 1;
-                ANIMS_StartAnim(1, v20->x, v20->y);
+                shot->doneflag = 1;
+                
+                ANIMS_StartAnim(A_SMALL_GROUND_EXPLO, shot->x, shot->y);
             }
             break;
         }
-    LAB_00015d11:
-        if (v20->mobj.done)
+    
+    shot_done:
+        
+        if (shot->move.done)
         {
-            if (v20->f_4c)
+            if (shot->delayflag)
             {
-                v20->f_4c = 0;
-                v20->mobj.x2 = v20->mobj.x + ((wrand() % 32) - 16);
-                v20->mobj.y2 = 0;
-                ANIMS_StartAnim(11, v20->mobj.x, v20->mobj.y);
-                InitMobj(&v20->mobj);
+                shot->delayflag = 0;
+                shot->move.x2 = shot->move.x + ((wrand() % 32) - 16);
+                shot->move.y2 = 0;
+                ANIMS_StartAnim(A_SMALL_SMOKE_DOWN, shot->move.x, shot->move.y);
+                InitMobj(&shot->move);
             }
             else
             {
-                switch (v1c->type)
+                switch (lib->type)
                 {
-                case 11:
+                case S_MEGA_BOMB:
                     ESHOT_Clear();
                     TILE_DamageAll();
-                    for (v24 = first_enemy.next; &last_enemy != v24; v24 = v24->next)
+                    for (enemy = first_enemy.next; &last_enemy != enemy; enemy = enemy->next)
                     {
-                        v24->hits -= v1c->hits;
+                        enemy->hits -= lib->hits;
                     }
                     startfadeflag = 1;
-                    ANIMS_StartAnim(20, 0, 0);
-                    v20 = SHOTS_Remove(v20);
+                    ANIMS_StartAnim(A_SUPER_SHIELD, 0, 0);
+                    shot = SHOTS_Remove(shot);
                     continue;
-                case 5:
+                
+                case S_TURRET:
                     break;
+                
                 default:
-                    v20 = SHOTS_Remove(v20);
+                    shot = SHOTS_Remove(shot);
                     continue;
                 }
             }
         }
-        if (v1c->move_flag)
+        
+        if (lib->move_flag)
         {
-            if (v1c->use_plot)
+            if (lib->use_plot)
             {
-                MoveSobj(&v20->mobj, v20->speedY);
+                MoveSobj(&shot->move, shot->speed);
             }
             else
             {
-                v20->mobj.y -= v20->speedY;
-                if (v20->mobj.y < 0)
+                shot->move.y -= shot->speed;
+                if (shot->move.y < 0)
                 {
-                    v20->mobj.done = 1;
-                    v20->f_48 = 1;
+                    shot->move.done = 1;
+                    shot->doneflag = 1;
                 }
             }
         }
     }
 }
 
-void SHOTS_Display(void)
+/***************************************************************************
+SHOTS_Display () - Displays All active Shots
+ ***************************************************************************/
+void 
+SHOTS_Display(
+    void
+)
 {
-    int v20, v24, v28;
-    shot_t *v1c;
-    texture_t * v2c;
-    for (v1c = first_shots.next; v1c != &last_shots; v1c = v1c->next)
+    int loop, x, y;
+    shot_t *shot;
+    texture_t *h;
+    
+    for (shot = first_shots.next; shot != &last_shots; shot = shot->next)
     {
-        switch (v1c->shotLib->beam)
+        switch (shot->lib->beam)
         {
         default:
             EXIT_Error("SHOTS_Display()");
             break;
-        case 0:
-            GFX_PutSprite(v1c->TexturePtr, v1c->x, v1c->y);
+        
+        case S_SHOOT:
+            GFX_PutSprite(shot->pic, shot->x, shot->y);
             break;
-        case 1:
-            GFX_Line(player_cx + 1, player_cy, v1c->mobj.x, v1c->mobj.y, 69);
-            GFX_Line(player_cx - 1, player_cy, v1c->mobj.x, v1c->mobj.y, 69);
-            GFX_Line(player_cx, player_cy, v1c->mobj.x, v1c->mobj.y, 64);
-            v1c = SHOTS_Remove(v1c);
+        
+        case S_LINE:
+            GFX_Line(player_cx + 1, player_cy, shot->move.x, shot->move.y, 69);
+            GFX_Line(player_cx - 1, player_cy, shot->move.x, shot->move.y, 69);
+            GFX_Line(player_cx, player_cy, shot->move.x, shot->move.y, 64);
+            shot = SHOTS_Remove(shot);
             break;
-        case 2:
-            for (v20 = v1c->mobj.y2; v20 < v1c->y; v20 += 3)
+        
+        case S_BEAM:
+            for (loop = shot->move.y2; loop < shot->y; loop += 3)
             {
-                GFX_PutSprite(v1c->TexturePtr, v1c->x, v20);
+                GFX_PutSprite(shot->pic, shot->x, loop);
             }
-            if (v1c->shotLib->type == 14)
-                GFX_PutSprite(detpow[v1c->f_5c], v1c->x - 4, v1c->y);
+            
+            if (shot->lib->type == S_DEATH_RAY)
+                GFX_PutSprite(detpow[shot->cnt], shot->x - 4, shot->y);
             else
-                GFX_PutSprite(laspow[v1c->f_5c], v1c->x, v1c->y);
-            v2c = lashit[v1c->f_5c];
-            v24 = v1c->x - (v2c->width >> 2);
-            v28 = v1c->mobj.y2 - 8;
-            if (v28 > 0)
-                GFX_PutSprite(v2c, v24, v28);
-            v1c->f_5c++;
-            v1c->f_5c = v1c->f_5c % 4;
+                GFX_PutSprite(laspow[shot->cnt], shot->x, shot->y);
+            
+            h = lashit[shot->cnt];
+            
+            x = shot->x - (h->width >> 2);
+            y = shot->move.y2 - 8;
+            
+            if (y > 0)
+                GFX_PutSprite(h, x, y);
+            
+            shot->cnt++;
+            shot->cnt = shot->cnt % 4;
             break;
         }
     }

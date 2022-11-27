@@ -88,7 +88,7 @@ struct enemy_t {
     int hits;                         // *
     int groundflag;                   // *
     int doneflag;
-    mobj_t mobj;
+    mobj_t move;
     int countdown;
     int curframe;
     int eframe;
