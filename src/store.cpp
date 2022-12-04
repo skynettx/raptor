@@ -17,9 +17,12 @@
 #include "input.h"
 #include "fileids.h"
 
+#define BUY_MODE  0
+#define SELL_MODE 1
+
 static int window;
-int buy_count, s_count;
-int buy_items[24], sell_items[24];
+int buy_count, sell_count;
+int b_items[S_LAST_OBJECT], s_items[S_LAST_OBJECT];
 int id_pics[4] = {
     FILE111_WMALE_PIC, FILE114_BMALE_PIC, FILE112_WFEMALE_PIC, FILE113_BFEMALE_PIC
 };
@@ -41,516 +44,626 @@ char saying[2][9] = {
     "RESALE"
 };
 
-int items[24] = {
-    0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x40,0x41,0x42,0x43,
-    0x44,0x45,0x46,0x47,0x48,0x49,0x4a,0x4b,-1,-1,-1,-1,-1,0
+int items[S_LAST_OBJECT] = {
+    FILE03a_ITEM00_TXT,
+    FILE03b_ITEM01_TXT,
+    FILE03c_ITEM02_TXT,
+    FILE03d_ITEM03_TXT,
+    FILE03e_ITEM04_TXT,
+    FILE03f_ITEM05_TXT,
+    FILE040_ITEM06_TXT,
+    FILE041_ITEM07_TXT,
+    FILE042_ITEM08_TXT,
+    FILE043_ITEM09_TXT,
+    FILE044_ITEM10_TXT,
+    FILE045_ITEM11_TXT,
+    FILE046_ITEM12_TXT,
+    FILE047_ITEM13_TXT,
+    FILE048_ITEM14_TXT,
+    FILE049_ITEM15_TXT,
+    FILE04a_ITEM16_TXT,
+    FILE04b_ITEM17_TXT,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    0
 };
 
 char storetext[8][20] = {
-    "      EXIT",
-    "ACTIVATE SELL MODE",
-    "ACTIVATE BUY MODE",
-    "    NEXT ITEM",
-    "  PREVIOUS ITEM",
-    "  BUY AN ITEM",
-    "  SELL AN ITEM",
-    " HDE MAIN DISPLAY"
+    "      EXIT",           //0
+    "ACTIVATE SELL MODE",   //1
+    "ACTIVATE BUY MODE",    //2
+    "    NEXT ITEM",        //3
+    "  PREVIOUS ITEM",      //4
+    "  BUY AN ITEM",        //5
+    "  SELL AN ITEM",       //6
+    " HDE MAIN DISPLAY"     //7
 };
 
 char yh_hold[16];
 
 static int cur_item, mode;
 
-int MakeBuyItems(void)
+/*-------------------------------------------------------------------------*
+MakeBuyItems () - Makes items you can Buy
+ *-------------------------------------------------------------------------*/
+int 
+MakeBuyItems(
+    void
+)
 {
-    int i, v24, v28, v2c, v20;
+    int loop, flag, cost1, cost2, num;
+    
     buy_count = 0;
-    memset(buy_items, 0, sizeof(buy_items));
-    for (i = 0; i < 18; i++)
+    memset(b_items, 0, sizeof(b_items));
+    
+    for (loop = 0; loop < S_ITEMBUY1; loop++)
     {
-        if (OBJS_CanBuy(i))
+        if (OBJS_CanBuy(loop))
         {
-            buy_items[buy_count] = i;
+            b_items[buy_count] = loop;
             buy_count++;
         }
     }
+    
+    // SORT BY $ AMOUNT ============================
+    
     if (buy_count > 1)
     {
         do
         {
-            v24 = 0;
-            for (i = 0; i < buy_count - 1; i++)
+            flag = 0;
+            for (loop = 0; loop < buy_count - 1; loop++)
             {
-                v28 = OBJS_GetCost(buy_items[i]);
-                v2c = OBJS_GetCost(buy_items[i+1]);
-                if (v28 > v2c)
+                cost1 = OBJS_GetCost(b_items[loop]);
+                cost2 = OBJS_GetCost(b_items[loop+1]);
+                
+                if (cost1 > cost2)
                 {
-                    v24 = 1;
-                    v20 = buy_items[i];
-                    buy_items[i] = buy_items[i + 1];
-                    buy_items[i + 1] = v20;
+                    flag = 1;
+                    num = b_items[loop];
+                    b_items[loop] = b_items[loop + 1];
+                    b_items[loop + 1] = num;
                 }
             }
-        } while (v24);
+        } while (flag);
     }
+    
     return buy_count;
 }
 
-int MakeSellItems(void)
+/*-------------------------------------------------------------------------*
+MakeSellItems() - Makes the items that you can sell
+ *-------------------------------------------------------------------------*/
+int 
+MakeSellItems(
+    void
+)
 {
-    int i, v24, v28, v2c, v20;
-    memset(sell_items, 0, sizeof(sell_items));
-    s_count = 0;
-    for (i = 0; i < 18; i++)
+    int loop, flag, cost1, cost2, num;
+    
+    memset(s_items, 0, sizeof(s_items));
+    
+    sell_count = 0;
+    for (loop = 0; loop < S_LAST_OBJECT; loop++)
     {
-        if (OBJS_CanSell(i))
+        if (OBJS_CanSell(loop))
         {
-            sell_items[s_count] = i;
-            s_count++;
+            s_items[sell_count] = loop;
+            sell_count++;
         }
     }
-    if (s_count > 1)
+    
+    // SORT BY $ AMOUNT ============================
+    
+    if (sell_count > 1)
     {
         do
         {
-            v24 = 0;
-            for (i = 0; i < s_count - 1; i++)
+            flag = 0;
+            for (loop = 0; loop < sell_count - 1; loop++)
             {
-                v28 = OBJS_GetCost(sell_items[i]);
-                v2c = OBJS_GetCost(sell_items[i+1]);
-                if (v28 > v2c)
+                cost1 = OBJS_GetCost(s_items[loop]);
+                cost2 = OBJS_GetCost(s_items[loop+1]);
+                
+                if (cost1 > cost2)
                 {
-                    v24 = 1;
-                    v20 = sell_items[i];
-                    sell_items[i] = sell_items[i + 1];
-                    sell_items[i + 1] = v20;
+                    flag = 1;
+                    num = s_items[loop];
+                    s_items[loop] = s_items[loop + 1];
+                    s_items[loop + 1] = num;
                 }
             }
-        } while (v24);
+        } while (flag);
     }
-    return s_count;
+    
+    return sell_count;
 }
 
-
-void Harrold(int a1)
+/*-------------------------------------------------------------------------*
+Harrold() - Lets Harrold do Some Talking
+ *-------------------------------------------------------------------------*/
+void 
+Harrold(
+    int item               // INPUT : GLB item of harrold text
+)
 {
-    int v1c, v20, v24, v28, v2c;
-    v1c = SWD_GetFieldItem(window, 2);
-    v20 = SWD_GetFieldItem(window, 3);
-    v24 = SWD_GetFieldItem(window, 4);
-    v28 = SWD_GetFieldItem(window, 5);
-    v2c = SWD_GetFieldItem(window, 6);
-    SWD_SetFieldItem(window, 2, -1);
-    SWD_SetFieldItem(window, 3, -1);
-    SWD_SetFieldItem(window, 4, -1);
-    SWD_SetFieldItem(window, 5, -1);
-    SWD_SetFieldItem(window, 6, -1);
+    int prev, next, buy, buyit, sell;
+    
+    prev = SWD_GetFieldItem(window, STOR_PREV);
+    next = SWD_GetFieldItem(window, STOR_NEXT);
+    buy = SWD_GetFieldItem(window, STOR_BUY);
+    buyit = SWD_GetFieldItem(window, STOR_BUYIT);
+    sell = SWD_GetFieldItem(window, STOR_SELL);
+    
+    SWD_SetFieldItem(window, STOR_PREV, -1);
+    SWD_SetFieldItem(window, STOR_NEXT, -1);
+    SWD_SetFieldItem(window, STOR_BUY, -1);
+    SWD_SetFieldItem(window, STOR_BUYIT, -1);
+    SWD_SetFieldItem(window, STOR_SELL, -1);
+    
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
+    
     KBD_Clear();
-    SWD_SetFieldText(window, 11, 0);
-    SWD_SetFieldText(window, 12, 0);
-    SWD_SetFieldText(window, 13, 0);
-    SWD_SetFieldText(window, 9, 0);
-    SWD_SetFieldItem(window, 7, a1);
+    
+    SWD_SetFieldText(window, STOR_STATS, 0);
+    SWD_SetFieldText(window, STOR_TEXTCOST, 0);
+    SWD_SetFieldText(window, STOR_NUM, 0);
+    SWD_SetFieldText(window, STOR_COST, 0);
+    SWD_SetFieldItem(window, STOR_COMP, item);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
+    
     IMS_WaitTimed(10);
-    IMS_WaitTimed(10);
-    SWD_SetFieldItem(window, 7, -1);
-    SWD_SetFieldItem(window, 2, v1c);
-    SWD_SetFieldItem(window, 3, v20);
-    SWD_SetFieldItem(window, 4, v24);
-    SWD_SetFieldItem(window, 5, v28);
-    SWD_SetFieldItem(window, 6, v2c);
+    
+    SWD_SetFieldItem(window, STOR_COMP, -1);
+    
+    SWD_SetFieldItem(window, STOR_PREV, prev);
+    SWD_SetFieldItem(window, STOR_NEXT, next);
+    SWD_SetFieldItem(window, STOR_BUY, buy);
+    SWD_SetFieldItem(window, STOR_BUYIT, buyit);
+    SWD_SetFieldItem(window, STOR_SELL, sell);
 }
 
-void STORE_Enter(void)
+/***************************************************************************
+STORE_Enter () - Lets User go in store and buy and sell things
+ ***************************************************************************/
+void 
+STORE_Enter(
+    void
+)
 {
-    int v24, v28, v1c, v30, v2c, v34, v38, v3c;
-    wdlg_t vec;
-    char v70[50], va4[50];
+    int update, opt, oldopt, max_items, pos, cost, loop, num;
+    wdlg_t dlg;
+    char youhave[50], coststr[50];
 
-    v24 = 0;
-    v28 = -1;
-    v1c = -1;
-    v30 = 0;
+    update = 0;
+    opt = -1;
+    oldopt = -1;
+    max_items = 0;
+    
     PTR_DrawCursor(0);
     KBD_Clear();
     GFX_FadeOut(0, 0, 0, 5);
+    
     g_button_flag = 0;
     window = SWD_InitMasterWindow(FILE131_STORE_SWD);
-    SWD_SetFieldItem(window, 0, id_pics[player.id_pic]);
-    SWD_SetFieldItem(window, 5, mainbut[mode]);
-    SWD_GetFieldText(window, 11, yh_hold);
-    SWD_SetFieldText(window, 11, NULL);
-    SWD_SetFieldText(window, 1, player.callsign);
-    sprintf(v70, "%07d", player.score);
-    SWD_SetFieldText(window, 10, v70);
+    SWD_SetFieldItem(window, STOR_ID, id_pics[plr.id_pic]);
+    SWD_SetFieldItem(window, STOR_BUYIT, mainbut[mode]);
+    SWD_GetFieldText(window, STOR_STATS, yh_hold);
+    SWD_SetFieldText(window, STOR_STATS, NULL);
+    SWD_SetFieldText(window, STOR_CALLSIGN, plr.callsign);
+    sprintf(youhave, "%07d", plr.score);
+    SWD_SetFieldText(window, STOR_SCORE, youhave);
+    
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
-    GFX_FadeIn(palette, 0x10);
-    SWD_SetFieldPtr(window, 0x14);
+    GFX_FadeIn(palette, 16);
+    
+    SWD_SetFieldPtr(window, STOR_VEXIT);
     PTR_DrawCursor(1);
+    
     OBJS_GetNum();
-    Harrold(0x4c);
+    
+    Harrold(FILE04c_HAR1_TXT);
+    
     cur_item = 0;
-    mode = 0;
-    if (mode == 0)
+    mode = BUY_MODE;
+    
+    if (mode == BUY_MODE)
     {
-        SWD_SetFieldItem(window, 4, buybut[0]);
-        SWD_SetFieldItem(window, 6, sellbut[1]);
+        SWD_SetFieldItem(window, STOR_BUY, buybut[0]);
+        SWD_SetFieldItem(window, STOR_SELL, sellbut[1]);
     }
     else
     {
-        SWD_SetFieldItem(window, 4, buybut[1]);
-        SWD_SetFieldItem(window, 6, sellbut[0]);
+        SWD_SetFieldItem(window, STOR_BUY, buybut[1]);
+        SWD_SetFieldItem(window, STOR_SELL, sellbut[0]);
     }
+    
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
-    v24 = 1;
+    update = 1;
+    
     while (1)
     {
         MakeSellItems();
         MakeBuyItems();
-        if (mode == 0)
-            v30 = buy_count;
+        
+        if (mode == BUY_MODE)
+            max_items = buy_count;
         else
-            v30 = s_count;
-        if (v30 < 1)
+            max_items = sell_count;
+        
+        if (max_items < 1)
         {
-            v24 = 1;
+            update = 1;
+            
             if (mode == 0)
                 EXIT_Error("STORE Error ( BUY_MODE )");
             else
             {
-                Harrold(80);
-                mode = 0;
-                v30 = MakeBuyItems();
-                if (v30 < 1)
+                Harrold(FILE050_HAR5_TXT);
+                mode = BUY_MODE;
+                max_items = MakeBuyItems();
+                if (max_items < 1)
                     EXIT_Error("STORE THING 2");
             }
         }
-        if (v24)
+        
+        if (update)
         {
-            v24 = 0;
+            update = 0;
+            
             if (cur_item < 0)
-                cur_item = v30 - 1;
-            if (cur_item >= v30)
+                cur_item = max_items - 1;
+            
+            if (cur_item >= max_items)
                 cur_item = 0;
-            if (mode == 0)
+            
+            if (mode == BUY_MODE)
             {
-                v2c = buy_items[cur_item];
-                SWD_SetFieldItem(window, 4, buybut[0]);
-                SWD_SetFieldItem(window, 6, sellbut[1]);
-                v34 = OBJS_GetCost(v2c);
-                if (OBJS_IsOnly(v2c))
-                    v3c = OBJS_GetAmt(v2c);
+                pos = b_items[cur_item];
+                SWD_SetFieldItem(window, STOR_BUY, buybut[0]);
+                SWD_SetFieldItem(window, STOR_SELL, sellbut[1]);
+                cost = OBJS_GetCost(pos);
+                if (OBJS_IsOnly(pos))
+                    num = OBJS_GetAmt(pos);
                 else
-                    v3c = OBJS_GetTotal(v2c);
-                sprintf(v70, "%02d", v3c);
-                sprintf(va4, "%02d", v34);
+                    num = OBJS_GetTotal(pos);
+                sprintf(youhave, "%02d", num);
+                sprintf(coststr, "%02d", cost);
             }
             else
             {
-                v2c = sell_items[cur_item];
-                SWD_SetFieldItem(window, 4, buybut[1]);
-                SWD_SetFieldItem(window, 6, sellbut[0]);
-                v34 = OBJS_GetResale(v2c);
-                if (OBJS_IsOnly(v2c))
-                    v3c = OBJS_GetAmt(v2c);
+                pos = s_items[cur_item];
+                SWD_SetFieldItem(window, STOR_BUY, buybut[1]);
+                SWD_SetFieldItem(window, STOR_SELL, sellbut[0]);
+                cost = OBJS_GetResale(pos);
+                if (OBJS_IsOnly(pos))
+                    num = OBJS_GetAmt(pos);
                 else
-                    v3c = OBJS_GetTotal(v2c);
-                sprintf(v70, "%02d", v3c);
-                sprintf(va4, "%02d", v34);
+                    num = OBJS_GetTotal(pos);
+                sprintf(youhave, "%02d", num);
+                sprintf(coststr, "%02d", cost);
             }
-            SWD_SetFieldText(window, 11, yh_hold);
-            SWD_SetFieldText(window, 12, saying[mode]);
-            SWD_SetFieldText(window, 13, v70);
-            SWD_SetFieldText(window, 9, va4);
-            sprintf(v70, "%07d", player.score);
-            SWD_SetFieldText(window, 10, v70);
-            SWD_SetFieldItem(window, 5, FILE134_BUYITEM_PIC);
-            if (v2c < 24)
-                SWD_SetFieldItem(window, 7, items[v2c]);
+            
+            SWD_SetFieldText(window, STOR_STATS, yh_hold);
+            SWD_SetFieldText(window, STOR_TEXTCOST, saying[mode]);
+            SWD_SetFieldText(window, STOR_NUM, youhave);
+            SWD_SetFieldText(window, STOR_COST, coststr);
+            sprintf(youhave, "%07d", plr.score);
+            SWD_SetFieldText(window, STOR_SCORE, youhave);
+            
+            SWD_SetFieldItem(window, STOR_BUYIT, FILE134_BUYITEM_PIC);
+            
+            if (pos < S_LAST_OBJECT)
+                SWD_SetFieldItem(window, STOR_COMP, items[pos]);
+            
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
         }
-        SWD_Dialog(&vec);
-        if (keyboard[45] && keyboard[56])
+        
+        SWD_Dialog(&dlg);
+        
+        if (keyboard[SC_X] && keyboard[SC_ALT])
             WIN_AskExit();
-        if (vec.f_30)
+        
+        if (dlg.viewactive)
         {
-            switch (vec.f_34)
+            switch (dlg.sfield)
             {
-            case 20:
-                v28 = vec.f_34;
+            case STOR_VEXIT:
+                opt = dlg.sfield;
                 if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                  //Fixed ptr input
-                    goto LAB_000209e5;
-                if (v28 != v1c)
+                    goto store_exit;
+                if (opt != oldopt)
                 {
-                    SWD_SetFieldText(window, 8, storetext[0]);
+                    SWD_SetFieldText(window, STOR_TEXT, storetext[0]);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
-                    v1c = v28;
+                    oldopt = opt;
                 }
                 break;
-            case 14:
-                v28 = vec.f_34;
-                if (v28 != v1c)
+            
+            case STOR_VBUY:
+                opt = dlg.sfield;
+                if (opt != oldopt)
                 {
-                    SWD_SetFieldText(window, 8, storetext[2]);
+                    SWD_SetFieldText(window, STOR_TEXT, storetext[2]);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
-                    v1c = v28;
+                    oldopt = opt;
                 }
                 break;
-            case 19:
-                v28 = vec.f_34;
-                if (v28 != v1c)
+            
+            case STOR_VSELL:
+                opt = dlg.sfield;
+                if (opt != oldopt)
                 {
-                    SWD_SetFieldText(window, 8, storetext[1]);
+                    SWD_SetFieldText(window, STOR_TEXT, storetext[1]);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
-                    v1c = v28;
+                    oldopt = opt;
                 }
                 break;
-            case 16:
-                v28 = vec.f_34;
-                if (v28 != v1c)
+            
+            case STOR_VNEXT:
+                opt = dlg.sfield;
+                if (opt != oldopt)
                 {
-                    SWD_SetFieldText(window, 8, storetext[3]);
+                    SWD_SetFieldText(window, STOR_TEXT, storetext[3]);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
-                    v1c = v28;
+                    oldopt = opt;
                 }
                 break;
-            case 15:
-                v28 = vec.f_34;
-                if (v28 != v1c)
+            
+            case STOR_VPREV:
+                opt = dlg.sfield;
+                if (opt != oldopt)
                 {
-                    SWD_SetFieldText(window, 8, storetext[4]);
+                    SWD_SetFieldText(window, STOR_TEXT, storetext[4]);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
-                    v1c = v28;
+                    oldopt = opt;
                 }
                 break;
-            case 18:
-                v28 = vec.f_34;
-                if (v28 != v1c)
+            
+            case STOR_VACCEPT:
+                opt = dlg.sfield;
+                if (opt != oldopt)
                 {
-                    if (mode == 0)
-                        SWD_SetFieldText(window, 8, storetext[5]);
+                    if (mode == BUY_MODE)
+                        SWD_SetFieldText(window, STOR_TEXT, storetext[5]);
                     else
-                        SWD_SetFieldText(window, 8, storetext[6]);
+                        SWD_SetFieldText(window, STOR_TEXT, storetext[6]);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
-                    v1c = v28;
+                    oldopt = opt;
                 }
                 break;
-            case 17:
-                v28 = vec.f_34;
-                if (v28 != v1c)
+            
+            case STOR_VSCREEN:
+                opt = dlg.sfield;
+                if (opt != oldopt)
                 {
-                    SWD_SetFieldText(window, 8, storetext[7]);
+                    SWD_SetFieldText(window, STOR_TEXT, storetext[7]);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
-                    v1c = v28;
+                    oldopt = opt;
                 }
                 break;
             }
         }
         else
         {
-            v28 = -1;
-            if (v28 != v1c)
+            opt = -1;
+            if (opt != oldopt)
             {
-                SWD_SetFieldText(window, 8, " ");
+                SWD_SetFieldText(window, STOR_TEXT, " ");
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
-                v1c = v28;
+                oldopt = opt;
             }
         }
+        
         if (joy_ipt_MenuNew)
         {
             if (StickY > 0)                                                   //Controller Input Store
             {
                 JOY_IsKey(StickY);
-                vec.keypress = 80;
+                dlg.keypress = SC_DOWN;
             }
             if (StickY < 0)
             {
                 JOY_IsKey(StickY);
-                vec.keypress = 72;
+                dlg.keypress = SC_UP;
             }
             if (StickX > 0)
             {
                 JOY_IsKey(StickX);
-                vec.keypress = 77;
+                dlg.keypress = SC_RIGHT;
             }
             if (StickX < 0)
             {
                 JOY_IsKey(StickX);
-                vec.keypress = 75;
+                dlg.keypress = SC_LEFT;
             }
             if (Down)
             {
                 JOY_IsKey(Down);
-                vec.keypress = 80;
+                dlg.keypress = SC_DOWN;
             }
             if (Up)
             {
                 JOY_IsKey(Up);
-                vec.keypress = 72;
+                dlg.keypress = SC_UP;
             }
             if (Left)
             {
                 JOY_IsKey(Left);
-                vec.keypress = 75;
+                dlg.keypress = SC_LEFT;
             }
             if (Right)
             {
                 JOY_IsKey(Right);
-                vec.keypress = 77;
+                dlg.keypress = SC_RIGHT;
             }
             if (AButton)
             {
                 JOY_IsKey(AButton);
-                vec.keypress = 28;
+                dlg.keypress = SC_ENTER;
             }
             if (Back)
             {
                 JOY_IsKey(Back);
-                vec.keypress = 1;
+                dlg.keypress = SC_ESC;
             }
             if (BButton)
             {
                 JOY_IsKey(BButton);
-                vec.keypress = 1;
+                dlg.keypress = SC_ESC;
             }
             if (LeftShoulder)
             {
                 JOY_IsKey(LeftShoulder);
-                vec.keypress = 57;
+                dlg.keypress = SC_SPACE;
             }
             if (RightShoulder)
             {
                 JOY_IsKey(RightShoulder);
-                vec.keypress = 59;
+                dlg.keypress = SC_F1;
             }
         }
-        switch (vec.keypress)
+        
+        switch (dlg.keypress)
         {
-        case 1:
-            goto LAB_000209e5;
-        case 0x3b:
+        case SC_ESC:
+            goto store_exit;
+        case SC_F1:
             HELP_Win("STORHLP1_TXT");
             break;
-        case 0x39:
-            KBD_Wait(vec.keypress);
-            mode ^= 1;
-            if (mode == 0)
+        
+        case SC_SPACE:
+            KBD_Wait(dlg.keypress);
+            mode ^= SELL_MODE;
+            if (mode == BUY_MODE)
             {
-                vec.cur_act = 1;
-                vec.cur_cmd = 10;
-                vec.field = 4;
+                dlg.cur_act = S_FLD_COMMAND;
+                dlg.cur_cmd = F_SELECT;
+                dlg.field = STOR_BUY;
             }
             else
             {
-                vec.cur_act = 1;
-                vec.cur_cmd = 10;
-                vec.field = 6;
+                dlg.cur_act = S_FLD_COMMAND;
+                dlg.cur_cmd = F_SELECT;
+                dlg.field = STOR_SELL;
             }
             break;
-        case 0x1c:
-            KBD_Wait(vec.keypress);
-            vec.cur_act = 1;
-            vec.cur_cmd = 10;
-            vec.field = 5;
+        
+        case SC_ENTER:
+            KBD_Wait(dlg.keypress);
+            dlg.cur_act = S_FLD_COMMAND;
+            dlg.cur_cmd = F_SELECT;
+            dlg.field = STOR_BUYIT;
             break;
-        case 0x48:
-        case 0x49:
-        case 0x4d:
-            KBD_Wait(vec.keypress);
-            vec.cur_act = 1;
-            vec.cur_cmd = 10;
-            vec.field = 3;
+        
+        case SC_UP:
+        case SC_PAGEUP:
+        case SC_RIGHT:
+            KBD_Wait(dlg.keypress);
+            dlg.cur_act = S_FLD_COMMAND;
+            dlg.cur_cmd = F_SELECT;
+            dlg.field = STOR_NEXT;
             break;
-        case 0x4b:
-        case 0x50:
-        case 0x51:
-            KBD_Wait(vec.keypress);
-            vec.cur_act = 1;
-            vec.cur_cmd = 10;
-            vec.field = 2;
+        
+        case SC_LEFT:
+        case SC_DOWN:
+        case SC_PAGEDN:
+            KBD_Wait(dlg.keypress);
+            dlg.cur_act = S_FLD_COMMAND;
+            dlg.cur_cmd = F_SELECT;
+            dlg.field = STOR_PREV;
             break;
         }
-        if (vec.cur_act == 1 && vec.cur_cmd == 10)
+        
+        if (dlg.cur_act == S_FLD_COMMAND && dlg.cur_cmd == F_SELECT)
         {
-            v24 = 1;
-            switch (vec.field)
+            update = 1;
+            switch (dlg.field)
             {
-            case 3:
-                SND_Patch(20, 127);
-                if (v30)
+            case STOR_NEXT:
+                SND_Patch(FX_SWEP, 127);
+                if (max_items)
                     cur_item++;
                 break;
-            case 2:
-                SND_Patch(20, 127);
-                if (v30)
+            
+            case STOR_PREV:
+                SND_Patch(FX_SWEP, 127);
+                if (max_items)
                     cur_item--;
                 break;
-            case 4:
-                SND_Patch(20, 127);
-                mode = 0;
-                v30 = MakeBuyItems();
+            
+            case STOR_BUY:
+                SND_Patch(FX_SWEP, 127);
+                mode = BUY_MODE;
+                max_items = MakeBuyItems();
                 cur_item = 0;
                 break;
-            case 6:
-                SND_Patch(20, 127);
-                mode = 1;
-                v30 = MakeSellItems();
+            
+            case STOR_SELL:
+                SND_Patch(FX_SWEP, 127);
+                mode = SELL_MODE;
+                max_items = MakeSellItems();
                 cur_item = 0;
                 break;
-            case 5:
-                if (mode == 0)
+            
+            case STOR_BUYIT:
+                if (mode == BUY_MODE)
                 {
-                    v2c = buy_items[cur_item];
-                    switch (OBJS_Buy(v2c))
+                    pos = b_items[cur_item];
+                    switch (OBJS_Buy(pos))
                     {
-                    case 0:
-                        SND_Patch(20, 127);
+                    case OBJ_GOTIT:
+                        SND_Patch(FX_SWEP, 127);
                         break;
-                    case 1:
-                        SND_Patch(22, 127);
-                        Harrold(0x4f);
+                    
+                    case OBJ_NOMONEY:
+                        SND_Patch(FX_WARNING, 127);
+                        Harrold(FILE04f_HAR4_TXT);
                         break;
-                    case 2:
-                        SND_Patch(22, 127);
-                        Harrold(0x51);
+                    
+                    case OBJ_SHIPFULL:
+                        SND_Patch(FX_WARNING, 127);
+                        Harrold(FILE051_HAR7_TXT);
                         break;
-                    case 3:
-                        SND_Patch(22, 127);
+                    
+                    case OBJ_ERROR:
+                        SND_Patch(FX_WARNING, 127);
                         break;
                     }
                     MakeBuyItems();
-                    for (v38 = 0; v38 < buy_count; v38++)
+                    for (loop = 0; loop < buy_count; loop++)
                     {
-                        if (buy_items[v38] == v2c)
-                            cur_item = v38;
+                        if (b_items[loop] == pos)
+                            cur_item = loop;
                         break;
                     }
                 }
                 else
                 {
-                    v2c = sell_items[cur_item];
-                    OBJS_Sell(v2c);
+                    pos = s_items[cur_item];
+                    OBJS_Sell(pos);
                     MakeSellItems();
-                    SND_Patch(20, 127);
-                    for (v38 = 0; v38 < s_count; v38++)
+                    SND_Patch(FX_SWEP, 127);
+                    for (loop = 0; loop < sell_count; loop++)
                     {
-                        if (sell_items[v38] == v2c)
-                            cur_item = v38;
+                        if (s_items[loop] == pos)
+                            cur_item = loop;
                         break;
                     }
                 }
@@ -558,16 +671,20 @@ void STORE_Enter(void)
             }
         }
     }
-LAB_000209e5:
-    SND_Patch(12, 127);
+
+store_exit:
+    SND_Patch(FX_DOOR, 127);
     while (IMS_IsAck())
     {
     }
     g_button_flag = 1;
+    
     GFX_FadeOut(0, 0, 0, 16);
+    
     PTR_DrawCursor(0);
     SWD_DestroyWindow(window);
     memset(displaybuffer, 0, 64000);
+    
     GFX_DisplayUpdate();
     GFX_SetPalette(palette, 0);
 }

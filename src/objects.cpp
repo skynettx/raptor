@@ -602,9 +602,9 @@ OBJS_DisplayStats(
         }
     }
     
-    if (player.sweapon != -1)
+    if (plr.sweapon != -1)
     {
-        item = obj_lib[player.sweapon].item;
+        item = obj_lib[plr.sweapon].item;
         GFX_PutSprite((texture_t*)GLB_GetItem(item), MAP_RIGHT - 18, MAP_TOP);
     }
     
@@ -699,7 +699,7 @@ OBJS_Add(
     
     if (lib->moneyflag)
     {
-        player.score += lib->cost;
+        plr.score += lib->cost;
         return OBJ_GOTIT;
     }
     
@@ -737,9 +737,9 @@ OBJS_Add(
     {
         cur->inuse = 1;
         p_objs[type] = cur;
-        if (player.sweapon == -1 && lib->specialw)
+        if (plr.sweapon == -1 && lib->specialw)
         {
-            player.sweapon = type;
+            plr.sweapon = type;
         }
     }
     
@@ -763,7 +763,7 @@ OBJS_Del(
         p_objs[type] = NULL;
         OBJS_Equip(type);
         
-        if (type == player.sweapon)
+        if (type == plr.sweapon)
             OBJS_GetNext();
     }
 }
@@ -781,10 +781,10 @@ OBJS_GetNext(
 
     setval = -1;
     
-    if (player.sweapon < S_DUMB_MISSLE)
+    if (plr.sweapon < S_DUMB_MISSLE)
         pos = S_DUMB_MISSLE;
     else
-        pos = player.sweapon + 1;
+        pos = plr.sweapon + 1;
     
     for (loop = FIRST_SPECIAL; loop <= LAST_WEAPON; loop++)
     {
@@ -801,7 +801,7 @@ OBJS_GetNext(
         pos++;
     }
     
-    player.sweapon = setval;
+    plr.sweapon = setval;
 }
 
 /***************************************************************************
@@ -833,7 +833,7 @@ OBJS_Use(
             OBJS_Remove(cur);
             p_objs[type] = NULL;
             OBJS_Equip(type);
-            if (player.sweapon == type)
+            if (plr.sweapon == type)
                 OBJS_GetNext();
         }
     }
@@ -857,7 +857,7 @@ OBJS_Sell(
     if (!cur)
         return 0;
     
-    player.score += OBJS_GetResale(type);
+    plr.score += OBJS_GetResale(type);
     
     if (type == S_DETECT)
     {
@@ -878,7 +878,7 @@ OBJS_Sell(
                 OBJS_Remove(cur);
                 p_objs[type] = NULL;
                 OBJS_Equip(type);
-                if (player.sweapon == type)
+                if (plr.sweapon == type)
                     OBJS_GetNext();
             }
         }
@@ -914,12 +914,12 @@ OBJS_Buy(
             return OBJ_SHIPFULL;
     }
     
-    if ((unsigned int)OBJS_GetCost(type) <= player.score)
+    if ((unsigned int)OBJS_GetCost(type) <= plr.score)
     {
         rval = OBJS_Add(type);
         
         if (!rval)
-            player.score -= OBJS_GetCost(type);
+            plr.score -= OBJS_GetCost(type);
     }
     
     return rval;
@@ -1260,7 +1260,7 @@ OBJS_LoseObj(
     objlib_t *lib;
     rval = 1;
     
-    if (player.sweapon == -1)
+    if (plr.sweapon == -1)
     {
         for (type = S_LAST_OBJECT - 1; type >= 0; type--)
         {
@@ -1275,7 +1275,7 @@ OBJS_LoseObj(
     }
     else
     {
-        OBJS_Del(player.sweapon);
+        OBJS_Del(plr.sweapon);
         rval = 1;
     }
     
@@ -1331,7 +1331,7 @@ OBJS_MakeSpecial(
     if (!lib->specialw)
         return 0;
     
-    player.sweapon = type;
+    plr.sweapon = type;
     
     return 1;
 }

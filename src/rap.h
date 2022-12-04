@@ -156,7 +156,7 @@ struct flat_t {
 };
 
 extern flat_t *flatlib[4];
-extern player_t player;
+extern player_t plr;
 
 int wrand(void);
 

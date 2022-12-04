@@ -1735,12 +1735,12 @@ int FUN_0002dbe4(wdlg_t *a1, swd_t *a2, swdfield_t *a3)
             {
             case 11:
                 v14 = 1;
-                a1->f_30 = 1;
+                a1->viewactive = 1;
                 a1->f_38 = a3[i].f_7c;
                 a1->f_3c = a3[i].f_80;
                 a1->f_24 = a3[i].f_84;
                 a1->f_28 = a3[i].f_88;
-                a1->f_34 = i;
+                a1->sfield = i;
                 break;
             }
             if (v14)
@@ -1824,7 +1824,7 @@ void SWD_Dialog(wdlg_t *a1)
             kbactive = 0;
     }
     old_win = active_window;
-    a1->f_30 = 0;
+    a1->viewactive = 0;
     if (g_wins[active_window].f_8)
         FUN_0002dbe4(a1, vc, vcc);
     if (active_field == -1)

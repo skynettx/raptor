@@ -150,8 +150,8 @@ struct wdlg_t {
     int f_24;
     int f_28;
     int f_2c;
-    int f_30;
-    int f_34;
+    int viewactive;
+    int sfield;
     int f_38;
     int f_3c;
 };

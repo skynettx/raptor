@@ -247,9 +247,9 @@ void WIN_Opts(void)
             }
             break;
         }
-        if (vb0.f_30)
+        if (vb0.viewactive)
         {
-            switch (vb0.f_34)
+            switch (vb0.sfield)
             {
             case 11:
                 if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                  //Fixed ptr input
@@ -640,12 +640,12 @@ int WIN_Register(void)
             GFX_DisplayUpdate();
             break;
         }
-        if (v80.f_30)
+        if (v80.viewactive)
         {
-            switch (v80.f_34)
+            switch (v80.sfield)
             {
             case 4:
-                v2c = v80.f_34;
+                v2c = v80.sfield;
                 if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                       //Fixed ptr input
                 {
                     while (IMS_IsAck())
@@ -668,7 +668,7 @@ int WIN_Register(void)
                 }
                 break;
             case 5:
-                v2c = v80.f_34;
+                v2c = v80.sfield;
                 if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                     //Fixed ptr input
                 {
                     while (IMS_IsAck())
@@ -685,7 +685,7 @@ int WIN_Register(void)
                 v1c = v2c;
                 break;
             case 6:
-                v2c = v80.f_34;
+                v2c = v80.sfield;
                 if (v2c != v1c)
                 {
                     SWD_SetFieldText(v24, 3, regtext[0]);
@@ -800,16 +800,16 @@ LAB_000244ea:
             vd8.trainflag = 0;
             vd8.fintrain = 1;
         }
-        memcpy(&player, &vd8, sizeof(player_t));
+        memcpy(&plr, &vd8, sizeof(player_t));
         RAP_SetPlayerDiff();
         OBJS_Add(0);
         OBJS_Add(16);
         OBJS_Add(16);
         OBJS_Add(16);
-        player.score = 10000;
+        plr.score = 10000;
         if (godmode)
         {
-            player.score += 0xd5fff;
+            plr.score += 0xd5fff;
             OBJS_Add(11);
             OBJS_Add(11);
             OBJS_Add(11);
@@ -850,9 +850,9 @@ int WIN_Hangar(void)
     PTR_DrawCursor(0);
     KBD_Clear();
 
-    if (player.trainflag)
+    if (plr.trainflag)
     {
-        player.trainflag = 0;
+        plr.trainflag = 0;
         v2c = 3;
     }
     else
@@ -971,7 +971,7 @@ int WIN_Hangar(void)
             case 0x1f:
             case 0x3e:
                 v34 = 3;
-                sprintf(v88, "Save %s - %s ?", player.name, player.callsign);
+                sprintf(v88, "Save %s - %s ?", plr.name, plr.callsign);
                 if (WIN_AskBool(v88))
                     RAP_SavePlayer();
                 break;
@@ -1017,8 +1017,8 @@ int WIN_Hangar(void)
                         SWD_GetFieldXYL(v28, v2c, &v1c, &v20, &v48, &v24);
                         PTR_SetPos(v1c + (v48>>1), v20 + (v24>>1));
                         v30 = -1;
-                        vd0.f_34 = v2c;
-                        vd0.f_30 = 1;
+                        vd0.sfield = v2c;
+                        vd0.viewactive = 1;
                     }
                     break;
                 default:
@@ -1026,14 +1026,14 @@ int WIN_Hangar(void)
                     break;
                 }
             }
-            if (vd0.f_30)
+            if (vd0.viewactive)
             {
 LAB_00024b33:
-                switch (vd0.f_34)
+                switch (vd0.sfield)
                 {
                 case 2:
                     v34 = 0;
-                    v2c = vd0.f_34;
+                    v2c = vd0.sfield;
                     if ((mouseb1) || (vd0.keypress == 0x1c) || (AButton && !joy_ipt_MenuNew))                //Fixed ptr input
                     {
                         SND_Patch(12, 60);
@@ -1052,7 +1052,7 @@ LAB_00024b33:
                     break;
                 case 3:
                     v34 = 1;
-                    v2c = vd0.f_34;
+                    v2c = vd0.sfield;
                     if ((mouseb1) || (vd0.keypress == 0x1c) || (AButton && !joy_ipt_MenuNew))               //Fixed ptr input
                     {
                         SND_Patch(12, 127);
@@ -1071,7 +1071,7 @@ LAB_00024b33:
                     break;
                 case 4:
                     v34 = 2;
-                    v2c = vd0.f_34;
+                    v2c = vd0.sfield;
                     if ((mouseb1) || (vd0.keypress == 0x1c) || (AButton && !joy_ipt_MenuNew))             //Fixed ptr input
                     {
                         v2c = -99;
@@ -1091,13 +1091,13 @@ LAB_00024b33:
                     break;
                 case 5:
                     v34 = 3;
-                    v2c = vd0.f_34;
+                    v2c = vd0.sfield;
                     if ((mouseb1) || (vd0.keypress == 0x1c) || (AButton && !joy_ipt_MenuNew))            //Fixed ptr input
                     {
                         while (IMS_IsAck())
                         {
                         }
-                        sprintf(v88, "Save %s - %s ?", player.name, player.callsign);
+                        sprintf(v88, "Save %s - %s ?", plr.name, plr.callsign);
                         if (WIN_AskBool(v88))
                             RAP_SavePlayer();
                         while (IMS_IsAck())
@@ -1156,7 +1156,7 @@ void WIN_LoadComp(void)
     sprintf(v44, "WAVE %d", game_wave[cur_game]);
     SWD_SetFieldText(v1c, 10, v44);
     SWD_SetFieldText(v1c, 9, v74[cur_game]);
-    if (diff_wrap[player.diff[cur_game]] - 1 == game_wave[cur_game])
+    if (diff_wrap[plr.diff[cur_game]] - 1 == game_wave[cur_game])
     {
         sprintf(v44, "FINAL WAVE %d", game_wave[cur_game] + 1);
         SWD_SetFieldText(v1c, 10, v44);
@@ -1501,30 +1501,30 @@ void WIN_MainLoop(void)
             INTRO_Landing();
             continue;
         }
-        v24 = diff_wrap[player.diff[cur_game]] - 1;
+        v24 = diff_wrap[plr.diff[cur_game]] - 1;
         if (game_wave[cur_game] == v24)
         {
-            if (!player.diff[cur_game] && !player.fintrain)
+            if (!plr.diff[cur_game] && !plr.fintrain)
             {
                 OBJS_Init();
-                player.sweapon = -1;
-                player.fintrain = 1;
-                player.score = 0;
+                plr.sweapon = -1;
+                plr.fintrain = 1;
+                plr.score = 0;
                 OBJS_Add(0);
                 OBJS_Add(16);
                 OBJS_Add(16);
                 OBJS_Add(16);
-                player.score = 0x2710;
-                if (player.diff[cur_game] < 3)
-                    player.diff[cur_game]++;
+                plr.score = 0x2710;
+                if (plr.diff[cur_game] < 3)
+                    plr.diff[cur_game]++;
                 for (v28 = 0; v28 < 4; v28++)
-                    if (!player.diff[v28])
-                        player.diff[v28] = 1;
+                    if (!plr.diff[v28])
+                        plr.diff[v28] = 1;
             }
             else
             {
-                if (player.diff[cur_game] < 3)
-                    player.diff[cur_game]++;
+                if (plr.diff[cur_game] < 3)
+                    plr.diff[cur_game]++;
             }
             RAP_SetPlayerDiff();
             game_wave[cur_game] = 0;

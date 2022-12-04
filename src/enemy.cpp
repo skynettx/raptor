@@ -1052,7 +1052,7 @@ void ENEMY_Think(
         
         if (sprite->hits <= 0)
         {
-            player.score += curlib->money;
+            plr.score += curlib->money;
             
             SND_3DPatch(FX_AIREXPLO, sprite->x + sprite->hlx, sprite->x + sprite->hlx);
             
