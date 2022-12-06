@@ -567,144 +567,160 @@ PutField_Exit:
         GFX_Print(text_x, text_y, fld_text, fld_font, curfld->fontbasecolor);
 }
 
-void SWD_DoButton(swd_t *a1, swdfield_t *a2)
+/*------------------------------------------------------------------------
+  SWD_DoButton() - processes all buttons from SWD_Dialog
+  ------------------------------------------------------------------------*/
+void 
+SWD_DoButton(
+    swd_t *curwin,         // INPUT : pointer to current window
+    swdfield_t *curfld     // INPUT : pointer to current field
+)
 {
-    if (joy_ipt_MenuNew)                                                 //Controller Input DoButton
+    // == CONTROLLER INPUT ==============================
+    
+    if (joy_ipt_MenuNew)                                                 
     {
-        if (StickY > 0)                                                   
+        if (StickY > 0 || Down)                                                   
         {
             if (JOY_IsScroll(0) == 1)
-                g_key = 80;
+                g_key = SC_DOWN;
         }
-        if (StickY < 0)
+        
+        if (StickY < 0 || Up)
         {
             if (JOY_IsScroll(0) == 1)
-                g_key = 72;
+                g_key = SC_UP;
         }
-        if (StickX > 0)
+        
+        if (StickX > 0 || Right)
         {
             if (JOY_IsScroll(0) == 1)
-                g_key = 77;
+                g_key = SC_RIGHT;
         }
-        if (StickX < 0)
+        
+        if (StickX < 0 || Left)
         {
             if (JOY_IsScroll(0) == 1)
-                g_key = 75;
+                g_key = SC_LEFT;
         }
-        if (Down)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = 80;
-        }
-        if (Up)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = 72;
-        }
-        if (Left)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = 75;
-        }
-        if (Right)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = 77;
-        }
+        
         if (AButton)
         {
             JOY_IsKey(AButton);
-            g_key = 28;
+            g_key = SC_ENTER;
         }
     }
     
     if (!g_button_flag)
         return;
+    
     switch (g_key)
     {
-    case 15:
-        if (keyboard[56])
+    case SC_TAB:
+        if (keyboard[SC_ALT])
         {
-            cur_act = 2;
-            cur_cmd = 14;
-            while (keyboard[15]) {
+            cur_act = S_WIN_COMMAND;
+            cur_cmd = W_NEXT;
+            while (keyboard[SC_TAB]) {
             }
         }
         else
         {
-            cur_act = 1;
-            if (capslock + keyboard[42] + keyboard[54])
-                cur_cmd = 4;
+            cur_act = S_FLD_COMMAND;
+            
+            if (KBD_ISCAPS)
+                cur_cmd = F_PREV;
             else
-                cur_cmd = 3;
+                cur_cmd = F_NEXT;
         }
         break;
-    case 28:
-        cur_act = 1;                                                         //Enter
-        cur_cmd = 10;
+    
+    case SC_ENTER:
+        cur_act = S_FLD_COMMAND;                                                         
+        cur_cmd = F_SELECT;
         break;
-    case 80:
-        if (a1->f_8)                                                         //Cursor Down
+    
+    case SC_DOWN:
+        if (curwin->arrowflag)                                                         
         {
-            cur_act = 1;
-            cur_cmd = 1;
+            cur_act = S_FLD_COMMAND;
+            cur_cmd = F_DOWN;
         }
         break;
-    case 72:                                                                //Cursor Up
-        if (a1->f_8)
+    
+    case SC_UP:                                                                
+        if (curwin->arrowflag)
         {
-            cur_act = 1;
-            cur_cmd = 2;
+            cur_act = S_FLD_COMMAND;
+            cur_cmd = F_UP;
         }
         break;
-    case 77:
-        if (a1->f_8)                                                        //Cursor Right
+    
+    case SC_RIGHT:
+        if (curwin->arrowflag)                                                        
         {
-            cur_act = 1;
-            cur_cmd = 5;
+            cur_act = S_FLD_COMMAND;
+            cur_cmd = F_RIGHT;
         }
         break;
-    case 75:
-        if (a1->f_8)                                                        //Cursor Left
+    
+    case SC_LEFT:
+        if (curwin->arrowflag)                                                        
         {
-            cur_act = 1;
-            cur_cmd = 6;
+            cur_act = S_FLD_COMMAND;
+            cur_cmd = F_LEFT;
         }
         break;
     }
 }
 
-void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
+/*------------------------------------------------------------------------
+  SWD_FieldInput() - Field Input function for SWD_Dialog
+  ------------------------------------------------------------------------*/
+void 
+SWD_FieldInput(
+    swd_t *curwin,          // INPUT : pointer to current window
+    swdfield_t *curfld      // INPUT : pointer to current field
+)
 {
     static int curpos;
-    font_t *vbx;
-    char *vs;
-    int vd;
-    vd = 0;
-    vbx = (font_t*)GLB_GetItem(a2->fontid);
-    vs = (char*)a2 + a2->txtoff;
-    curpos = strlen(vs);
+    font_t *fld_font;
+    char *wrkbuf;
+    int flag;
+    flag = 0;
+    fld_font = (font_t*)GLB_GetItem(curfld->fontid);
+    wrkbuf = (char*)curfld + curfld->txtoff;
     
-    ///////////////////////////////////Controller FieldInput///////////////////////////////////
+    curpos = strlen(wrkbuf);
+    
+    // == CONTROLLER FIELDINPUT ==============================   
+    
     if (joy_ipt_MenuNew)
     {
-        if (StickY || Down || Up || AButton || YButton || Start)            //Input Joy Max FieldInput
+        
+        // == INPUT CONTROLLER MAX FIELDINPUT ==============================
+        
+        if (StickY || Down || Up || AButton || YButton || Start)            
         {
             if (curpos > 17)
             {
                 curpos--;
-                vs[curpos] = 0;
+                wrkbuf[curpos] = 0;
             }
+            
             if (fi_sec_field)
             {
                 if (curpos > 10)
                 {
                     curpos--;
-                    vs[curpos] = 0;
+                    wrkbuf[curpos] = 0;
                 }
             }
         }
-        if (StickY > 0)                                                    //Input Joy Analog Ascii Table Down
+        
+        // == INPUT CONTROLLER ASCII TABLE DOWN ==============================
+
+        if (StickY > 0 || Down)                                                    
         {
             if (JOY_IsScroll(0) == 1)
             {
@@ -712,23 +728,28 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
                 {
                     curpos--;
                     g_joy_ascii--;
-                    vs[curpos] = g_joy_ascii;
+                    wrkbuf[curpos] = g_joy_ascii;
+                    
                     if (g_joy_ascii < 0x30)
                     {
                         g_joy_ascii = 0x5a;
-                        vs[curpos] = g_joy_ascii;
+                        wrkbuf[curpos] = g_joy_ascii;
                     }
                 }
+                
                 if (fi_joy_count == 0)
                 {
                     fi_joy_count++;
                     g_joy_ascii = 0x41;
-                    vs[curpos] = g_joy_ascii;
-                    vs[curpos + 1] = 0;
+                    wrkbuf[curpos] = g_joy_ascii;
+                    wrkbuf[curpos + 1] = 0;
                 }
             }
         }
-        if (StickY < 0)                                                    //Input Joy Analog Ascii Table Up
+        
+        // == INPUT CONTROLLER ASCII TABLE UP ==============================
+
+        if (StickY < 0 || Up)                                                    
         {
             if (JOY_IsScroll(0) == 1)
             {
@@ -736,516 +757,599 @@ void SWD_FieldInput(swd_t *a1, swdfield_t *a2)
                 {
                     curpos--;
                     g_joy_ascii++;
-                    vs[curpos] = g_joy_ascii;
+                    wrkbuf[curpos] = g_joy_ascii;
+                    
                     if (g_joy_ascii > 0x5a)
                     {
                         g_joy_ascii = 0x30;
-                        vs[curpos] = g_joy_ascii;
+                        wrkbuf[curpos] = g_joy_ascii;
                     }
                 }
+                
                 if (fi_joy_count == 0)
                 {
                     fi_joy_count++;
                     g_joy_ascii = 0x41;
-                    vs[curpos] = g_joy_ascii;
-                    vs[curpos + 1] = 0;
+                    wrkbuf[curpos] = g_joy_ascii;
+                    wrkbuf[curpos + 1] = 0;
                 }
             }
         }
-        if (StickX > 0)
+        
+        if (StickX > 0 || Right)
         {
             if (JOY_IsScroll(0) == 1)
-                g_key = 77;
+                g_key = SC_RIGHT;
         }
-        if (StickX < 0)
+        
+        if (StickX < 0 || Left)
         {
             if (JOY_IsScroll(0) == 1)
-                g_key = 75;
+                g_key = SC_LEFT;
         }
-        if (Down)                                                     //Input Joy DPad Ascii Table Down
-        {
-            if (JOY_IsScroll(0) == 1)
-            {
-                if (fi_joy_count > 0)
-                {
-                    curpos--;
-                    g_joy_ascii--;
-                    vs[curpos] = g_joy_ascii;
-                    if (g_joy_ascii < 0x30)
-                    {
-                        g_joy_ascii = 0x5a;
-                        vs[curpos] = g_joy_ascii;
-                    }
-                }
-                if (fi_joy_count == 0)
-                {
-                    fi_joy_count++;
-                    g_joy_ascii = 0x41;
-                    vs[curpos] = g_joy_ascii;
-                    vs[curpos + 1] = 0;
-                }
-            }
-        }
-        if (Up)                                                        //Input Joy DPad Ascii Table Up 
-        {
-            if (JOY_IsScroll(0) == 1)
-            {
-                if (fi_joy_count > 0)
-                {
-                    curpos--;
-                    g_joy_ascii++;
-                    vs[curpos] = g_joy_ascii;
-                    if (g_joy_ascii > 0x5a)
-                    {
-                        g_joy_ascii = 0x30;
-                        vs[curpos] = g_joy_ascii;
-                    }
-                }
-                if (fi_joy_count == 0)
-                {
-                    fi_joy_count++;
-                    g_joy_ascii = 0x41;
-                    vs[curpos] = g_joy_ascii;
-                    vs[curpos + 1] = 0;
-                }
-            }
-        }
-        if (Left)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = 75;
-        }
-        if (Right)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = 77;
-        }
-        if (AButton)                                                  //Input Joy next Input
+        
+        // == INPUT CONTROLLER NEXT INPUT ==============================
+
+        if (AButton)                                                  
         {
             JOY_IsKey(AButton);
             curpos++;
             fi_joy_count = 0;
         }
-        if (XButton)                                                  //Input Joy for Delete
+        
+        // == INPUT CONTROLLER DELETE ==============================
+
+        if (XButton)                                                  
         {
             JOY_IsKey(XButton);
-            vd = 1;
+            flag = 1;
+            
             if (curpos > 0)
                 curpos--;
-            vs[curpos] = 0;
+            
+            wrkbuf[curpos] = 0;
             fi_joy_count = 0;
         }
-        if (YButton)                                                  //Input Joy for Space
+        
+        // == INPUT CONTROLLER SPACE ==============================
+        
+        if (YButton)                                                  
         {
             JOY_IsKey(YButton);
-            vs[curpos + 1] = 0;
+            wrkbuf[curpos + 1] = 0;
             g_joy_ascii = 0x20;
-            vs[curpos] = g_joy_ascii;
+            wrkbuf[curpos] = g_joy_ascii;
             fi_joy_count = 0;
         }
-        if (Start)                                                   //Input Joy for confirm FieldInput
+        
+        // == INPUT CONTROLLER CONFIRM ==============================
+
+        if (Start)                                                   
         {
             JOY_IsKey(Start);
-            g_key = 28;
+            g_key = SC_ENTER;
             fi_joy_count = 0;
         }
     }
-    ///////////////////////////////////g_key FieldInput///////////////////////////////////
+    
     switch (g_key)
     {
-    case 15:
-        if (keyboard[56])
+    case SC_TAB:
+        if (keyboard[SC_ALT])
         {
-            while (keyboard[15]) {
+            while (keyboard[SC_TAB]) {
             }
-            cur_act = 2;
-            cur_cmd = 14;
+            cur_act = S_WIN_COMMAND;
+            cur_cmd = W_NEXT;
         }
         else
         {
-            cur_act = 1;
-            if (capslock + keyboard[42] + keyboard[54])
-                cur_cmd = 4;
+            cur_act = S_FLD_COMMAND;
+            
+            if (KBD_ISCAPS)
+                cur_cmd = F_PREV;
             else
-                cur_cmd = 3;
+                cur_cmd = F_NEXT;
         }
+        
         if (fi_sec_field == false)
             fi_sec_field = true;
         else
             fi_sec_field = false;
         break;
-    case 28:
-        cur_act = 1;
-        cur_cmd = 10;
+    
+    case SC_ENTER:
+        cur_act = S_FLD_COMMAND;
+        cur_cmd = F_SELECT;
         break;
-    case 80:
-        if (a1->f_8)
+    
+    case SC_DOWN:
+        if (curwin->arrowflag)
         {
-            cur_act = 1;
-            cur_cmd = 1;
+            cur_act = S_FLD_COMMAND;
+            cur_cmd = F_DOWN;
         }
         break;
-    case 72:
-        if (a1->f_8)
+    
+    case SC_UP:
+        if (curwin->arrowflag)
         {
-            cur_act = 1;
-            cur_cmd = 2;
+            cur_act = S_FLD_COMMAND;
+            cur_cmd = F_UP;
         }
         break;
-    case 77:
-        if (a1->f_8)
+    
+    case SC_RIGHT:
+        if (curwin->arrowflag)
         {
-            cur_act = 1;
-            cur_cmd = 5;
+            cur_act = S_FLD_COMMAND;
+            cur_cmd = F_RIGHT;
         }
         break;
-    case 75:
-        if (a1->f_8)
+    
+    case SC_LEFT:
+        if (curwin->arrowflag)
         {
-            cur_act = 1;
-            cur_cmd = 6;
+            cur_act = S_FLD_COMMAND;
+            cur_cmd = F_LEFT;
         }
         break;
-    case 14:
-        vd = 1;
+    
+    case SC_BACKSPACE:
+        flag = 1;
         if (curpos > 0)
             curpos--;
-        vs[curpos] = 0;
+        wrkbuf[curpos] = 0;
         break;
+    
     default:
-        if (keyboard[21] && keyboard[29])
+        if (keyboard[SC_Y] && keyboard[SC_CTRL])
         {
             curpos = 0;
-            vd = 1;
-            *vs = 0;
+            flag = 1;
+            *wrkbuf = 0;
         }
-        else if (!keyboard[56] && !keyboard[29] && g_key > 0 && a2->maxchars-1 > curpos)
+        else if (!keyboard[SC_ALT] && !keyboard[SC_CTRL] && g_key > 0 && curfld->maxchars-1 > curpos)
         {
             if (g_ascii > 31 && g_ascii < 127)
             {
-                switch (a2->f_18)
+                switch (curfld->input_opt)
                 {
-                case 0:
-                    vs[curpos] = g_ascii;
+                case I_NORM:
+                    wrkbuf[curpos] = g_ascii;
                     break;
-                case 1:
-                    vs[curpos] = toupper(g_ascii);
+                
+                case I_TOUPPER:
+                    wrkbuf[curpos] = toupper(g_ascii);
                     break;
-                case 2:
+                
+                case I_NUMERIC:
                     if (isdigit(g_ascii) || g_ascii == '-')
-                        vs[curpos] = g_ascii;
+                        wrkbuf[curpos] = g_ascii;
                     else
-                        vs[curpos] = 0;
+                        wrkbuf[curpos] = 0;
                     break;
                 }
             }
             else
-                vs[curpos] = 0;
-            if (GFX_StrPixelLen(vbx, vs, curpos + 1) >= a2->lx)
+                wrkbuf[curpos] = 0;
+            
+            if (GFX_StrPixelLen(fld_font, wrkbuf, curpos + 1) >= curfld->lx)
                 curpos--;
-            vd = 1;
-            vs[curpos + 1] = 0;
+            
+            flag = 1;
+            wrkbuf[curpos + 1] = 0;
         }
         break;
     }
-    if (vd)
+    
+    if (flag)
     {
-        SWD_PutField(a1, a2);
-        cur_act = 5;
-        cur_cmd = 0;
+        SWD_PutField(curwin, curfld);
+        cur_act = S_UPDATE;
+        cur_cmd = C_IDLE;
     }
 }
 
-void FUN_0002c8e4(int a1)
+/*------------------------------------------------------------------------
+   SWD_GetObjAreaInfo () - looks for a objarea then sets obj_xx variables
+  ------------------------------------------------------------------------*/
+void 
+SWD_GetObjAreaInfo(
+    int handle             // INPUT: handle of window
+)
 {
-    int i;
-    swd_t* vb;
-    swdfield_t *va;
+    int loop;
+    swd_t* cwin;
+    swdfield_t *curfld;
+    
     obj_x = 0;
     obj_y = 0;
     obj_width = 0;
     obj_height = 0;
-    vb = g_wins[a1].win;
-    va = (swdfield_t*)((char*)vb + vb->f_4c);
-    for (i = 0; i < vb->numflds; i++)
+    
+    cwin = g_wins[handle].win;
+    curfld = (swdfield_t*)((char*)cwin + cwin->fldofs);
+    
+    for (loop = 0; loop < cwin->numflds; loop++)
     {
-        if (va[i].opt == 10)
+        if (curfld[loop].opt == FLD_OBJAREA)
         {
-            obj_x = va[i].x;
-            obj_y = va[i].y;
-            obj_width = va[i].lx;
-            obj_height = va[i].ly;
+            obj_x = curfld[loop].x;
+            obj_y = curfld[loop].y;
+            obj_width = curfld[loop].lx;
+            obj_height = curfld[loop].ly;
             return;
         }
     }
 }
 
-void SWD_SetWindowFlag(void)
+/*------------------------------------------------------------------------
+  SWD_GetNextWindow() - Gets the Next Active Window
+  ------------------------------------------------------------------------*/
+void 
+SWD_GetNextWindow(
+    void
+)
 {
-    int i;
-    int va;
-    va = active_window - 1;
+    int loop;
+    int pos;
+    pos = active_window - 1;
+    
     active_window = -1;
-    if (va < 0)
-        va = 11;
-    for (i = 0; i < 12; i++)
+    
+    if (pos < 0)
+        pos = MAX_WINDOWS - 1;
+    
+    for (loop = 0; loop < MAX_WINDOWS; loop++)
     {
-        if (g_wins[va].f_4 && g_wins[va].win->f_c)
+        if (g_wins[pos].flag && g_wins[pos].win->display)
         {
-            active_window = va;
-            active_field = g_wins[va].win->f_54;
+            active_window = pos;
+            active_field = g_wins[pos].win->firstfld;
             break;
         }
-        va--;
-        if (va < 0)
-            va = 11;
+        pos--;
+        if (pos < 0)
+            pos = MAX_WINDOWS - 1;
     }
+    
     if (active_window == -1)
         active_field = -1;
+    
     lastfld = NULL;
 }
 
-int FUN_0002c9d8(void)
+/*------------------------------------------------------------------------
+  SWD_GetFirstField() - Gets the first selectable field
+  ------------------------------------------------------------------------*/
+int 
+SWD_GetFirstField(
+    void
+)
 {
-    return g_wins[active_window].win->f_54;
+    return g_wins[active_window].win->firstfld;
 }
 
-int FUN_0002c9ec(swdfield_t *a1, int a2)
+/*------------------------------------------------------------------------
+  SWD_GetLastField() - Gets the last selectable field
+  ------------------------------------------------------------------------*/
+int 
+SWD_GetLastField(
+    swdfield_t *firstfld,   // INPUT : pointer to first field
+    int maxfields           // INPUT : number of fields
+)
 {
-    int vc;
-    int i;
-    vc = -1;
-    for (i = a2 - 1; i >= 0; i--)
+    int rval;
+    int loop;
+    rval = -1;
+    
+    for (loop = maxfields - 1; loop >= 0; loop--)
     {
-        switch (a1[i].opt)
+        switch (firstfld[loop].opt)
         {
-        case 0:
-        case 1:
-        case 6:
-        case 7:
-        case 8:
+        case FLD_OFF:
+        case FLD_TEXT:
+        case FLD_DRAGBAR:
+        case FLD_BUMPIN:
+        case FLD_BUMPOUT:
+        case FLD_ICON:
             break;
+        
         default:
-            if (a1[i].f_78)
-                vc = i;
+            if (firstfld[loop].selectable)
+                rval = loop;
             break;
         }
-        if (vc != -1)
+        
+        if (rval != -1)
             break;
     }
-    return vc;
+    
+    return rval;
 }
 
-int SWD_GetRightField(swdfield_t *a1, int a2)
+/*------------------------------------------------------------------------
+  SWD_GetNextField() - Gets the Next selectable field
+  ------------------------------------------------------------------------*/
+int
+SWD_GetNextField(
+    swdfield_t* firstfld,   // INPUT : pointer to first field
+    int maxfields           // INPUT : number of fields
+)
 {
-    int vbp, i, vdi, va;
-    swdfield_t *vs;
-    vdi = 0x7fff;
-    vs = a1 + active_field;
-    vbp = FUN_0002c9d8();
-    for (i = 0; i < a2; i++)
+    int rval, loop, low, del;
+    swdfield_t* activefld;
+
+    low = 0x7fff;
+    activefld = firstfld + active_field;
+    rval = SWD_GetFirstField();
+
+    for (loop = 0; loop < maxfields; loop++)
     {
-        if (a1[i].opt != 6 && a1[i].f_78 && a1[i].f_4 > vs->f_4)
+        if (firstfld[loop].opt != FLD_DRAGBAR && firstfld[loop].selectable && firstfld[loop].id > activefld->id)
         {
-            va = abs(a1[i].f_4 - vs->f_4);
-            if (va < vdi)
+            del = abs(firstfld[loop].id - activefld->id);
+
+            if (del < low)
             {
-                vdi = va;
-                vbp = i;
+                low = del;
+                rval = loop;
             }
         }
     }
-    if (vbp != -1)
-        active_field = vbp;
-    return vbp;
+
+    if (rval != -1)
+        active_field = rval;
+
+    return rval;
 }
 
-int SWD_GetPrevField(swdfield_t *a1, int a2)
+/*------------------------------------------------------------------------
+  SWD_GetPrevField() - Gets the Previous selectable field
+  ------------------------------------------------------------------------*/
+int 
+SWD_GetPrevField(
+    swdfield_t *firstfld,   // INPUT : pointer to first field
+    int maxfields           // INPUT : number of fields
+)
 {
-    int vbp, i, vdi, va;
-    swdfield_t *vs;
-    vdi = 0x7fff;
-    vs = a1 + active_field;
-    vbp = FUN_0002c9d8();
-    for (i = 0; i < a2; i++)
+    int rval, loop, low, del;
+    swdfield_t *activefld;
+    
+    low = 0x7fff;
+    activefld = firstfld + active_field;
+    rval = SWD_GetLastField(firstfld, maxfields);
+    
+    for (loop = 0; loop < maxfields; loop++)
     {
-        if (a1[i].opt != 6 && a1[i].f_78 && a1[i].f_4 < vs->f_4)
+        if (firstfld[loop].opt != FLD_DRAGBAR && firstfld[loop].selectable && firstfld[loop].id < activefld->id)
         {
-            va = abs(vs->f_4 - a1[i].f_4);
-            if (va < vdi)
+            del = abs(activefld->id - firstfld[loop].id);
+            
+            if (del < low)
             {
-                vdi = va;
-                vbp = i;
+                low = del;
+                rval = loop;
             }
         }
     }
-    if (vbp != -1)
-        active_field = vbp;
-    return vbp;
+    
+    if (rval != -1)
+        active_field = rval;
+    
+    return rval;
 }
 
-int FUN_0002cb50(swdfield_t *a1, int a2)
+/*------------------------------------------------------------------------
+  SWD_GetRightField() - Gets the closest right selectable field
+  ------------------------------------------------------------------------*/
+int 
+SWD_GetRightField(
+    swdfield_t* firstfld,   // INPUT : pointer to first field
+    int maxfields           // INPUT : number of fields
+) 
 {
-    int v1c, v18, i, d;
-    swdfield_t *vd;
+    int rval, low, loop, del;
+    swdfield_t* activefld;
 
-    v1c = -1;
-    v18 = 0x7fff;
-    vd = a1 + active_field;
-    for (i = 0; i < a2; i++)
+    rval = -1;
+    low = 0x7fff;
+    activefld = firstfld + active_field;
+    
+    for (loop = 0; loop < maxfields; loop++)
     {
-        switch (a1[i].opt)
+        switch (firstfld[loop].opt)
         {
         default:
-            if (a1[i].x > vd->x)
+            if (firstfld[loop].x > activefld->x)
             {
-                d = abs(a1[i].x - vd->x) + abs(a1[i].y - vd->y);
-                if (d < v18 && a1[i].f_78)
+                del = abs(firstfld[loop].x - activefld->x) + abs(firstfld[loop].y - activefld->y);
+                
+                if (del < low && firstfld[loop].selectable)
                 {
-                    v18 = d;
-                    v1c = i;
+                    low = del;
+                    rval = loop;
                 }
             }
             break;
-        case 0:
-        case 1:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
+        
+        case FLD_OFF:
+        case FLD_TEXT:
+        case FLD_DRAGBAR:
+        case FLD_BUMPIN:
+        case FLD_BUMPOUT:
+        case FLD_ICON:
             break;
         }
     }
-    if (v1c < 0)
-        SWD_GetRightField(a1, a2);
+    
+    if (rval < 0)
+        SWD_GetNextField(firstfld, maxfields);
     else
-        active_field = v1c;
-    return v1c;
+        active_field = rval;
+    
+    return rval;
 }
 
-int SWD_GetUpField(swdfield_t *a1, int a2)
+/*------------------------------------------------------------------------
+  SWD_GetUpField() - Gets the closest right selectable field
+  ------------------------------------------------------------------------*/
+int 
+SWD_GetUpField(
+    swdfield_t *firstfld,  // INPUT : pointer to first field
+    int maxfields          // INPUT : number of fields
+)
 {
-    int v1c, v18, i, d;
-    swdfield_t *vd;
+    int rval, low, loop, del;
+    swdfield_t *activefld;
 
-    v18 = 0x7fff;
-    v1c = FUN_0002c9ec(a1, a2);
-    vd = a1 + active_field;
-    for (i = 0; i < a2; i++)
+    low = 0x7fff;
+    rval = SWD_GetLastField(firstfld, maxfields);
+    activefld = firstfld + active_field;
+    
+    for (loop = 0; loop < maxfields; loop++)
     {
-        switch (a1[i].opt)
+        switch (firstfld[loop].opt)
         {
         default:
-            if (a1[i].y < vd->y)
+            if (firstfld[loop].y < activefld->y)
             {
-                d = abs(a1[i].x - vd->x) + abs(a1[i].y - vd->y);
-                if (d < v18 && a1[i].f_78)
+                del = abs(firstfld[loop].x - activefld->x) + abs(firstfld[loop].y - activefld->y);
+                
+                if (del < low && firstfld[loop].selectable)
                 {
-                    v18 = d;
-                    v1c = i;
+                    low = del;
+                    rval = loop;
                 }
             }
             break;
-        case 0:
-        case 1:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
+        
+        case FLD_OFF:
+        case FLD_TEXT:
+        case FLD_DRAGBAR:
+        case FLD_BUMPIN:
+        case FLD_BUMPOUT:
+        case FLD_ICON:
             break;
         }
     }
-    if (v1c < 0)
-        active_field = FUN_0002c9d8();
+    
+    if (rval < 0)
+        active_field = SWD_GetFirstField();
     else
-        active_field = v1c;
-    return v1c;
+        active_field = rval;
+    
+    return rval;
 }
 
-int SWD_GetDownField(swdfield_t *a1, int a2)
+/*------------------------------------------------------------------------
+  SWD_GetDownField() - Gets the closest right selectable field
+  ------------------------------------------------------------------------*/
+int 
+SWD_GetDownField(
+    swdfield_t *firstfld,  // INPUT : pointer to first field
+    int maxfields          // INPUT : number of fields
+)
 {
-    int v1c, v18, i, d;
-    swdfield_t *vd;
+    int rval, low, loop, del;
+    swdfield_t *activefld;
 
-    v18 = 0x7fff;
-    v1c = FUN_0002c9d8();
-    vd = a1 + active_field;
-    for (i = 0; i < a2; i++)
+    low = 0x7fff;
+    rval = SWD_GetFirstField();
+    activefld = firstfld + active_field;
+    
+    for (loop = 0; loop < maxfields; loop++)
     {
-        switch (a1[i].opt)
+        switch (firstfld[loop].opt)
         {
         default:
-            if (a1[i].y > vd->y)
+            if (firstfld[loop].y > activefld->y)
             {
-                d = abs(a1[i].x - vd->x) + abs(a1[i].y - vd->y);
-                if (d < v18 && a1[i].f_78)
+                del = abs(firstfld[loop].x - activefld->x) + abs(firstfld[loop].y - activefld->y);
+                
+                if (del < low && firstfld[loop].selectable)
                 {
-                    v18 = d;
-                    v1c = i;
+                    low = del;
+                    rval = loop;
                 }
             }
             break;
-        case 0:
-        case 1:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
+        
+        case FLD_OFF:
+        case FLD_TEXT:
+        case FLD_DRAGBAR:
+        case FLD_BUMPIN:
+        case FLD_BUMPOUT:
+        case FLD_ICON:
             break;
         }
     }
-    if (v1c < 0)
-        active_field = FUN_0002c9d8();
+    
+    if (rval < 0)
+        active_field = SWD_GetFirstField();
     else
-        active_field = v1c;
-    return v1c;
+        active_field = rval;
+    
+    return rval;
 }
 
-int FUN_0002cdbc(swdfield_t *a1, int a2)
+/*------------------------------------------------------------------------
+  SWD_GetLeftField() - Gets the closest right selectable field
+  ------------------------------------------------------------------------*/
+int 
+SWD_GetLeftField(
+    swdfield_t *firstfld,   // INPUT : pointer to first field
+    int maxfields           // INPUT : number of fields
+)
 {
-    int v1c, v18, i, d;
-    swdfield_t *vd;
+    int rval, low, loop, del;
+    swdfield_t *activefld;
 
-    v1c = -1;
-    v18 = 0x7fff;
-    vd = a1 + active_field;
-    for (i = 0; i < a2; i++)
+    rval = -1;
+    low = 0x7fff;
+    activefld = firstfld + active_field;
+    
+    for (loop = 0; loop < maxfields; loop++)
     {
-        switch (a1[i].opt)
+        switch (firstfld[loop].opt)
         {
         default:
-            if (a1[i].x < vd->x)
+            if (firstfld[loop].x < activefld->x)
             {
-                d = abs(a1[i].x - vd->x) + abs(a1[i].y - vd->y);
-                if (d < v18 && a1[i].f_78)
+                del = abs(firstfld[loop].x - activefld->x) + abs(firstfld[loop].y - activefld->y);
+                
+                if (del < low && firstfld[loop].selectable)
                 {
-                    v18 = d;
-                    v1c = i;
+                    low = del;
+                    rval = loop;
                 }
             }
             break;
-        case 0:
-        case 1:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
+        
+        case FLD_OFF:
+        case FLD_TEXT:
+        case FLD_DRAGBAR:
+        case FLD_BUMPIN:
+        case FLD_BUMPOUT:
+        case FLD_ICON:
             break;
         }
     }
-    if (v1c < 0)
-        SWD_GetPrevField(a1, a2);
+    
+    if (rval < 0)
+        SWD_GetPrevField(firstfld, maxfields);
     else
-        active_field = v1c;
-    return v1c;
+        active_field = rval;
+    
+    return rval;
 }
-
 
 int SWD_ShowAllFields(swd_t *a1)
 {
     int i, v20, vbp;
     texture_t *tex;
-    swdfield_t *vs = (swdfield_t*)((char*)a1 + a1->f_4c);
+    swdfield_t *vs = (swdfield_t*)((char*)a1 + a1->fldofs);
     for (i = 0; i < a1->numflds; i++)
     {
         if (vs[i].opt)
@@ -1288,7 +1392,7 @@ void SWD_PutWin(int a1)
     vdi = vs->x - 8;
     v24 = vs->f_6c;
     vc = vs->y + 8;
-    if (vs->f_c)
+    if (vs->display)
     {
         if (vs->f_74)
         {
@@ -1344,7 +1448,7 @@ void SWD_PutWin(int a1)
             SWD_ShowAllFields(vs);
         if (winfuncs[a1])
         {
-            FUN_0002c8e4(a1);
+            SWD_GetObjAreaInfo(a1);
             wdlg.f_1c = obj_x;
             wdlg.f_20 = obj_y;
             wdlg.f_28 = obj_width;
@@ -1427,18 +1531,18 @@ swd_t* SWD_ReformatFieldData(swd_t* v1c, int a1)
     memcpy(swdNewData, v1c, sizeof(swd_t));
     memcpy((char*)swdNewData + len, (char*)v1c + oldLen, eof);
 
-    swdfield_32_t* swdfield32 = (swdfield_32_t*)((char*)v1c + v1c->f_4c);
-    swdfield_t* swdfield = (swdfield_t*)((char*)swdNewData + swdNewData->f_4c);
+    swdfield_32_t* swdfield32 = (swdfield_32_t*)((char*)v1c + v1c->fldofs);
+    swdfield_t* swdfield = (swdfield_t*)((char*)swdNewData + swdNewData->fldofs);
 
     for (size_t i = 0; i < v1c->numflds; i++)
     {
         swdfield[i].opt = swdfield32[i].f_0;
-        swdfield[i].f_4 = swdfield32[i].f_4;
+        swdfield[i].id = swdfield32[i].f_4;
         swdfield[i].f_8 = swdfield32[i].f_8;
         swdfield[i].f_c = swdfield32[i].f_c;
         swdfield[i].f_10 = swdfield32[i].f_10;
         swdfield[i].f_14 = swdfield32[i].f_14;
-        swdfield[i].f_18 = swdfield32[i].f_18;
+        swdfield[i].input_opt = swdfield32[i].f_18;
         swdfield[i].bstatus = swdfield32[i].f_1c;
         for (size_t j = 0; j < 16; j++)
         {
@@ -1456,7 +1560,7 @@ swd_t* SWD_ReformatFieldData(swd_t* v1c, int a1)
         swdfield[i].mark = swdfield32[i].f_6c;
         swdfield[i].saveflag = swdfield32[i].f_70;
         swdfield[i].f_74 = swdfield32[i].f_74;
-        swdfield[i].f_78 = swdfield32[i].f_78;
+        swdfield[i].selectable = swdfield32[i].f_78;
         swdfield[i].x = swdfield32[i].f_7c;
         swdfield[i].y = swdfield32[i].f_80;
         swdfield[i].lx = swdfield32[i].f_84;
@@ -1499,21 +1603,21 @@ int SWD_InitWindow(int a1)
     v1c = SWD_ReformatFieldData(v1c, a1);
 #endif
 #endif
-    vd = (swdfield_t*)((char*)v1c + v1c->f_4c);
+    vd = (swdfield_t*)((char*)v1c + v1c->fldofs);
     
     for (i = 0; i < 12; i++)
     {
-        if (!g_wins[i].f_4)
+        if (!g_wins[i].flag)
         {
             prev_window = active_window;
             g_wins[i].win = v1c;
-            g_wins[i].f_4 = 1;
+            g_wins[i].flag = 1;
             g_wins[i].f_0 = a1;
             active_window = i;
-            v1c->f_c = 1;
-            active_field = g_wins[i].win->f_54;
-            if (!vd[active_field].f_78)
-                active_field = FUN_0002c9d8();
+            v1c->display = 1;
+            active_field = g_wins[i].win->firstfld;
+            if (!vd[active_field].selectable)
+                active_field = SWD_GetFirstField();
             if (v1c->f_44)
             {
                 v1c->f_40 = GLB_GetItemID(v1c->f_30);
@@ -1531,7 +1635,7 @@ int SWD_InitWindow(int a1)
                     case 4:
                     case 5:
                     case 6:
-                        if (usekb_flag && vd[j].f_78)
+                        if (usekb_flag && vd[j].selectable)
                             vd[j].f_c = 1;
                         else
                             vd[j].f_c = 0;
@@ -1584,7 +1688,7 @@ void SWD_SetViewDrawHook(void (*a1)(void))
 
 void SWD_SetWinDrawFunc(int a1, void (*a2)(wdlg_t*))
 {
-    if (a2 && g_wins[a1].f_4)
+    if (a2 && g_wins[a1].flag)
         winfuncs[a1] = a2;
 }
 
@@ -1600,18 +1704,18 @@ int SWD_ShowAllWindows(void)
         return 0;
     if (clearscreenflag && (master_window == -1 || viewdraw == NULL))
         memset(displaybuffer, 0, 64000);
-    if (master_window != -1 && g_wins[master_window].f_4)
+    if (master_window != -1 && g_wins[master_window].flag)
         SWD_PutWin(master_window);
     if (viewdraw)
         viewdraw();
     for (i = 0; i < 12; i++)
     {
-        if (g_wins[i].f_4 && i != active_window && i != master_window)
+        if (g_wins[i].flag && i != active_window && i != master_window)
             SWD_PutWin(i);
     }
     if (movebuffer)
         memcpy(movebuffer, displaybuffer, 64000);
-    if (active_window != -1 && active_window != master_window && g_wins[active_window].f_4)
+    if (active_window != -1 && active_window != master_window && g_wins[active_window].flag)
         SWD_PutWin(active_window);
     return 1;
 }
@@ -1626,13 +1730,13 @@ void SWD_SetWindowPtr(int a1)
 
     if (active_field == -1 || !va->numflds)
     {
-        if (!g_wins[a1].f_4 || va == NULL)
+        if (!g_wins[a1].flag || va == NULL)
             return;
         PTR_SetPos(va->x + (va->f_6c>>1), va->y + (va->f_70>>1));
     }
     else
     {
-        fl = (swdfield_t*)((char*)va + va->f_4c);
+        fl = (swdfield_t*)((char*)va + va->fldofs);
         fl += active_field;
         PTR_SetPos(fl->x + (fl->lx>>1), fl->y + (fl->ly>>1));
     }
@@ -1648,13 +1752,13 @@ void SWD_SetFieldPtr(int a1, int a2)
 
     if (a2 == -1 || !va->numflds)
     {
-        if (!g_wins[a1].f_4 || va == NULL)
+        if (!g_wins[a1].flag || va == NULL)
             return;
         PTR_SetPos(va->x + (va->f_6c>>1), va->y + (va->f_70>>1));
     }
     else
     {
-        fl = (swdfield_t*)((char*)va + va->f_4c);
+        fl = (swdfield_t*)((char*)va + va->fldofs);
         fl += a2;
         PTR_SetPos(fl->x + (fl->lx>>1), fl->y + (fl->ly>>1));
     }
@@ -1662,7 +1766,7 @@ void SWD_SetFieldPtr(int a1, int a2)
 
 void FUN_0002d7c8(int a1)
 {
-    if (!g_wins[a1].f_4)
+    if (!g_wins[a1].flag)
         EXIT_Error("SWD: SetActiveWindow #%u", a1);
     active_window = a1;
 }
@@ -1673,8 +1777,8 @@ void SWD_SetActiveField(int a1, int a2)
     swdfield_t *fl;
     va = g_wins[a1].win;
     if (active_field != -1)
-        lastfld = (swdfield_t*)((char*)va + va->f_4c) + active_field;
-    fl = (swdfield_t*)((char*)va + va->f_4c);
+        lastfld = (swdfield_t*)((char*)va + va->fldofs) + active_field;
+    fl = (swdfield_t*)((char*)va + va->fldofs);
     fl += a2;
     if (fl->f_c != 0)
         highlight_flag = 1;
@@ -1689,9 +1793,9 @@ void SWD_DestroyWindow(int a1)
     int i, vd;
     va = g_wins[a1].win;
     PTR_ResetJoyStick();
-    if (!g_wins[a1].f_4)
+    if (!g_wins[a1].flag)
         EXIT_Error("SWD: DestroyWindow %d", a1);
-    fl = (swdfield_t*)((char*)va + va->f_4c);
+    fl = (swdfield_t*)((char*)va + va->fldofs);
     for (i = 0; i < va->numflds; i++)
     {
         if (fl[i].item != -1)
@@ -1704,28 +1808,28 @@ void SWD_DestroyWindow(int a1)
     if (va->f_40)
         GLB_FreeItem(va->f_40);
     GLB_FreeItem(g_wins[a1].f_0);
-    g_wins[a1].f_4 = 0;
+    g_wins[a1].flag = 0;
     winfuncs[a1] = NULL;
     if (a1 == master_window)
         master_window = -1;
     kbactive = 0;
     highlight_flag = 0;
     lastfld = NULL;
-    SWD_SetWindowFlag();
+    SWD_GetNextWindow();
     if (active_field != -1)
     {
         va = g_wins[active_window].win;
-        fl = (swdfield_t*)((char*)va + va->f_4c);
+        fl = (swdfield_t*)((char*)va + va->fldofs);
         if (fl[active_field].f_c)
             kbactive = 1;
     }
     //if (g_wins[prev_window].f_4)
-    if (prev_window >= 0) if (g_wins[prev_window].f_4)
+    if (prev_window >= 0) if (g_wins[prev_window].flag)
     {
         vd = prev_window;
         prev_window = active_window;
         active_window = vd;
-        active_field = g_wins[active_window].win->f_54;
+        active_field = g_wins[active_window].win->firstfld;
     }
     if (active_window != -1)
         SWD_ShowAllWindows();
@@ -1748,7 +1852,7 @@ int FUN_0002d9d0(int a1, int a2)
     {
         for (i = 0; i < 12; i++)
         {
-            if (g_wins[i].f_4 == 1)
+            if (g_wins[i].flag == 1)
             {
                 va = g_wins[i].win;
                 vb = va->x + va->f_6c;
@@ -1796,7 +1900,7 @@ int FUN_0002daac(int a1, swd_t *a2, swdfield_t *a3)
                 vb = 0;
                 break;
             case 6:
-                if (a3[i].f_78)
+                if (a3[i].selectable)
                 {
                     active_field = i;
                     cur_act = 2;
@@ -1883,10 +1987,10 @@ void FUN_0002dcb8(void)
     swdfield_t *fl;
     for (i = 0; i < 12; i++)
     {
-        if (g_wins[i].f_4)
+        if (g_wins[i].flag)
         {
             vc = g_wins[i].win;
-            fl = (swdfield_t*)((char*)vc + vc->f_4c);
+            fl = (swdfield_t*)((char*)vc + vc->fldofs);
             for (j = 0; j < vc->numflds; j++)
             {
                 fl[j].bstatus = 0;
@@ -1915,7 +2019,7 @@ void SWD_Dialog(wdlg_t *a1)
         return;
 
     vc = g_wins[active_window].win;
-    vcc = (swdfield_t*)((char*)vc + vc->f_4c);
+    vcc = (swdfield_t*)((char*)vc + vc->fldofs);
     v1c = vcc + active_field;
     cur_act = 0;
     cur_cmd = 0;
@@ -1966,8 +2070,8 @@ void SWD_Dialog(wdlg_t *a1)
                 FUN_0002dcb8();
                 lastfld = NULL;
                 vc = g_wins[active_window].win;
-                vcc = (swdfield_t*)((char*)vc + vc->f_4c);
-                active_field = vc->f_54;
+                vcc = (swdfield_t*)((char*)vc + vc->fldofs);
+                active_field = vc->firstfld;
                 v1c = vcc + active_field;
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
@@ -2050,20 +2154,20 @@ void SWD_Dialog(wdlg_t *a1)
             break;
         case 3:
         case 5:
-            SWD_GetRightField(vcc, vc->numflds);
+            SWD_GetNextField(vcc, vc->numflds);
             break;
         case 4:
         case 6:
             SWD_GetPrevField(vcc, vc->numflds);
             break;
         case 7:
-            active_field = FUN_0002c9d8();
+            active_field = SWD_GetFirstField();
             break;
         case 8:
-            active_field = FUN_0002c9ec(vcc, vc->numflds);
+            active_field = SWD_GetLastField(vcc, vc->numflds);
             break;
         case 9:
-            active_field = vc->f_54;
+            active_field = vc->firstfld;
             break;
         case 10:
             v1c->bstatus = 2;
@@ -2099,10 +2203,10 @@ void SWD_Dialog(wdlg_t *a1)
         case 14:
             if (!vc->f_48)
             {
-                SWD_SetWindowFlag();
+                SWD_GetNextWindow();
                 if (active_window == master_window)
-                    SWD_SetWindowFlag();
-                active_field = FUN_0002c9d8();
+                    SWD_GetNextWindow();
+                active_field = SWD_GetFirstField();
                 if (lastfld)
                     lastfld->bstatus = 0;
                 SWD_ShowAllWindows();
@@ -2170,7 +2274,7 @@ void SWD_Dialog(wdlg_t *a1)
 
 void SWD_SetWindowLock(int a1, int a2)
 {
-    if (g_wins[a1].f_4 == 1)
+    if (g_wins[a1].flag == 1)
         g_wins[a1].win->f_48 = a2;
 }
 
@@ -2204,7 +2308,7 @@ int SWD_GetFieldText(int a1, int a2, char *a3)
     swdfield_t *fld;
     char *t;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
     t = (char*)fld + fld->txtoff;
     memcpy(a3, t, fld->maxchars);
     return fld->maxchars;
@@ -2216,7 +2320,7 @@ int SWD_SetFieldText(int a1, int a2, const char *a3)
     swdfield_t *fld;
     char *t;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
     t = (char*)fld + fld->txtoff;
     if (a3)
     {
@@ -2234,7 +2338,7 @@ int SWD_GetFieldValue(int a1, int a2)
     swdfield_t *fld;
     char *t;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
     t = (char*)fld + fld->txtoff;
     return atoi(t);
 }
@@ -2245,7 +2349,7 @@ int SWD_SetFieldValue(int a1, int a2, int a3)
     swdfield_t *fld;
     char *t;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
     t = (char*)fld + fld->txtoff;
     sprintf(t, "%d", a3);
     return atoi(t);
@@ -2256,8 +2360,8 @@ void SWD_SetFieldSelect(int a1, int a2, int a3)
     swd_t* va;
     swdfield_t *fld;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
-    fld->f_78 = a3;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
+    fld->selectable = a3;
 }
 
 int SWD_GetFieldMark(int a1, int a2)
@@ -2265,7 +2369,7 @@ int SWD_GetFieldMark(int a1, int a2)
     swd_t* va;
     swdfield_t *fld;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
     return fld->mark;
 }
 
@@ -2274,7 +2378,7 @@ void SWD_SetFieldMark(int a1, int a2, int a3)
     swd_t* va;
     swdfield_t *fld;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
     fld->mark = a3;
 }
 
@@ -2283,8 +2387,8 @@ int SWD_GetFieldInputOpt(int a1, int a2)
     swd_t* va;
     swdfield_t *fld;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
-    return fld->f_18;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
+    return fld->input_opt;
 }
 
 int SWD_SetFieldInputOpt(int a1, int a2, int a3)
@@ -2293,9 +2397,9 @@ int SWD_SetFieldInputOpt(int a1, int a2, int a3)
     swdfield_t *fld;
     int o;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
-    o = fld->f_18;
-    fld->f_18 = a3;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
+    o = fld->input_opt;
+    fld->input_opt = a3;
     return o;
 }
 
@@ -2304,7 +2408,7 @@ void SWD_SetFieldItem(int a1, int a2, int a3)
     swd_t* va;
     swdfield_t *fld;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
     if (a3 != -1)
     {
         if (fld->item != -1)
@@ -2321,7 +2425,7 @@ int SWD_GetFieldItem(int a1, int a2)
     swd_t* va;
     swdfield_t *fld;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
     return fld->item;
 }
 
@@ -2331,7 +2435,7 @@ void SWD_SetFieldName(int a1, int a2, const char *a3)
     swdfield_t *fld;
     int it;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
     it = GLB_GetItemID(a3);
     if (it != -1)
     {
@@ -2349,7 +2453,7 @@ int SWD_GetFieldItemName(int a1, int a2, char *a3)
     swdfield_t *fld;
     int vc;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
     vc = 10;
     memcpy(a3, fld->f_30, vc);
     return vc;
@@ -2376,8 +2480,8 @@ int FUN_0002e84c(int a1, int a2)
 {
     swd_t* va;
     va = g_wins[a1].win;
-    va->f_c = a2;
-    SWD_SetWindowFlag();
+    va->display = a2;
+    SWD_GetNextWindow();
     return va->f_18;
 }
 
@@ -2403,7 +2507,7 @@ int SWD_GetFieldXYL(int a1, int a2, int* a3, int* a4, int* a5, int* a6)
     swd_t* va;
     swdfield_t *fld;
     va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->f_4c) + a2;
+    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
     if (a3)
         *a3 = va->x + fld->x;
     if (a4)

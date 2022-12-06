@@ -95,8 +95,8 @@ struct swd_t
 {
     int f_0;     //not used
     int f_4;     //not used
-    int f_8;
-    int f_c;
+    int arrowflag;                // Use Arrow Keys ( TRUE/FALSE )
+    int display;                  // DISPLAY FLAG
     int f_10;    //not used
     int f_14;    //not used
     int f_18;
@@ -110,9 +110,9 @@ struct swd_t
     int f_40;
     int f_44;
     int f_48;
-    int f_4c; // field offset
+    int fldofs;                  // OFFSET IN BYTES TO FIRST FIELD
     int f_50;    //not used
-    int f_54; // active field
+    int firstfld;                // FIELD TO GOTO FIRST
     int f_58;
     int f_5c;
     int numflds;                 // NUMBER OF FIELDS
@@ -125,12 +125,12 @@ struct swd_t
 
 struct swdfield_t {
     int opt;                     // FIELD TYPE
-    int f_4;
+    int id;                      // FIELD ID
     int f_8;
     int f_c;
     int f_10;
     int f_14;
-    int f_18;
+    int input_opt;               // OPTIONS used in INPUT FIELDS
     int bstatus;                 // BUTTON STATUS NORMAL/UP/DOWN
     //int f_20;
     //int f_24;
@@ -149,7 +149,7 @@ struct swdfield_t {
     int mark;                    // FIELD MARK ( TRUE/FLASE )
     int saveflag;                // MEM TO SAVE PIC UNDER FIELD ( Y/N )
     int f_74;
-    int f_78;
+    int selectable;              // SELECTABLE ON/OFF
     int x;                       // X POSITION ON SCREEN
     int y;                       // Y POSITION ON SCREEN
     int lx;                      // WIDTH IN PIXELS
@@ -214,7 +214,7 @@ struct wdlg_t {
 
 struct window_t {
     int f_0;
-    int f_4;
+    int flag;                    // TRUE = in use ,FALSE = not in use
     int f_8;
     swd_t *win;                  // POINTER TO WINDOW
 };
