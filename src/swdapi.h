@@ -99,47 +99,43 @@ struct swd_t
     int display;                  // DISPLAY FLAG
     int f_10;    //not used
     int f_14;    //not used
-    int f_18;
-    int f_1c;
+    int id;                       // WINDOW ID NUMBER
+    int type;                     // WINDOW TYPE NUMBER
     //int f_20;
     //int f_24;
     //int f_28;
     //int f_2c;
     char Name[16];
-    char f_30[16]; // TODO: determine size
-    int f_40;
-    int f_44;
+    char item_name[16];          // TEXT NAME OF ITEM
+    int item;                    // ITEM ID NUMBER
+    int picflag;                 // FILL/TEXTURE/PICTURE
     int f_48;
     int fldofs;                  // OFFSET IN BYTES TO FIRST FIELD
     int f_50;    //not used
     int firstfld;                // FIELD TO GOTO FIRST
     int f_58;
-    int f_5c;
+    int color;                   // COLOR OF WINDOW
     int numflds;                 // NUMBER OF FIELDS
     int x;                       // X POSITON ON SCREEN
     int y;                       // Y POSITION ON SCREEN
-    int f_6c;
-    int f_70;
-    int f_74;
+    int lx;                      // WIDTH IN PIXELS
+    int ly;                      // HEIGHT IN PIXELS
+    int shadow;                  // SHADOW TRUE/FALSE
 };
 
 struct swdfield_t {
     int opt;                     // FIELD TYPE
     int id;                      // FIELD ID
-    int f_8;
-    int f_c;
-    int f_10;
-    int f_14;
+    int hotkey;                  // SCAN CODE OF HOT KEY
+    int kbflag;                  // TRUE if field should be KBACTIVE
+    int opt3;                    // not used
+    int opt4;                    // not used
     int input_opt;               // OPTIONS used in INPUT FIELDS
     int bstatus;                 // BUTTON STATUS NORMAL/UP/DOWN
-    //int f_20;
-    //int f_24;
-    //int f_28;
-    //int f_2c;
-    char Name[16];
-    char f_30[16];
+    char name[16];               // TEXT NAME OF FIELD ( NOT DISPLAYED )
+    char item_name[16];          // TEXT NAME OF ITEM #
     int item;                    // ITEM ID NUMBER
-    char f_44[16];
+    char font_name[16];          // FONT .GLB NAME
     int fontid;                  // FONT NUMBER
     int fontbasecolor;           // FONT BASE COLOR
     int maxchars;                // MAXCHARS IN FIELD TEXT
@@ -148,7 +144,7 @@ struct swdfield_t {
     int lite;                    // HIGHLIGHT COLOR
     int mark;                    // FIELD MARK ( TRUE/FLASE )
     int saveflag;                // MEM TO SAVE PIC UNDER FIELD ( Y/N )
-    int f_74;
+    int shadow;                  // SHADOW ON/OFF
     int selectable;              // SELECTABLE ON/OFF
     int x;                       // X POSITION ON SCREEN
     int y;                       // Y POSITION ON SCREEN
@@ -156,55 +152,51 @@ struct swdfield_t {
     int ly;                      // HEIGHT IN PIXELS
     int txtoff;                  // OFFSET TO TEXT DATA ( BYTES )
     texture_t *sptr;             // SEG POINTER TO SAVE INFO
-}; // size: 0x94
+}; 
 
 struct swdfield_32_t {
-    int f_0;
-    int f_4;
-    int f_8;
-    int f_c;
-    int f_10;
-    int f_14;
-    int f_18;
-    int f_1c;
-    //int f_20;
-    //int f_24;
-    //int f_28;
-    //int f_2c;
-    char Name[16];
-    char f_30[16];
-    int f_40;
-    char f_44[16];
-    int f_54;
-    int f_58;
-    int f_5c;
-    int f_60;
-    int f_64;
-    int f_68;
-    int f_6c;
-    int f_70;
-    int f_74;
-    int f_78;
-    int f_7c;
-    int f_80;
-    int f_84;
-    int f_88;
-    int f_8c;
-    int PlaceHolder;
-}; // size: 0x94
+    int opt;                     // FIELD TYPE
+    int id;                      // FIELD ID
+    int hotkey;                  // SCAN CODE OF HOT KEY
+    int kbflag;                  // TRUE if field should be KBACTIVE
+    int opt3;                    // not used
+    int opt4;                    // not used
+    int input_opt;               // OPTIONS used in INPUT FIELDS
+    int bstatus;                 // BUTTON STATUS NORMAL/UP/DOWN
+    char name[16];               // TEXT NAME OF FIELD ( NOT DISPLAYED )
+    char item_name[16];          // TEXT NAME OF ITEM #
+    int item;                    // ITEM ID NUMBER
+    char font_name[16];          // FONT .GLB NAME
+    int fontid;                  // FONT NUMBER
+    int fontbasecolor;           // FONT BASE COLOR
+    int maxchars;                // MAXCHARS IN FIELD TEXT
+    int picflag;                 // PICTURE TRUE/FALSE
+    int color;                   // COLOR OF FIELD
+    int lite;                    // HIGHLIGHT COLOR
+    int mark;                    // FIELD MARK ( TRUE/FLASE )
+    int saveflag;                // MEM TO SAVE PIC UNDER FIELD ( Y/N )
+    int shadow;                  // SHADOW ON/OFF
+    int selectable;              // SELECTABLE ON/OFF
+    int x;                       // X POSITION ON SCREEN
+    int y;                       // Y POSITION ON SCREEN
+    int lx;                      // WIDTH IN PIXELS
+    int ly;                      // HEIGHT IN PIXELS
+    int txtoff;                  // OFFSET TO TEXT DATA ( BYTES )
+    int PlaceHolder;             // PLACEHOLDER TO KEEP SIZE
+}; 
 
 struct wdlg_t {
-    int f_0;
+    int window;
     int field;
     int cur_act;
     int cur_cmd;
     int keypress;
-    int f_14;
-    int f_18;
-    int f_1c;
-    int f_20;
-    int f_24;
-    int f_28;
+    int id;
+    int type;
+    int x;
+    int y;
+    int height;
+    int width;
     int f_2c;
     int viewactive;
     int sfield;
@@ -213,9 +205,9 @@ struct wdlg_t {
 };
 
 struct window_t {
-    int f_0;
+    int gitem;                   // GLB ITEM ID
     int flag;                    // TRUE = in use ,FALSE = not in use
-    int f_8;
+    int viewflag;                // TRUE = has viewarea(s) FALSE = none
     swd_t *win;                  // POINTER TO WINDOW
 };
 
