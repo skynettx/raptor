@@ -1499,7 +1499,7 @@ SWD_IsButtonDown(
     if (keyboard[SC_ENTER])
         return 1;
     
-    if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                       //Fixed ptr input
+    if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                       
          return 1;
     
     return 0;
@@ -1672,7 +1672,7 @@ SWD_InitWindow(
 #endif
 #if __GNUC__
 #if __x86_64__
-    v1c = SWD_ReformatFieldData(v1c, a1);
+    header = SWD_ReformatFieldData(header, handle);
 #endif
 #endif
     
@@ -1757,9 +1757,11 @@ SWD_InitWindow(
                     }
                 }
             }
+            
             return rec_num;
         }
     }
+    
     return -1;
 }
 
