@@ -1765,325 +1765,468 @@ SWD_InitWindow(
     return -1;
 }
 
-int SWD_InitMasterWindow(int a1)
+/***************************************************************************
+   SWD_InitMasterWindow () - Inits the Master Window ( must be full screen )
+ ***************************************************************************/
+int 
+SWD_InitMasterWindow(
+    int handle              // INPUT : GLB Item Number    
+)
 {
-    master_window = SWD_InitWindow(a1);
+    master_window = SWD_InitWindow(handle);
+    
     return master_window;
 }
 
-void SWD_SetViewDrawHook(void (*a1)(void))
+/***************************************************************************
+   SWD_SetViewDrawHook () Sets Function to draw after the master window
+ ***************************************************************************/
+void 
+SWD_SetViewDrawHook(
+    void (*func)(void)      // INPUT : pointer to function
+)
 {
-    viewdraw = a1;
+    viewdraw = func;
 }
 
-void SWD_SetWinDrawFunc(int a1, void (*a2)(wdlg_t*))
+/***************************************************************************
+   SWD_SetWinDrawFunc () - Function called after window is drawn
+ ***************************************************************************/
+void 
+SWD_SetWinDrawFunc(
+    int handle,             // INPUT :handle of window
+    void (*infunc)(wdlg_t*) // INPUT :pointer to function
+)
 {
-    if (a2 && g_wins[a1].flag)
-        winfuncs[a1] = a2;
+    if (infunc && g_wins[handle].flag)
+        winfuncs[handle] = infunc;
 }
 
-void SWD_SetClearFlag(int a1)
+/***************************************************************************
+SWD_SetClearFlag() - Turns ON/OFF memsetting of display buffer in showallwins
+ ***************************************************************************/
+void 
+SWD_SetClearFlag(
+    int inflag
+)
 {
-    clearscreenflag = a1;
+    clearscreenflag = inflag;
 }
 
-int SWD_ShowAllWindows(void)
+/***************************************************************************
+ SWD_ShowAllWindows()- Diplays all windows.. puts active window on top
+ ***************************************************************************/
+int                           // RETURN : TRUE = OK, FALSE = Error
+SWD_ShowAllWindows(
+    void
+)
 {
-    int i;
+    int loop;
+    
     if (active_window < 0)
         return 0;
+    
     if (clearscreenflag && (master_window == -1 || viewdraw == NULL))
         memset(displaybuffer, 0, 64000);
+    
     if (master_window != -1 && g_wins[master_window].flag)
         SWD_PutWin(master_window);
+    
     if (viewdraw)
         viewdraw();
-    for (i = 0; i < 12; i++)
+    
+    for (loop = 0; loop < MAX_WINDOWS; loop++)
     {
-        if (g_wins[i].flag && i != active_window && i != master_window)
-            SWD_PutWin(i);
+        if (g_wins[loop].flag && loop != active_window && loop != master_window)
+            SWD_PutWin(loop);
     }
+    
     if (movebuffer)
         memcpy(movebuffer, displaybuffer, 64000);
+    
     if (active_window != -1 && active_window != master_window && g_wins[active_window].flag)
         SWD_PutWin(active_window);
+    
     return 1;
 }
 
-void SWD_SetWindowPtr(int a1)
+/***************************************************************************
+SWD_SetWindowPtr() - Sets Pointer to center of active field
+ ***************************************************************************/
+void 
+SWD_SetWindowPtr(
+    int handle             // INPUT : number/handle of window
+)
 {
-    swd_t* va;
-    swdfield_t *fl;
-    va = g_wins[a1].win;
-    if (!ptractive || a1 == -1)
+    swd_t* curwin;
+    swdfield_t *curfld;
+    curwin = g_wins[handle].win;
+    
+    if (!ptractive || handle == -1)
         return;
 
-    if (active_field == -1 || !va->numflds)
+    if (active_field == -1 || !curwin->numflds)
     {
-        if (!g_wins[a1].flag || va == NULL)
+        if (!g_wins[handle].flag || curwin == NULL)
             return;
-        PTR_SetPos(va->x + (va->lx>>1), va->y + (va->ly>>1));
+        
+        PTR_SetPos(curwin->x + (curwin->lx>>1), curwin->y + (curwin->ly>>1));
     }
     else
     {
-        fl = (swdfield_t*)((char*)va + va->fldofs);
-        fl += active_field;
-        PTR_SetPos(fl->x + (fl->lx>>1), fl->y + (fl->ly>>1));
+        curfld = (swdfield_t*)((char*)curwin + curwin->fldofs);
+        curfld += active_field;
+        
+        PTR_SetPos(curfld->x + (curfld->lx>>1), curfld->y + (curfld->ly>>1));
     }
 }
 
-void SWD_SetFieldPtr(int a1, int a2)
+/***************************************************************************
+SWD_SetFieldPtr () - Sets Pointer on a field
+ ***************************************************************************/
+void 
+SWD_SetFieldPtr(
+    int handle,            // INPUT : number/handle of window
+    int field              // INPUT : field
+)
 {
-    swd_t* va;
-    swdfield_t *fl;
-    va = g_wins[a1].win;
-    if (!ptractive || a1 == -1)
+    swd_t* curwin;
+    swdfield_t *curfld;
+    curwin = g_wins[handle].win;
+    
+    if (!ptractive || handle == -1)
         return;
 
-    if (a2 == -1 || !va->numflds)
+    if (field == -1 || !curwin->numflds)
     {
-        if (!g_wins[a1].flag || va == NULL)
+        if (!g_wins[handle].flag || curwin == NULL)
             return;
-        PTR_SetPos(va->x + (va->lx>>1), va->y + (va->ly>>1));
+        
+        PTR_SetPos(curwin->x + (curwin->lx>>1), curwin->y + (curwin->ly>>1));
     }
     else
     {
-        fl = (swdfield_t*)((char*)va + va->fldofs);
-        fl += a2;
-        PTR_SetPos(fl->x + (fl->lx>>1), fl->y + (fl->ly>>1));
+        curfld = (swdfield_t*)((char*)curwin + curwin->fldofs);
+        curfld += field;
+        
+        PTR_SetPos(curfld->x + (curfld->lx>>1), curfld->y + (curfld->ly>>1));
     }
 }
 
-void FUN_0002d7c8(int a1)
+/***************************************************************************
+ SWD_SetActiveWindow() - Sets the current working window
+ ***************************************************************************/
+void 
+SWD_SetActiveWindow(
+    int handle            // INPUT : number/handle of window
+)
 {
-    if (!g_wins[a1].flag)
-        EXIT_Error("SWD: SetActiveWindow #%u", a1);
-    active_window = a1;
+    if (!g_wins[handle].flag)
+        EXIT_Error("SWD: SetActiveWindow #%u", handle);
+    
+    active_window = handle;
 }
 
-void SWD_SetActiveField(int a1, int a2)
+/***************************************************************************
+ SWD_SetActiveField() - Sets the current working field
+ ***************************************************************************/
+void 
+SWD_SetActiveField(
+    int handle,            // INPUT : handle of window
+    int field_id           // INPUT : number/handle of field
+)
 {
-    swd_t* va;
-    swdfield_t *fl;
-    va = g_wins[a1].win;
+    swd_t* curwin;
+    swdfield_t *curfld;
+    curwin = g_wins[handle].win;
+    
     if (active_field != -1)
-        lastfld = (swdfield_t*)((char*)va + va->fldofs) + active_field;
-    fl = (swdfield_t*)((char*)va + va->fldofs);
-    fl += a2;
-    if (fl->kbflag != 0)
+        lastfld = (swdfield_t*)((char*)curwin + curwin->fldofs) + active_field;
+    
+    curfld = (swdfield_t*)((char*)curwin + curwin->fldofs);
+    curfld += field_id;
+    
+    if (curfld->kbflag != 0)
         highlight_flag = 1;
-    kbactive = fl->kbflag != 0;
-    active_field = a2;
+    
+    kbactive = curfld->kbflag != 0;
+    active_field = field_id;
 }
 
-void SWD_DestroyWindow(int a1)
+/***************************************************************************
+ SWD_DestroyWindow() - removes a window from SWD system
+ ***************************************************************************/
+void 
+SWD_DestroyWindow(
+    int handle            // INPUT : handle of window
+)
 {
-    swd_t* va;
-    swdfield_t *fl;
-    int i, vd;
-    va = g_wins[a1].win;
+    swd_t* curwin;
+    swdfield_t *curfld;
+    int loop, hold;
+    curwin = g_wins[handle].win;
+    
     PTR_ResetJoyStick();
-    if (!g_wins[a1].flag)
-        EXIT_Error("SWD: DestroyWindow %d", a1);
-    fl = (swdfield_t*)((char*)va + va->fldofs);
-    for (i = 0; i < va->numflds; i++)
+    
+    if (!g_wins[handle].flag)
+        EXIT_Error("SWD: DestroyWindow %d", handle);
+    
+    curfld = (swdfield_t*)((char*)curwin + curwin->fldofs);
+    
+    for (loop = 0; loop < curwin->numflds; loop++)
     {
-        if (fl[i].item != -1)
-            GLB_FreeItem(fl[i].item);
-        if (fl[i].fontid != -1)
-            GLB_FreeItem(fl[i].fontid);
-        if (fl[i].saveflag && fl[i].sptr)
-            free(fl[i].sptr);
+        if (curfld[loop].item != -1)
+            GLB_FreeItem(curfld[loop].item);
+        
+        if (curfld[loop].fontid != -1)
+            GLB_FreeItem(curfld[loop].fontid);
+        
+        if (curfld[loop].saveflag && curfld[loop].sptr)
+            free(curfld[loop].sptr);
     }
-    if (va->item)
-        GLB_FreeItem(va->item);
-    GLB_FreeItem(g_wins[a1].gitem);
-    g_wins[a1].flag = 0;
-    winfuncs[a1] = NULL;
-    if (a1 == master_window)
+    
+    if (curwin->item)
+        GLB_FreeItem(curwin->item);
+    
+    GLB_FreeItem(g_wins[handle].gitem);
+    
+    g_wins[handle].flag = 0;
+    winfuncs[handle] = NULL;
+    
+    if (handle == master_window)
         master_window = -1;
+    
     kbactive = 0;
     highlight_flag = 0;
     lastfld = NULL;
+    
     SWD_GetNextWindow();
+    
     if (active_field != -1)
     {
-        va = g_wins[active_window].win;
-        fl = (swdfield_t*)((char*)va + va->fldofs);
-        if (fl[active_field].kbflag)
+        curwin = g_wins[active_window].win;
+        curfld = (swdfield_t*)((char*)curwin + curwin->fldofs);
+        
+        if (curfld[active_field].kbflag)
             kbactive = 1;
     }
-    //if (g_wins[prev_window].f_4)
+    
     if (prev_window >= 0) if (g_wins[prev_window].flag)
     {
-        vd = prev_window;
+        hold = prev_window;
         prev_window = active_window;
-        active_window = vd;
+        active_window = hold;
         active_field = g_wins[active_window].win->firstfld;
     }
+    
     if (active_window != -1)
         SWD_ShowAllWindows();
 }
 
-int FUN_0002d9d0(int a1, int a2)
+/*------------------------------------------------------------------------
+   SWD_FindWindow() - finds window at x, y pos else returns EMPTY
+  ------------------------------------------------------------------------*/
+int 
+SWD_FindWindow(
+    int x,                 // INPUT : x position
+    int y                  // INPUT : y position
+)
 {
-    swd_t *va;
-    int v18;
-    int vb, vd;
-    int i;
+    swd_t *curwin;
+    int rval;
+    int x2, y2;
+    int loop;
 
-    va = g_wins[active_window].win;
-    v18 = -1;
-    vb = va->x + va->lx;
-    vd = va->y + va->ly;
-    if (a1 > va->x && a1 < vb && a2 > va->y && a2 < vd)
-        v18 = active_window;
+    curwin = g_wins[active_window].win;
+    rval = -1;
+    x2 = curwin->x + curwin->lx;
+    y2 = curwin->y + curwin->ly;
+    
+    if (x > curwin->x && x < x2 && y > curwin->y && y < y2)
+        rval = active_window;
     else
     {
-        for (i = 0; i < 12; i++)
+        for (loop = 0; loop < MAX_WINDOWS; loop++)
         {
-            if (g_wins[i].flag == 1)
+            if (g_wins[loop].flag == 1)
             {
-                va = g_wins[i].win;
-                vb = va->x + va->lx;
-                vd = va->y + va->ly;
-                if (a1 > va->x && a1 < vb && a2 > va->y && a2 < vd)
+                curwin = g_wins[loop].win;
+                x2 = curwin->x + curwin->lx;
+                y2 = curwin->y + curwin->ly;
+                
+                if (x > curwin->x && x < x2 && y > curwin->y && y < y2)
                 {
-                    v18 = active_window;
+                    rval = loop;
                     break;
                 }
             }
         }
     }
-    return v18;
+    
+    return rval;
 }
 
-int FUN_0002daac(int a1, swd_t *a2, swdfield_t *a3)
+/*------------------------------------------------------------------------
+   SWD_CheckMouse () does mouse stuff and returns SWD_XXX code
+  ------------------------------------------------------------------------*/
+int 
+SWD_CheckMouse(
+    int a1, 
+    swd_t *curwin,         // INPUT : pointer to current window
+    swdfield_t *curfld     // INPUT : pointer to current field
+)
 {
-    int v18;
-    int v14;
-    int vb;
-    int i;
-    int v24;
-    int vs;
-    int v1c;
-    int v20;
-    int vc;
+    int px;
+    int py;
+    int flag;
+    int loop;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    int mflag;
 
-    vb = 1;
-    vc = 0;
-    v18 = cur_mx;
-    v14 = cur_my;
+    flag = 1;
+    mflag = 0;
+    px = cur_mx;
+    py = cur_my;
   
-    for (i = 0; i < a2->numflds; i++)
+    for (loop = 0; loop < curwin->numflds; loop++)
     {
-        v24 = a2->x + a3[i].x;
-        vs = a2->y + a3[i].y;
-        v1c = v24 + a3[i].lx + 1;
-        v20 = vs + a3[i].ly + 1;
-        if (v18 >= v24 && v18 <= v1c && vs <= v14 && v14 <= v20)
+        x1 = curwin->x + curfld[loop].x;
+        y1 = curwin->y + curfld[loop].y;
+        x2 = x1 + curfld[loop].lx + 1;
+        y2 = y1 + curfld[loop].ly + 1;
+        
+        if (px >= x1 && px <= x2 && y1 <= py && py <= y2)
         {
-            vb = 1;
-            switch (a3[i].opt)
+            flag = 1;
+            switch (curfld[loop].opt)
             {
             default:
-                vb = 0;
+                flag = 0;
                 break;
-            case 6:
-                if (a3[i].selectable)
+            
+            case FLD_DRAGBAR:
+                if (curfld[loop].selectable)
                 {
-                    active_field = i;
-                    cur_act = 2;
-                    cur_cmd = 15;
-                    vc = 0;
+                    active_field = loop;
+                    cur_act = S_WIN_COMMAND;
+                    cur_cmd = W_MOVE;
+                    mflag = 0;
                 }
                 else
-                    vb = 0;
+                    flag = 0;
                 break;
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                active_field = i;
-                cur_act = 1;
-                cur_cmd = 10;
-                vc = 0;
+            
+            case FLD_BUTTON:
+            case FLD_INPUT:
+            case FLD_MARK:
+            case FLD_CLOSE:
+                active_field = loop;
+                cur_act = S_FLD_COMMAND;
+                cur_cmd = F_SELECT;
+                mflag = 0;
                 break;
-            case 10:
-                cur_act = 1;
-                cur_cmd = 11;
-                vc = 0;
+            
+            case FLD_OBJAREA:
+                cur_act = S_FLD_COMMAND;
+                cur_cmd = F_OBJ_AREA;
+                mflag = 0;
                 break;
-            case 11:
-                cur_act = 1;
-                cur_cmd = 12;
-                vc = 0;
+            
+            case FLD_VIEWAREA:
+                cur_act = S_FLD_COMMAND;
+                cur_cmd = F_VIEW_AREA;
+                mflag = 0;
                 break;
             }
-            if (vb)
+            
+            if (flag)
                 break;
         }
     }
-    if (vc)
+    
+    if (mflag)
     {
         while (mouseb1) {
         }
     }
-    return vb;
+    
+    return flag;
 }
 
-int FUN_0002dbe4(wdlg_t *a1, swd_t *a2, swdfield_t *a3)
+/*------------------------------------------------------------------------
+   SWD_CheckViewArea ()
+  ------------------------------------------------------------------------*/
+int 
+SWD_CheckViewArea(
+    wdlg_t *dlg,             // INPUT : pointer to DLG window messages 
+    swd_t *curwin,           // INPUT : pointer to current window 
+    swdfield_t *curfld       // INPUT : pointer to current field
+)
 {
-    int i;
-    int vdi, vc;
-    int v14, v18, v1c;
-    int v20, v24;
+    int loop;
+    int x1, y1;
+    int flag, px, py;
+    int x2, y2;
 
-    v14 = 0;
-    v18 = cur_mx;
-    v1c = cur_my;
+    flag = 0;
+    px = cur_mx;
+    py = cur_my;
     
-    for (i = 0; i < a2->numflds; i++)
+    for (loop = 0; loop < curwin->numflds; loop++)
     {
-        vdi = a2->x + a3[i].x;
-        vc = a2->y + a3[i].y;
-        v20 = vdi + a3[i].lx + 1;
-        v24 = vc + a3[i].ly + 1;
-        if (vdi <= v18 && v18 <= v20 && vc <= v1c && v1c <= v24)
+        x1 = curwin->x + curfld[loop].x;
+        y1 = curwin->y + curfld[loop].y;
+        x2 = x1 + curfld[loop].lx + 1;
+        y2 = y1 + curfld[loop].ly + 1;
+        
+        if (x1 <= px && px <= x2 && y1 <= py && py <= y2)
         {
-            switch (a3[i].opt)
+            switch (curfld[loop].opt)
             {
-            case 11:
-                v14 = 1;
-                a1->viewactive = 1;
-                a1->f_38 = a3[i].x;
-                a1->f_3c = a3[i].y;
-                a1->height = a3[i].lx;
-                a1->width = a3[i].ly;
-                a1->sfield = i;
+            case FLD_VIEWAREA:
+                flag = 1;
+                dlg->viewactive = 1;
+                dlg->sx = curfld[loop].x;
+                dlg->sy = curfld[loop].y;
+                dlg->height = curfld[loop].lx;
+                dlg->width = curfld[loop].ly;
+                dlg->sfield = loop;
                 break;
             }
-            if (v14)
+            
+            if (flag)
                 break;
         }
     }
-    return v14;
+    
+    return flag;
 }
 
-void FUN_0002dcb8(void)
+/*------------------------------------------------------------------------
+   SWD_ClearAllButtons () Clears all buttons in all windows to NORMAL
+  ------------------------------------------------------------------------*/
+void 
+SWD_ClearAllButtons(
+    void
+)
 {
-    int i, j;
-    swd_t *vc;
-    swdfield_t *fl;
-    for (i = 0; i < 12; i++)
+    int wloop, loop;
+    swd_t *curwin;
+    swdfield_t *curfld;
+    
+    for (wloop = 0; wloop < MAX_WINDOWS; wloop++)
     {
-        if (g_wins[i].flag)
+        if (g_wins[wloop].flag)
         {
-            vc = g_wins[i].win;
-            fl = (swdfield_t*)((char*)vc + vc->fldofs);
-            for (j = 0; j < vc->numflds; j++)
+            curwin = g_wins[wloop].win;
+            curfld = (swdfield_t*)((char*)curwin + curwin->fldofs);
+            
+            for (loop = 0; loop < curwin->numflds; loop++)
             {
-                fl[j].bstatus = 0;
+                curfld[loop].bstatus = NORMAL;
             }
         }
     }
@@ -2133,7 +2276,7 @@ void SWD_Dialog(wdlg_t *a1)
     }
     if (old_win != active_window)
     {
-        FUN_0002dcb8();
+        SWD_ClearAllButtons();
         lastfld = NULL;
         cur_act = 2;
         highlight_flag = 1;
@@ -2146,18 +2289,18 @@ void SWD_Dialog(wdlg_t *a1)
     old_win = active_window;
     a1->viewactive = 0;
     if (g_wins[active_window].viewflag)
-        FUN_0002dbe4(a1, vc, vcc);
+        SWD_CheckViewArea(a1, vc, vcc);
     if (active_field == -1)
         return;
 
     if ((mouseb1 && !cur_act) || (AButton && !joy_ipt_MenuNew && !cur_act))                            //Fixed ptr input
     {
         old_field = active_field;
-        if (FUN_0002daac(vc->f_48, vc, vcc))
+        if (SWD_CheckMouse(vc->f_48, vc, vcc))
         {
             if (old_win != active_window)
             {
-                FUN_0002dcb8();
+                SWD_ClearAllButtons();
                 lastfld = NULL;
                 vc = g_wins[active_window].win;
                 vcc = (swdfield_t*)((char*)vc + vc->fldofs);
@@ -2337,12 +2480,12 @@ void SWD_Dialog(wdlg_t *a1)
             }
             break;
         case 16:
-            FUN_0002dcb8();
+            SWD_ClearAllButtons();
             lastfld = NULL;
             kbactive = 0;
             break;
         case 17:
-            FUN_0002dcb8();
+            SWD_ClearAllButtons();
             lastfld = NULL;
             kbactive = 0;
             break;

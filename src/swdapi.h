@@ -200,8 +200,8 @@ struct wdlg_t {
     int f_2c;
     int viewactive;
     int sfield;
-    int f_38;
-    int f_3c;
+    int sx;
+    int sy;
 };
 
 struct window_t {
