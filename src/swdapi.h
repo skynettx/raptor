@@ -105,15 +105,15 @@ struct swd_t
     //int f_24;
     //int f_28;
     //int f_2c;
-    char Name[16];
+    char name[16];               // TEXT NAME OF WINDOW ( NOT DISPLAYED )
     char item_name[16];          // TEXT NAME OF ITEM
     int item;                    // ITEM ID NUMBER
     int picflag;                 // FILL/TEXTURE/PICTURE
-    int f_48;
+    int lock;                    // TRUE = cannot goto other windows
     int fldofs;                  // OFFSET IN BYTES TO FIRST FIELD
     int f_50;    //not used
     int firstfld;                // FIELD TO GOTO FIRST
-    int f_58;
+    int opt;                     // WINDOW TYPE
     int color;                   // COLOR OF WINDOW
     int numflds;                 // NUMBER OF FIELDS
     int x;                       // X POSITON ON SCREEN
