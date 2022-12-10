@@ -93,25 +93,21 @@ enum INPUTOPT
 
 struct swd_t
 {
-    int f_0;     //not used
-    int f_4;     //not used
-    int arrowflag;                // Use Arrow Keys ( TRUE/FALSE )
-    int display;                  // DISPLAY FLAG
-    int f_10;    //not used
-    int f_14;    //not used
-    int id;                       // WINDOW ID NUMBER
-    int type;                     // WINDOW TYPE NUMBER
-    //int f_20;
-    //int f_24;
-    //int f_28;
-    //int f_2c;
+    int version;                 // VERSION NUMBER ( not used )
+    int swdsize;                 // SIZE OF WIN/FIELD AND TEXT ( not used )
+    int arrowflag;               // Use Arrow Keys ( TRUE/FALSE )
+    int display;                 // DISPLAY FLAG
+    int opt3;                    // OPTION 3 ( not used )
+    int opt4;                    // OPTION 4 ( not used )
+    int id;                      // WINDOW ID NUMBER
+    int type;                    // WINDOW TYPE NUMBER
     char name[16];               // TEXT NAME OF WINDOW ( NOT DISPLAYED )
     char item_name[16];          // TEXT NAME OF ITEM
     int item;                    // ITEM ID NUMBER
     int picflag;                 // FILL/TEXTURE/PICTURE
     int lock;                    // TRUE = cannot goto other windows
     int fldofs;                  // OFFSET IN BYTES TO FIRST FIELD
-    int f_50;    //not used
+    int txtofs;                  // OFFSET IN BYTES TO TEXT AREA ( not used )
     int firstfld;                // FIELD TO GOTO FIRST
     int opt;                     // WINDOW TYPE
     int color;                   // COLOR OF WINDOW
@@ -216,22 +212,22 @@ extern int g_button_flag;
 extern unsigned int fi_joy_count;
 extern bool fi_sec_field;
 
-void SWD_Install(int a1);
+void SWD_Install(int moveflag);
 void SWD_End(void);
-void SWD_Dialog(wdlg_t *a1);
-swd_t* SWD_ReformatFieldData(swd_t* swdData, int a1);
-int SWD_InitMasterWindow(int a1);
+void SWD_Dialog(wdlg_t *swd_dlg);
+swd_t* SWD_ReformatFieldData(swd_t* header, int handle);
+int SWD_InitMasterWindow(int handle);
 int SWD_ShowAllWindows(void);
-void SWD_SetWindowPtr(int a1);
-void SWD_SetFieldSelect(int a1, int a2, int a3);
-void SWD_SetFieldItem(int a1, int a2, int a3);
-int SWD_SetFieldText(int a1, int a2, const char *a3);
-void SWD_DestroyWindow(int a1);
-int SWD_InitWindow(int a1);
-void SWD_SetActiveField(int a1, int a2);
-int SWD_GetFieldXYL(int a1, int a2, int* a3, int* a4, int* a5, int* a6);
-void SWD_SetWinDrawFunc(int a1, void (*a2)(wdlg_t*));
-void SWD_SetFieldPtr(int a1, int a2);
-int SWD_GetFieldText(int a1, int a2, char *a3);
-int SWD_GetFieldItem(int a1, int a2);
-void SWD_SetClearFlag(int a1);
+void SWD_SetWindowPtr(int handle);
+void SWD_SetFieldSelect(int handle, int field_id, int opt);
+void SWD_SetFieldItem(int handle, int field_id, int item);
+int SWD_SetFieldText(int handle, int field_id, const char *in_text);
+void SWD_DestroyWindow(int handle);
+int SWD_InitWindow(int handle);
+void SWD_SetActiveField(int handle, int field_id);
+int SWD_GetFieldXYL(int handle, int field_id, int* x, int* y, int* lx, int* ly);
+void SWD_SetWinDrawFunc(int handle, void (*infunc)(wdlg_t*));
+void SWD_SetFieldPtr(int handle, int field);
+int SWD_GetFieldText(int handle, int field_id, char *out_text);
+int SWD_GetFieldItem(int handle, int field_id);
+void SWD_SetClearFlag(int inflag);

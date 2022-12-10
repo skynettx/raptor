@@ -1489,7 +1489,7 @@ SWD_PutWin(
 }
 
 /*------------------------------------------------------------------------
-   SWD_IsButtonDown () - returns TRUE if any SWD Butons are down
+   SWD_IsButtonDown () - returns TRUE if any SWD Buttons are down
   ------------------------------------------------------------------------*/
 int 
 SWD_IsButtonDown(
@@ -1639,7 +1639,7 @@ SWD_ReformatFieldData(
 }
 
 /***************************************************************************
- SWD_InitWindow() - Adds window to list and initailizes
+ SWD_InitWindow() - Adds window to list and initializes
  ***************************************************************************/
 int                           // RETURN: handle to window
 SWD_InitWindow(
@@ -2783,130 +2783,240 @@ SWD_GetFieldInputOpt(
     return curfld->input_opt;
 }
 
-int SWD_SetFieldInputOpt(int a1, int a2, int a3)
+/***************************************************************************
+ SWD_SetFieldInputOpt() - Sets the Field InputOpt ( button )
+ ***************************************************************************/
+int                           // RETURN: InputOpt status
+SWD_SetFieldInputOpt(
+    int handle,            // INPUT : window handle
+    int field_id,          // INPUT : field handle
+    int opt                // INPUT : input option
+)
 {
-    swd_t* va;
-    swdfield_t *fld;
-    int o;
-    va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
-    o = fld->input_opt;
-    fld->input_opt = a3;
-    return o;
+    swd_t* curwin;
+    swdfield_t *curfld;
+    int old_opt;
+    curwin = g_wins[handle].win;
+    
+    curfld = (swdfield_t*)((char*)curwin + curwin->fldofs) + field_id;
+    
+    old_opt = curfld->input_opt;
+    curfld->input_opt = opt;
+    
+    return old_opt;
 }
 
-void SWD_SetFieldItem(int a1, int a2, int a3)
+/***************************************************************************
+   SWD_SetFieldItem () - Sets field Item ID ( picture )
+ ***************************************************************************/
+void 
+SWD_SetFieldItem(
+    int handle,            // INPUT : window handle
+    int field_id,          // INPUT : field handle
+    int item               // INPUT : GLB item id
+)
 {
-    swd_t* va;
-    swdfield_t *fld;
-    va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
-    if (a3 != -1)
+    swd_t* curwin;
+    swdfield_t *curfld;
+    curwin = g_wins[handle].win;
+    
+    curfld = (swdfield_t*)((char*)curwin + curwin->fldofs) + field_id;
+    
+    if (item != -1)
     {
-        if (fld->item != -1)
-            GLB_FreeItem(fld->item);
-        fld->item = a3;
-        GLB_LockItem(a3);
+        if (curfld->item != -1)
+            GLB_FreeItem(curfld->item);
+        
+        curfld->item = item;
+        
+        GLB_LockItem(item);
     }
     else
-        fld->item = -1;
+        curfld->item = -1;
 }
 
-int SWD_GetFieldItem(int a1, int a2)
+/***************************************************************************
+   SWD_GetFieldItem () - Returns Field Item number
+ ***************************************************************************/
+int                           // RETURN: Item GLB ID
+SWD_GetFieldItem(
+    int handle,            // INPUT : window handle 
+    int field_id           // INPUT : field handle
+)
 {
-    swd_t* va;
-    swdfield_t *fld;
-    va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
-    return fld->item;
+    swd_t* curwin;
+    swdfield_t *curfld;
+    curwin = g_wins[handle].win;
+    
+    curfld = (swdfield_t*)((char*)curwin + curwin->fldofs) + field_id;
+    
+    return curfld->item;
 }
 
-void SWD_SetFieldName(int a1, int a2, const char *a3)
+/***************************************************************************
+   SWD_SetFieldItemName () - Sets Field Item Name and Loads it in
+ ***************************************************************************/
+void 
+SWD_SetFieldItemName(
+    int handle,            // INPUT : window handle
+    int field_id,          // INPUT : field handle
+    const char *item_name  // INPUT : pointer to Item Name
+)
 {
-    swd_t* va;
-    swdfield_t *fld;
-    int it;
-    va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
-    it = GLB_GetItemID(a3);
-    if (it != -1)
+    swd_t* curwin;
+    swdfield_t *curfld;
+    int item;
+    curwin = g_wins[handle].win;
+    
+    curfld = (swdfield_t*)((char*)curwin + curwin->fldofs) + field_id;
+    
+    item = GLB_GetItemID(item_name);
+    
+    if (item != -1)
     {
-        if (fld->item != -1)
-            GLB_FreeItem(fld->item);
-        memcpy(fld->item_name, a3, 16);
-        fld->item = it;
-        GLB_LockItem(it);
+        if (curfld->item != -1)
+            GLB_FreeItem(curfld->item);
+        
+        memcpy(curfld->item_name, item_name, 16);
+        curfld->item = item;
+        GLB_LockItem(item);
     }
 }
 
-int SWD_GetFieldItemName(int a1, int a2, char *a3)
+/***************************************************************************
+   SWD_GetFieldItemName () - Gets Field Item Name
+ ***************************************************************************/
+void 
+SWD_GetFieldItemName(
+    int handle,           // INPUT : window handle
+    int field_id,         // INPUT : field handle
+    char *item_name       // OUTPUT: pointer to Item Name
+)
 {
-    swd_t* va;
-    swdfield_t *fld;
-    int vc;
-    va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
-    vc = 10;
-    memcpy(a3, fld->item_name, vc);
-    return vc;
+    swd_t* curwin;
+    swdfield_t *curfld;
+    curwin = g_wins[handle].win;
+    
+    curfld = (swdfield_t*)((char*)curwin + curwin->fldofs) + field_id;
+    
+    memcpy(item_name, curfld->item_name, 16);
 }
 
-int SWD_SetWindowID(int a1, int a2)
+/***************************************************************************
+   SWD_SetWindowID () - Sets Window ID number
+ ***************************************************************************/
+int                           // RETURN: old Window ID
+SWD_SetWindowID(
+    int handle,            // INPUT : window handle
+    int id                 // INPUT : NEW window ID
+)
 {
-    swd_t* va;
-    int o;
-    va = g_wins[a1].win;
-    o = va->id;
-    va->id = o;
-    return o;
+    swd_t* curwin;
+    int old_id;
+    curwin = g_wins[handle].win;
+    old_id = curwin->id;
+    
+    curwin->id = id;
+    
+    return old_id;
 }
 
-int SWD_GetWindowID(int a1)
+/***************************************************************************
+   SWD_GetWindowID () - Returns Window ID number
+ ***************************************************************************/
+int 
+SWD_GetWindowID(
+    int handle             // INPUT : window handle
+)
 {
-    swd_t* va;
-    va = g_wins[a1].win;
-    return va->id;
+    swd_t* curwin;
+    curwin = g_wins[handle].win;
+    
+    return curwin->id;
 }
 
-int FUN_0002e84c(int a1, int a2)
+/***************************************************************************
+SWD_SetWindowFlag () - Sets A window to be turned on/off
+ ***************************************************************************/
+int 
+SWD_SetWindowFlag(
+    int handle,             // INPUT : window handle
+    int flag                // INPUT : TRUE/FALSE
+)
 {
-    swd_t* va;
-    va = g_wins[a1].win;
-    va->display = a2;
+    swd_t* curwin;
+    curwin = g_wins[handle].win;
+    
+    curwin->display = flag;
+    
     SWD_GetNextWindow();
-    return va->id;
+    
+    return curwin->id;
 }
 
-int SWD_SetWindowType(int a1, int a2)
+/***************************************************************************
+   SWD_SetWindowType () Sets Window TYPE number
+ ***************************************************************************/
+int                           // RETURN: old Window TYPE
+SWD_SetWindowType(
+    int handle,            // INPUT : window handle 
+    int type               // INPUT : NEW window TYPE
+)
 {
-    swd_t* va;
-    int o;
-    va = g_wins[a1].win;
-    o = va->type;
-    va->type = o;
-    return o;
+    swd_t* curwin;
+    int old_type;
+    curwin = g_wins[handle].win;
+    old_type = curwin->type;
+    
+    curwin->type = type;
+    
+    return old_type;
 }
 
-int SWD_GetWindowType(int a1)
+/***************************************************************************
+   SWD_GetWindowType () - Returns Window TYPE number
+ ***************************************************************************/
+int                           // RETURN: window TYPE
+SWD_GetWindowType(
+    int handle             // INPUT : window handle
+)
 {
-    swd_t* va;
-    va = g_wins[a1].win;
-    return va->type;
+    swd_t* curwin;
+    curwin = g_wins[handle].win;
+    
+    return curwin->type;
 }
 
-int SWD_GetFieldXYL(int a1, int a2, int* a3, int* a4, int* a5, int* a6)
+/***************************************************************************
+   SWD_GetFieldXYL () Gets Field X,Y, WIDTH, HEIGHT
+ ***************************************************************************/
+int 
+SWD_GetFieldXYL(
+    int handle,            // INPUT : window handle
+    int field_id,          // INPUT : field handle
+    int* x,                // OUTPUT: x
+    int* y,                // OUTPUT: y
+    int* lx,               // OUTPUT: width 
+    int* ly                // OUTPUT: height
+)
 {
-    swd_t* va;
-    swdfield_t *fld;
-    va = g_wins[a1].win;
-    fld = (swdfield_t*)((char*)va + va->fldofs) + a2;
-    if (a3)
-        *a3 = va->x + fld->x;
-    if (a4)
-        *a4 = va->y + fld->y;
-    if (a5)
-        *a5 = fld->lx;
-    if (a6)
-        *a6 = fld->ly;
-    return fld->lx;
+    swd_t* curwin;
+    swdfield_t *curfld;
+    curwin = g_wins[handle].win;
+    
+    curfld = (swdfield_t*)((char*)curwin + curwin->fldofs) + field_id;
+    
+    if (x)
+        *x = curwin->x + curfld->x;
+    
+    if (y)
+        *y = curwin->y + curfld->y;
+    
+    if (lx)
+        *lx = curfld->lx;
+    
+    if (ly)
+        *ly = curfld->ly;
+    
+    return curfld->lx;
 }
