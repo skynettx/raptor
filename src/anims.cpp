@@ -361,8 +361,8 @@ ANIMS_Think(
             
             if (!cur->edone)
             {
-                cur->dx = cur->en->mobj.x + cur->x;
-                cur->dy = cur->en->mobj.y + cur->y;
+                cur->dx = cur->en->move.x + cur->x;
+                cur->dy = cur->en->move.y + cur->y;
             }
         }
         else

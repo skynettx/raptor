@@ -62,7 +62,7 @@ RAP_SetPlayerDiff(
 {
     cur_diff = 0;
     
-    curplr_diff = player.diff[cur_game];
+    curplr_diff = plr.diff[cur_game];
     
     switch (curplr_diff)
     {
@@ -97,13 +97,13 @@ RAP_ClearPlayer(
 {
     OBJS_Clear();
     filepos = -1;
-    memset(&player, 0, sizeof(player));
-    player.sweapon = -1;
-    player.diff[0] = DIFF_2;
-    player.diff[1] = DIFF_2;
-    player.diff[2] = DIFF_2;
-    player.diff[3] = DIFF_2;
-    player.fintrain = 0;
+    memset(&plr, 0, sizeof(plr));
+    plr.sweapon = -1;
+    plr.diff[0] = DIFF_2;
+    plr.diff[1] = DIFF_2;
+    plr.diff[2] = DIFF_2;
+    plr.diff[3] = DIFF_2;
+    plr.fintrain = 0;
     cur_game = 0;
     memset(game_wave, 0, sizeof(game_wave));
 }
@@ -266,7 +266,7 @@ RAP_LoadPlayer(
     
     // == Clear Player =======================
     OBJS_Clear();
-    memset(&player, 0, sizeof(player));
+    memset(&plr, 0, sizeof(plr));
     
     if (cdflag)
         sprintf(filename, cdfmt, cdpath, filepos);
@@ -281,10 +281,10 @@ RAP_LoadPlayer(
         return 0;
     }
     
-    fread(&player, 1, sizeof(player), handle);
-    GLB_DeCrypt(gdmodestr, &player, sizeof(player));
+    fread(&plr, 1, sizeof(plr), handle);
+    GLB_DeCrypt(gdmodestr, &plr, sizeof(plr));
     
-    for (loop = 0; loop < player.numobjs; loop++)
+    for (loop = 0; loop < plr.numobjs; loop++)
     {
         fread(&inobj, 1, sizeof(inobj), handle);
         GLB_DeCrypt(gdmodestr, &inobj, sizeof(inobj));
@@ -295,12 +295,12 @@ RAP_LoadPlayer(
     
     fclose(handle);
     
-    cur_game = player.cur_game;
-    game_wave[0] = player.game_wave[0];
-    game_wave[1] = player.game_wave[1];
-    game_wave[2] = player.game_wave[2];
+    cur_game = plr.cur_game;
+    game_wave[0] = plr.game_wave[0];
+    game_wave[1] = plr.game_wave[1];
+    game_wave[2] = plr.game_wave[2];
     
-    if (!OBJS_IsEquip(player.sweapon))
+    if (!OBJS_IsEquip(plr.sweapon))
         OBJS_GetNext();
     
     if (OBJS_GetAmt(S_ENERGY) <= 0)
@@ -346,20 +346,20 @@ RAP_SavePlayer(
         return 0;
     }
     
-    player.cur_game = cur_game;
-    player.game_wave[0] = game_wave[0];
-    player.game_wave[1] = game_wave[1];
-    player.game_wave[2] = game_wave[2];
-    player.numobjs = 0;
+    plr.cur_game = cur_game;
+    plr.game_wave[0] = game_wave[0];
+    plr.game_wave[1] = game_wave[1];
+    plr.game_wave[2] = game_wave[2];
+    plr.numobjs = 0;
     
     for (cur = first_objs.next; &last_objs != cur; cur = cur->next)
     {
-        player.numobjs++;
+        plr.numobjs++;
     }
     
-    GLB_EnCrypt(gdmodestr, &player, sizeof(player));
-    fwrite(&player, 1, sizeof(player), handle);
-    GLB_DeCrypt(gdmodestr, &player, sizeof(player));
+    GLB_EnCrypt(gdmodestr, &plr, sizeof(plr));
+    fwrite(&plr, 1, sizeof(plr), handle);
+    GLB_DeCrypt(gdmodestr, &plr, sizeof(plr));
     
     for (cur = first_objs.next; &last_objs != cur; cur = cur->next)
     {

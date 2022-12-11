@@ -36,13 +36,13 @@ DEMO_MakePlayer(
     int game
 )
 {
-    memset(&player, 0, sizeof(player));
+    memset(&plr, 0, sizeof(plr));
 
-    player.sweapon = -1;
-    player.diff[0] = DIFF_3;
-    player.diff[1] = DIFF_3;
-    player.diff[2] = DIFF_3;
-    player.id_pic = 0;
+    plr.sweapon = -1;
+    plr.diff[0] = DIFF_3;
+    plr.diff[1] = DIFF_3;
+    plr.diff[2] = DIFF_3;
+    plr.id_pic = 0;
     
     RAP_SetPlayerDiff();
     
@@ -52,7 +52,7 @@ DEMO_MakePlayer(
     OBJS_Add(S_ENERGY);
     OBJS_Add(S_ENERGY);
     OBJS_Add(S_DETECT);
-    player.score = 10000;
+    plr.score = 10000;
     
     switch (game)
     {
@@ -76,7 +76,7 @@ DEMO_MakePlayer(
         OBJS_Add(S_MICRO_MISSLE);
         OBJS_Add(S_TURRET);
         OBJS_Add(S_GRD_MISSLE);
-        player.score += 0x50003;
+        plr.score += 0x50003;
         break;
     
     case 2:
@@ -89,7 +89,7 @@ DEMO_MakePlayer(
         OBJS_Add(S_MICRO_MISSLE);
         OBJS_Add(S_FORWARD_LASER);
         OBJS_Add(S_GRD_MISSLE);
-        player.score += 0xd5fff;
+        plr.score += 0xd5fff;
         break;
     }
     

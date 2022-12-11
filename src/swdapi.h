@@ -35,132 +35,176 @@ enum ACT
     S_END
 };
 
+enum FCMD
+{
+    R_IDLE,
+    R_CLOSED,
+    R_CLOSE_ALL,
+    R_END_DIALOG
+};
+
+enum DSTYLE 
+{
+    FILL,
+    TEXTURE,
+    PICTURE,
+    SEE_THRU,
+    INVISABLE
+};
+
+enum BUTTON
+{ 
+    NORMAL, 
+    UP, 
+    DOWN 
+};
+
+enum INPUTOPT
+{ 
+    I_NORM, 
+    I_TOUPPER, 
+    I_NUMERIC 
+};
+
+#define FLD_OFF 0       // 0
+#define FLD_TEXT 1      // 1
+#define FLD_BUTTON 2    // 2 *
+#define FLD_INPUT 3     // 3 *
+#define FLD_MARK 4      // 5 *
+#define FLD_CLOSE 5     // 6
+#define FLD_DRAGBAR 6   // 7 *
+#define FLD_BUMPIN 7    // 8
+#define FLD_BUMPOUT 8   // 9
+#define FLD_ICON 9      // 4
+#define FLD_OBJAREA 10  // 10
+#define FLD_VIEWAREA 11 // 11
+
+#define SWD_FILENUM 1
+
+// basic format of a window data object
+//
+//  SWIN structure
+//  SFIELDS..
+//  TEXT AREA for window
+//
+
+#define MAX_WINDOWS 12
+#define MAX_FONTS 2
+
 struct swd_t
 {
-    int f_0;     //not used
-    int f_4;     //not used
-    int f_8;
-    int f_c;
-    int f_10;    //not used
-    int f_14;    //not used
-    int f_18;
-    int f_1c;
-    //int f_20;
-    //int f_24;
-    //int f_28;
-    //int f_2c;
-    char Name[16];
-    char f_30[16]; // TODO: determine size
-    int f_40;
-    int f_44;
-    int f_48;
-    int f_4c; // field offset
-    int f_50;    //not used
-    int f_54; // active field
-    int f_58;
-    int f_5c;
-    int f_60;
-    int f_64;
-    int f_68;
-    int f_6c;
-    int f_70;
-    int f_74;
+    int version;                 // VERSION NUMBER ( not used )
+    int swdsize;                 // SIZE OF WIN/FIELD AND TEXT ( not used )
+    int arrowflag;               // Use Arrow Keys ( TRUE/FALSE )
+    int display;                 // DISPLAY FLAG
+    int opt3;                    // OPTION 3 ( not used )
+    int opt4;                    // OPTION 4 ( not used )
+    int id;                      // WINDOW ID NUMBER
+    int type;                    // WINDOW TYPE NUMBER
+    char name[16];               // TEXT NAME OF WINDOW ( NOT DISPLAYED )
+    char item_name[16];          // TEXT NAME OF ITEM
+    int item;                    // ITEM ID NUMBER
+    int picflag;                 // FILL/TEXTURE/PICTURE
+    int lock;                    // TRUE = cannot goto other windows
+    int fldofs;                  // OFFSET IN BYTES TO FIRST FIELD
+    int txtofs;                  // OFFSET IN BYTES TO TEXT AREA ( not used )
+    int firstfld;                // FIELD TO GOTO FIRST
+    int opt;                     // WINDOW TYPE
+    int color;                   // COLOR OF WINDOW
+    int numflds;                 // NUMBER OF FIELDS
+    int x;                       // X POSITON ON SCREEN
+    int y;                       // Y POSITION ON SCREEN
+    int lx;                      // WIDTH IN PIXELS
+    int ly;                      // HEIGHT IN PIXELS
+    int shadow;                  // SHADOW TRUE/FALSE
 };
 
 struct swdfield_t {
-    int f_0;
-    int f_4;
-    int f_8;
-    int f_c;
-    int f_10;
-    int f_14;
-    int f_18;
-    int f_1c;
-    //int f_20;
-    //int f_24;
-    //int f_28;
-    //int f_2c;
-    char Name[16];
-    char f_30[16];
-    int f_40;
-    char f_44[16];
-    int f_54;
-    int f_58;
-    int f_5c;
-    int f_60;
-    int f_64;
-    int f_68;
-    int f_6c;
-    int f_70;
-    int f_74;
-    int f_78;
-    int f_7c;
-    int f_80;
-    int f_84;
-    int f_88;
-    int f_8c;
-    texture_t *f_90;
-}; // size: 0x94
+    int opt;                     // FIELD TYPE
+    int id;                      // FIELD ID
+    int hotkey;                  // SCAN CODE OF HOT KEY
+    int kbflag;                  // TRUE if field should be KBACTIVE
+    int opt3;                    // not used
+    int opt4;                    // not used
+    int input_opt;               // OPTIONS used in INPUT FIELDS
+    int bstatus;                 // BUTTON STATUS NORMAL/UP/DOWN
+    char name[16];               // TEXT NAME OF FIELD ( NOT DISPLAYED )
+    char item_name[16];          // TEXT NAME OF ITEM #
+    int item;                    // ITEM ID NUMBER
+    char font_name[16];          // FONT .GLB NAME
+    int fontid;                  // FONT NUMBER
+    int fontbasecolor;           // FONT BASE COLOR
+    int maxchars;                // MAXCHARS IN FIELD TEXT
+    int picflag;                 // PICTURE TRUE/FALSE
+    int color;                   // COLOR OF FIELD
+    int lite;                    // HIGHLIGHT COLOR
+    int mark;                    // FIELD MARK ( TRUE/FLASE )
+    int saveflag;                // MEM TO SAVE PIC UNDER FIELD ( Y/N )
+    int shadow;                  // SHADOW ON/OFF
+    int selectable;              // SELECTABLE ON/OFF
+    int x;                       // X POSITION ON SCREEN
+    int y;                       // Y POSITION ON SCREEN
+    int lx;                      // WIDTH IN PIXELS
+    int ly;                      // HEIGHT IN PIXELS
+    int txtoff;                  // OFFSET TO TEXT DATA ( BYTES )
+    texture_t *sptr;             // SEG POINTER TO SAVE INFO
+}; 
 
 struct swdfield_32_t {
-    int f_0;
-    int f_4;
-    int f_8;
-    int f_c;
-    int f_10;
-    int f_14;
-    int f_18;
-    int f_1c;
-    //int f_20;
-    //int f_24;
-    //int f_28;
-    //int f_2c;
-    char Name[16];
-    char f_30[16];
-    int f_40;
-    char f_44[16];
-    int f_54;
-    int f_58;
-    int f_5c;
-    int f_60;
-    int f_64;
-    int f_68;
-    int f_6c;
-    int f_70;
-    int f_74;
-    int f_78;
-    int f_7c;
-    int f_80;
-    int f_84;
-    int f_88;
-    int f_8c;
-    int PlaceHolder;
-}; // size: 0x94
+    int opt;                     // FIELD TYPE
+    int id;                      // FIELD ID
+    int hotkey;                  // SCAN CODE OF HOT KEY
+    int kbflag;                  // TRUE if field should be KBACTIVE
+    int opt3;                    // not used
+    int opt4;                    // not used
+    int input_opt;               // OPTIONS used in INPUT FIELDS
+    int bstatus;                 // BUTTON STATUS NORMAL/UP/DOWN
+    char name[16];               // TEXT NAME OF FIELD ( NOT DISPLAYED )
+    char item_name[16];          // TEXT NAME OF ITEM #
+    int item;                    // ITEM ID NUMBER
+    char font_name[16];          // FONT .GLB NAME
+    int fontid;                  // FONT NUMBER
+    int fontbasecolor;           // FONT BASE COLOR
+    int maxchars;                // MAXCHARS IN FIELD TEXT
+    int picflag;                 // PICTURE TRUE/FALSE
+    int color;                   // COLOR OF FIELD
+    int lite;                    // HIGHLIGHT COLOR
+    int mark;                    // FIELD MARK ( TRUE/FLASE )
+    int saveflag;                // MEM TO SAVE PIC UNDER FIELD ( Y/N )
+    int shadow;                  // SHADOW ON/OFF
+    int selectable;              // SELECTABLE ON/OFF
+    int x;                       // X POSITION ON SCREEN
+    int y;                       // Y POSITION ON SCREEN
+    int lx;                      // WIDTH IN PIXELS
+    int ly;                      // HEIGHT IN PIXELS
+    int txtoff;                  // OFFSET TO TEXT DATA ( BYTES )
+    int PlaceHolder;             // PLACEHOLDER TO KEEP SIZE
+}; 
 
 struct wdlg_t {
-    int f_0;
+    int window;
     int field;
     int cur_act;
     int cur_cmd;
     int keypress;
-    int f_14;
-    int f_18;
-    int f_1c;
-    int f_20;
-    int f_24;
-    int f_28;
+    int id;
+    int type;
+    int x;
+    int y;
+    int height;
+    int width;
     int f_2c;
-    int f_30;
-    int f_34;
-    int f_38;
-    int f_3c;
+    int viewactive;
+    int sfield;
+    int sx;
+    int sy;
 };
 
 struct window_t {
-    int f_0;
-    int f_4;
-    int f_8;
-    swd_t *f_c;
+    int gitem;                   // GLB ITEM ID
+    int flag;                    // TRUE = in use ,FALSE = not in use
+    int viewflag;                // TRUE = has viewarea(s) FALSE = none
+    swd_t *win;                  // POINTER TO WINDOW
 };
 
 extern int usekb_flag;
@@ -168,22 +212,22 @@ extern int g_button_flag;
 extern unsigned int fi_joy_count;
 extern bool fi_sec_field;
 
-void SWD_Install(int a1);
+void SWD_Install(int moveflag);
 void SWD_End(void);
-void SWD_Dialog(wdlg_t *a1);
-swd_t* SWD_ReformatFieldData(swd_t* swdData, int a1);
-int SWD_InitMasterWindow(int a1);
+void SWD_Dialog(wdlg_t *swd_dlg);
+swd_t* SWD_ReformatFieldData(swd_t* header, int handle);
+int SWD_InitMasterWindow(int handle);
 int SWD_ShowAllWindows(void);
-void SWD_SetWindowPtr(int a1);
-void SWD_SetFieldSelect(int a1, int a2, int a3);
-void SWD_SetFieldItem(int a1, int a2, int a3);
-int SWD_SetFieldText(int a1, int a2, const char *a3);
-void SWD_DestroyWindow(int a1);
-int SWD_InitWindow(int a1);
-void SWD_SetActiveField(int a1, int a2);
-int SWD_GetFieldXYL(int a1, int a2, int* a3, int* a4, int* a5, int* a6);
-void SWD_SetWinDrawFunc(int a1, void (*a2)(wdlg_t*));
-void SWD_SetFieldPtr(int a1, int a2);
-int SWD_GetFieldText(int a1, int a2, char *a3);
-int SWD_GetFieldItem(int a1, int a2);
-void SWD_SetClearFlag(int a1);
+void SWD_SetWindowPtr(int handle);
+void SWD_SetFieldSelect(int handle, int field_id, int opt);
+void SWD_SetFieldItem(int handle, int field_id, int item);
+int SWD_SetFieldText(int handle, int field_id, const char *in_text);
+void SWD_DestroyWindow(int handle);
+int SWD_InitWindow(int handle);
+void SWD_SetActiveField(int handle, int field_id);
+int SWD_GetFieldXYL(int handle, int field_id, int* x, int* y, int* lx, int* ly);
+void SWD_SetWinDrawFunc(int handle, void (*infunc)(wdlg_t*));
+void SWD_SetFieldPtr(int handle, int field);
+int SWD_GetFieldText(int handle, int field_id, char *out_text);
+int SWD_GetFieldItem(int handle, int field_id);
+void SWD_SetClearFlag(int inflag);

@@ -398,12 +398,12 @@ ENEMY_Add(
     newe->y -= newe->hly;
     newe->x2 = newe->x + newe->width;
     newe->y2 = newe->y + newe->height;
-    newe->mobj.x = newe->sx = newe->x;
-    newe->mobj.y = newe->sy = newe->y;
+    newe->move.x = newe->sx = newe->x;
+    newe->move.y = newe->sy = newe->y;
     newe->frame_rate = curlib->frame_rate;
     newe->speed = curlib->movespeed;
     
-    newe->countdown = curlib->countdown - newe->mobj.y;
+    newe->countdown = curlib->countdown - newe->move.y;
     newe->shoot_disable = 0;
     newe->shoot_on = 0;
     newe->shootagain = NORM_SHOOT;
@@ -444,33 +444,33 @@ ENEMY_Add(
     case F_KAMI:
         newe->groundflag = 0;
         newe->sy = 100 - newe->hly;
-        newe->mobj.x2 = newe->sx + curlib->flightx[0];
-        newe->mobj.y2 = newe->sy + curlib->flighty[0];
+        newe->move.x2 = newe->sx + curlib->flightx[0];
+        newe->move.y2 = newe->sy + curlib->flighty[0];
         newe->movepos = 1;
-        InitMobj(&newe->mobj);
-        MoveMobj(&newe->mobj);
+        InitMobj(&newe->move);
+        MoveMobj(&newe->move);
         break;
     
     case F_GROUND:                                          
         newe->groundflag = 1;
-        newe->mobj.x2 = newe->x;
-        newe->mobj.y2 = 211;
+        newe->move.x2 = newe->x;
+        newe->move.y2 = 211;
         break;
     
     case F_GROUNDRIGHT:                                           
         newe->x -= newe->width;
-        newe->mobj.x = newe->sx = newe->x;
+        newe->move.x = newe->sx = newe->x;
         newe->groundflag = 1;
-        newe->mobj.x2 = 335;
-        newe->mobj.y2 = 211;
+        newe->move.x2 = 335;
+        newe->move.y2 = 211;
         break;
     
     case F_GROUNDLEFT:                                           
         newe->x += newe->width;
-        newe->mobj.x = newe->sx = newe->x;
+        newe->move.x = newe->sx = newe->x;
         newe->groundflag = 1;
-        newe->mobj.x2 = -newe->hlx;
-        newe->mobj.y2 = 211;
+        newe->move.x2 = -newe->hlx;
+        newe->move.y2 = 211;
         break;
     }
     
@@ -795,26 +795,26 @@ void ENEMY_Think(
         switch (curlib->flighttype)
         {
         case F_REPEAT:
-            sprite->x = sprite->mobj.x;
-            sprite->y = sprite->mobj.y;
+            sprite->x = sprite->move.x;
+            sprite->y = sprite->move.y;
             sprite->x2 = sprite->x + sprite->width - 1;
             sprite->y2 = sprite->y + sprite->height - 1;
             
             speed = curlib->movespeed;
             
-            speed = MoveEobj(&sprite->mobj, speed);
+            speed = MoveEobj(&sprite->move, speed);
             
-            if (sprite->mobj.done)
+            if (sprite->move.done)
             {
-                sprite->mobj.x = sprite->mobj.x2;
-                sprite->mobj.y = sprite->mobj.y2;
-                sprite->mobj.x2 = sprite->sx + curlib->flightx[sprite->movepos];
-                sprite->mobj.y2 = sprite->sy + curlib->flighty[sprite->movepos];
+                sprite->move.x = sprite->move.x2;
+                sprite->move.y = sprite->move.y2;
+                sprite->move.x2 = sprite->sx + curlib->flightx[sprite->movepos];
+                sprite->move.y2 = sprite->sy + curlib->flighty[sprite->movepos];
                 
-                InitMobj(&sprite->mobj);
-                MoveMobj(&sprite->mobj);
+                InitMobj(&sprite->move);
+                MoveMobj(&sprite->move);
                 
-                speed = MoveEobj(&sprite->mobj, speed);
+                speed = MoveEobj(&sprite->move, speed);
                 
                 if (!sprite->edir)
                 {
@@ -838,51 +838,51 @@ void ENEMY_Think(
             break;
         
         case F_KAMI:
-            sprite->x = sprite->mobj.x;
-            sprite->y = sprite->mobj.y;
+            sprite->x = sprite->move.x;
+            sprite->y = sprite->move.y;
             sprite->x2 = sprite->x + sprite->width - 1;
             sprite->y2 = sprite->y + sprite->height - 1;
             
             speed = curlib->movespeed;
-            speed = MoveEobj(&sprite->mobj, speed);
+            speed = MoveEobj(&sprite->move, speed);
             
             if (sprite->kami == KAMI_END)
             {
-                if (sprite->mobj.y > 0xc9)
+                if (sprite->move.y > 0xc9)
                     sprite->doneflag = 1;
                 
-                if (sprite->hlx + 320 < sprite->mobj.x)
+                if (sprite->hlx + 320 < sprite->move.x)
                     sprite->doneflag = 1;
                 
-                if (sprite->mobj.y + sprite->width < 0)
+                if (sprite->move.y + sprite->width < 0)
                     sprite->doneflag = 1;
                 
-                if (sprite->mobj.x + sprite->width < 0)
+                if (sprite->move.x + sprite->width < 0)
                     sprite->doneflag = 1;
             }
             
-            if (sprite->mobj.done && sprite->kami != KAMI_END)
+            if (sprite->move.done && sprite->kami != KAMI_END)
             {
-                sprite->mobj.x = sprite->mobj.x2;
-                sprite->mobj.y = sprite->mobj.y2;
+                sprite->move.x = sprite->move.x2;
+                sprite->move.y = sprite->move.y2;
                 sprite->x2 = sprite->x + sprite->width - 1;
                 sprite->y2 = sprite->y + sprite->height - 1;
                 
                 if (sprite->kami == KAMI_CHASE)
                 {
-                    sprite->mobj.x2 = player_cx;
-                    sprite->mobj.y2 = player_cy;
+                    sprite->move.x2 = player_cx;
+                    sprite->move.y2 = player_cy;
                     sprite->kami = KAMI_END;
                 }
                 else
                 {
-                    sprite->mobj.x2 = sprite->sx + curlib->flightx[sprite->movepos];
-                    sprite->mobj.y2 = sprite->sy + curlib->flighty[sprite->movepos];
+                    sprite->move.x2 = sprite->sx + curlib->flightx[sprite->movepos];
+                    sprite->move.y2 = sprite->sy + curlib->flighty[sprite->movepos];
                 }
                 
-                InitMobj(&sprite->mobj);
-                MoveMobj(&sprite->mobj);
-                speed = MoveEobj(&sprite->mobj, speed);
+                InitMobj(&sprite->move);
+                MoveMobj(&sprite->move);
+                speed = MoveEobj(&sprite->move, speed);
                 
                 if (curlib->numflight - 1 > sprite->movepos)
                     sprite->movepos++;
@@ -892,26 +892,26 @@ void ENEMY_Think(
             break;
         
         case F_LINEAR:
-            sprite->x = sprite->mobj.x;
-            sprite->y = sprite->mobj.y;
+            sprite->x = sprite->move.x;
+            sprite->y = sprite->move.y;
             sprite->x2 = sprite->x + sprite->width - 1;
             sprite->y2 = sprite->y + sprite->height - 1;
             
             speed = curlib->movespeed;
             
-            speed = MoveEobj(&sprite->mobj, speed);
+            speed = MoveEobj(&sprite->move, speed);
             
-            if (sprite->mobj.done)
+            if (sprite->move.done)
             {
-                sprite->mobj.x = sprite->mobj.x2;
-                sprite->mobj.y = sprite->mobj.y2;
-                sprite->mobj.x2 = sprite->sx + curlib->flightx[sprite->movepos];
-                sprite->mobj.y2 = sprite->sy + curlib->flighty[sprite->movepos];
+                sprite->move.x = sprite->move.x2;
+                sprite->move.y = sprite->move.y2;
+                sprite->move.x2 = sprite->sx + curlib->flightx[sprite->movepos];
+                sprite->move.y2 = sprite->sy + curlib->flighty[sprite->movepos];
                 
-                InitMobj(&sprite->mobj);
-                MoveMobj(&sprite->mobj);
+                InitMobj(&sprite->move);
+                MoveMobj(&sprite->move);
                 
-                speed = MoveEobj(&sprite->mobj, speed);
+                speed = MoveEobj(&sprite->move, speed);
                 
                 sprite->movepos++;
                 
@@ -923,7 +923,7 @@ void ENEMY_Think(
         case F_GROUND:
             if (scroll_flag)
                 sprite->y++;
-            if (sprite->y > sprite->mobj.y2)
+            if (sprite->y > sprite->move.y2)
                 sprite->doneflag = 1;
             sprite->x2 = sprite->x + sprite->width - 1;
             sprite->y2 = sprite->y + sprite->height - 1;
@@ -935,9 +935,9 @@ void ENEMY_Think(
             if (sprite->y >= 0)
             {
                 sprite->x += curlib->movespeed;
-                if (sprite->x > sprite->mobj.x2)
+                if (sprite->x > sprite->move.x2)
                     sprite->doneflag = 1;
-                else if (sprite->y > sprite->mobj.y2)
+                else if (sprite->y > sprite->move.y2)
                     sprite->doneflag = 1;
             }
             sprite->x2 = sprite->x + sprite->width - 1;
@@ -950,9 +950,9 @@ void ENEMY_Think(
             if (sprite->y >= 0)
             {
                 sprite->x -= curlib->movespeed;
-                if (sprite->x < sprite->mobj.x2)
+                if (sprite->x < sprite->move.x2)
                     sprite->doneflag = 1;
-                else if (sprite->y > sprite->mobj.y2)
+                else if (sprite->y > sprite->move.y2)
                     sprite->doneflag = 1;
             }
             sprite->x2 = sprite->x + sprite->width - 1;
@@ -1052,7 +1052,7 @@ void ENEMY_Think(
         
         if (sprite->hits <= 0)
         {
-            player.score += curlib->money;
+            plr.score += curlib->money;
             
             SND_3DPatch(FX_AIREXPLO, sprite->x + sprite->hlx, sprite->x + sprite->hlx);
             

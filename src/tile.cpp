@@ -235,7 +235,7 @@ void TILE_Think(void)
             {
                 SND_3DPatch(15, v30 + 16, v34 + 16);
                 FUN_000127a1(v1c->f_c, 5);
-                player.score += money[v2c];
+                plr.score += money[v2c];
                 TILE_Explode(v1c, 10);
                 ANIMS_StartAnim(0, v30 + 16, v34 + 16);
                 tdead[v2c] = 1;
