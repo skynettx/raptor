@@ -193,7 +193,7 @@ struct wdlg_t {
     int y;
     int height;
     int width;
-    int f_2c;
+    int objactive;
     int viewactive;
     int sfield;
     int sx;

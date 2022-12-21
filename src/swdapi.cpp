@@ -1193,7 +1193,7 @@ SWD_GetRightField(
 }
 
 /*------------------------------------------------------------------------
-  SWD_GetUpField() - Gets the closest right selectable field
+  SWD_GetUpField() - Gets the closest up selectable field
   ------------------------------------------------------------------------*/
 int 
 SWD_GetUpField(
@@ -1244,7 +1244,7 @@ SWD_GetUpField(
 }
 
 /*------------------------------------------------------------------------
-  SWD_GetDownField() - Gets the closest right selectable field
+  SWD_GetDownField() - Gets the closest down selectable field
   ------------------------------------------------------------------------*/
 int 
 SWD_GetDownField(
@@ -1295,7 +1295,7 @@ SWD_GetDownField(
 }
 
 /*------------------------------------------------------------------------
-  SWD_GetLeftField() - Gets the closest right selectable field
+  SWD_GetLeftField() - Gets the closest left selectable field
   ------------------------------------------------------------------------*/
 int 
 SWD_GetLeftField(

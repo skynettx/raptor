@@ -62,6 +62,7 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/mpucore.cpp
 )
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    find_package(ALSA REQUIRED)
     target_link_libraries(raptor
         textscreen
         asound
