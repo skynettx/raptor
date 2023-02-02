@@ -9,13 +9,16 @@
 #include "fx.h"
 #include "anims.h"
 
-int eitems[1350];
-int titems[1350];
-short hits[1350];
-short tdead[1350];
-short money[1350];
+#define MAX_STILES ( MAP_ONSCREEN * MAP_COLS )
+#define MAX_TILEDELAY ( ( MAP_ONSCREEN + 1 ) * MAP_COLS )
 
-tdel_t tdel[81];
+int eitems[MAP_SIZE];
+int titems[MAP_SIZE];
+short hits[MAP_SIZE];
+short tdead[MAP_SIZE];
+short money[MAP_SIZE];
+
+tdel_t tdel[MAX_TILEDELAY];
 
 tdel_t first_delay;
 tdel_t last_delay;
@@ -24,6 +27,13 @@ tdel_t *free_delay;
 
 int tileloopy;
 char *tilepic;
+
+char game_start[4][17] = {
+   "STARTG1TILES",
+   "STARTG2TILES",
+   "STARTG3TILES",
+   "STARTG4TILES"
+};
 
 int scroll_flag;
 int last_tile;
@@ -35,263 +45,400 @@ int startflat[4];
 int tilepos;
 int tileyoff;
 
-tspot_t tspots[72];
+tspot_t tspots[MAX_STILES];
 tspot_t *lastspot;
 int spark_delay;
 int flare_delay;
 
-void TILE_Explode(tspot_t* a1, int a2);
-
-void TClear(void)
+/*-------------------------------------------------------------------------*
+TClear () - Clears TILE Delay Link List
+ *-------------------------------------------------------------------------*/
+void 
+TClear(
+    void
+)
 {
-    int i;
-    first_delay.f_0 = NULL;
-    first_delay.f_4 = &last_delay;
-    last_delay.f_0 = &first_delay;
-    last_delay.f_4 = NULL;
+    int loop;
+    
+    first_delay.prev = NULL;
+    first_delay.next = &last_delay;
+    
+    last_delay.prev = &first_delay;
+    last_delay.next = NULL;
+    
     free_delay = &tdel[0];
+    
     memset(tdel, 0, sizeof(tdel));
-    for (i = 0; i < 80; i++)
+    
+    for (loop = 0; loop < MAX_TILEDELAY - 1; loop++)
     {
-        tdel[i].f_4 = &tdel[i + 1];
+        tdel[loop].next = &tdel[loop + 1];
     }
 }
 
-tdel_t *TGet(void)
+/*-------------------------------------------------------------------------*
+TGet () - Get a TDELAY object
+ *-------------------------------------------------------------------------*/
+tdel_t 
+*TGet(
+    void
+)
 {
-    tdel_t *v1c;
+    tdel_t *newtd;
+    
     if (!free_delay)
         EXIT_Error("TILEDELAY_Get() - Max ");
-    v1c = free_delay;
-    free_delay = free_delay->f_4;
-    memset(v1c, 0, sizeof(tdel_t));
-    v1c->f_4 = &last_delay;
-    v1c->f_0 = last_delay.f_0;
-    last_delay.f_0 = v1c;
-    v1c->f_0->f_4 = v1c;
-    return v1c;
+    
+    newtd = free_delay;
+    free_delay = free_delay->next;
+    
+    memset(newtd, 0, sizeof(tdel_t));
+    
+    newtd->next = &last_delay;
+    newtd->prev = last_delay.prev;
+    last_delay.prev = newtd;
+    newtd->prev->next = newtd;
+    
+    return newtd;
 }
 
-tdel_t *TRemove(tdel_t *a1)
+/*-------------------------------------------------------------------------*
+TRemove () - Remove a TDELAY Object from link list
+ *-------------------------------------------------------------------------*/
+tdel_t 
+*TRemove(
+    tdel_t *sh
+)
 {
-    tdel_t *v1c;
-    v1c = a1->f_0;
-    a1->f_4->f_0 = a1->f_0;
-    a1->f_0->f_4 = a1->f_4;
-    memset(a1, 0, sizeof(tdel_t));
-    a1->f_4 = free_delay;
-    free_delay = a1;
-    return v1c;
+    tdel_t *next;
+    
+    next = sh->prev;
+    
+    sh->next->prev = sh->prev;
+    sh->prev->next = sh->next;
+    
+    memset(sh, 0, sizeof(tdel_t));
+    
+    sh->next = free_delay;
+    
+    free_delay = sh;
+    
+    return next;
 }
 
-void FUN_000127a1(int a1, int a2)
+/*--------------------------------------------------------------------------
+TILE_DoDamage
+ --------------------------------------------------------------------------*/
+void 
+TILE_DoDamage(
+    int mapspot, 
+    int damage
+)
 {
     static int mlookup[3] = {
-        -1, -9, 1
+        -1, -MAP_COLS, 1
     };
     static int xlookup[3] = {
         -1, 0, 1
     };
-    int i, v18, v20, v24;
-    v18 = a1 % 9;
-    for (i = 0; i < 3; i++)
+    int loop, ix, spot, x;
+    ix = mapspot % MAP_COLS;
+    
+    for (loop = 0; loop < 3; loop++)
     {
-        v20 = a1 + mlookup[i];
-        if (v20 < 0 || v20 >= 1350)
+        spot = mapspot + mlookup[loop];
+        
+        if (spot < 0 || spot >= MAP_SIZE)
             continue;
-        if (eitems[v20] != titems[v20])
+        
+        if (eitems[spot] != titems[spot])
         {
-            v24 = v18 + xlookup[i];
-            if (v24 < 0 || v24 >= 9)
+            x = ix + xlookup[loop];
+            
+            if (x < 0 || x >= MAP_COLS)
                 continue;
-            hits[v20] -= a2;
+            
+            hits[spot] -= damage;
         }
     }
 }
 
-void TILE_Put(char *a1, int a2, int a3)
+/***************************************************************************
+TILE_Put () - Draws 32 by 32 TILE Clips on y only
+ ***************************************************************************/
+void 
+TILE_Put(
+    char *inpic,          // INPUT : pointer to GFX_PIC ( norm )
+    int x,                // INPUT : x position
+    int y                 // INPUT : y position
+)
 {
-    int v14;
-    v14 = 0;
-    if (a3 + 32 <= 0 || a3 >= 200)
+    int flag;
+    flag = 0;
+    
+    if (y + 32 <= 0 || y >= SCREENHEIGHT)
         return;
+    
     tileloopy = 32;
-    tilepic = a1;
-    if (a3 < 0)
+    tilepic = inpic;
+    
+    if (y < 0)
     {
-        tilepic += a3 * -32;
-        tileloopy += a3;
-        a3 = 0;
-        v14 = 1;
+        tilepic += y * -32;
+        tileloopy += y;
+        y = 0;
+        flag = 1;
     }
-    if (a3 + tileloopy > 200)
+    
+    if (y + tileloopy > SCREENHEIGHT)
     {
-        tileloopy = 200 - a3;
-        v14 = 1;
+        tileloopy = SCREENHEIGHT - y;
+        flag = 1;
     }
-    tilestart = displaybuffer + ylookup[a3] + a2;
-    if (v14)
+    
+    tilestart = displaybuffer + ylookup[y] + x;
+    
+    if (flag)
         TILE_ClipDraw();
     else
         TILE_Draw();
 }
 
-void TILE_Init(void)
+/***************************************************************************
+TILE_Init () - Sets Up A level for Displaying
+ ***************************************************************************/
+void 
+TILE_Init(
+    void
+)
 {
     TClear();
-    g_mapleft = 16;
+    g_mapleft = MAP_LEFT;
+    
     scroll_flag = 1;
     last_tile = 0;
-    startflat[0] = GLB_GetItemID("STARTG1TILES");
+    
+    // FIND START OF GAME TILES ========
+    startflat[0] = GLB_GetItemID(game_start[0]);
     startflat[0]++;
-    startflat[1] = GLB_GetItemID("STARTG2TILES");
+    
+    startflat[1] = GLB_GetItemID(game_start[1]);
     startflat[1]++;
-    startflat[2] = GLB_GetItemID("STARTG3TILES");
+    
+    startflat[2] = GLB_GetItemID(game_start[2]);
     startflat[2]++;
-    startflat[3] = GLB_GetItemID("STARTG4TILES");
+    
+    startflat[3] = GLB_GetItemID(game_start[3]);
     startflat[3]++;
 }
 
-void TILE_CacheLevel(void)
+/***************************************************************************
+TILE_CacheLevel () - Cache tiles in current level
+ ***************************************************************************/
+void 
+TILE_CacheLevel(
+    void
+)
 {
-    int i, v1c, v24;
-    flat_t *v20;
+    int loop, game, item;
+    flat_t *lib;
+    
     TClear();
-    g_mapleft = 16;
-    tilepos = 1278;
-    tileyoff = -56;
-    lastspot = &tspots[71];
+    g_mapleft = MAP_LEFT;
+    
+    // SET UP START POS ON MAP =========
+    tilepos = (MAP_ROWS - MAP_ONSCREEN) * MAP_COLS;
+    tileyoff = 200 - (MAP_ONSCREEN * MAP_BLOCKSIZE);
+    lastspot = &tspots[MAX_STILES - 1];
+    
     scroll_flag = 1;
     last_tile = 0;
+    
     memset(titems, 0, sizeof(titems));
     memset(eitems, 0, sizeof(eitems));
     memset(hits, 0, sizeof(hits));
     memset(tdead, 0, sizeof(tdead));
-    for (i = 0; i < 1350; i++)
+    
+    // == CACHE TILES =========================
+    for (loop = 0; loop < MAP_SIZE; loop++)
     {
-        v1c = mapmem->map[i].fgame;
-        v20 = flatlib[v1c];
-        money[i] = v20[mapmem->map[i].flats].f_6;
-        v24 = startflat[v1c];
-        v24 += mapmem->map[i].flats;
-        titems[i] = v24;
-        GLB_CacheItem(v24);
-        v24 = startflat[v1c];
-        v24 += v20[mapmem->map[i].flats].f_0;
-        eitems[i] = v24;
-        if (eitems[i] != titems[i])
-            GLB_CacheItem(v24);
-        if (eitems[i] != titems[i])
-            hits[i] = v20[mapmem->map[i].flats].f_4;
+        game = mapmem->map[loop].fgame;
+        lib = flatlib[game];
+        
+        money[loop] = lib[mapmem->map[loop].flats].bounty;
+        
+        item = startflat[game];
+        item += mapmem->map[loop].flats;
+        titems[loop] = item;
+        GLB_CacheItem(item);
+        
+        item = startflat[game];
+        item += lib[mapmem->map[loop].flats].linkflat;
+        eitems[loop] = item;
+        
+        if (eitems[loop] != titems[loop])
+            GLB_CacheItem(item);
+        
+        if (eitems[loop] != titems[loop])
+            hits[loop] = lib[mapmem->map[loop].flats].bonus;
         else
-            hits[i] = 1;
+            hits[loop] = 1;
     }
 }
 
-void TILE_FreeLevel(void)
+/***************************************************************************
+TILE_FreeLevel () - Free tile level
+ ***************************************************************************/
+void 
+TILE_FreeLevel(
+    void
+)
 {
-    int i;
-    for (i = 0; i < 1350; i++)
+    int loop;
+    
+    for (loop = 0; loop < MAP_SIZE; loop++)
     {
-        GLB_FreeItem(titems[i]);
-        if (eitems[i] != titems[i])
-            GLB_FreeItem(eitems[i]);
+        GLB_FreeItem(titems[loop]);
+        
+        if (eitems[loop] != titems[loop])
+            GLB_FreeItem(eitems[loop]);
     }
 }
 
-void TILE_DamageAll(void)
+/***************************************************************************
+TILE_DamageAll () - Damages All tiles on screen
+ ***************************************************************************/
+void 
+TILE_DamageAll(
+    void
+)
 {
-    tspot_t *v1c;
-    v1c = tspots;
+    tspot_t *ts;
+    ts = tspots;
+    
     do
     {
-        if (eitems[v1c->f_c] != titems[v1c->f_c])
-            hits[v1c->f_c] -= 20;
-        if (v1c == lastspot)
+        if (eitems[ts->mapspot] != titems[ts->mapspot])
+            hits[ts->mapspot] -= 20;
+        
+        if (ts == lastspot)
             break;
-        v1c++;
+        
+        ts++;
     } while (1);
 }
 
-void TILE_Think(void)
+/***************************************************************************
+TILE_Think () - Does Position Calculations for tiles
+ ***************************************************************************/
+void 
+TILE_Think(
+    void
+)
 {
-    int v3c, v38, v34, v30, v2c, i, j;
-    tspot_t *v1c;
-    tdel_t *v20;
+    int ty, tx, y, x, mapspot, loopy, loopx;
+    tspot_t *ts;
+    tdel_t *td;
 
-    v34 = tileyoff;
-    v2c = tilepos;
-    v1c = tspots;
-    for (i = 0; i < 8; i++, v34 += 32)
+    y = tileyoff;
+    mapspot = tilepos;
+    
+    ts = tspots;
+    
+    for (loopy = 0; loopy < MAP_ONSCREEN; loopy++, y += 32)
     {
-        v30 = 16;
-        for (j = 0; j < 9; j++, v30 += 32, v2c++, v1c++)
+        x = MAP_LEFT;
+        
+        for (loopx = 0; loopx < MAP_COLS; loopx++, x += 32, mapspot++, ts++)
         {
-            v1c->f_c = v2c;
-            v1c->f_4 = v30;
-            v1c->f_8 = v34;
-            v1c->f_0 = titems[v2c];
-            if (hits[v2c] < 0 && !tdead[v2c])
+            ts->mapspot = mapspot;
+            ts->x = x;
+            ts->y = y;
+            ts->item = titems[mapspot];
+            
+            if (hits[mapspot] < 0 && !tdead[mapspot])
             {
-                SND_3DPatch(15, v30 + 16, v34 + 16);
-                FUN_000127a1(v1c->f_c, 5);
-                plr.score += money[v2c];
-                TILE_Explode(v1c, 10);
-                ANIMS_StartAnim(0, v30 + 16, v34 + 16);
-                tdead[v2c] = 1;
+                SND_3DPatch(FX_GEXPLO, x + 16, y + 16);
+                
+                TILE_DoDamage(ts->mapspot, 5);
+                
+                plr.score += money[mapspot];
+                
+                TILE_Explode(ts, 10);
+                ANIMS_StartAnim(A_LARGE_GROUND_EXPLO1, x + 16, y + 16);
+                
+                tdead[mapspot] = 1;
             }
         }
     }
-    for (v20 = first_delay.f_4; &last_delay != v20; v20 = v20->f_4)
+    
+    for (td = first_delay.next; &last_delay != td; td = td->next)
     {
-        if (v20->f_c - tilepos > 72)
+        if (td->mapspot - tilepos > (MAP_ONSCREEN * MAP_COLS))
         {
-            v20 = TRemove(v20);
+            td = TRemove(td);
             continue;
         }
-        if (v20->f_8 < 0)
+        
+        if (td->frames < 0)
         {
-            v38 = v20->f_14->f_4 + 8 + (wrand() % 8);
-            v3c = v20->f_14->f_8 + 26;
-            FUN_000127a1(v20->f_c, 20);
+            tx = td->ts->x + 8 + (wrand() % 8);
+            ty = td->ts->y + 26;
+            
+            TILE_DoDamage(td->mapspot, 20);
+            
             spark_delay++;
             flare_delay++;
+            
             if (spark_delay > 2)
             {
-                ANIMS_StartAnim(18, v38, v3c);
+                ANIMS_StartAnim(A_GROUND_SPARKLE, tx, ty);
                 spark_delay = 0;
             }
+            
             if (flare_delay > 4)
             {
-                ANIMS_StartAnim(17, v38, v3c);
+                ANIMS_StartAnim(A_GROUND_FLARE, tx, ty);
                 flare_delay = 0;
             }
-            v1c = &tspots[v20->f_c - tilepos];
-            titems[v1c->f_c] = v20->f_10;
-            eitems[v1c->f_c] = v20->f_10;
-            v20 = TRemove(v20);
+            
+            ts = &tspots[td->mapspot - tilepos];
+            titems[ts->mapspot] = td->item;
+            eitems[ts->mapspot] = td->item;
+            td = TRemove(td);
         }
         else
-            v20->f_8--;
+            td->frames--;
     }
 }
 
-void TILE_Display(void)
+/***************************************************************************
+TILE_Display () - Displays Tiles
+ ***************************************************************************/
+void 
+TILE_Display(
+    void
+)
 {
-    char *v20;
-    tspot_t *v1c;
+    char *pic;
+    tspot_t *ts;
 
-    v1c = tspots;
+    ts = tspots;
+    
     do
     {
-        v20 = GLB_GetItem(v1c->f_0);
-        v20 += 20;
-        TILE_Put(v20, v1c->f_4, v1c->f_8);
-        if (v1c == lastspot)
+        pic = GLB_GetItem(ts->item);
+        pic += 20;
+        TILE_Put(pic, ts->x, ts->y);
+        
+        if (ts == lastspot)
             break;
-        v1c++;
+        
+        ts++;
     } while (1);
+    
     tileyoff++;
+    
     if (tileyoff > 0)
     {
         if (last_tile && tileyoff >= 0)
@@ -301,9 +448,10 @@ void TILE_Display(void)
         }
         else
         {
-            tileyoff -= 32;
-            tilepos -= 9;
+            tileyoff -= MAP_BLOCKSIZE;
+            tilepos -= MAP_COLS;
         }
+        
         if (tilepos <= 0)
         {
             tilepos = 0;
@@ -312,75 +460,112 @@ void TILE_Display(void)
     }
 }
 
-int TILE_IsHit(int a1, int a2, int a3)
+/***************************************************************************
+TILE_IsHit () - Checks to see if a shot hits an explodable tile
+ ***************************************************************************/
+int                        // RETURNS : TRUE = Tile Hit
+TILE_IsHit(
+    int damage,            // INPUT : damage to tile
+    int x,                 // INOUT : x screen pos, out tile x
+    int y                  // INOUT : y screen pos, out tile y
+)
 {
-    tspot_t *v14 = tspots;
-    while (v14 != lastspot)
+    tspot_t *ts = tspots;
+    
+    while (ts != lastspot)
     {
-        if (a2 >= v14->f_4 && v14->f_4 + 32 > a2 && a3 >= v14->f_8 && v14->f_8 + 32 > a3)
+        if (x >= ts->x && ts->x + 32 > x && y >= ts->y && ts->y + 32 > y)
         {
-            if (eitems[v14->f_c] != titems[v14->f_c])
+            if (eitems[ts->mapspot] != titems[ts->mapspot])
             {
-                hits[v14->f_c] -= a1;
+                hits[ts->mapspot] -= damage;
+                
                 switch (wrand() % 2)
                 {
                 case 0:
-                    ANIMS_StartGAnim(14, a2, a3);
+                    ANIMS_StartGAnim(A_BLUE_SPARK, x, y);
                     break;
                 case 1:
-                    ANIMS_StartGAnim(15, a2, a3);
+                    ANIMS_StartGAnim(A_ORANGE_SPARK, x, y);
                     break;
                 }
+                
                 return 1;
             }
         }
-        v14++;
+        
+        ts++;
     }
+    
     return 0;
 }
 
-int TILE_Bomb(int a1, int a2, int a3)
+/***************************************************************************
+TILE_Bomb () - Checks to see if a BOMB hits an explodable tile
+ ***************************************************************************/
+int                        // RETURNS : TRUE = Tile Hit
+TILE_Bomb(
+    int damage,            // INPUT : damage to tile 
+    int x,                 // INOUT : x screen pos, out tile x
+    int y                  // INOUT : y screen pos, out tile y
+)
 {
-    tspot_t *v14 = tspots;
-    while (v14 != lastspot)
+    tspot_t *ts = tspots;
+    
+    while (ts != lastspot)
     {
-        if (a2 >= v14->f_4 && v14->f_4 + 32 > a2 && a3 >= v14->f_8 && v14->f_8 + 32 > a3)
+        if (x >= ts->x && ts->x + 32 > x && y >= ts->y && ts->y + 32 > y)
         {
-            if (eitems[v14->f_c] != titems[v14->f_c])
+            if (eitems[ts->mapspot] != titems[ts->mapspot])
             {
-                hits[v14->f_c] -= a1;
-                FUN_000127a1(v14->f_c, a1);
-                if (v14->f_c > 9)
-                    FUN_000127a1(v14->f_c - 9, a1 >> 1);
+                hits[ts->mapspot] -= damage;
+                
+                TILE_DoDamage(ts->mapspot, damage);
+                
+                if (ts->mapspot > MAP_COLS)
+                    TILE_DoDamage(ts->mapspot - MAP_COLS, damage >> 1);
+                
                 return 1;
             }
         }
-        v14++;
+        
+        ts++;
     }
+    
     return 0;
 }
 
-void TILE_Explode(tspot_t *a1, int a2)
+/***************************************************************************
+TILE_Explode () - Sets the Tile to show explosion tile
+ ***************************************************************************/
+void 
+TILE_Explode(
+    tspot_t *ts,           // INPUT : tilespot of explosion
+    int delay              // INPUT : frames to delay
+)
 {
-    tdel_t *v18;
-    if (a1->f_c != -1 && a1->f_c >= tilepos)
+    tdel_t *td;
+    
+    if (ts->mapspot != -1 && ts->mapspot >= tilepos)
     {
-        if (a2)
+        if (delay)
         {
-            v18 = TGet();
-            if (v18)
+            td = TGet();
+            
+            if (td)
             {
-                v18->f_14 = a1;
-                v18->f_c = a1->f_c;
-                v18->f_8 = a2;
-                v18->f_10 = eitems[a1->f_c];
+                td->ts = ts;
+                td->mapspot = ts->mapspot;
+                td->frames = delay;
+                td->item = eitems[ts->mapspot];
             }
-            eitems[a1->f_c] = titems[a1->f_c];
+            
+            eitems[ts->mapspot] = titems[ts->mapspot];
         }
         else
         {
-            a1->f_0 = eitems[a1->f_c];
-            titems[a1->f_c] = eitems[a1->f_c];
+            ts->item = eitems[ts->mapspot];
+            titems[ts->mapspot] = eitems[ts->mapspot];
         }
     }
 }

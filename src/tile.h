@@ -8,26 +8,27 @@ extern int tilepos;
 extern int scroll_flag;
 
 struct tspot_t {
-    int f_0;
-    int f_4;
-    int f_8;
-    int f_c;
+    int item;
+    int x;
+    int y;
+    int mapspot;
 };
 
 struct tdel_t {
-    tdel_t *f_0;
-    tdel_t *f_4;
-    int f_8;
-    int f_c;
-    int f_10;
-    tspot_t *f_14;
+    tdel_t *prev;
+    tdel_t *next;
+    int frames;
+    int mapspot;
+    int item;
+    tspot_t *ts;
 };
 
 void TILE_Init(void);
 void TILE_Think(void);
 void TILE_Display(void);
-int TILE_IsHit(int a1, int a2, int a3);
-int TILE_Bomb(int a1, int a2, int a3);
+int TILE_IsHit(int damage, int x, int y);
+int TILE_Bomb(int damage, int x, int y);
+void TILE_Explode(tspot_t* ts, int delay);
 void TILE_DamageAll(void);
 void TILE_CacheLevel(void);
 void TILE_FreeLevel(void);

@@ -150,9 +150,9 @@ enum KEYOPTS
 };
 
 struct flat_t {
-    int f_0; // eitems
-    short f_4; // hits
-    short f_6; // money
+    int linkflat; 
+    short bonus; 
+    short bounty;
 };
 
 extern flat_t *flatlib[4];
