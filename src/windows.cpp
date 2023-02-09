@@ -20,13 +20,22 @@
 #include "store.h"
 #include "demo.h"
 #include "joyapi.h"
+#include "enemy.h"
 #include "fileids.h"
+
+#define HANGAR_MISSION   0
+#define HANGAR_SUPPLIES  1
+#define HANGAR_EXITDOS   2
+#define HANGAR_NONE      3
+
+#define MUSIC_VOL 0
+#define FX_VOL 1
 
 int d_count;
 int hangto;
 int opt_detail;
 
-int DAT_00061a78[2] = { 127, 127 };
+int opt_vol[2] = { 127, 127 };
 int opt_window;
 
 char hangtext[4][18] = {
@@ -42,294 +51,392 @@ char regtext[3][30] = {
     "        EXIT"
 };
 
-void WIN_WinGame(int a1)
+int sid_pics[4] = {
+    FILE116_WMALEID_PIC,
+    FILE119_BMALEID_PIC,
+    FILE117_WFMALEID_PIC,
+    FILE118_BFMALEID_PIC
+};
+
+int songsg1[] = {
+    FILE060_RAP8_MUS,       // WAVE 1
+    FILE05a_RAP2_MUS,       // WAVE 2
+    FILE05c_RAP4_MUS,       // WAVE 3
+    FILE05f_RAP7_MUS,       // WAVE 4
+    FILE05e_RAP6_MUS,       // WAVE 5
+    FILE05a_RAP2_MUS,       // WAVE 6
+    FILE05b_RAP3_MUS,       // WAVE 7
+    FILE05c_RAP4_MUS,       // WAVE 8
+    FILE05e_RAP6_MUS        // WAVE 9
+};
+
+int songsg2[] = {
+    FILE05b_RAP3_MUS,       // WAVE 1
+    FILE05a_RAP2_MUS,       // WAVE 2
+    FILE05c_RAP4_MUS,       // WAVE 3
+    FILE060_RAP8_MUS,       // WAVE 4
+    FILE05e_RAP6_MUS,       // WAVE 5
+    FILE05a_RAP2_MUS,       // WAVE 6
+    FILE060_RAP8_MUS,       // WAVE 7
+    FILE059_RAP1_MUS,       // WAVE 8
+    FILE05e_RAP6_MUS        // WAVE 9
+};
+
+int songsg3[] = {
+    FILE060_RAP8_MUS,       // WAVE 1
+    FILE05c_RAP4_MUS,       // WAVE 2
+    FILE059_RAP1_MUS,       // WAVE 3
+    FILE05f_RAP7_MUS,       // WAVE 4
+    FILE05e_RAP6_MUS,       // WAVE 5
+    FILE05a_RAP2_MUS,       // WAVE 6
+    FILE05b_RAP3_MUS,       // WAVE 7
+    FILE05c_RAP4_MUS,       // WAVE 8
+    FILE05e_RAP6_MUS        // WAVE 9
+};
+
+#define HANGTOSTORE    0
+#define HANGTOMISSION  1
+
+#define DEMO_DELAY ( 800 * 5 )
+
+int g_x, g_y, g_lx, g_ly;
+int diff_wrap[E_NUM_DIFF] = { 4, 9, 9, 9 };
+
+/***************************************************************************
+WIN_WinGame () - Window text for winners of a game
+ ***************************************************************************/
+void 
+WIN_WinGame(
+    int game               // INPUT : game number 0,1,2
+)
 {
-    int v1c;
-    int v30[4] = {
-        10, 11, 12, 9
+    int window;
+    int dtext[4] = {
+        FILE00a_END1_TXT, 
+        FILE00b_END2_TXT,
+        FILE00c_END3_TXT,
+        FILE009_END0_TXT
     };
-    if (a1 > 3)
+    
+    if (game > 3)
         return;
 
     GFX_FadeOut(0, 0, 0, 2);
-    v1c = SWD_InitWindow(FILE13e_WINGAME_SWD);
-    SWD_SetFieldItem(v1c, 2, v30[a1]);
+    
+    window = SWD_InitWindow(FILE13e_WINGAME_SWD);
+    SWD_SetFieldItem(window, WIN_TEXT, dtext[game]);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
     GFX_FadeIn(palette, 16);
+    
     IMS_WaitTimed(30);
-    SWD_DestroyWindow(v1c);
+    
+    SWD_DestroyWindow(window);
     GFX_DisplayUpdate();
 }
 
-void WIN_Msg(const char *a1)
+/***************************************************************************
+WIN_Msg () - Display a Message for ten secs or until user Acks something
+ ***************************************************************************/
+void 
+WIN_Msg(
+    const char *msg        // INPUT : pointer to message to ask
+)
 {
-    int v1c;
+    int window;
 
-    v1c = SWD_InitWindow(FILE13a_MSG_SWD);
-    SWD_SetFieldText(v1c, 5, a1);
+    window = SWD_InitWindow(FILE13a_MSG_SWD);
+    
+    SWD_SetFieldText(window, INFO_MSG, msg);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
-    SND_Patch(20, 127);
+    
+    SND_Patch(FX_SWEP, 127);
+    
     IMS_WaitTimed(10);
-    SWD_DestroyWindow(v1c);
+    
+    SWD_DestroyWindow(window);
     GFX_DisplayUpdate();
     KBD_Clear();
 }
 
-void FUN_000233f8(wdlg_t *a1)
+/***************************************************************************
+WIN_OptDraw() -
+ ***************************************************************************/
+void 
+WIN_OptDraw(
+    wdlg_t *dlg
+)
 {
-    int v1c, v20, v24, v38;
-    if (!a1)
+    int x, y, lx, ly;
+    
+    if (!dlg)
         return;
-    SWD_GetFieldXYL(opt_window, 11, &v1c, &v20, &v24, &v38);
-    GFX_PutSprite((texture_t*)GLB_GetItem(FILE127_SLIDE_PIC), v1c + DAT_00061a78[0] - 2, v20);
-    SWD_GetFieldXYL(opt_window, 12, &v1c, &v20, &v24, &v38);
-    GFX_PutSprite((texture_t*)GLB_GetItem(FILE127_SLIDE_PIC), v1c + DAT_00061a78[1] - 2, v20);
+    
+    SWD_GetFieldXYL(opt_window, OPTS_VMUSIC, &x, &y, &lx, &ly);
+    GFX_PutSprite((texture_t*)GLB_GetItem(FILE127_SLIDE_PIC), x + opt_vol[MUSIC_VOL] - 2, y);
+    
+    SWD_GetFieldXYL(opt_window, OPTS_VFX, &x, &y, &lx, &ly);
+    GFX_PutSprite((texture_t*)GLB_GetItem(FILE127_SLIDE_PIC), x + opt_vol[FX_VOL] - 2, y);
 }
 
-void WIN_Opts(void)
+/***************************************************************************
+WIN_Opts() - Sets Game Options
+ ***************************************************************************/
+void 
+WIN_Opts(
+    void
+)
 {
-    wdlg_t vb0;
-    int v1c, v20, v24, v3c;
-    int v34, v38, v30, v2c;
-    int v28;
-    int v48[3] = {
-        3, 4, 5
+    wdlg_t dlg;
+    int x, y, lx, ly;
+    int kbactive, patchflag, curd, cur_field;
+    int new_vol;
+    int fpics[3] = {
+        OPTS_PIC1, OPTS_PIC2, OPTS_PIC3
     };
-    char v68[2][16] = {
+    char detail[2][16] = {
         "LOW DETAIL",
         "HIGH DETAIL"
     };
 
-    v34 = 0;
-    v38 = 0;
-    v30 = opt_detail;
-    v2c = 0;
+    kbactive = 0;
+    patchflag = 0;
+    curd = opt_detail;
+    cur_field = 0;
 
-    DAT_00061a78[0] = music_volume;
-    DAT_00061a78[1] = fx_volume;
+    opt_vol[MUSIC_VOL] = music_volume;
+    opt_vol[FX_VOL] = fx_volume;
+    
     opt_window = SWD_InitWindow(FILE13f_OPTS_SWD);
+    
     SWD_SetWindowPtr(opt_window);
-    SWD_SetFieldText(opt_window, 6, v68[v30]);
-    SWD_SetWinDrawFunc(opt_window, FUN_000233f8);
-    SWD_SetFieldItem(opt_window, 3, -1);
-    SWD_SetFieldItem(opt_window, 4, -1);
-    SWD_SetFieldItem(opt_window, 5, -1);
+    SWD_SetFieldText(opt_window, OPTS_DETAIL, detail[curd]);
+    SWD_SetWinDrawFunc(opt_window, WIN_OptDraw);
+    
+    SWD_SetFieldItem(opt_window, OPTS_PIC1, -1);
+    SWD_SetFieldItem(opt_window, OPTS_PIC2, -1);
+    SWD_SetFieldItem(opt_window, OPTS_PIC3, -1);
+    
     SWD_ShowAllWindows();
-    SND_Patch(20, 127);
+    
+    SND_Patch(FX_SWEP, 127);
     GFX_DisplayUpdate();
 
     while (1)
     {
-        v38 = 0;
-        SWD_Dialog(&vb0);
+        patchflag = 0;
+        SWD_Dialog(&dlg);
 
         if (joy_ipt_MenuNew)
         {
-            if (StickY > 0)                                                   //Controller Input WIN_Opts
+            if (StickY > 0 || Down)                                                   //Controller Input WIN_Opts
             {
                 if (JOY_IsScroll(0) == 1)
-                    vb0.keypress = 80;
+                    dlg.keypress = SC_DOWN;
             }
-            if (StickY < 0)
+            
+            if (StickY < 0 || Up)
             {
                 if (JOY_IsScroll(0) == 1)
-                    vb0.keypress = 72;
+                    dlg.keypress = SC_UP;
             }
-            if (StickX > 0)
+            
+            if (StickX > 0 || Right)
             {
                 if (JOY_IsScroll(0) == 1)
-                    vb0.keypress = 77;
+                    dlg.keypress = SC_RIGHT;
             }
-            if (StickX < 0)
+            
+            if (StickX < 0 || Left)
             {
                 if (JOY_IsScroll(0) == 1)
-                    vb0.keypress = 75;
+                    dlg.keypress = SC_LEFT;
             }
-            if (Down)
-            {
-                if (JOY_IsScroll(0) == 1)
-                    vb0.keypress = 80;
-            }
-            if (Up)
-            {
-                if (JOY_IsScroll(0) == 1)
-                    vb0.keypress = 72;
-            }
-            if (Left)
-            {
-                if (JOY_IsScroll(0) == 1)
-                    vb0.keypress = 75;
-            }
-            if (Right)
-            {
-                if (JOY_IsScroll(0) == 1)
-                    vb0.keypress = 77;
-            }
+            
             if (Back)
             {
-                vb0.keypress = 1;
+                dlg.keypress = SC_ESC;
                 JOY_IsKey(Back);
             }
+            
             if (BButton)
             {
-                vb0.keypress = 1;
+                dlg.keypress = SC_ESC;
                 JOY_IsKey(BButton);
             }
+            
             if (AButton)
             {
-                vb0.keypress = 28;
+                dlg.keypress = SC_ENTER;
                 JOY_IsKey(AButton);
             }
         }
-        switch (vb0.keypress)
+        
+        switch (dlg.keypress)
         {
-        case 1:
-            vb0.cur_act = 1;
-            vb0.cur_cmd = 10;
-            vb0.field = 7;
+        case SC_ESC:
+            dlg.cur_act = S_FLD_COMMAND;
+            dlg.cur_cmd = F_SELECT;
+            dlg.field = OPTS_EXIT;
             break;
-        case 0x4b:
-            if (v2c)
+        
+        case SC_LEFT:
+            if (cur_field)
             {
-                if (v2c == 2)
-                    v38 = 1;
-                DAT_00061a78[v2c - 1] -= 8;
-                if (DAT_00061a78[v2c - 1] < 0)
-                    DAT_00061a78[v2c - 1] = 0;
+                if (cur_field == 2)
+                    patchflag = 1;
+                opt_vol[cur_field - 1] -= 8;
+                if (opt_vol[cur_field - 1] < 0)
+                    opt_vol[cur_field - 1] = 0;
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
             }
             break;
-        case 0x4d:
-            if (v2c)
+        
+        case SC_RIGHT:
+            if (cur_field)
             {
-                if (v2c == 2)
-                    v38 = 1;
-                DAT_00061a78[v2c - 1] += 8;
-                if (DAT_00061a78[v2c - 1] > 127)
-                    DAT_00061a78[v2c - 1] = 127;
+                if (cur_field == 2)
+                    patchflag = 1;
+                opt_vol[cur_field - 1] += 8;
+                if (opt_vol[cur_field - 1] > 127)
+                    opt_vol[cur_field - 1] = 127;
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
             }
             break;
-        case 0x48:
-            if (v34 && v2c > 0)
-                v2c--;
-            v34 = 1;
-            SND_Patch(20, 127);
-            SWD_SetFieldItem(opt_window, 3, -1);
-            SWD_SetFieldItem(opt_window, 4, -1);
-            SWD_SetFieldItem(opt_window, 5, -1);
-            SWD_SetFieldItem(opt_window, v48[v2c], FILE128_POINT_PIC);
+        
+        case SC_UP:
+            if (kbactive && cur_field > 0)
+                cur_field--;
+            kbactive = 1;
+            SND_Patch(FX_SWEP, 127);
+            SWD_SetFieldItem(opt_window, OPTS_PIC1, -1);
+            SWD_SetFieldItem(opt_window, OPTS_PIC2, -1);
+            SWD_SetFieldItem(opt_window, OPTS_PIC3, -1);
+            SWD_SetFieldItem(opt_window, fpics[cur_field], FILE128_POINT_PIC);
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
             break;
-        case 0x50:
-            if (v34 && v2c < 2)
-                v2c++;
-            v34 = 1;
-            SND_Patch(20, 127);
-            SWD_SetFieldItem(opt_window, 3, -1);
-            SWD_SetFieldItem(opt_window, 4, -1);
-            SWD_SetFieldItem(opt_window, 5, -1);
-            SWD_SetFieldItem(opt_window, v48[v2c], FILE128_POINT_PIC);
+        
+        case SC_DOWN:
+            if (kbactive && cur_field < 2)
+                cur_field++;
+            kbactive = 1;
+            SND_Patch(FX_SWEP, 127);
+            SWD_SetFieldItem(opt_window, OPTS_PIC1, -1);
+            SWD_SetFieldItem(opt_window, OPTS_PIC2, -1);
+            SWD_SetFieldItem(opt_window, OPTS_PIC3, -1);
+            SWD_SetFieldItem(opt_window, fpics[cur_field], FILE128_POINT_PIC);
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
             break;
-        case 0x1c:
-            if (!v2c)
+        
+        case SC_ENTER:
+            if (!cur_field)
             {
-                vb0.cur_act = 1;
-                vb0.cur_cmd = 10;
-                vb0.field = 6;
+                dlg.cur_act = S_FLD_COMMAND;
+                dlg.cur_cmd = F_SELECT;
+                dlg.field = OPTS_DETAIL;
             }
             break;
         }
-        if (vb0.viewactive)
+        
+        if (dlg.viewactive)
         {
-            switch (vb0.sfield)
+            switch (dlg.sfield)
             {
-            case 11:
+            case OPTS_VMUSIC:
                 if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                  //Fixed ptr input
                 {
                     while (!IMS_IsAck())
                     {
                     }
-                    SWD_GetFieldXYL(opt_window, 11, &v1c, &v20, &v24, &v3c);
-                    v28 = cur_mx- v1c;
-                    if (v28 < 0)
-                        v28 = 0;
-                    if (v28 > 127)
-                        v28 = 127;
-                    DAT_00061a78[0] = v28;
+                    SWD_GetFieldXYL(opt_window, OPTS_VMUSIC, &x, &y, &lx, &ly);
+                    new_vol = cur_mx - x;
+                    if (new_vol < 0)
+                        new_vol = 0;
+                    if (new_vol > 127)
+                        new_vol = 127;
+                    opt_vol[MUSIC_VOL] = new_vol;
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
                 break;
-            case 12:
+            
+            case OPTS_VFX:
                 if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                 //Fixed ptr input
                 {
                     while (!IMS_IsAck())
                     {
                     }
-                    SWD_GetFieldXYL(opt_window, 12, &v1c, &v20, &v24, &v3c);
-                    v28 = cur_mx - v1c;
-                    if (v28 < 0)
-                        v28 = 0;
-                    if (v28 > 127)
-                        v28 = 127;
-                    DAT_00061a78[1] = v28;
+                    SWD_GetFieldXYL(opt_window, OPTS_VFX, &x, &y, &lx, &ly);
+                    new_vol = cur_mx - x;
+                    if (new_vol < 0)
+                        new_vol = 0;
+                    if (new_vol > 127)
+                        new_vol = 127;
+                    opt_vol[FX_VOL] = new_vol;
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
                 break;
             }
         }
-        opt_detail = v30;
-        if (fx_volume != DAT_00061a78[1])
-            fx_volume = DAT_00061a78[1];
-        if (music_volume != DAT_00061a78[0])
+        
+        opt_detail = curd;
+        
+        if (fx_volume != opt_vol[FX_VOL])
+            fx_volume = opt_vol[FX_VOL];
+        
+        if (music_volume != opt_vol[MUSIC_VOL])
         {
-            music_volume = DAT_00061a78[0];
+            music_volume = opt_vol[MUSIC_VOL];
             MUS_SetVolume(music_volume);
         }
-        if (vb0.cur_act == 1 && vb0.cur_cmd == 10)
+        
+        if (dlg.cur_act == S_FLD_COMMAND && dlg.cur_cmd == F_SELECT)
         {
-            switch (vb0.field)
+            switch (dlg.field)
             {
-            case 7:
-                if (DAT_00061a78[0] >= 0 && DAT_00061a78[0] < 128)
+            case OPTS_EXIT:
+                if (opt_vol[MUSIC_VOL] >= 0 && opt_vol[MUSIC_VOL] < 128)
                 {
-                    music_volume = DAT_00061a78[0];
+                    music_volume = opt_vol[MUSIC_VOL];
                     INI_PutPreferenceLong("Music", "Volume", music_volume);
                 }
-                if (DAT_00061a78[1] >= 0 && DAT_00061a78[1] < 128)
+                if (opt_vol[FX_VOL] >= 0 && opt_vol[FX_VOL] < 128)
                 {
-                    fx_volume = DAT_00061a78[1];
+                    fx_volume = opt_vol[FX_VOL];
                     INI_PutPreferenceLong("SoundFX", "Volume", fx_volume);
                 }
                 INI_PutPreferenceLong("Setup", "Detail", opt_detail);
-                SND_Patch(20, 127);
-                goto LAB_00023a57;
-            case 6:
-                SND_Patch(20, 127);
-                v30 ^= 1;
-                SWD_SetFieldText(opt_window, 6, v68[v30]);
+                SND_Patch(FX_SWEP, 127);
+                goto exit_opts;
+            
+            case OPTS_DETAIL:
+                SND_Patch(FX_SWEP, 127);
+                curd ^= 1;
+                SWD_SetFieldText(opt_window, OPTS_DETAIL, detail[curd]);
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
                 break;
             }
         }
-        if (v38)
-            SND_Patch(20, 127);
+        
+        if (patchflag)
+            SND_Patch(FX_SWEP, 127);
     }
-LAB_00023a57:
+
+exit_opts:
+    
     SWD_SetWinDrawFunc(opt_window, NULL);
+    
     SWD_DestroyWindow(opt_window);
     GFX_DisplayUpdate();
     KBD_Clear();
+    
     return;
 }
 
@@ -558,13 +665,6 @@ LAB_00024094:
     GFX_DisplayUpdate();
     return v1c;
 }
-
-int sid_pics[4] = {
-    FILE116_WMALEID_PIC,
-    FILE119_BMALEID_PIC,
-    FILE117_WFMALEID_PIC,
-    FILE118_BFMALEID_PIC
-};
 
 int WIN_Register(void)
 {
@@ -1138,9 +1238,6 @@ LAB_00024b33:
     return v2c;
 }
 
-int g_x, g_y, g_lx, g_ly;
-int diff_wrap[4] = { 4, 9, 9, 9 };
-
 void WIN_LoadComp(void)
 {
     char v44[40];
@@ -1427,18 +1524,6 @@ void WIN_EndLoad(void)
     GFX_DisplayUpdate();
     GFX_SetPalette(palette, 0);
 }
-
-int songsg1[] = {
-    0x60,0x5a,0x5c,0x5f,0x5e,0x5a,0x5b,0x5c,0x5e
-};
-
-int songsg2[] = {
-    0x5b,0x5a,0x5c,0x60,0x5e,0x5a,0x60,0x59,0x5e
-};
-
-int songsg3[] = {
-    0x60,0x5c,0x59,0x5f,0x5e,0x5a,0x5b,0x5c,0x5e
-};
 
 void WIN_MainLoop(void)
 {
