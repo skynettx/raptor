@@ -230,7 +230,7 @@ WIN_Opts(
 
         if (joy_ipt_MenuNew)
         {
-            if (StickY > 0 || Down)                                                   //Controller Input WIN_Opts
+            if (StickY > 0 || Down)                                                   
             {
                 if (JOY_IsScroll(0) == 1)
                     dlg.keypress = SC_DOWN;
@@ -348,7 +348,7 @@ WIN_Opts(
             switch (dlg.sfield)
             {
             case OPTS_VMUSIC:
-                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                  //Fixed ptr input
+                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                  
                 {
                     while (!IMS_IsAck())
                     {
@@ -366,7 +366,7 @@ WIN_Opts(
                 break;
             
             case OPTS_VFX:
-                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                 //Fixed ptr input
+                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                 
                 {
                     while (!IMS_IsAck())
                     {
@@ -440,174 +440,242 @@ exit_opts:
     return;
 }
 
-void WIN_Pause(void)
+/***************************************************************************
+WIN_Pause () - Display a Pause Message Wait until user does something
+ ***************************************************************************/
+void 
+WIN_Pause(
+    void
+)
 {
-    int v1c;
+    int window;
 
-    v1c = SWD_InitWindow(FILE13a_MSG_SWD);
-    SWD_SetFieldText(v1c, 5, "GAME PAUSED");
+    window = SWD_InitWindow(FILE13a_MSG_SWD);
+    
+    SWD_SetFieldText(window, INFO_MSG, "GAME PAUSED");
+    
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
-    SND_Patch(20, 127);
-    while (!IMS_CheckAck())                                      //Pause Screen
+    
+    SND_Patch(FX_SWEP, 127);
+    
+    while (!IMS_CheckAck())                                      
     {
     }
-    SWD_DestroyWindow(v1c);
+    
+    SWD_DestroyWindow(window);
     GFX_DisplayUpdate();
+    
     JOY_Wait(0);
     KBD_Clear();
     IMS_StartAck();
 }
 
-void WIN_Order(void)
+/***************************************************************************
+WIN_Order () - Display a Pause Message Wait until user does something
+ ***************************************************************************/
+void 
+WIN_Order(
+    void
+)
 {
-    int v1c, v20;
+    int window, dchold;
 
-    v20 = g_drawcursor;
-    if (gameflag[1] == 0 && gameflag[2] + gameflag[3] == 0)
+    dchold = g_drawcursor;
+    
+    if (GAME2 == 0 && GAME3 == 0)
     {
         PTR_DrawCursor(0);
         KBD_Clear();
         GFX_FadeOut(0, 0, 0, 2);
-        v1c = SWD_InitWindow(FILE13b_ORDER_SWD);
+        
+        window = SWD_InitWindow(FILE13b_ORDER_SWD);
         SWD_ShowAllWindows();
         GFX_DisplayUpdate();
         GFX_FadeIn(palette, 16);
+        
         IMS_WaitTimed(15);
+        
         GFX_FadeOut(0, 0, 0, 16);
-        SWD_DestroyWindow(v1c);
+        SWD_DestroyWindow(window);
         memset(displaybuffer, 0, 64000);
         GFX_DisplayUpdate();
         GFX_SetPalette(palette, 0);
         KBD_Clear();
-        PTR_DrawCursor(v20);
+        
+        PTR_DrawCursor(dchold);
     }
 }
 
-int WIN_Credits(void)
+/***************************************************************************
+WIN_Credits () -
+ ***************************************************************************/
+int 
+WIN_Credits(
+    void
+)
 {
-    int v20, v1c;
-    static int songid = 1;
-    int songs[3] = {
-        83, 84, 85
+    int window, rval;
+    static int cnt = 1;
+    int csng[3] = {
+        FILE053_BOSS2_MUS, 
+        FILE054_BOSS3_MUS, 
+        FILE055_BOSS4_MUS
     };
-    songid++;
-    if (songid >= 3)
-        songid = 0;
-    SND_PlaySong(songs[songid], 1, 1);
+    
+    cnt++;
+    
+    if (cnt >= 3)
+        cnt = 0;
+    
+    SND_PlaySong(csng[cnt], 1, 1);
+    
     KBD_Clear();
     GFX_FadeOut(0, 0, 0, 16);
-    v20 = SWD_InitWindow(FILE13c_CREDIT_SWD);
+    
+    window = SWD_InitWindow(FILE13c_CREDIT_SWD);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
     GFX_FadeIn(palette, 16);
-    v1c = IMS_WaitTimed(25);
+    
+    rval = IMS_WaitTimed(25);
+    
     GFX_FadeOut(0, 0, 0, 16);
-    SWD_DestroyWindow(v20);
+    SWD_DestroyWindow(window);
     memset(displaybuffer, 0, 64000);
     memset(displayscreen, 0, 64000);
     GFX_SetPalette(palette, 0);
     KBD_Clear();
-    return v1c;
+    
+    return rval;
 }
 
-int WIN_AskBool(const char *a1)
+/***************************************************************************
+   WIN_AskBool () - Askes USER a YES/NO Question????
+ ***************************************************************************/
+int                        // RETURN: TRUE/FALSE
+WIN_AskBool(
+    const char *question   // INPUT : pointer to message to ask
+)
 {
-    int v1c;
-    int v40;
-    int v24;
-    int v30, v34, v20, v3c;
-    wdlg_t v8c;
+    int rval;
+    int dchold;
+    int ask_window;
+    int px, py, lx, ly;
+    wdlg_t dlg;
 
-    v1c = 0;
-    v40 = g_drawcursor;
+    rval = 0;
+    dchold = g_drawcursor;
+    
     KBD_Clear();
-    v24 = SWD_InitWindow(FILE135_ASK_SWD);
-    SWD_SetFieldText(v24, 5, a1);
-    SWD_SetActiveField(v24, 6);
+    ask_window = SWD_InitWindow(FILE135_ASK_SWD);
+    
+    SWD_SetFieldText(ask_window, ASK_DRAGBAR, question);
+    SWD_SetActiveField(ask_window, ASK_YES);
+    
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
-    SND_Patch(20, 127);
+    
+    SND_Patch(FX_SWEP, 127);
+    
     PTR_DrawCursor(1);
-    SWD_GetFieldXYL(v24, 6, &v30, &v34, &v20, &v3c);
-    PTR_SetPos(v30 + (v20 >> 1), v34 + (v3c >> 1));
-    SWD_SetActiveField(v24, 6);
+    
+    SWD_GetFieldXYL(ask_window, ASK_YES, &px, &py, &lx, &ly);
+    PTR_SetPos(px + (lx >> 1), py + (ly >> 1));
+    
+    SWD_SetActiveField(ask_window, ASK_YES);
 
     while (1)
     {
-        SWD_Dialog(&v8c);
-        if (KBD_IsKey(1) || JOY_IsKeyInGameBack(Back))                                                   //Fixed Line Gamepad Abort Mission Screen
+        SWD_Dialog(&dlg);
+        
+        if (KBD_IsKey(SC_ESC) || JOY_IsKeyInGameBack(Back))                                                   //Fixed Line Gamepad Abort Mission Screen
         {
-            v8c.cur_act = 1;
-            v8c.cur_cmd = 10;
-            v8c.field = 7;
+            dlg.cur_act = S_FLD_COMMAND;
+            dlg.cur_cmd = F_SELECT;
+            dlg.field = ASK_NO;
         }
-        if (v8c.cur_act == 1 && v8c.cur_cmd == 10)
+        
+        if (dlg.cur_act == S_FLD_COMMAND && dlg.cur_cmd == F_SELECT)
         {
-            switch (v8c.field)
+            switch (dlg.field)
             {
-            case 6:
-                v1c = 1;
+            case ASK_YES:
+                rval = 1;
                 [[fallthrough]];
-            case 7:
-                SWD_DestroyWindow(v24);
+            case ASK_NO:
+                SWD_DestroyWindow(ask_window);
                 GFX_DisplayUpdate();
-                PTR_DrawCursor(v40);
-                return v1c;
+                PTR_DrawCursor(dchold);
+                return rval;
             }
         }
     }
+    
     return 0;
 }
 
-void WIN_AskExit(void)
+/***************************************************************************
+WIN_AskExit () - Opens Windows and Askes if User wants 2 quit
+ ***************************************************************************/
+void 
+WIN_AskExit(
+    void
+)
 {
     if (WIN_AskBool("EXIT TO DOS"))
     {
         SND_FadeOutSong();
+        
         switch (bday_num)
         {
         case 0:
-            SND_Patch(3, 127);
-            while (SND_IsPatchPlaying(2))
+            SND_Patch(FX_MON3, 127);
+            while (SND_IsPatchPlaying(FX_MON2))
             {
             }
             break;
+        
         case 1:
-            SND_Patch(7, 127);
-            while (SND_IsPatchPlaying(7))
+            SND_Patch(FX_DAVE, 127);
+            while (SND_IsPatchPlaying(FX_DAVE))
             {
             }
             break;
+        
         case 2:
-            SND_Patch(4, 127);
-            while (SND_IsPatchPlaying(4))
+            SND_Patch(FX_MON4, 127);
+            while (SND_IsPatchPlaying(FX_MON4))
             {
             }
             break;
+        
         case 3:
-            SND_Patch(1, 127);
-            while (SND_IsPatchPlaying(1))
+            SND_Patch(FX_MON1, 127);
+            while (SND_IsPatchPlaying(FX_MON1))
             {
             }
             break;
+        
         case 4:
-            SND_Patch(2, 127);
-            while (SND_IsPatchPlaying(2))
+            SND_Patch(FX_MON2, 127);
+            while (SND_IsPatchPlaying(FX_MON2))
             {
             }
-            SND_Patch(2, 127);
-            while (SND_IsPatchPlaying(2))
+            SND_Patch(FX_MON2, 127);
+            while (SND_IsPatchPlaying(FX_MON2))
             {
             }
             break;
+        
         case 5:
-            SND_Patch(6, 127);
-            while (SND_IsPatchPlaying(6))
+            SND_Patch(FX_MON6, 127);
+            while (SND_IsPatchPlaying(FX_MON6))
             {
             }
             break;
         }
+        
         retraceflag = 1;
         GFX_FadeOut(60, 15, 2, 32);
         GFX_FadeOut(0, 0, 0, 6);
@@ -616,54 +684,73 @@ void WIN_AskExit(void)
     }
 }
 
-int WIN_AskDiff(void)
+/***************************************************************************
+WIN_AskDiff () - Select Difficulty Window
+ ***************************************************************************/
+int                         // RETURN -1=ABORT 0=EASY, 1=MED, 2=HARD
+WIN_AskDiff(
+    void
+)
 {
-    wdlg_t v7c;
-    int v1c, v24;
-    int v28, v2c, v20, v30;
+    wdlg_t dlg;
+    int rval, ask_window;
+    int px, py, lx, ly;
 
-    v1c = -1;
+    rval = -1;
+    
     KBD_Clear();
-    v24 = SWD_InitWindow(FILE13d_ASKDIFF_SWD);
-    SWD_SetActiveField(v24, 8);
+    ask_window = SWD_InitWindow(FILE13d_ASKDIFF_SWD);
+    SWD_SetActiveField(ask_window, OKREG_MED);
+    
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
-    SWD_GetFieldXYL(v24, 8, &v28, &v2c, &v20, &v30);
-    PTR_SetPos(v28 + (v20 >> 1), v2c + (v30 >> 1));
+    
+    SWD_GetFieldXYL(ask_window, OKREG_MED, &px, &py, &lx, &ly);
+    PTR_SetPos(px + (lx >> 1), py + (ly >> 1));
+    
     while (1)
     {
-        SWD_Dialog(&v7c);
-        if (KBD_IsKey(1) || Back || BButton)                                                      //Fixed Line Gamepad Difficulty Menü
+        SWD_Dialog(&dlg);
+        
+        if (KBD_IsKey(SC_ESC) || Back || BButton)                                                      
         {
-            v1c = -1;
-            goto LAB_00024094;
+            rval = -1;
+            goto askdiff_exit;
         }
-        if (v7c.cur_act == 1 && v7c.cur_cmd == 10)
+        
+        if (dlg.cur_act == S_FLD_COMMAND && dlg.cur_cmd == F_SELECT)
         {
-            switch (v7c.field)
+            switch (dlg.field)
             {
-            case 6:
-                v1c = 0;
+            case OKREG_TRAIN:
+                rval = DIFF_0;
                 WIN_Msg("TRAIN MODE plays 4 of 9 levels!");
-                goto LAB_00024094;
-            case 7:
-                v1c = 1;
-                goto LAB_00024094;
-            case 8:
-                v1c = 2;
-                goto LAB_00024094;
-            case 9:
-                v1c = 3;
-                goto LAB_00024094;
-            case 10:
-                goto LAB_00024094;
+                goto askdiff_exit;
+            
+            case OKREG_EASY:
+                rval = DIFF_1;
+                goto askdiff_exit;
+            
+            case OKREG_MED:
+                rval = DIFF_2;
+                goto askdiff_exit;
+            
+            case OKREG_HARD:
+                rval = DIFF_3;
+                goto askdiff_exit;
+            
+            case OKREG_ABORT:
+                goto askdiff_exit;
             }
         }
     }
-LAB_00024094:
-    SWD_DestroyWindow(v24);
+
+askdiff_exit:
+
+    SWD_DestroyWindow(ask_window);
     GFX_DisplayUpdate();
-    return v1c;
+
+    return rval;
 }
 
 int WIN_Register(void)
