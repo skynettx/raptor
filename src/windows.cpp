@@ -472,7 +472,7 @@ WIN_Pause(
 }
 
 /***************************************************************************
-WIN_Order () - Display a Pause Message Wait until user does something
+WIN_Order () - Order Window
  ***************************************************************************/
 void 
 WIN_Order(
@@ -508,7 +508,7 @@ WIN_Order(
 }
 
 /***************************************************************************
-WIN_Credits () -
+WIN_Credits () - Credits Window
  ***************************************************************************/
 int 
 WIN_Credits(
@@ -589,7 +589,7 @@ WIN_AskBool(
     {
         SWD_Dialog(&dlg);
         
-        if (KBD_IsKey(SC_ESC) || JOY_IsKeyInGameBack(Back))                                                   //Fixed Line Gamepad Abort Mission Screen
+        if (KBD_IsKey(SC_ESC) || JOY_IsKeyInGameBack(Back))                                                   
         {
             dlg.cur_act = S_FLD_COMMAND;
             dlg.cur_cmd = F_SELECT;
@@ -685,9 +685,9 @@ WIN_AskExit(
 }
 
 /***************************************************************************
-WIN_AskDiff () - Select Difficulty Window
+WIN_AskDiff () - Difficulty Window
  ***************************************************************************/
-int                         // RETURN -1=ABORT 0=EASY, 1=MED, 2=HARD
+int                         // RETURN -1=ABORT 0=TRAIN, 1=EASY, 2=MED, 3=HARD
 WIN_AskDiff(
     void
 )
@@ -753,270 +753,310 @@ askdiff_exit:
     return rval;
 }
 
-int WIN_Register(void)
+/***************************************************************************
+WIN_Register () - Register Window
+ ***************************************************************************/
+int 
+WIN_Register(
+    void
+)
 {
-    wdlg_t v80;
-    int v28, v2c, v1c, v20, v24, v30, v38;
-    player_t vd8;
+    wdlg_t dlg;
+    int cur_id, opt, oldopt, rval, window, diff, loop;
+    player_t tp;
 
-    v28 = 0;
-    v2c = -1;
-    v1c = -99;
-    v20 = 0;
+    cur_id = 0;
+    opt = -1;
+    oldopt = -99;
+    rval = 0;
 
     PTR_DrawCursor(0);
 
-    SND_PlaySong(88, 1, 1);
+    SND_PlaySong(FILE058_HANGAR_MUS, 1, 1);
+    
     KBD_Clear();
     GFX_FadeOut(0, 0, 0, 2);
-    memset(&vd8, 0, sizeof(vd8));
-    vd8.sweapon = -1;
-    vd8.diff[0] = 2;
-    vd8.diff[1] = 2;
-    vd8.diff[2] = 2;
-    vd8.diff[3] = 2;
-    vd8.id_pic = 0;
-    v24 = SWD_InitWindow(FILE137_REGISTER_SWD);
-    SWD_SetFieldItem(v24, 0, sid_pics[vd8.id_pic]);
-    SWD_SetActiveField(v24, 1);
+    
+    memset(&tp, 0, sizeof(tp));
+    tp.sweapon = -1;
+    tp.diff[0] = DIFF_2;
+    tp.diff[1] = DIFF_2;
+    tp.diff[2] = DIFF_2;
+    tp.diff[3] = DIFF_2;
+    tp.id_pic = 0;
+    
+    window = SWD_InitWindow(FILE137_REGISTER_SWD);
+    SWD_SetFieldItem(window, REG_IDPIC, sid_pics[tp.id_pic]);
+    SWD_SetActiveField(window, REG_NAME);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
+    
     GFX_FadeIn(palette, 16);
-    SWD_SetFieldPtr(v24, 5);
+    
+    SWD_SetFieldPtr(window, REG_VIEWID);
     PTR_DrawCursor(1);
+    
     while (1)
     {
-        SWD_Dialog(&v80);
+        SWD_Dialog(&dlg);
 
-        if (joy_ipt_MenuNew)                                                               //Controller Input WIN_Register
+        if (joy_ipt_MenuNew)                                                               
         {
             if (LeftShoulder)                                           
             {
                 JOY_IsKey(LeftShoulder);
-                v80.keypress = 29;
+                dlg.keypress = SC_CTRL;
             }
+            
             if (RightShoulder)
             {
                 JOY_IsKey(RightShoulder);
-                v80.keypress = 59;
+                dlg.keypress = SC_F1;
             }
         }
-        if (keyboard[1] || Back || BButton)
+        
+        if (keyboard[SC_ESC] || Back || BButton)
         {
-            v20 = 0;
+            rval = 0;
             fi_joy_count = 0;
             fi_sec_field = false;
-            goto LAB_000244ea;
+            goto reg_exit;
         }
-        if (keyboard[45] && keyboard[56])
+        
+        if (keyboard[SC_X] && keyboard[SC_ALT])
             WIN_AskExit();
 
-
-        switch (v80.keypress)
+        switch (dlg.keypress)
         {
-        case 0x3b:
+        case SC_F1:
             HELP_Win("NEWPLAY1_TXT");
             break;
-        case 0x38:
-        case 0x1d:
-            v28++;
-            v28 %= 4;
-            SWD_SetFieldItem(v24, 0, sid_pics[v28]);
-            vd8.id_pic = v28;
+        
+        case SC_ALT:
+        case SC_CTRL:
+            cur_id++;
+            cur_id %= 4;
+            SWD_SetFieldItem(window, REG_IDPIC, sid_pics[cur_id]);
+            tp.id_pic = cur_id;
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
             break;
         }
-        if (v80.viewactive)
+        
+        if (dlg.viewactive)
         {
-            switch (v80.sfield)
+            switch (dlg.sfield)
             {
-            case 4:
-                v2c = v80.sfield;
-                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                       //Fixed ptr input
+            case REG_VIEWEXIT:
+                opt = dlg.sfield;
+                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                       
                 {
                     while (IMS_IsAck())
                     {
                     }
-                    if (RAP_IsSaveFile(&vd8))
+                    if (RAP_IsSaveFile(&tp))
                         WIN_Msg("Pilot NAME and CALLSIGN Used !");
                     else
                     {
-                        v20 = 1;
-                        goto LAB_000244ea;
+                        rval = 1;
+                        goto reg_exit;
                     }
                 }
-                if (v2c != v1c)
+                if (opt != oldopt)
                 {
-                    SWD_SetFieldText(v24, 3, regtext[2]);
+                    SWD_SetFieldText(window, REG_TEXT, regtext[2]);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
-                    v1c = v2c;
+                    oldopt = opt;
                 }
                 break;
-            case 5:
-                v2c = v80.sfield;
-                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                     //Fixed ptr input
+            
+            case REG_VIEWID:
+                opt = dlg.sfield;
+                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                     
                 {
                     while (IMS_IsAck())
                     {
                     }
-                    v28++;
-                    v28 %= 4;
-                    SWD_SetFieldItem(v24, 0, sid_pics[v28]);
-                    vd8.id_pic = v28;
+                    cur_id++;
+                    cur_id %= 4;
+                    SWD_SetFieldItem(window, REG_IDPIC, sid_pics[cur_id]);
+                    tp.id_pic = cur_id;
                 }
-                SWD_SetFieldText(v24, 3, regtext[1]);
+                SWD_SetFieldText(window, REG_TEXT, regtext[1]);
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
-                v1c = v2c;
+                oldopt = opt;
                 break;
-            case 6:
-                v2c = v80.sfield;
-                if (v2c != v1c)
+            
+            case REG_VIEWREG:
+                opt = dlg.sfield;
+                if (opt != oldopt)
                 {
-                    SWD_SetFieldText(v24, 3, regtext[0]);
+                    SWD_SetFieldText(window, REG_TEXT, regtext[0]);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
-                    v1c = v2c;
+                    oldopt = opt;
                 }
                 break;
             }
         }
         else
         {
-            v2c = -1;
-            if (v2c != v1c)
+            opt = -1;
+            
+            if (opt != oldopt)
             {
-                SWD_SetFieldText(v24, 3, " ");
+                SWD_SetFieldText(window, REG_TEXT, " ");
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
-                v1c = v2c;
+                oldopt = opt;
             }
         }
-        if (v80.cur_act == 1 && v80.cur_cmd == 10)
+        
+        if (dlg.cur_act == S_FLD_COMMAND && dlg.cur_cmd == F_SELECT)
         {
-            switch (v80.field)
+            switch (dlg.field)
             {
-            case 1:
-                SWD_GetFieldText(v24, 1, vd8.name);
-                if (strlen(vd8.name) != 0 && v80.keypress == 0x1c)
+            case REG_NAME:
+                SWD_GetFieldText(window, REG_NAME, tp.name);
+                if (strlen(tp.name) != 0 && dlg.keypress == SC_ENTER)
                 {
                     fi_sec_field = true;
-                    SWD_SetActiveField(v24, 2);
+                    SWD_SetActiveField(window, REG_CALLSIGN);
                 }
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
                 break;
-            case 2:
-                SWD_GetFieldText(v24, 2, vd8.callsign);
-                SWD_GetFieldText(v24, 2, vd8.name);
-                if (!strlen(vd8.name))
+            
+            case REG_CALLSIGN:
+                SWD_GetFieldText(window, REG_CALLSIGN, tp.callsign);
+                SWD_GetFieldText(window, REG_CALLSIGN, tp.name);
+                if (!strlen(tp.name))
                 {
                     fi_sec_field = false;
-                    SWD_SetActiveField(v24, 1);
+                    SWD_SetActiveField(window, REG_NAME);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
-                else if (!strlen(vd8.callsign))
+                else if (!strlen(tp.callsign))
                 {
-                    SWD_SetActiveField(v24, 2);
+                    SWD_SetActiveField(window, REG_CALLSIGN);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
-                else if (v80.keypress == 0x1c || keyboard[28])
+                else if (dlg.keypress == SC_ENTER || keyboard[SC_ENTER])
                 {
-                    if (RAP_IsSaveFile(&vd8))
+                    if (RAP_IsSaveFile(&tp))
                         WIN_Msg("Pilot NAME and CALLSIGN Used !");
                     else
                     {
                         fi_sec_field = false;
-                        v20 = 1;
-                        goto LAB_000244ea;
+                        rval = 1;
+                        goto reg_exit;
                     }
                 }
                 break;
             }
         }
     }
-LAB_000244ea:
-    SWD_GetFieldText(v24, 1, vd8.name);
-    SWD_GetFieldText(v24, 2, vd8.callsign);
-    if (!strlen(vd8.name))
+
+reg_exit:
+    
+    SWD_GetFieldText(window, REG_NAME, tp.name);
+    SWD_GetFieldText(window, REG_CALLSIGN, tp.callsign);
+    
+    if (!strlen(tp.name))
     {
-        SWD_SetActiveField(v24, 1);
-        v20 = 0;
+        SWD_SetActiveField(window, REG_NAME);
+        rval = 0;
     }
-    if (!strlen(vd8.callsign))
+    
+    if (!strlen(tp.callsign))
     {
-        SWD_SetActiveField(v24, 2);
-        v20 = 0;
+        SWD_SetActiveField(window, REG_CALLSIGN);
+        rval = 0;
     }
-    v30 = 1;
-    if (v20)
+    
+    diff = 1;
+    
+    if (rval)
     {
-        v30 = WIN_AskDiff();
-        if (v30 >= 0)
+        diff = WIN_AskDiff();
+        
+        if (diff >= 0)
         {
             ingameflag = 0;
+            
             if (!RAP_FFSaveFile())
             {
                 WIN_Msg("ERROR : YOU MUST DELETE A PILOT");
-                v20 = 0;
+                rval = 0;
             }
         }
         else
         {
             WIN_Msg("PLAYER ABORTED!");
-            v20 = 0;
+            rval = 0;
         }
     }
-    if (v20)
+    
+    if (rval)
     {
         ingameflag = 0;
-        vd8.diff[0] = v30;
-        vd8.diff[1] = v30;
-        vd8.diff[2] = v30;
-        if (v30 == 0)
+        tp.diff[0] = diff;
+        tp.diff[1] = diff;
+        tp.diff[2] = diff;
+        
+        if (diff == DIFF_0)
         {
-            vd8.trainflag = 1;
-            vd8.fintrain = 0;
+            tp.trainflag = 1;
+            tp.fintrain = 0;
         }
         else
         {
-            vd8.trainflag = 0;
-            vd8.fintrain = 1;
+            tp.trainflag = 0;
+            tp.fintrain = 1;
         }
-        memcpy(&plr, &vd8, sizeof(player_t));
+        
+        memcpy(&plr, &tp, sizeof(player_t));
         RAP_SetPlayerDiff();
-        OBJS_Add(0);
-        OBJS_Add(16);
-        OBJS_Add(16);
-        OBJS_Add(16);
+        OBJS_Add(S_FORWARD_GUNS);
+        OBJS_Add(S_ENERGY);
+        OBJS_Add(S_ENERGY);
+        OBJS_Add(S_ENERGY);
         plr.score = 10000;
+        
         if (godmode)
         {
-            plr.score += 0xd5fff;
-            OBJS_Add(11);
-            OBJS_Add(11);
-            OBJS_Add(11);
-            OBJS_Add(11);
-            OBJS_Add(17);
-            for (v38 = 1; v38 < 16; v38++)
-                OBJS_Add(v38);
+            plr.score += 876543;
+            OBJS_Add(S_MEGA_BOMB);
+            OBJS_Add(S_MEGA_BOMB);
+            OBJS_Add(S_MEGA_BOMB);
+            OBJS_Add(S_MEGA_BOMB);
+            OBJS_Add(S_DETECT);
+            
+            for (loop = 1; loop < S_ENERGY; loop++)
+                OBJS_Add(loop);
         }
+        
         OBJS_GetNext();
     }
+    
     PTR_DrawCursor(0);
     GFX_FadeOut(0, 0, 0, 16);
-    SWD_DestroyWindow(v24);
+    SWD_DestroyWindow(window);
     memset(displaybuffer, 0, 64000);
+    
     GFX_DisplayUpdate();
     GFX_SetPalette(palette, 0);
-    hangto = 0;
-    if (v20)
+    
+    hangto = HANGTOSTORE;
+    
+    if (rval)
         ingameflag = 0;
-    return v20;
+    
+    return rval;
 }
 
 int WIN_Hangar(void)
