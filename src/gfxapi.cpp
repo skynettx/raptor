@@ -35,7 +35,6 @@ static int timer_init = 0;
 int retraceflag = 1;
 int fontspacing = 1;
 
-
 int G3D_x;                        // input: x position
 int G3D_y;                        // input: y position
 int G3D_z;                        // input: z position

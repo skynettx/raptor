@@ -1059,310 +1059,339 @@ reg_exit:
     return rval;
 }
 
-int WIN_Hangar(void)
+/***************************************************************************
+WIN_Hangar() - Does the hangar
+ ***************************************************************************/
+int 
+WIN_Hangar(
+    void
+)
 {
-    char v88[44];
-    wdlg_t vd0;
-    int v2c, v30, v34, v38, v3c, v40, v28;
-    int v1c, v20, v48, v24;
-    int v5c[4] = {
-        2, 3, 4, 5
+    char temp[44];
+    wdlg_t dlg;
+    int opt, oldopt, pos, kflag, local_cnt, pic_cnt, window;
+    int x, y, lx, ly;
+    int poslookup[4] = {
+        HANG_MISSION, 
+        HANG_SUPPLIES, 
+        HANG_MAIN_MENU, 
+        HANG_QSAVE
     };
-    v2c = 3;
-    v30 = -1;
-    v34 = 0;
-    v38 = 0;
-    v3c = GFX_GetFrameCount();
-    v40 = 0;
+    opt = HANG_SUPPLIES;
+    oldopt = -1;
+    pos = 0;
+    kflag = 0;
+    local_cnt = GFX_GetFrameCount();
+    pic_cnt = 0;
+    
     PTR_DrawCursor(0);
+    
     KBD_Clear();
 
     if (plr.trainflag)
     {
         plr.trainflag = 0;
-        v2c = 3;
+        opt = HANG_SUPPLIES;
     }
     else
     {
         GFX_FadeOut(0, 0, 0, 2);
-        v28 = SWD_InitMasterWindow(FILE134_HANGAR_SWD);
-        SWD_GetFieldItem(v28, 0);
-        SND_PlaySong(88, 1, 1);
+        
+        window = SWD_InitMasterWindow(FILE134_HANGAR_SWD);
+        
+        SWD_GetFieldItem(window, HANG_PIC);
+        
+        SND_PlaySong(FILE058_HANGAR_MUS, 1, 1);
+        
         SWD_ShowAllWindows();
         GFX_DisplayUpdate();
+        
         GFX_FadeIn(palette, 16);
-        if (control != 1)
-            v38 = 1;
+        
+        if (control != I_MOUSE)
+            kflag = 1;
+        
         switch (hangto)
         {
-        case 1:
-            v34 = 0;
-            SWD_SetActiveField(v28, v5c[v34]);
+        case HANGTOMISSION:
+            pos = 0;
+            SWD_SetActiveField(window, poslookup[pos]);
             break;
+        
         default:
-        case 0:
-            v34 = 1;
-            SWD_SetActiveField(v28, v5c[v34]);
+        case HANGTOSTORE:
+            pos = 1;
+            SWD_SetActiveField(window, poslookup[pos]);
             break;
         }
-        hangto = 1;
-        SWD_SetWindowPtr(v28);
+        
+        hangto = HANGTOMISSION;
+        
+        SWD_SetWindowPtr(window);
         PTR_DrawCursor(1);
+        
         while (1)
         {
-            v40++;
-            if (v40 > 4)
+            pic_cnt++;
+            
+            if (pic_cnt > 4)
             {
-                v40 = 0;
+                pic_cnt = 0;
+                
                 if ((wrand() % 3) == 0)
-                    SWD_SetFieldItem(v28, 0, FILE10b_HANGP_PIC);
+                    SWD_SetFieldItem(window, HANG_PIC, FILE10b_HANGP_PIC);
                 else
-                    SWD_SetFieldItem(v28, 0, -1);
+                    SWD_SetFieldItem(window, HANG_PIC, -1);
+                
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
             }
             else
             {
-                v3c = GFX_GetFrameCount();
-                while (GFX_GetFrameCount() == v3c)
+                local_cnt = GFX_GetFrameCount();
+                while (GFX_GetFrameCount() == local_cnt)
                 {
                 }
             }
-            SWD_Dialog(&vd0);
+            
+            SWD_Dialog(&dlg);
 
             if (joy_ipt_MenuNew)
             {
-                if (StickY > 0)                                                   //Controller Input WIN_Hangar
+                if (StickY > 0 || Down)                                                   
                 {
                     JOY_IsKey(StickY);
-                    vd0.keypress = 80;
+                    dlg.keypress = SC_DOWN;
                 }
-                if (StickY < 0)
+                
+                if (StickY < 0 || Up)
                 {
                     JOY_IsKey(StickY);
-                    vd0.keypress = 72;
+                    dlg.keypress = SC_UP;
                 }
-                if (StickX > 0)
+                
+                if (StickX > 0 || Right)
                 {
                     JOY_IsKey(StickX);
-                    vd0.keypress = 77;
+                    dlg.keypress = SC_RIGHT;
                 }
-                if (StickX < 0)
+                
+                if (StickX < 0 || Left)
                 {
                     JOY_IsKey(StickX);
-                    vd0.keypress = 75;
+                    dlg.keypress = SC_LEFT;
                 }
-                if (Down)
-                {
-                    JOY_IsKey(Down);
-                    vd0.keypress = 80;
-                }
-                if (Up)
-                {
-                    JOY_IsKey(Up);
-                    vd0.keypress = 72;
-                }
-                if (Left)
-                {
-                    JOY_IsKey(Left);
-                    vd0.keypress = 75;
-                }
-                if (Right)
-                {
-                    JOY_IsKey(Right);
-                    vd0.keypress = 77;
-                }
+                
                 if (AButton)
                 {
                     JOY_IsKey(AButton);
-                    vd0.keypress = 28;
+                    dlg.keypress = SC_ENTER;
                 }
+                
                 if (RightShoulder)
                 {
                     JOY_IsKey(RightShoulder);
-                    vd0.keypress = 59;
+                    dlg.keypress = SC_F1;
                 }
             }
-            if (keyboard[1] || Back || BButton)
+            
+            if (keyboard[SC_ESC] || Back || BButton)
             {
-                v2c = -99;
-                goto LAB_00024d9c;
+                opt = -99;
+                goto hangar_exit;
             }
-            if (keyboard[45] && keyboard[56])
+            
+            if (keyboard[SC_X] && keyboard[SC_ALT])
                 WIN_AskExit();
-            switch (vd0.keypress)
+            
+            switch (dlg.keypress)
             {
-            case 0x3b:
+            case SC_F1:
                 HELP_Win("HANGHLP1_TXT");
                 break;
-            case 0x1f:
-            case 0x3e:
-                v34 = 3;
-                sprintf(v88, "Save %s - %s ?", plr.name, plr.callsign);
-                if (WIN_AskBool(v88))
+            
+            case SC_S:
+            case SC_F2:
+                pos = 3;
+                sprintf(temp, "Save %s - %s ?", plr.name, plr.callsign);
+                if (WIN_AskBool(temp))
                     RAP_SavePlayer();
                 break;
-            case 0xf:
-            case 0x48:
-            case 0x4b:
-                v38 = 1;
-                KBD_Wait(0x48);
-                KBD_Wait(0x4b);
-                v34++;
-                v34 %= 4;
+            
+            case SC_TAB:
+            case SC_UP:
+            case SC_LEFT:
+                kflag = 1;
+                KBD_Wait(SC_UP);
+                KBD_Wait(SC_LEFT);
+                pos++;
+                pos %= 4;
                 break;
 
-            case 0x4d:
-            case 0x50:
-                v38 = 1;
-                KBD_Wait(0x50);
-                KBD_Wait(0x4d);
-                v34--;
-                if (v34 < 0)
-                    v34 = 3;
+            case SC_RIGHT:
+            case SC_DOWN:
+                kflag = 1;
+                KBD_Wait(SC_DOWN);
+                KBD_Wait(SC_RIGHT);
+                pos--;
+                if (pos < 0)
+                    pos = 3;
                 break;
-            case 0x1c:
-            case 0x39:
-                KBD_Wait(0x1c);
-                KBD_Wait(0x39);
-                v2c = v5c[v34];
-                goto LAB_00024b33;
+            
+            case SC_ENTER:
+            case SC_SPACE:
+                KBD_Wait(SC_ENTER);
+                KBD_Wait(SC_SPACE);
+                opt = poslookup[pos];
+                goto keyboard_part;
             }
-            if (v38)
+            
+            if (kflag)
             {
-                v38 = 0;
-                switch (v34)
+                kflag = 0;
+                switch (pos)
                 {
                 case 0:
                 case 1:
                 case 2:
                 case 3:
-                    v2c = v5c[v34];
-                    if (v2c != v30)
+                    opt = poslookup[pos];
+                    if (opt != oldopt)
                     {
-                        v30 = v2c;
-                        SWD_GetFieldXYL(v28, v2c, &v1c, &v20, &v48, &v24);
-                        PTR_SetPos(v1c + (v48>>1), v20 + (v24>>1));
-                        v30 = -1;
-                        vd0.sfield = v2c;
-                        vd0.viewactive = 1;
+                        oldopt = opt;
+                        SWD_GetFieldXYL(window, opt, &x, &y, &lx, &ly);
+                        PTR_SetPos(x + (lx>>1), y + (ly>>1));
+                        oldopt = -1;
+                        dlg.sfield = opt;
+                        dlg.viewactive = 1;
                     }
                     break;
+                
                 default:
-                    v34 = 0;
+                    pos = 0;
                     break;
                 }
             }
-            if (vd0.viewactive)
+            
+            if (dlg.viewactive)
             {
-LAB_00024b33:
-                switch (vd0.sfield)
+keyboard_part:
+                
+                switch (dlg.sfield)
                 {
-                case 2:
-                    v34 = 0;
-                    v2c = vd0.sfield;
-                    if ((mouseb1) || (vd0.keypress == 0x1c) || (AButton && !joy_ipt_MenuNew))                //Fixed ptr input
+                case HANG_MISSION:
+                    pos = 0;
+                    opt = dlg.sfield;
+                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (AButton && !joy_ipt_MenuNew))                
                     {
-                        SND_Patch(12, 60);
+                        SND_Patch(FX_DOOR, 60);
                         while (IMS_IsAck())
                         {
                         }
-                        goto LAB_00024d9c;
+                        goto hangar_exit;
                     }
-                    if (v2c != v30)
+                    if (opt != oldopt)
                     {
-                        SWD_SetFieldText(v28, 1, hangtext[v34]);
+                        SWD_SetFieldText(window, HANG_TEXT, hangtext[pos]);
                         SWD_ShowAllWindows();
                         GFX_DisplayUpdate();
-                        v30 = v2c;
+                        oldopt = opt;
                     }
                     break;
-                case 3:
-                    v34 = 1;
-                    v2c = vd0.sfield;
-                    if ((mouseb1) || (vd0.keypress == 0x1c) || (AButton && !joy_ipt_MenuNew))               //Fixed ptr input
+                
+                case HANG_SUPPLIES:
+                    pos = 1;
+                    opt = dlg.sfield;
+                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (AButton && !joy_ipt_MenuNew))               
                     {
-                        SND_Patch(12, 127);
+                        SND_Patch(FX_DOOR, 127);
                         while (IMS_IsAck())
                         {
                         }
-                        goto LAB_00024d9c;
+                        goto hangar_exit;
                     }
-                    if (v2c != v30)
+                    if (opt != oldopt)
                     {
-                        SWD_SetFieldText(v28, 1, hangtext[v34]);
+                        SWD_SetFieldText(window, HANG_TEXT, hangtext[pos]);
                         SWD_ShowAllWindows();
                         GFX_DisplayUpdate();
-                        v30 = v2c;
+                        oldopt = opt;
                     }
                     break;
-                case 4:
-                    v34 = 2;
-                    v2c = vd0.sfield;
-                    if ((mouseb1) || (vd0.keypress == 0x1c) || (AButton && !joy_ipt_MenuNew))             //Fixed ptr input
+                
+                case HANG_MAIN_MENU:
+                    pos = 2;
+                    opt = dlg.sfield;
+                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (AButton && !joy_ipt_MenuNew))             
                     {
-                        v2c = -99;
-                        SND_Patch(12, 200);
+                        opt = -99;
+                        SND_Patch(FX_DOOR, 200);
                         while (IMS_IsAck())
                         {
                         }
-                        goto LAB_00024d9c;
+                        goto hangar_exit;
                     }
-                    if (v2c != v30)
+                    if (opt != oldopt)
                     {
-                        SWD_SetFieldText(v28, 1, hangtext[v34]);
+                        SWD_SetFieldText(window, HANG_TEXT, hangtext[pos]);
                         SWD_ShowAllWindows();
                         GFX_DisplayUpdate();
-                        v30 = v2c;
+                        oldopt = opt;
                     }
                     break;
-                case 5:
-                    v34 = 3;
-                    v2c = vd0.sfield;
-                    if ((mouseb1) || (vd0.keypress == 0x1c) || (AButton && !joy_ipt_MenuNew))            //Fixed ptr input
+                
+                case HANG_QSAVE:
+                    pos = 3;
+                    opt = dlg.sfield;
+                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (AButton && !joy_ipt_MenuNew))            
                     {
                         while (IMS_IsAck())
                         {
                         }
-                        sprintf(v88, "Save %s - %s ?", plr.name, plr.callsign);
-                        if (WIN_AskBool(v88))
+                        sprintf(temp, "Save %s - %s ?", plr.name, plr.callsign);
+                        if (WIN_AskBool(temp))
                             RAP_SavePlayer();
                         while (IMS_IsAck())
                         {
                         }
                         break;
                     }
-                    if (v2c != v30)
+                    if (opt != oldopt)
                     {
-                        SWD_SetFieldText(v28, 1, hangtext[v34]);
+                        SWD_SetFieldText(window, HANG_TEXT, hangtext[pos]);
                         SWD_ShowAllWindows();
                         GFX_DisplayUpdate();
-                        v30 = v2c;
+                        oldopt = opt;
                     }
                     break;
                 }
             }
             else
             {
-                v2c = -1;
-                if (v2c != v30)
+                opt = -1;
+                if (opt != oldopt)
                 {
-                    SWD_SetFieldText(v28, 1, " ");
+                    SWD_SetFieldText(window, HANG_TEXT, " ");
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
-                    v30 = v2c;
+                    oldopt = opt;
                 }
             }
         }
-    LAB_00024d9c:
+    
+    hangar_exit:
+        
         PTR_DrawCursor(0);
+        
         GFX_FadeOut(0, 0, 0, 16);
-        SWD_DestroyWindow(v28);
+        
+        SWD_DestroyWindow(window);
         memset(displaybuffer, 0, 64000);
         GFX_DisplayUpdate();
         GFX_SetPalette(palette, 0);
     }
-    return v2c;
+    
+    return opt;
 }
 
 void WIN_LoadComp(void)
