@@ -1394,285 +1394,368 @@ keyboard_part:
     return opt;
 }
 
-void WIN_LoadComp(void)
+/***************************************************************************
+WIN_LoadComp() - Shows computer loading screen
+ ***************************************************************************/
+void 
+WIN_LoadComp(
+    void
+)
 {
-    char v44[40];
-    int v1c;
-    char v74[3][15] = {
+    char temp[40];
+    int window;
+    char sect[3][15] = {
         "BRAVO SECTOR",
         "TANGO SECTOR",
         "OUTER REGIONS"
     };
 
-    v1c = SWD_InitMasterWindow(FILE140_LOADCOMP_SWD);
-    SWD_GetFieldXYL(v1c, 11, &g_x, &g_y, &g_lx, &g_ly);
-    sprintf(v44, "WAVE %d", game_wave[cur_game]);
-    SWD_SetFieldText(v1c, 10, v44);
-    SWD_SetFieldText(v1c, 9, v74[cur_game]);
+    window = SWD_InitMasterWindow(FILE140_LOADCOMP_SWD);
+    SWD_GetFieldXYL(window, LCOMP_LEVEL, &g_x, &g_y, &g_lx, &g_ly);
+    
+    sprintf(temp, "WAVE %d", game_wave[cur_game]);
+    SWD_SetFieldText(window, LCOMP_WAVE, temp);
+    
+    SWD_SetFieldText(window, LCOMP_SECTOR, sect[cur_game]);
+    
     if (diff_wrap[plr.diff[cur_game]] - 1 == game_wave[cur_game])
     {
-        sprintf(v44, "FINAL WAVE %d", game_wave[cur_game] + 1);
-        SWD_SetFieldText(v1c, 10, v44);
+        sprintf(temp, "FINAL WAVE %d", game_wave[cur_game] + 1);
+        SWD_SetFieldText(window, LCOMP_WAVE, temp);
     }
     else
     {
-        sprintf(v44, "WAVE %d", game_wave[cur_game] + 1);
-        SWD_SetFieldText(v1c, 10, v44);
+        sprintf(temp, "WAVE %d", game_wave[cur_game] + 1);
+        SWD_SetFieldText(window, LCOMP_WAVE, temp);
     }
+    
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
     GFX_FadeIn(palette, 8);
-    SWD_DestroyWindow(v1c);
+    
+    SWD_DestroyWindow(window);
 }
 
-int WIN_ShipComp(void)
+/***************************************************************************
+WIN_ShipComp () - Does Game Selection 1, 2 or 3
+ ***************************************************************************/
+int 
+WIN_ShipComp(
+    void
+)
 {
-    wdlg_t v94;
-    int v24, v28, v2c, v30, v34,v1c,v20;
-    int v3c;
-    int v40, v44, v38, v4c;
+    wdlg_t dlg;
+    int rval, secret1, secret2, secret3, secret, cz1, cz2;
+    int window;
+    int px, py, lx, ly;
 
-    v24 = 1;
-    v28 = 0;
-    v2c = 0;
-    v30 = 0;
-    v34 = 0;
+    rval = 1;
+    secret1 = 0;
+    secret2 = 0;
+    secret3 = 0;
+    secret = 0;
 
-    v1c = *ltable;
-    v20 = *dtable;
+    cz1 = *ltable;
+    cz2 = *dtable;
+    
     GLB_FreeAll();
+    
     PTR_DrawCursor(0);
+    
     ltable[0] = 0;
     dtable[0] = 0;
-    SND_PlaySong(88, 1, 1);
+    
+    SND_PlaySong(FILE058_HANGAR_MUS, 1, 1);
+    
     KBD_Clear();
     GFX_FadeOut(0, 0, 0, 2);
-    cur_diff &= ~7;
-    v3c = SWD_InitMasterWindow(FILE133_SHIPCOMP_SWD);
+    
+    cur_diff &= ~(EB_SECRET_1 + EB_SECRET_2 + EB_SECRET_3);
+    
+    window = SWD_InitMasterWindow(FILE133_SHIPCOMP_SWD);
+    
     GLB_LockItem(FILE12a_LIGHTON_PIC);
     GLB_LockItem(FILE12b_LIGHTOFF_PIC);
-    SWD_GetFieldXYL(v3c, 11, &v40, &v44, &v38, &v4c);
-    PTR_SetPos(v40 + (v38 >> 1), v44 + (v4c >> 1));
-    SWD_SetActiveField(v3c, 11);
-    SWD_SetFieldItem(v3c, 0, FILE12b_LIGHTOFF_PIC);
-    SWD_SetFieldItem(v3c, 1, FILE12b_LIGHTOFF_PIC);
-    SWD_SetFieldItem(v3c, 2, FILE12b_LIGHTOFF_PIC);
+    
+    SWD_GetFieldXYL(window, COMP_AUTO, &px, &py, &lx, &ly);
+    PTR_SetPos(px + (lx >> 1), py + (ly >> 1));
+    SWD_SetActiveField(window, COMP_AUTO);
+    
+    SWD_SetFieldItem(window, COMP_LITE1, FILE12b_LIGHTOFF_PIC);
+    SWD_SetFieldItem(window, COMP_LITE2, FILE12b_LIGHTOFF_PIC);
+    SWD_SetFieldItem(window, COMP_LITE3, FILE12b_LIGHTOFF_PIC);
 
     if (bday_flag)
     {
-        v34 = 1;
-        v28 = 1;
-        v2c = 1;
-        v30 = 1;
-        SWD_SetFieldItem(v3c, 0, FILE12a_LIGHTON_PIC);
-        SWD_SetFieldItem(v3c, 1, FILE12a_LIGHTON_PIC);
-        SWD_SetFieldItem(v3c, 2, FILE12a_LIGHTON_PIC);
-        SND_Patch(14, 127);
+        secret = 1;
+        secret1 = 1;
+        secret2 = 1;
+        secret3 = 1;
+        SWD_SetFieldItem(window, COMP_LITE1, FILE12a_LIGHTON_PIC);
+        SWD_SetFieldItem(window, COMP_LITE2, FILE12b_LIGHTOFF_PIC);
+        SWD_SetFieldItem(window, COMP_LITE3, FILE12a_LIGHTON_PIC);
+        SND_Patch(FX_EGRAB, 127);
     }
+    
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
+    
     GFX_FadeIn(palette, 16);
-    SWD_SetWindowPtr(v3c);
+    
+    SWD_SetWindowPtr(window);
     PTR_DrawCursor(1);
+    
     while (1)
     {
-        SWD_Dialog(&v94);
+        SWD_Dialog(&dlg);
 
         if (joy_ipt_MenuNew)
         {
-            if (Back)                                                         //Input Controller WIN_ShipComp
+            if (Back)                                                         
             {
                 JOY_IsKey(Back);
-                v94.keypress = 1;
+                dlg.keypress = SC_ESC;
             }
+            
             if (BButton)
             {
                 JOY_IsKey(BButton);
-                v94.keypress = 1;
+                dlg.keypress = SC_ESC;
             }
+            
             if (RightShoulder)
             {
                 JOY_IsKey(RightShoulder);
-                v94.keypress = 59;
+                dlg.keypress = SC_F1;
             }
         }
-        if (keyboard[45] && keyboard[56])
+        
+        if (keyboard[SC_X] && keyboard[SC_ALT])
             WIN_AskExit();
-        switch (v94.keypress)
+        
+        switch (dlg.keypress)
         {
-        case 1:
-            v24 = 0;
-            goto LAB_000255a5;
-        case 0x3b:
+        case SC_ESC:
+            rval = 0;
+            goto abort_shipcomp;
+        
+        case SC_F1:
             HELP_Win("COMPHLP1_TXT");
             break;
-        case 0x2c:
+        
+        case SC_Z:
             if (godmode || demo_flag)
                 cur_game = 0;
             break;
-        case 0x2d:
+        
+        case SC_X:
             if (godmode || demo_flag)
                 cur_game = 1;
             break;
-        case 0x2e:
+        
+        case SC_C:
             if (godmode || demo_flag)
                 cur_game = 2;
             break;
-        case 0x10:
+        
+        case SC_Q:
             if (godmode || demo_flag)
                 game_wave[cur_game] = 0;
-            goto LAB_00025553;
-        case 0x11:
+            goto exit_shipcomp;
+        
+        case SC_W:
             if (godmode || demo_flag)
                 game_wave[cur_game] = 1;
-            goto LAB_00025553;
-        case 0x12:
+            goto exit_shipcomp;
+        
+        case SC_E:
             if (godmode || demo_flag)
                 game_wave[cur_game] = 2;
-            goto LAB_00025553;
-        case 0x13:
+            goto exit_shipcomp;
+        
+        case SC_R:
             if (godmode || demo_flag)
                 game_wave[cur_game] = 3;
-            goto LAB_00025553;
-        case 0x14:
+            goto exit_shipcomp;
+        
+        case SC_T:
             if (godmode || demo_flag)
                 game_wave[cur_game] = 4;
-            goto LAB_00025553;
-        case 0x15:
+            goto exit_shipcomp;
+        
+        case SC_Y:
             if (godmode || demo_flag)
                 game_wave[cur_game] = 5;
-            goto LAB_00025553;
-        case 0x16:
+            goto exit_shipcomp;
+        
+        case SC_U:
             if (godmode || demo_flag)
                 game_wave[cur_game] = 6;
-            goto LAB_00025553;
-        case 0x17:
+            goto exit_shipcomp;
+        
+        case SC_I:
             if (godmode || demo_flag)
                 game_wave[cur_game] = 7;
-            goto LAB_00025553;
-        case 0x18:
+            goto exit_shipcomp;
+        
+        case SC_O:
             if (godmode || demo_flag)
                 game_wave[cur_game] = 8;
-            goto LAB_00025553;
+            goto exit_shipcomp;
         }
-        if (v94.cur_act == 1 && v94.cur_cmd == 10)
+        
+        if (dlg.cur_act == S_FLD_COMMAND && dlg.cur_cmd == F_SELECT)
         {
-            switch (v94.field)
+            switch (dlg.field)
             {
-            case 6:
-                v34 = 1;
+            case COMP_SECRET:
+                secret = 1;
                 break;
-            case 11:
-                goto LAB_00025553;
-            case 4:
+            
+            case COMP_AUTO:
+                goto exit_shipcomp;
+            
+            case COMP_GAME1:
                 cur_game = 0;
-                goto LAB_00025553;
-            case 5:
+                goto exit_shipcomp;
+            
+            case COMP_GAME2:
                 if (!gameflag[1])
                 {
                     WIN_Order();
-                    v24 = 0;
-                    goto LAB_000255a5;
+                    rval = 0;
+                    goto abort_shipcomp;
                 }
                 cur_game = 1;
-                goto LAB_00025553;
-            case 10:
+                goto exit_shipcomp;
+            
+            case COMP_GAME3:
                 if (!gameflag[2])
                 {
                     WIN_Order();
-                    v24 = 0;
-                    goto LAB_000255a5;
+                    rval = 0;
+                    goto abort_shipcomp;
                 }
                 cur_game = 2;
-                goto LAB_00025553;
-            case 7:
-                if (v34)
+                goto exit_shipcomp;
+            
+            case COMP_B1:
+                if (secret)
                 {
-                    v28 ^= 1;
-                    if (v28)
-                        SWD_SetFieldItem(v3c, 0, FILE12a_LIGHTON_PIC);
+                    secret1 ^= 1;
+                    if (secret1)
+                        SWD_SetFieldItem(window, COMP_LITE1, FILE12a_LIGHTON_PIC);
                     else
-                        SWD_SetFieldItem(v3c, 0, FILE12b_LIGHTOFF_PIC);
+                        SWD_SetFieldItem(window, COMP_LITE1, FILE12b_LIGHTOFF_PIC);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
                 break;
-            case 8:
-                if (v34)
+            
+            case COMP_B2:
+                if (secret)
                 {
-                    v2c ^= 1;
-                    if (v2c)
-                        SWD_SetFieldItem(v3c, 1, FILE12a_LIGHTON_PIC);
+                    secret2 ^= 1;
+                    if (secret2)
+                        SWD_SetFieldItem(window, COMP_LITE2, FILE12a_LIGHTON_PIC);
                     else
-                        SWD_SetFieldItem(v3c, 1, FILE12b_LIGHTOFF_PIC);
+                        SWD_SetFieldItem(window, COMP_LITE2, FILE12b_LIGHTOFF_PIC);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
                 break;
-            case 9:
-                if (v34)
+            
+            case COMP_B3:
+                if (secret)
                 {
-                    v30 ^= 1;
-                    if (v30)
-                        SWD_SetFieldItem(v3c, 2, FILE12a_LIGHTON_PIC);
+                    secret3 ^= 1;
+                    if (secret3)
+                        SWD_SetFieldItem(window, COMP_LITE3, FILE12a_LIGHTON_PIC);
                     else
-                        SWD_SetFieldItem(v3c, 2, FILE12b_LIGHTOFF_PIC);
+                        SWD_SetFieldItem(window, COMP_LITE3, FILE12b_LIGHTOFF_PIC);
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
                 break;
-            case 3:
-                v24 = 0;
-                goto LAB_000255a5;
+            
+            case COMP_CLOSE:
+                rval = 0;
+                goto abort_shipcomp;
             }
         }
     }
-LAB_00025553:
-    *ltable = v1c;
-    *dtable = v20;
-    SWD_SetFieldText(v3c, 4, 0);
-    SWD_SetFieldText(v3c, 5, 0);
-    SWD_SetFieldText(v3c, 10, 0);
-    SWD_SetFieldText(v3c, 11, 0);
-LAB_000255a5:
+
+exit_shipcomp:
+    
+    *ltable = cz1;
+    *dtable = cz2;
+    
+    SWD_SetFieldText(window, COMP_GAME1, 0);
+    SWD_SetFieldText(window, COMP_GAME2, 0);
+    SWD_SetFieldText(window, COMP_GAME3, 0);
+    SWD_SetFieldText(window, COMP_AUTO, 0);
+
+abort_shipcomp:
+    
     PTR_DrawCursor(0);
+    
     GFX_FadeOut(0, 0, 0, 8);
-    SWD_DestroyWindow(v3c);
+    
+    SWD_DestroyWindow(window);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
-    if (v34)
+    
+    if (secret)
     {
-        if (v28 == 1 && v2c == 1 && v30 == 1)
+        if (secret1 == 1 && secret2 == 1 && secret3 == 1)
         {
-            cur_diff |= 1;
-            cur_diff |= 2;
-            cur_diff |= 4;
-            SND_Patch(14, 127);
+            cur_diff |= EB_SECRET_1;
+            cur_diff |= EB_SECRET_2;
+            cur_diff |= EB_SECRET_3;
+            SND_Patch(FX_EGRAB, 127);
         }
     }
+    
     if (bday_flag)
     {
-        cur_diff |= 1;
-        cur_diff |= 2;
-        cur_diff |= 4;
-        SND_Patch(14, 127);
+        cur_diff |= EB_SECRET_1;
+        cur_diff |= EB_SECRET_2;
+        cur_diff |= EB_SECRET_3;
+        SND_Patch(FX_EGRAB, 127);
     }
-    hangto = 1;
+    
+    hangto = HANGTOMISSION;
+    
     GLB_FreeItem(FILE12a_LIGHTON_PIC);
     GLB_FreeItem(FILE12b_LIGHTOFF_PIC);
-    return v24;
+    
+    return rval;
 }
 
-void WIN_SetLoadLevel(int a1)
+/***************************************************************************
+WIN_SetLoadLevel()
+ ***************************************************************************/
+void 
+WIN_SetLoadLevel(
+    int level
+)
 {
-    int v1c, v20;
-    v1c = (g_lx << 16) / 100;
-    v20 = v1c * a1;
-    GFX_ColorBox(g_x, g_y, (v20 >> 16) + 1, g_ly, 85);
+    int addx, curs;
+    
+    addx = (g_lx << 16) / 100;
+    curs = addx * level;
+    
+    GFX_ColorBox(g_x, g_y, (curs >> 16) + 1, g_ly, 85);
     GFX_DisplayUpdate();
 }
 
-void WIN_EndLoad(void)
+/***************************************************************************
+WIN_EndLoad () - Shows Ship computer while loading level
+ ***************************************************************************/
+void 
+WIN_EndLoad(
+    void
+)
 {
     GFX_FadeOut(0, 0, 0, 16);
     memset(displaybuffer, 0, 64000);
@@ -1681,37 +1764,52 @@ void WIN_EndLoad(void)
     GFX_SetPalette(palette, 0);
 }
 
-void WIN_MainLoop(void)
+/***************************************************************************
+WIN_MainLoop() - Handles Locker/Register/Store/Hangar and starting game
+ ***************************************************************************/
+void 
+WIN_MainLoop(
+    void
+)
 {
-    int v1c, v20, v24, v28;
-    v1c = -1;
-    v20 = 0;
+    int rval, abort_flag, dwrap, loop;
+    rval = -1;
+    abort_flag = 0;
+    
     ingameflag = 1;
-    SND_PlaySong(88, 1, 1);
+    
+    SND_PlaySong(FILE058_HANGAR_MUS, 1, 1);
+    
     while (1)
     {
-        if (demo_flag != 1)
+        if (demo_flag != DEMO_RECORD)
         {
-            if (v1c == -1)
-                v1c = WIN_Hangar();
-            switch (v1c)
+            if (rval == -1)
+                rval = WIN_Hangar();
+            
+            switch (rval)
             {
-            case 2:
-                v1c = -1;
+            case HANG_MISSION:
+                rval = -1;
                 break;
+            
             default:
                 return;
-            case 3:
+            
+            case HANG_SUPPLIES:
                 STORE_Enter();
-                hangto = 1;
-                v1c = -1;
+                hangto = HANGTOMISSION;
+                rval = -1;
                 continue;
             }
         }
+        
         if (!WIN_ShipComp())
             continue;
-        if (demo_flag == 1)
+        
+        if (demo_flag == DEMO_RECORD)
             DEMO_MakePlayer(cur_game);
+        
         switch (cur_game)
         {
         default:
@@ -1725,25 +1823,32 @@ void WIN_MainLoop(void)
             SND_PlaySong(songsg3[game_wave[cur_game]], 1, 1);
             break;
         }
+        
         WIN_LoadComp();
         RAP_LoadMap();
         retraceflag = 0;
-        v20 = Do_Game();
+        
+        abort_flag = Do_Game();
+        
         retraceflag = 1;
-        if (OBJS_GetAmt(16) <= 0)
+        
+        if (OBJS_GetAmt(S_ENERGY) <= 0)
         {
             ingameflag = 0;
-            SND_PlaySong(93, 1, 1);
+            SND_PlaySong(FILE05d_RAP5_MUS, 1, 1);
             INTRO_Death();
             return;
         }
-        if (v20)
+        
+        if (abort_flag)
         {
             INTRO_Landing();
             continue;
         }
-        v24 = diff_wrap[plr.diff[cur_game]] - 1;
-        if (game_wave[cur_game] == v24)
+        
+        dwrap = diff_wrap[plr.diff[cur_game]] - 1;
+        
+        if (game_wave[cur_game] == dwrap)
         {
             if (!plr.diff[cur_game] && !plr.fintrain)
             {
@@ -1751,25 +1856,30 @@ void WIN_MainLoop(void)
                 plr.sweapon = -1;
                 plr.fintrain = 1;
                 plr.score = 0;
-                OBJS_Add(0);
-                OBJS_Add(16);
-                OBJS_Add(16);
-                OBJS_Add(16);
-                plr.score = 0x2710;
-                if (plr.diff[cur_game] < 3)
+                OBJS_Add(S_FORWARD_GUNS);
+                OBJS_Add(S_ENERGY);
+                OBJS_Add(S_ENERGY);
+                OBJS_Add(S_ENERGY);
+                plr.score = 10000;
+                
+                if (plr.diff[cur_game] < DIFF_3)
                     plr.diff[cur_game]++;
-                for (v28 = 0; v28 < 4; v28++)
-                    if (!plr.diff[v28])
-                        plr.diff[v28] = 1;
+                
+                for (loop = 0; loop < 4; loop++)
+                    if (!plr.diff[loop])
+                        plr.diff[loop] = DIFF_1;
             }
             else
             {
-                if (plr.diff[cur_game] < 3)
+                if (plr.diff[cur_game] < DIFF_3)
                     plr.diff[cur_game]++;
             }
+            
             RAP_SetPlayerDiff();
+            
             game_wave[cur_game] = 0;
-            if (v24 < 8)
+            
+            if (dwrap < 8)
             {
                 WIN_WinGame(3);
                 cur_game = 0;
@@ -1777,19 +1887,24 @@ void WIN_MainLoop(void)
                 game_wave[1] = 0;
                 game_wave[2] = 0;
             }
-            else if (v20 == 0)
+            else if (abort_flag == 0)
             {
                 INTRO_EndGame(cur_game);
                 cur_game++;
             }
+            
             if (cur_game >= 3)
                 cur_game = 0;
+            
             if (!gameflag[cur_game])
                 cur_game = 0;
+            
             continue;
         }
-        if (!v20)
+        
+        if (!abort_flag)
             game_wave[cur_game]++;
+        
         INTRO_Landing();
     }
 }
