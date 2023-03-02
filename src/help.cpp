@@ -11,6 +11,7 @@
 #include "joyapi.h"
 #include "input.h"
 #include "fileids.h"
+#include "winids.h"
 
 static int startitem;
 static int curpage;

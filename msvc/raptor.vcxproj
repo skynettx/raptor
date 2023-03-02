@@ -59,6 +59,7 @@
     <ClInclude Include="..\src\tile.h" />
     <ClInclude Include="..\src\vmemapi.h" />
     <ClInclude Include="..\src\windows.h" />
+    <ClInclude Include="..\src\winids.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\anims.cpp" />

@@ -23,6 +23,7 @@
 #include "enemy.h"
 #include "windows.h"
 #include "fileids.h"
+#include "winids.h"
 
 #define HANGAR_MISSION   0
 #define HANGAR_SUPPLIES  1
