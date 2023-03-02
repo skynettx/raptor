@@ -21,6 +21,7 @@
 #include "demo.h"
 #include "joyapi.h"
 #include "enemy.h"
+#include "windows.h"
 #include "fileids.h"
 
 #define HANGAR_MISSION   0
@@ -1909,238 +1910,309 @@ WIN_MainLoop(
     }
 }
 
-void WIN_MainAuto(int a1)
+/***************************************************************************
+   WIN_MainAuto()
+ ***************************************************************************/
+void 
+WIN_MainAuto(
+    int cur_opt
+)
 {
-    int v1c, v20, v24;
-    v1c = 5;
-    v20 = 0;
-    v24 = g_drawcursor;
+    int max_opt, end_flag, dchold;
+    max_opt = 5;
+    end_flag = 0;
+    dchold = g_drawcursor;
+    
     PTR_DrawCursor(0);
-    if (gameflag[1])
-        v1c += 3;
-    if (gameflag[2] + gameflag[3])
-        v1c += 3;
+    
+    if (GAME2)
+        max_opt += 3;
+    
+    if (GAME3)
+        max_opt += 3;
+    
     while (1)
     {
-        switch (a1)
+        switch (cur_opt)
         {
-        case 0:
+        case DEM_INTRO:
             SND_CacheFX();
-            SND_PlaySong(86, 1, 1);
-            v20 = INTRO_PlayMain();
+            SND_PlaySong(FILE056_RINTRO_MUS, 1, 1);
+            end_flag = INTRO_PlayMain();
             break;
-        case 1:
-            v20 = WIN_Credits();
+        
+        case DEM_CREDITS:
+            end_flag = WIN_Credits();
             break;
-        case 2:
+        
+        case DEM_DEMO1G1:
             DEMO_GLBFile(FILE107_DEMO1G1_REC);
-            v20 = DEMO_Play();
+            end_flag = DEMO_Play();
             break;
-        case 3:
+        
+        case DEM_DEMO2G1:
             DEMO_GLBFile(FILE108_DEMO2G1_REC);
-            v20 = DEMO_Play();
+            end_flag = DEMO_Play();
             break;
-        case 4:
+        
+        case DEM_DEMO3G1:
             DEMO_GLBFile(FILE109_DEMO3G1_REC);
-            v20 = DEMO_Play();
+            end_flag = DEMO_Play();
             break;
-        case 5:
+        
+        case DEM_DEMO1G2:
             DEMO_GLBFile(FILE20b_DEMO1G2_REC);
-            v20 = DEMO_Play();
+            end_flag = DEMO_Play();
             break;
-        case 6:
+        
+        case DEM_DEMO2G2:
             DEMO_GLBFile(FILE20c_DEMO2G2_REC);
-            v20 = DEMO_Play();
+            end_flag = DEMO_Play();
             break;
-        case 7:
+        
+        case DEM_DEMO3G2:
             DEMO_GLBFile(FILE20d_DEMO3G2_REC);
-            v20 = DEMO_Play();
+            end_flag = DEMO_Play();
             break;
-        case 8:
+        
+        case DEM_DEMO1G3:
             DEMO_GLBFile(FILE307_DEMO1G3_REC);
-            v20 = DEMO_Play();
+            end_flag = DEMO_Play();
             break;
-        case 9:
+        
+        case DEM_DEMO2G3:
             DEMO_GLBFile(FILE308_DEMO2G3_REC);
-            v20 = DEMO_Play();
+            end_flag = DEMO_Play();
             break;
-        case 10:
+        
+        case DEM_DEMO3G3:
             DEMO_GLBFile(FILE309_DEMO3G3_REC);
-            v20 = DEMO_Play();
+            end_flag = DEMO_Play();
             break;
         }
-        if (v20)
+        
+        if (end_flag)
             break;
-        a1++;
-        a1 %= v1c;
+        
+        cur_opt++;
+        
+        cur_opt %= max_opt;
     }
-    PTR_DrawCursor(v24);
+    
+    PTR_DrawCursor(dchold);
     GLB_FreeAll();
     SND_CacheIFX();
 }
 
-int FUN_00025c70(int a1)
+/***************************************************************************
+WIN_DemoDelay (
+ ***************************************************************************/
+int 
+WIN_DemoDelay(
+    int startflag
+)
 {
-    int now;
-    if (a1)
+    int local_cnt;
+    
+    if (startflag)
     {
         d_count = 0;
         return 0;
     }
     else
     {
-        now = GFX_GetFrameCount();
-        while (now == GFX_GetFrameCount())
+        local_cnt = GFX_GetFrameCount();
+        while (local_cnt == GFX_GetFrameCount())
         {
         }
+        
         d_count++;
-        if (d_count < 4000)
+        
+        if (d_count < DEMO_DELAY)
             return 0;
+        
         return 1;
     }
 }
 
-void WIN_MainMenu(void)
+/***************************************************************************
+WIN_MainMenu () - Main Menu
+ ***************************************************************************/
+void 
+WIN_MainMenu(
+    void
+)
 {
-    int v20;
-    int v24;
-    char v1c;
-    wdlg_t v6c;
+    int window;
+    int cur_opt;
+    char cz1;
+    wdlg_t dlg;
 
-    v1c = ltable[0];
-    v24 = 0;
+    cz1 = ltable[0];
+    cur_opt = 0;
+    
     KBD_Clear();
+    
     PTR_DrawCursor(0);
-    FUN_00025c70(1);
-    if (demo_flag == 1)
+    
+    WIN_DemoDelay(1);
+    
+    if (demo_flag == DEMO_RECORD)
         return;
-    v20 = SWD_InitMasterWindow(FILE132_MAIN_SWD);
+    
+    window = SWD_InitMasterWindow(FILE132_MAIN_SWD);
+    
     if (ingameflag)
     {
-        SWD_SetFieldSelect(v20, 7, 1);
-        SWD_SetFieldItem(v20, 7, FILE129_MENU7_PIC);
-        SWD_SetFieldText(v20, 8, 0);
+        SWD_SetFieldSelect(window, MAIN_RETURN, 1);
+        SWD_SetFieldItem(window, MAIN_RETURN, FILE129_MENU7_PIC);
+        SWD_SetFieldText(window, MAIN_DEMO, 0);
     }
     else
     {
-        SWD_SetFieldSelect(v20, 7, 0);
-        SWD_SetFieldItem(v20, 7, -1);
+        SWD_SetFieldSelect(window, MAIN_RETURN, 0);
+        SWD_SetFieldItem(window, MAIN_RETURN, -1);
     }
 
     PTR_DrawCursor(0);
     SWD_ShowAllWindows();
     GFX_DisplayUpdate();
+    
     if (ingameflag)
-        SND_PlaySong(0x56, 1, 1);
+        SND_PlaySong(FILE056_RINTRO_MUS, 1, 1);
     else
-        SND_PlaySong(0x57, 1, 1);
+        SND_PlaySong(FILE057_MAINMENU_MUS, 1, 1);
 
     GFX_FadeIn(palette, 10);
+    
     SND_CacheIFX();
-    SWD_SetWindowPtr(v20);
+    
+    SWD_SetWindowPtr(window);
     PTR_DrawCursor(1);
     ltable[0] = 0;
+    
     do
     {
-        SWD_Dialog(&v6c);
-        if (v6c.keypress == 0x20 || YButton)                                    //Get Button to start Demo Mode
+        SWD_Dialog(&dlg);
+        
+        if (dlg.keypress == SC_D || YButton)                                    
         {
-            v24 = 2;
-            d_count = 4002;
+            cur_opt = DEM_DEMO1G1;
+            d_count = DEMO_DELAY + 2;
         }
-        if (FUN_00025c70(0) && !ingameflag)
+        
+        if (WIN_DemoDelay(0) && !ingameflag)
         {
             GFX_FadeOut(0, 0, 0, 3);
-            SWD_DestroyWindow(v20);
+            SWD_DestroyWindow(window);
             memset(displaybuffer, 0, 64000);
             memset(displayscreen, 0, 64000);
-            WIN_MainAuto(v24);
-            v24 = 0;
-            v20 = SWD_InitMasterWindow(FILE132_MAIN_SWD);
+            WIN_MainAuto(cur_opt);
+            cur_opt = 0;
+            window = SWD_InitMasterWindow(FILE132_MAIN_SWD);
             if (ingameflag)
-                SWD_SetFieldItem(v20, 7, FILE129_MENU7_PIC);
+                SWD_SetFieldItem(window, MAIN_RETURN, FILE129_MENU7_PIC);
             else
-                SWD_SetFieldItem(v20, 7, -1);
+                SWD_SetFieldItem(window, MAIN_RETURN, -1);
             PTR_DrawCursor(0);
-            SND_PlaySong(87, 1, 1);
+            SND_PlaySong(FILE057_MAINMENU_MUS, 1, 1);
             GFX_FadeOut(0, 0, 0, 2);
             SWD_ShowAllWindows();
             GFX_DisplayUpdate();
             GFX_FadeIn(palette, 16);
-            FUN_00025c70(1);
+            WIN_DemoDelay(1);
             GLB_FreeAll();
             SND_CacheIFX();
             PTR_DrawCursor(1);
         }
-        if (keyboard[45] && keyboard[56])
+        
+        if (keyboard[SC_X] && keyboard[SC_ALT])
             WIN_AskExit();
-        if ((keyboard[1] && ingameflag) || (Back && ingameflag) || (BButton && ingameflag))                                   //Go back to Hangar when mission before started
-            goto LAB_000260df;
-        if ((v6c.keypress == 0x3b) || (JOY_IsKeyMenu(RightShoulder)))                                                         //Input Help Screen
+        
+        if ((keyboard[SC_ESC] && ingameflag) || (Back && ingameflag) || (BButton && ingameflag))                                   
+            goto menu_exit;
+        
+        if ((dlg.keypress == SC_F1) || (JOY_IsKeyMenu(RightShoulder)))                                                         
             HELP_Win("HELP1_TXT");
-        if (mouseb1 || mouseb2 || v6c.keypress || (AButton && !joy_ipt_MenuNew))                                              //Fixed ptr input
-            FUN_00025c70(1);
-        if (v6c.cur_act == 1 && v6c.cur_cmd == 10)
+        
+        if (mouseb1 || mouseb2 || dlg.keypress || (AButton && !joy_ipt_MenuNew))                                              
+            WIN_DemoDelay(1);
+        
+        if (dlg.cur_act == S_FLD_COMMAND && dlg.cur_cmd == F_SELECT)
         {
-            FUN_00025c70(1);
-            switch (v6c.field)
+            WIN_DemoDelay(1);
+            switch (dlg.field)
             {
-            case 1:
+            case MAIN_NEW:
                 if (WIN_Register())
-                    goto LAB_000260df;
+                    goto menu_exit;
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
                 GFX_FadeIn(palette, 16);
                 PTR_DrawCursor(1);
                 break;
-            case 2:
+            
+            case MAIN_LOAD:
                 switch (RAP_LoadWin())
                 {
                 case -1:
                     WIN_Msg("No Pilots to Load");
                     break;
+                
                 case 0:
                     break;
+                
                 case 1:
                     ingameflag = 0;
-                    goto LAB_000260df;
+                    goto menu_exit;
                 }
                 break;
-            case 3:
+            
+            case MAIN_OPTS:
                 WIN_Opts();
                 break;
-            case 4:
+            
+            case MAIN_ORDER:
                 if (reg_flag)
                     HELP_Win("REG_VER1_TXT");
                 else
                     HELP_Win("RAP1_TXT");
                 break;
-            case 5:
+            
+            case MAIN_CREDITS:
                 PTR_DrawCursor(0);
                 WIN_Credits();
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
-                SND_PlaySong(87, 1, 1);
+                SND_PlaySong(FILE057_MAINMENU_MUS, 1, 1);
                 PTR_DrawCursor(1);
                 break;
-            case 7:
+            
+            case MAIN_RETURN:
                 if (ingameflag)
-                    goto LAB_000260df;
+                    goto menu_exit;
                 break;
-            case 6:
+            
+            case MAIN_QUIT:
                 WIN_AskExit();
                 break;
             }
         }
     } while (1);
-LAB_000260df:
+
+menu_exit:
+    
     PTR_DrawCursor(0);
+    
     GFX_FadeOut(0, 0, 0, 16);
-    SWD_DestroyWindow(v20);
+    SWD_DestroyWindow(window);
     memset(displaybuffer, 0, 64000);
+    
     GFX_DisplayUpdate();
     GFX_SetPalette(palette, 0);
-    ltable[0] = v1c;
-    hangto = 0;
+    
+    ltable[0] = cz1;
+    
+    hangto = HANGTOSTORE;
 }
 
