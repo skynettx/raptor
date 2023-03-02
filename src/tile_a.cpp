@@ -5,48 +5,81 @@
 #include "gfxapi.h"
 #include "i_video.h"
 
-void TILE_Draw(void)
+#define TILEWIDTH 32
+#define TILEHEIGHT 32
+
+/***************************************************************************
+TILE_Draw() - 32 by 32 Tile draw
+ ***************************************************************************/
+void 
+TILE_Draw(
+    void
+)
 {
-    int i;
-    for (i = 0; i < 32; i++)
+    int loop;
+    
+    for (loop = 0; loop < TILEHEIGHT; loop++)
     {
-        memcpy(&tilestart[i * 320], &tilepic[i * 32], 32);
+        memcpy(&tilestart[loop * SCREENWIDTH], &tilepic[loop * TILEWIDTH], TILEWIDTH);
     }
 }
 
-void TILE_ClipDraw(void)
+/***************************************************************************
+TILE_ClipDraw() - 
+ ***************************************************************************/
+void 
+TILE_ClipDraw(
+    void
+)
 {
-    int i;
-    for (i = 0; i < tileloopy; i++)
+    int loop;
+    
+    for (loop = 0; loop < tileloopy; loop++)
     {
-        memcpy(&tilestart[i * 320], &tilepic[i * 32], 32);
+        memcpy(&tilestart[loop * SCREENWIDTH], &tilepic[loop * TILEWIDTH], TILEWIDTH);
     }
 }
 
-void TILE_ShakeScreen(void)
+/***************************************************************************
+TILE_ShakeScreen() -
+ ***************************************************************************/
+void 
+TILE_ShakeScreen(
+    void
+)
 {
-    int i;
+    int loop;
     char *src = displaybuffer + 12;
     char *dst = displayscreen + g_mapleft - 4;
-    for (i = 0; i < 200; i++)
+    
+    for (loop = 0; loop < SCREENHEIGHT; loop++)
     {
         memcpy(dst, src, 296);
-        dst += 320;
-        src += 320;
+        dst += SCREENWIDTH;
+        src += SCREENWIDTH;
     }
+    
     I_FinishUpdate();
 }
 
-void TILE_DisplayScreen(void)
+/***************************************************************************
+TILE_DisplayScreen() -
+ ***************************************************************************/
+void 
+TILE_DisplayScreen(
+    void
+)
 {
-    int i;
-    char *src = displaybuffer + 16;
-    char *dst = displayscreen + 16;
-    for (i = 0; i < 200; i++)
+    int loop;
+    char *src = displaybuffer + MAP_LEFT;
+    char *dst = displayscreen + MAP_LEFT;
+    
+    for (loop = 0; loop < SCREENHEIGHT; loop++)
     {
         memcpy(dst, src, 288);
-        dst += 320;
-        src += 320;
+        dst += SCREENWIDTH;
+        src += SCREENWIDTH;
     }
+    
     I_FinishUpdate();
 }

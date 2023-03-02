@@ -19,6 +19,7 @@
 #include "joyapi.h"
 #include "input.h"
 #include "fileids.h"
+#include "winids.h"
 
 #ifdef _WIN32
 #include <io.h>

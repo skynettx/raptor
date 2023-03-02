@@ -16,6 +16,7 @@
 #include "joyapi.h"
 #include "input.h"
 #include "fileids.h"
+#include "winids.h"
 
 #define BUY_MODE  0
 #define SELL_MODE 1

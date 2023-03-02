@@ -269,6 +269,7 @@
 		<Unit filename="../src/vmemapi.h" />
 		<Unit filename="../src/windows.cpp" />
 		<Unit filename="../src/windows.h" />
+		<Unit filename="../src/winids.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
