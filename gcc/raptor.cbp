@@ -185,6 +185,9 @@
 			<Add option="-Wall" />
 			<Add option="-g" />
 		</Compiler>
+		<Unit filename="../rsrc/resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
 		<Unit filename="../src/anims.cpp" />
 		<Unit filename="../src/anims.h" />
 		<Unit filename="../src/bonus.cpp" />

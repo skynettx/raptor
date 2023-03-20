@@ -107,6 +107,9 @@
     <ClCompile Include="..\src\vmemapi.cpp" />
     <ClCompile Include="..\src\windows.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\rsrc\resource.rc" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
