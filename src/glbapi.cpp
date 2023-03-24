@@ -8,12 +8,10 @@
 #include "common.h"
 #include "glbapi.h"
 #include "vmemapi.h"
+
 #ifdef _WIN32
 #include <io.h>
 #endif // _WIN32
-#ifdef __linux__
-#include <sys/io.h>
-#endif // __linux__
 #ifdef __GNUC__
 #include <unistd.h>
 char* strupr(char* s)
@@ -26,11 +24,11 @@ char* strupr(char* s)
 
     return s;
 }
-#endif
+#endif // __GNUC__
 #ifdef _MSC_VER
 #include <windows.h>
 #define PATH_MAX MAX_PATH
-#endif
+#endif // _MSC_VER
 
 char prefix[] = "FILE";
 char exePath[PATH_MAX];

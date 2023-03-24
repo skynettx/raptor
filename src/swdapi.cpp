@@ -1668,13 +1668,16 @@ SWD_InitWindow(
 #if _MSC_VER
 #if _WIN64
     header = SWD_ReformatFieldData(header, handle);
-#endif
-#endif
+#endif // _WIN64
+#endif // _MSC_VER
 #if __GNUC__
 #if __x86_64__
     header = SWD_ReformatFieldData(header, handle);
-#endif
-#endif
+#endif // __x86_64__
+#if __aarch64__
+    header = SWD_ReformatFieldData(header, handle);
+#endif // __aarch64__
+#endif // __GNUC__
     
     curfld = (swdfield_t*)((char*)header + header->fldofs);
     
