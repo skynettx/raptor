@@ -194,6 +194,9 @@ int usegamma = 0;
 // Joystick/gamepad hysteresis
 unsigned int joywait = 0;
 
+// Set to true if screen coordinates are in points rather than pixels
+int screencoordpoint = 0;
+
 void VIDEO_LoadPrefs(void)
 {
     fullscreen = INI_GetPreferenceLong("Video", "fullscreen", 0);
@@ -1393,6 +1396,7 @@ void I_InitGraphics(uint8_t *pal)
 {
     SDL_Event dummy;
     char *env;
+    int rw = 0, rh = 0;
 
     // Pass through the XSCREENSAVER_WINDOW environment variable to
     // SDL_WINDOWID, to embed the SDL window into the Xscreensaver
@@ -1485,6 +1489,13 @@ void I_InitGraphics(uint8_t *pal)
     // Call I_ShutdownGraphics on quit
 
     // I_AtExit(I_ShutdownGraphics, true);
+
+    SDL_GetRendererOutputSize(renderer, &rw, &rh);
+
+    if (rw != window_width)
+    {
+        screencoordpoint = 1;
+    }
 }
 
 // Bind all variables controlling video options into the configuration
@@ -1520,6 +1531,13 @@ void I_GetMousePos(int *x, int *y)
     SDL_GetMouseState(x, y);
     SDL_RenderGetViewport(renderer, &viewport);
     SDL_RenderGetScale(renderer, &sx, &sy);
+
+    if (screencoordpoint)
+    {
+        sx /= 2;
+        sy /= 2;
+    }
+
     *x = (int)(*x / sx) - viewport.x;
     *y = (int)(((*y / sy - viewport.y) * (float)SCREENHEIGHT) / actualheight);
 }
@@ -1530,6 +1548,13 @@ void I_SetMousePos(int x, int y)
     float sx, sy;
     SDL_RenderGetViewport(renderer, &viewport);
     SDL_RenderGetScale(renderer, &sx, &sy);
+
+    if (screencoordpoint)
+    {
+        sx /= 2;
+        sy /= 2;
+    }
+
     x = (int)((x + viewport.x) * sx);
     y = (int)(((y * actualheight) / (float)SCREENHEIGHT + viewport.y) * sy);
     SDL_WarpMouseInWindow(screen, x, y);
