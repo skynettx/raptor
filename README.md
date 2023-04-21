@@ -5,6 +5,9 @@ Based on the reverse-engineered codebase from Raptor Call Of The Shadows by nuke
 Click on the thumbnail to watch some videos showing the project in action  
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Nt2HfchiudY/0.jpg)](https://www.youtube.com/channel/UCedmTTlonJK5DvkiMpA_teQ)
+## Information
+Original Raptor Call of The Shadows author Scott Host is working on a new modernized version of the classic called Raptor Remixed. If you are a Raptor fan it would be cool if you would support the project on Kickstarter. For more information visit [www.mking.com](https://www.mking.com)
+
 ## Installing
 You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or fullversion.
 Important only the DOS version v1.2 is compatible!
@@ -126,6 +129,7 @@ to `fullscreen=1`. Or aspect ratio mode off `aspect_ratio_correct=1` to `aspect_
 
 ## Thanks
 Special thanks to [nukeykt](https://github.com/nukeykt) and [wel97459](https://github.com/wel97459) for their great work on the reconstructed source code.
+Big thanks to [Scott Host](https://www.mking.com) for his great support.
 Also many thanks to [schellingb](https://github.com/schellingb) for the great TinySoundFont library and to all contributors from the
 [chocolate-doom project](https://github.com/chocolate-doom) for the awesome libtextscreen. Furthermore, many thanks to Tim Brechbill for the TimGM6mb
 soundfont.
