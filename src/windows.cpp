@@ -1854,11 +1854,9 @@ WIN_MainLoop(
         {
             if (!plr.diff[cur_game] && !plr.fintrain)
             {
-                OBJS_Init();
-                plr.sweapon = -1;
                 plr.fintrain = 1;
-                plr.score = 0;
-                OBJS_Add(S_FORWARD_GUNS);
+
+                OBJS_SetAmt(S_ENERGY, 0);
                 OBJS_Add(S_ENERGY);
                 OBJS_Add(S_ENERGY);
                 OBJS_Add(S_ENERGY);

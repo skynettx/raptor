@@ -73,6 +73,7 @@ extern object_t first_objs, last_objs;
 void OBJS_Init(void);
 int OBJS_Add(int type);
 void OBJS_GetNext(void);
+int OBJS_SetAmt(int type, int amt);
 int OBJS_GetAmt(int type);
 objlib_t *OBJS_GetLib(int type);
 int OBJS_CanBuy(int type);

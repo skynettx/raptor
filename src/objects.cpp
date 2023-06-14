@@ -950,6 +950,26 @@ OBJS_SubAmt(
 }
 
 /***************************************************************************
+OBJS_SetAmt() - Set the number of items within TYPE in Equiped Items
+ ***************************************************************************/
+int                        // RETURN: return nums in OBJ
+OBJS_SetAmt(
+    int type,               // INPUT : OBJ type
+    int amt               // INPUT : Amount type
+)
+{
+    object_t* cur;
+
+    cur = p_objs[type];
+    
+    if (!cur)
+        return 0;
+
+    cur->num = amt;
+    return cur->num;
+}
+
+/***************************************************************************
 OBJS_GetAmt() - Returns number of items within TYPE in Equiped Items
  ***************************************************************************/
 int                        // RETURN: return nums in OBJ
