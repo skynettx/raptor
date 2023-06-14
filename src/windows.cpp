@@ -1860,7 +1860,7 @@ WIN_MainLoop(
                 OBJS_Add(S_ENERGY);
                 OBJS_Add(S_ENERGY);
                 OBJS_Add(S_ENERGY);
-                plr.score = 10000;
+                plr.score = 0;
                 
                 if (plr.diff[cur_game] < DIFF_3)
                     plr.diff[cur_game]++;
