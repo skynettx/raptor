@@ -40,10 +40,12 @@
 #include <unistd.h>
 #endif // __GNUC__
 
+#define wmemcpy(dst,src,size) memmove(dst,src,size)
+
 struct bday_t {
-    int f_0;
-    int f_4;
-    int f_8;
+    int month;
+    int day;
+    int year;
     const char *f_c;
 };
 
@@ -52,7 +54,7 @@ int wRandSeed = 1;
 int wrand(void)
 {
     wRandSeed = ((long long)wRandSeed * 1103515245) + 12345;
-    //wRandSeed = (wRandSeed * 1103515245) + 12345;
+    
     return (wRandSeed >> 16) & 0x7fff;
 }
 
@@ -61,8 +63,14 @@ void wsrand(int seed)
     wRandSeed = seed;
 }
 
+#define MAX_BDAY 6
 
-bday_t bday[6];
+bday_t bday[MAX_BDAY];
+
+#define MONTH     2
+#define DAY       20
+#define YEAR      1994
+#define WLENGTH   12
 
 int bday_flag = 0;
 int bday_num = -1;
@@ -95,10 +103,10 @@ int draw_player;
 int fadeflag;
 int end_fadeflag;
 int debugflag;
-int playerx = 0x90;
-int playery = 0xa0;
-int player_cx = 0x90;
-int player_cy = 0xa0;
+int playerx = PLAYERINITX;
+int playery = PLAYERINITY;
+int player_cx = PLAYERINITX;
+int player_cy = PLAYERINITY;
 int playerbasepic = 3;
 int startfadeflag;
 int g_oldsuper = -1;
@@ -113,7 +121,11 @@ int g_mapleft;
 
 int fadecnt;
 
-int shakes[20] = {
+#define ROTPAL_START 240 
+#define FADE_FRAMES  20
+#define MAX_GLOW 20
+
+int shakes[FADE_FRAMES] = {
     -4, 4, -3, 3, -2, 2, -1, 1,
     -1, 1, -1, 1, -1, 1, -1, 1,
     -1, 1, 0, 0
@@ -148,35 +160,56 @@ char flatnames[4][14] = {
 
 flat_t *flatlib[4];
 
-void RAP_Bday(void)
+/***************************************************************************
+RAP_Bday() - Get system date
+ ***************************************************************************/
+void 
+RAP_Bday(
+    void
+)
 {
     time_t t = time(NULL);
-    struct tm *d = localtime(&t);
-    int i;
+    struct tm *date = localtime(&t);
+    int loop;
+    
     bday_flag = 0;
     bday_num = -1;
-    for (i = 0; i < 6; i++)
+    
+    for (loop = 0; loop < MAX_BDAY; loop++)
     {
-        if (bday[i].f_4)
+        if (bday[loop].day)
         {
-            if (d->tm_mon + 1 == bday[i].f_0 && d->tm_mday == bday[i].f_4 && d->tm_year + 1900 >= bday[i].f_8)
+            if (date->tm_mon + 1 == bday[loop].month && date->tm_mday == bday[loop].day && date->tm_year + 1900 >= bday[loop].year)
             {
-                bday_num = i;
-                if (i == 0)
+                bday_num = loop;
+                
+                if (loop == 0)
                     bday_flag = 1;
             }
         }
     }
 }
 
-void InitScreen(void)
+/***************************************************************************
+InitScreen() - Prints the Init Screen
+ ***************************************************************************/
+void 
+InitScreen(
+    void
+)
 {
     printf(" RAPTOR: Call Of The Shadows V1.2                        (c)1994 Cygnus Studios\n");
 }
 
-void ShutDown(int a1)
+/*==========================================================================
+   ShutDown () Shut Down function called by EXIT_xxx functions
+ ==========================================================================*/
+void 
+ShutDown(
+    int errcode
+)
 {
-    if (!a1 && !godmode)
+    if (!errcode && !godmode)
         WIN_Order();
 
     //IPT_DeInit();
@@ -184,115 +217,129 @@ void ShutDown(int a1)
     //GFX_EndSystem();
     //PTR_End();
     //KBD_End();
-    if (!reg_flag)
-        LASTSCR = GLB_GetItem(FILE001_LASTSCR1_TXT); //Get ANSI Screen Shareware from GLB to char*
-
+    
     if (reg_flag)
         LASTSCR = GLB_GetItem(FILE002_LASTSCR2_TXT); //Get ANSI Screen Fullversion from GLB to char*
-    
+    else
+        LASTSCR = GLB_GetItem(FILE001_LASTSCR1_TXT); //Get ANSI Screen Shareware from GLB to char*
+
     closewindow();                                   //Close Main Window
     I_LASTSCR();                                     //Call to display ANSI Screen 
     GLB_FreeAll();
     IPT_CloJoy();                                    //Close Joystick
     SWD_End();
     SDL_Quit();
+    
     free(g_highmem);
 }
 
-void RAP_ClearSides(void)
+/***************************************************************************
+RAP_ClearSides () - Clears the Sides
+ ***************************************************************************/
+void 
+RAP_ClearSides(
+    void
+)
 {
-    GFX_ColorBox(0, 0, 16, 200, 0);
-    GFX_ColorBox(304, 0, 16, 200, 0);
+    GFX_ColorBox(0, 0, MAP_LEFT, 200, 0);
+    GFX_ColorBox(320 - MAP_LEFT, 0, MAP_LEFT, 200, 0);
 }
 
-void RAP_GetShipPic(void)
+/***************************************************************************
+RAP_GetShipPic () - Loads Correct Ship Pics for Light/Dark Waves
+ ***************************************************************************/
+void 
+RAP_GetShipPic(
+    void
+)
 {
-    int v20, i;
-
-    v20 = 1;
+    int lightflag, loop;
+    lightflag = 1;
+    
+    // GAME 2 wave 8
     if (cur_game == 1 && game_wave[cur_game] == 7)
-        v20 = 0;
+        lightflag = 0;
+    
+    // GAME 3 wave 3
     if (cur_game == 2 && game_wave[cur_game] == 2)
-        v20 = 0;
+        lightflag = 0;
 
-    for (i = 0; i < 7; i++)
+    for (loop = 0; loop < 7; loop++)
     {
-        if (v20)
+        if (lightflag)
         {
-            curship[i] = lship[i];
-            curship[i + 7] = lship[i];
+            curship[loop] = lship[loop];
+            curship[loop + 7] = lship[loop];
         }
         else
         {
-            curship[i] = dship[i];
-            curship[i + 7] = fship[i];
+            curship[loop] = dship[loop];
+            curship[loop + 7] = fship[loop];
         }
     }
-    for (i = 0; i < 14; i++)
-    {
-        GLB_CacheItem(curship[i]);
-    }
-}
-
-#define wmemcpy(a1,a2,a3) memmove(a1,a2,a3)
-/*void wmemcpy(char *a1, char *a2, int a3)
-{
-    while (a3 >= 4)
-    {
-        *(int*)a1 = *(int*)a2;
-        a3 -= 4;
-        a1 += 4;
-        a2 += 4;
-    }
-    while (a3 > 0)
-    {
-        *a1 = *a2;
-        a3--;
-        a1++;
-        a2++;
-    }
-}*/
-
-void Rot_Color(char *a1, int a2, int a3)
-{
-    short v14;
-    short v18;
-    char v1c[3];
     
-    v14 = a2 * 3;
-    v18 = a3 * 3;
-
-    wmemcpy(v1c, &a1[v14], 3);
-    wmemcpy(&a1[v14], &a1[v14+3], v18);
-    wmemcpy(&a1[v14+v18-3], v1c, 3);
+    for (loop = 0; loop < 14; loop++)
+    {
+        GLB_CacheItem(curship[loop]);
+    }
 }
 
-void InitMobj(mobj_t *m)
+/***************************************************************************
+   Rot_Color () - Rotates color in palette
+ ***************************************************************************/
+void 
+Rot_Color(
+    char *gpal, 
+    int snum, 
+    int len)
 {
-    m->done = 0;
-    m->addx = 1;
-    m->addy = 1;
-    m->delx = m->x2 - m->x;
-    m->dely = m->y2 - m->y;
-    if (m->delx < 0)
+    short pos;
+    short maxloop;
+    char h1[3];
+    
+    pos = snum * 3;
+    maxloop = len * 3;
+
+    wmemcpy(h1, &gpal[pos], 3);
+    wmemcpy(&gpal[pos], &gpal[pos+3], maxloop);
+    wmemcpy(&gpal[pos+maxloop-3], h1, 3);
+}
+
+/***************************************************************************
+   InitMobj() - Inits an object to be moved
+ ***************************************************************************/
+void 
+InitMobj(
+    mobj_t *cur            // INPUT : pointer to MOVEOBJ
+)
+{
+    cur->done = 0;
+    cur->addx = 1;
+    cur->addy = 1;
+    
+    cur->delx = cur->x2 - cur->x;
+    cur->dely = cur->y2 - cur->y;
+    
+    if (cur->delx < 0)
     {
-        m->delx = -m->delx;
-        m->addx = -m->addx;
+        cur->delx = -cur->delx;
+        cur->addx = -cur->addx;
     }
-    if (m->dely < 0)
+    if (cur->dely < 0)
     {
-        m->dely = -m->dely;
-        m->addy = -m->addy;
+        cur->dely = -cur->dely;
+        cur->addy = -cur->addy;
     }
-    if (m->delx >= m->dely)
+    
+    if (cur->delx >= cur->dely)
     {
-        m->err = -(m->dely >> 1);
-        m->maxloop = m->delx + 1;
+        cur->err = -(cur->dely >> 1);
+        cur->maxloop = cur->delx + 1;
     }
     else
     {
-        m->err = m->delx >> 1;
-        m->maxloop = m->dely + 1;
+        cur->err = cur->delx >> 1;
+        cur->maxloop = cur->dely + 1;
     }
 }
 
@@ -1072,34 +1119,34 @@ int main(int argc, char *argv[])
     printf("Init -\n");
     EXIT_Install(ShutDown);
     memset(bday, 0, sizeof(bday));
-    bday[0].f_0 = 5;
-    bday[0].f_4 = 16;
-    bday[0].f_8 = 1994;
+    bday[0].month = 5;
+    bday[0].day = 16;
+    bday[0].year = 1994;
     bday[0].f_c = "Scott Host";
 
-    bday[1].f_0 = 2;
-    bday[1].f_4 = 27;
-    bday[1].f_8 = 1996;
+    bday[1].month = 2;
+    bday[1].day = 27;
+    bday[1].year = 1996;
     bday[1].f_c = "Dave T.";
 
-    bday[2].f_0 = 10;
-    bday[2].f_4 = 2;
-    bday[2].f_8 = 1995;
+    bday[2].month = 10;
+    bday[2].day = 2;
+    bday[2].year = 1995;
     bday[2].f_c = "Jim M.";
 
-    bday[3].f_0 = 3;
-    bday[3].f_4 = 12;
-    bday[3].f_8 = 1995;
+    bday[3].month = 3;
+    bday[3].day = 12;
+    bday[3].year = 1995;
     bday[3].f_c = "Bobby P.";
 
-    bday[4].f_0 = 8;
-    bday[4].f_4 = 28;
-    bday[4].f_8 = 1995;
+    bday[4].month = 8;
+    bday[4].day = 28;
+    bday[4].year = 1995;
     bday[4].f_c = "Rich F.";
 
-    bday[5].f_0 = 4;
-    bday[5].f_4 = 24;
-    bday[5].f_8 = 1996;
+    bday[5].month = 4;
+    bday[5].day = 24;
+    bday[5].year = 1996;
     bday[5].f_c = "Paul R.";
 
     RAP_Bday();
