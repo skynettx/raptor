@@ -343,190 +343,260 @@ InitMobj(
     }
 }
 
-void MoveMobj(mobj_t *m)
+/***************************************************************************
+   MoveMobj() - gets next postion for an Object
+ ***************************************************************************/
+void 
+MoveMobj(
+    mobj_t *cur            // INPUT : pointer to MOVEOBJ
+)
 {
-    if (m->maxloop == 0)
+    if (cur->maxloop == 0)
     {
-        m->done = 1;
+        cur->done = 1;
         return;
     }
-    if (m->delx >= m->dely)
+    
+    if (cur->delx >= cur->dely)
     {
-        m->x += m->addx;
-        m->err += m->dely;
-        if (m->err > 0)
+        cur->x += cur->addx;
+        cur->err += cur->dely;
+        
+        if (cur->err > 0)
         {
-            m->y += m->addy;
-            m->err -= m->delx;
+            cur->y += cur->addy;
+            cur->err -= cur->delx;
         }
     }
     else
     {
-        m->y += m->addy;
-        m->err += m->delx;
-        if (m->err > 0)
+        cur->y += cur->addy;
+        cur->err += cur->delx;
+        
+        if (cur->err > 0)
         {
-            m->x += m->addx;
-            m->err -= m->dely;
+            cur->x += cur->addx;
+            cur->err -= cur->dely;
         }
     }
-    m->maxloop--;
+    
+    cur->maxloop--;
 }
 
-int MoveSobj(mobj_t *m, int a2)
+/***************************************************************************
+   MoveSobj() - gets next postion for an Object at speed
+ ***************************************************************************/
+int 
+MoveSobj(
+    mobj_t *cur,           // INPUT : pointer to MOVEOBJ
+    int speed              // INPUT : speed to plot at
+)
 {
-    if (a2 == 0)
+    if (speed == 0)
         return 0;
-    if (m->delx >= m->dely)
+    
+    if (cur->delx >= cur->dely)
     {
-        while (a2)
+        while (speed)
         {
-            a2--;
-            m->maxloop--;
-            m->x += m->addx;
-            m->err += m->dely;
-            if (m->err > 0)
+            speed--;
+            cur->maxloop--;
+            cur->x += cur->addx;
+            cur->err += cur->dely;
+            
+            if (cur->err > 0)
             {
-                m->y += m->addy;
-                m->err -= m->delx;
+                cur->y += cur->addy;
+                cur->err -= cur->delx;
             }
         }
     }
     else
     {
-        while (a2)
+        while (speed)
         {
-            a2--;
-            m->maxloop--;
-            m->y += m->addy;
-            m->err += m->delx;
-            if (m->err > 0)
+            speed--;
+            cur->maxloop--;
+            cur->y += cur->addy;
+            cur->err += cur->delx;
+            
+            if (cur->err > 0)
             {
-                m->x += m->addx;
-                m->err -= m->dely;
+                cur->x += cur->addx;
+                cur->err -= cur->dely;
             }
         }
     }
-    if (m->maxloop < 1)
-        m->done = 1;
-    return a2;
+    
+    if (cur->maxloop < 1)
+        cur->done = 1;
+    
+    return speed;
 }
 
-void RAP_PrintNum(int a1, int a2, char *a3)
+/***************************************************************************
+RAP_PrintNum() -
+ ***************************************************************************/
+void 
+RAP_PrintNum(
+    int x, 
+    int y, 
+    char *str
+)
 {
-    int l, v18;
+    int maxloop, num;
 
-    l = strlen(a3);
-    GFX_PutSprite(numbers[10], a1, a2);
-    a1 += 9;
-    while (--l != -1)
+    maxloop = strlen(str);
+    
+    GFX_PutSprite(numbers[10], x, y);
+    x += 9;
+    
+    while (--maxloop != -1)
     {
-        v18 = *a3 - '0';
-        if (v18 < 11 && v18 >= 0)
-            GFX_PutSprite(numbers[v18], a1, a2);
-        a1 += 8;
-        a3++;
+        num = *str - '0';
+        
+        if (num < 11 && num >= 0)
+            GFX_PutSprite(numbers[num], x, y);
+        
+        x += 8;
+        str++;
     }
 }
 
-void RAP_DisplayShieldLevel(int a1, int a2)
+/***************************************************************************
+RAP_DisplayShieldLevel() - 
+ ***************************************************************************/
+void 
+RAP_DisplayShieldLevel(
+    int xpos, 
+    int level
+)
 {
-    char *v1c;
-    unsigned int v24, v20;
-    int i;
+    char *outbuf;
+    unsigned int curs, addx;
+    int loop;
 
-    v1c = &displayscreen[ylookup[199] + a1];
+    outbuf = &displayscreen[ylookup[199] + xpos];
 
-    v20 = 5898;
-    v24 = 0;
-    for (i = 0; i < 100; i++)
+    addx = (SHIELD_COLOR_RUN << 16) / MAX_SHIELD;
+    curs = 0;
+    
+    for (loop = 0; loop < MAX_SHIELD; loop++)
     {
-        if (i < a2)
-            memset(v1c, 74 - (v24 >> 16), 4);
+        if (loop < level)
+            memset(outbuf, 74 - (curs >> 16), 4);
         else
-            memset(v1c, 0, 4);
-        v24 += v20;
-        v1c -= 320 * 2;
+            memset(outbuf, 0, 4);
+        
+        curs += addx;
+        
+        outbuf -= 640;
     }
 }
 
-void RAP_DisplayStats(void)
+/***************************************************************************
+RAP_DisplayStats() - 
+ ***************************************************************************/
+void 
+RAP_DisplayStats(
+    void
+)
 {
-    char v4c[24];
-    int v24, v20, i, v1c, v30;
-    texture_t *v34, *v2c;
+    char temp[24];
+    int super, shield, loop, x, y;
+    texture_t *pic, *h;
     static int damage = -1;
     static int blinkflag = 1;
 
-    v24 = OBJS_GetAmt(15);
-    if (g_oldsuper != v24)
+    // == DISPLAY SUPER SHIELD ========================
+    super = OBJS_GetAmt(S_SUPER_SHIELD);
+    if (g_oldsuper != super)
     {
-        RAP_DisplayShieldLevel(8, v24);
-        g_oldsuper = v24;
+        RAP_DisplayShieldLevel(MAP_LEFT - 8, super);
+        g_oldsuper = super;
     }
-    v20 = OBJS_GetAmt(16);
-    if (g_oldshield != v20)
-        RAP_DisplayShieldLevel(308, v20);
-
-    if (v20 <= 0 && !godmode)
+    
+    // == DISPLAY NORM SHIELD ========================
+    shield = OBJS_GetAmt(S_ENERGY);
+    if (g_oldshield != shield)
     {
-        ANIMS_StartAnim(5, playerx + (wrand()%32), playery + (wrand()%32));
-        ANIMS_StartAnim(6, playerx + (wrand()%32), playery + (wrand()%32));
-        if (startendwave > 24)
+        RAP_DisplayShieldLevel(MAP_RIGHT + 4, shield);
+    }
+
+    if (shield <= 0 && !godmode)
+    {
+        // BLOW UP SHIP IF ! IN GOD MODE ===================
+        
+        ANIMS_StartAnim(A_MED_AIR_EXPLO, playerx + (wrand()%32), playery + (wrand()%32));
+        ANIMS_StartAnim(A_SMALL_AIR_EXPLO, playerx + (wrand()%32), playery + (wrand()%32));
+        
+        if (startendwave > END_EXPLODE)
         {
             if ((wrand()%2) == 0)
-                SND_Patch(8, 0x1e);
+                SND_Patch(FX_AIREXPLO, 30);
             else
-                SND_Patch(8, 0xe1);
+                SND_Patch(FX_AIREXPLO, 225);
         }
+        
         if (startendwave == -1)
-            startendwave = 60;
-        if (startendwave == 24)
+            startendwave = END_DURATION;
+        
+        if (startendwave == END_EXPLODE)
         {
             draw_player = 0;
-            SND_Patch(8, 127);
-            SND_Patch(9, 127);
-            ANIMS_StartAnim(4, player_cx, player_cy);
-            for (i = 0; i < 512; i++)
+            SND_Patch(FX_AIREXPLO, 127);
+            SND_Patch(FX_AIREXPLO2, 127);
+            ANIMS_StartAnim(A_LARGE_AIR_EXPLO, player_cx, player_cy);
+            
+            for (loop = 0; loop < (PLAYERWIDTH * PLAYERHEIGHT) / 2; loop++)
             {
-                v1c = playerx - 16 + (wrand() % 32) * 2;
-                v30 = playery - 16 + (wrand() % 32) * 2;
-                if (i&1)
-                    ANIMS_StartAnim(4, v1c, v30);
+                x = playerx - (PLAYERWIDTH / 2) + (wrand() % 32) * 2;
+                y = playery - (PLAYERWIDTH / 2) + (wrand() % 32) * 2;
+                
+                if (loop & 1)
+                    ANIMS_StartAnim(A_LARGE_AIR_EXPLO, x, y);
                 else
-                    ANIMS_StartAAnim(7, v1c, v30);
+                    ANIMS_StartAAnim(A_MED_AIR_EXPLO2, x, y);
             }
-            SND_Patch(9, 127);
+            SND_Patch(FX_AIREXPLO2, 127);
         }
     }
 
-    if (startendwave != -1 && v20 > 0)
+    // IF END OF WAVE FLY SHIP OFF SCREEN ===================
+
+    if (startendwave != -1 && shield > 0)
     {
-        if (startendwave == 40)
+        if (startendwave == END_FLYOFF)
         {
             IPT_PauseControl(1);
-            SND_Patch(13, 127);
+            SND_Patch(FX_FLYBY, 127);
         }
-        if (startendwave < 40)
+        
+        if (startendwave < END_FLYOFF)
         {
-            v1c = 0;
-            if (playerx < 0x98)
-                v1c = 8;
-            else if (playerx > 0xa8)
-                v1c = -8;
-            IPT_FMovePlayer(v1c, -4);
+            x = 0;
+            
+            if (playerx < 152)
+                x = 8;
+            else if (playerx > 168)
+                x = -8;
+            
+            IPT_FMovePlayer(x, -4);
         }
     }
-    if (v20 < 11 && !godmode)
+    
+    if (shield <= SHIELD_LOW && !godmode)
     {
         if (!(gl_cnt % 8))
         {
             blinkflag ^= 1;
+            
             if (blinkflag)
             {
                 if (damage)
                 {
                     damage--;
+                    
                     if ((haptic) && (control == 2))
                     {
                         IPT_CalJoyRumbleHigh();                                                                   //Rumble when Shield is low
@@ -534,47 +604,64 @@ void RAP_DisplayStats(void)
                 }
             }
         }
-        if (v20 < g_oldshield && v24 < 1)
+        
+        if (shield < g_oldshield && super < 1)
         {
             if (OBJS_LoseObj())
             {
-                SND_Patch(11, 127);
+                SND_Patch(FX_CRASH, 127);
                 damage = 2;
             }
         }
+        
         if (blinkflag)
         {
             if (damage)
             {
-                v2c = v34 = (texture_t*)GLB_GetItem(FILE111_WEPDEST_PIC);
-                GFX_PutSprite(v34, (320 - v2c->width) >> 1, 0xad);
+                h = pic = (texture_t*)GLB_GetItem(FILE111_WEPDEST_PIC);
+                GFX_PutSprite(pic, (320 - h->width) >> 1, MAP_BOTTOM - 9);
             }
+            
             if (startendwave == -1)
-                SND_Patch(22, 127);
-            v2c = v34 = (texture_t*)GLB_GetItem(FILE110_SHLDLOW_PIC);
-            GFX_PutSprite(v34, (320 - v2c->width) >> 1, 0xb6);
+                SND_Patch(FX_WARNING, 127);
+            
+            h = pic = (texture_t*)GLB_GetItem(FILE110_SHLDLOW_PIC);
+            GFX_PutSprite(pic, (320 - h->width) >> 1, MAP_BOTTOM);
         }
     }
-    g_oldshield = v20;
+    
+    g_oldshield = shield;
+    
     OBJS_DisplayStats();
-    sprintf(v4c, "%08u", plr.score);
-    RAP_PrintNum(0x77, 2, v4c);
-    if (demo_mode == 1)
+    
+    sprintf(temp, "%08u", plr.score);
+    RAP_PrintNum(119, MAP_TOP, temp);
+    
+    if (demo_mode == DEMO_RECORD)
         DEMO_DisplayStats();
+    
     if (debugflag)
     {
-        sprintf(v4c, "%02u", plr.diff[cur_game]);
-        RAP_PrintNum(0x12, 2, v4c);
-        v1c = 32;
-        for (i = 0; i < 16; i++)
+        sprintf(temp, "%02u", plr.diff[cur_game]);
+        RAP_PrintNum(18, MAP_TOP, temp);
+        
+        x = MAP_LEFT + 16;
+        
+        for (loop = 0; loop < 16; loop++)
         {
-            GFX_ColorBox(v1c, 0, 8, 8, 240 + i);
-            v1c += 8;
+            GFX_ColorBox(x, 0, 8, 8, 240 + loop);
+            x += 8;
         }
     }
 }
 
-void RAP_PaletteStuff(void)
+/***************************************************************************
+RAP_PaletteStuff() - 
+ ***************************************************************************/
+void 
+RAP_PaletteStuff(
+    void
+)
 {
     static int wblink = 0;
     static int glow1 = 0;
@@ -582,104 +669,130 @@ void RAP_PaletteStuff(void)
     static int cnt = 0;
     static int palcnt = 0;
     static int blink = 0;
-    int v1c;
-    char *v24, *v28;
-    int v20;
+    int offset;
+    char *pal1, *pal2;
+    int num;
+    
     if (cnt & 1)
     {
+        // == COLOR 240 - 244 ======== WATER
         if (palcnt % 4 != 0)
             Rot_Color(gpal, 240, 5);
+        
+        // == COLOR 245 - 249 ======== FIRE
         if (palcnt % 2 != 0)
             Rot_Color(gpal, 245, 5);
-        v1c = 250 * 3;
-        v24 = &gpal[v1c];
-        v28 = &palette[v1c];
-        v20 = glowtable[glow1];
+        
+        // == COLOR 250 ======== GLOWING FIRE 1
+        offset = 250 * 3;
+        pal1 = &gpal[offset];
+        pal2 = &palette[offset];
+        
+        num = glowtable[glow1];
         glow1++;
-        glow1 %= 20;
-        *v24 = *v28 - v20;
-        if ((uint8_t)*v28 < v20)
-            *v24 = 0;
-        v24++;
-        v28++;
-        *v24 = *v28 - v20;
-        if ((uint8_t)*v28 < v20)
-            *v24 = 0;
-        v24++;
-        v28++;
-        *v24 = *v28 - v20;
-        if ((uint8_t)*v28 < v20)
-            *v24 = 0;
+        glow1 %= MAX_GLOW;
+        
+        *pal1 = *pal2 - num;
+        if ((uint8_t)*pal2 < num)
+            *pal1 = 0;
+        pal1++;
+        pal2++;
+        
+        *pal1 = *pal2 - num;
+        if ((uint8_t)*pal2 < num)
+            *pal1 = 0;
+        pal1++;
+        pal2++;
+        
+        *pal1 = *pal2 - num;
+        if ((uint8_t)*pal2 < num)
+            *pal1 = 0;
 
-        v1c = 251 * 3;
-        v24 = &gpal[v1c];
-        v28 = &palette[v1c];
-        v20 = glowtable[glow2];
+        // == COLOR 251 ======== GLOWING FIRE 2
+        offset = 251 * 3;
+        pal1 = &gpal[offset];
+        pal2 = &palette[offset];
+        
+        num = glowtable[glow2];
         glow2++;
-        glow2 %= 20;
-        *v24 = *v28 - v20;
-        if ((uint8_t)*v28 < v20)
-            *v24 = 0;
-        v24++;
-        v28++;
-        *v24 = *v28 - v20;
-        if ((uint8_t)*v28 < v20)
-            *v24 = 0;
-        v24++;
-        v28++;
-        *v24 = *v28 - v20;
-        if ((uint8_t)*v28 < v20)
-            *v24 = 0;
+        glow2 %= MAX_GLOW;
+        
+        *pal1 = *pal2 - num;
+        if ((uint8_t)*pal2 < num)
+            *pal1 = 0;
+        pal1++;
+        pal2++;
+        
+        *pal1 = *pal2 - num;
+        if ((uint8_t)*pal2 < num)
+            *pal1 = 0;
+        pal1++;
+        pal2++;
+        
+        *pal1 = *pal2 - num;
+        if ((uint8_t)*pal2 < num)
+            *pal1 = 0;
+        
+        // == COLOR 252 & 253 ======== BLINKING RED AND GREEN
         if (palcnt % 2)
         {
-            v1c = 252 * 3;
-            v24 = &gpal[v1c];
-            v28 = &palette[v1c];
+            offset = 252 * 3;
+            pal1 = &gpal[offset];
+            pal2 = &palette[offset];
+            
             if (blink & 1)
             {
-                memcpy(v24, v28, 3);
-                v24 += 3;
-                v28 += 3;
-                memset(v24, 0, 3);
+                memcpy(pal1, pal2, 3);
+                pal1 += 3;
+                pal2 += 3;
+                memset(pal1, 0, 3);
             }
             else
             {
-                memset(v24, 0, 3);
-                v24 += 3;
-                v28 += 3;
-                memcpy(v24, v28, 3);
+                memset(pal1, 0, 3);
+                pal1 += 3;
+                pal2 += 3;
+                memcpy(pal1, pal2, 3);
             }
+            
             blink++;
         }
-        v1c = 254 * 3;
+        
+        // == COLOR 254 ======== BLINKING BLUE
+        offset = 254 * 3;
         if ((wrand() % 3) == 0)
         {
-            v24 = &gpal[v1c];
-            v28 = &palette[v1c];
-            memcpy(v24, v28, 3);
+            pal1 = &gpal[offset];
+            pal2 = &palette[offset];
+            memcpy(pal1, pal2, 3);
         }
         else
         {
-            v24 = &gpal[v1c];
-            memset(v24, 0, 3);
+            pal1 = &gpal[offset];
+            memset(pal1, 0, 3);
         }
-        v1c = 255 * 3;
+        
+        // == COLOR 255 ======== BLINKING WHITE
+        offset = 255 * 3;
         if (wblink < 3)
         {
-            v24 = &gpal[v1c];
-            v28 = &palette[v1c];
-            memcpy(v24, v28, 3);
+            pal1 = &gpal[offset];
+            pal2 = &palette[offset];
+            memcpy(pal1, pal2, 3);
         }
         else
         {
-            v24 = &gpal[v1c];
-            memset(v24, 0, 3);
+            pal1 = &gpal[offset];
+            memset(pal1, 0, 3);
         }
+        
         wblink++;
         wblink %= 6;
+        
         GFX_SetPalette(gpal, 240);
         palcnt++;
     }
+    
     cnt++;
 }
 
