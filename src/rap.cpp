@@ -796,61 +796,83 @@ RAP_PaletteStuff(
     cnt++;
 }
 
-int Do_Game(void)
+/***************************************************************************
+Do_Game () - The main game thing this is it dude
+ ***************************************************************************/
+int            // TRUE=Aborted, FALSE = timeout
+Do_Game(
+    void
+)
 {
-    int v20, v24, v28, v2c, v30, v1c;
-    v20 = 0;
-    v24 = 0;
-    v28 = 1;
-    v2c = 0;
-    v30 = 0;
+    int b2_flag, b3_flag, init_flag, rval, start_score, local_cnt;
+    b2_flag = 0;
+    b3_flag = 0;
+    init_flag = 1;
+    rval = 0;
+    start_score = 0;
+    
     draw_player = 1;
 
     wsrand(game_wave[cur_game] << 10);
+    
     fadeflag = 0;
     end_fadeflag = 0;
     KBD_Clear();
     IMS_StartAck();
-    buttons[0] = 0;
-    buttons[1] = 0;
-    buttons[2] = 0;
-    buttons[3] = 0;
-    playerx = 0x90;
-    playery = 0xa0;
-    if (!demo_mode) {
-        PTR_SetPos(0x90, 0xa0);
+    BUT_1 = 0;
+    BUT_2 = 0;
+    BUT_3 = 0;
+    BUT_4 = 0;
+    
+    playerx = PLAYERINITX;
+    playery = PLAYERINITY;
+    
+    if (!demo_mode) 
+    {
+        PTR_SetPos(playerx, playery);
         IPT_Start();
     }
+    
     RAP_GetShipPic();
     BONUS_Clear();
     ANIMS_Clear();
     SHOTS_Clear();
     ESHOT_Clear();
+    
     memcpy(gpal, palette, 768);
     GFX_FadeOut(0, 0, 0, 2);
-    memset(displaybuffer, 0, 0xfa00);
-    memset(displayscreen, 0, 0xfa00);
-    v1c = GFX_GetFrameCount();
+    
+    memset(displaybuffer, 0, 64000);
+    memset(displayscreen, 0, 64000);
+    
+    local_cnt = GFX_GetFrameCount();
+    
     g_flash = 0;
     g_oldsuper = -1;
     g_oldshield = -1;
     startendwave = -1;
-    if (demo_flag == 1)
+    
+    if (demo_flag == DEMO_RECORD)
         DEMO_StartRec();
 
-    v30 = plr.score;
+    // == CLEAR ALL BUTTONS ===========================
+
+    start_score = plr.score;
     IMS_StartAck();
     memset(buttons, 0, sizeof(buttons));
+    
     do
     {
         num_shadows = num_gshadows = 0;
+        
         IPT_MovePlayer();
-        if (KBD_IsKey(0x3b))                                                                   //Input Help Screen GamePad not implemented
+        
+        if (KBD_IsKey(SC_F1))                                                                   //Input Help Screen GamePad not implemented
         {
             SWD_SetClearFlag(0);
             IPT_End();
             HELP_Win("OVERVW06_TXT");
-            memset(displayscreen, 0, 0xfa00);
+            memset(displayscreen, 0, 64000);
             IPT_Start();
             g_oldsuper = -1;
             g_oldshield = -1;
@@ -858,14 +880,15 @@ int Do_Game(void)
             RAP_DisplayStats();
             SWD_SetClearFlag(1);
             IMS_StartAck();
-            buttons[0] = 0;
-            buttons[1] = 0;
-            buttons[2] = 0;
-            buttons[3] = 0;
-            v20 = 0;
-            v24 = 0;
+            BUT_1 = 0;
+            BUT_2 = 0;
+            BUT_3 = 0;
+            BUT_4 = 0;
+            b2_flag = 0;
+            b3_flag = 0;
         }
-        if (KBD_IsKey(0x19) || JOY_IsKeyInGameStart(Start))                                                                  //Input Pause Screen
+        
+        if (KBD_IsKey(SC_P) || JOY_IsKeyInGameStart(Start))                                                                  //Input Pause Screen
         {
             while (IMS_IsAck())
             {
@@ -879,116 +902,138 @@ int Do_Game(void)
             RAP_DisplayStats();
             SWD_SetClearFlag(1);
             IMS_StartAck();
-            buttons[0] = 0;
-            buttons[1] = 0;
-            buttons[2] = 0;
-            buttons[3] = 0;
-            v20 = 0;
-            v24 = 0;
+            BUT_1 = 0;
+            BUT_2 = 0;
+            BUT_3 = 0;
+            BUT_4 = 0;
+            b2_flag = 0;
+            b3_flag = 0;
         }
-        if (KBD_IsKey(0x42) && godmode)
+        
+        if (KBD_IsKey(SC_F8) && godmode)
         {
             while (IMS_IsAck())
             {
             }
             debugflag ^= 1;
         }
+        
         if (DEMO_Think())
             break;
-        if (demo_mode == 2)
+        
+        if (demo_mode == DEMO_PLAYBACK)
         {
-            if (IMS_IsAck() && !buttons[1] && !buttons[2] && !buttons[3])
+            if (IMS_IsAck() && !BUT_2 && !BUT_3 && !BUT_4)
             {
-                v2c = 1;
+                rval = 1;
                 break;
             }
         }
-       
-        switch (lastscan)
+        
+        switch (KBD_LASTSCAN)
         {
-        case 0:
+        case SC_NONE:
             break;
+        
         case 1:
             break;
-        case 2:
-            OBJS_MakeSpecial(3);
+        
+        case SC_1:
+            OBJS_MakeSpecial(S_DUMB_MISSLE);
             break;
-        case 3:
-            OBJS_MakeSpecial(4);
+        
+        case SC_2:
+            OBJS_MakeSpecial(S_MINI_GUN);
             break;
-        case 4:
-            OBJS_MakeSpecial(5);
+        
+        case SC_3:
+            OBJS_MakeSpecial(S_TURRET);
             break;
-        case 5:
-            OBJS_MakeSpecial(6);
+        
+        case SC_4:
+            OBJS_MakeSpecial(S_MISSLE_PODS);
             break;
-        case 6:
-            OBJS_MakeSpecial(7);
+        
+        case SC_5:
+            OBJS_MakeSpecial(S_AIR_MISSLE);
             break;
-        case 7:
-            OBJS_MakeSpecial(8);
+        
+        case SC_6:
+            OBJS_MakeSpecial(S_GRD_MISSLE);
             break;
-        case 8:
-            OBJS_MakeSpecial(9);
+        
+        case SC_7:
+            OBJS_MakeSpecial(S_BOMB);
             break;
-        case 9:
-            OBJS_MakeSpecial(10);
+        
+        case SC_8:
+            OBJS_MakeSpecial(S_ENERGY_GRAB);
             break;
-        case 10:
-            OBJS_MakeSpecial(12);
+        
+        case SC_9:
+            OBJS_MakeSpecial(S_PULSE_CANNON);
             break;
-        case 11:
-            OBJS_MakeSpecial(14);
+        
+        case SC_0:
+            OBJS_MakeSpecial(S_DEATH_RAY);
             break;
-        case 12:
-            OBJS_MakeSpecial(13);
+        
+        case SC_MINUS:
+            OBJS_MakeSpecial(S_FORWARD_LASER);
             break;
         }
-        if (buttons[0])
+        
+        if (BUT_1)
         {
-            OBJS_Use(0);
-            OBJS_Use(1);
-            OBJS_Use(2);
-            buttons[0] = 0;
+            OBJS_Use(S_FORWARD_GUNS);
+            OBJS_Use(S_PLASMA_GUNS);
+            OBJS_Use(S_MICRO_MISSLE);
+            BUT_1 = 0;
             if (plr.sweapon != -1)
                 OBJS_Use(plr.sweapon);
         }
-        if (buttons[1])
+        
+        if (BUT_2)
         {
-            buttons[1] = 0;
-            if (!v20)
+            BUT_2 = 0;
+            if (!b2_flag)
             {
-                SND_Patch(20, 127);
-                v20 = 1;
+                SND_Patch(FX_SWEP, 127);
+                b2_flag = 1;
                 OBJS_GetNext();
             }
         }
         else
         {
-            if (v20 == 1)
-                v20 = 0;
+            if (b2_flag == 1)
+                b2_flag = 0;
         }
-        if (buttons[2])
+        
+        if (BUT_3)
         {
-            buttons[2] = 0;
-            if (!v24)
+            BUT_3 = 0;
+            if (!b3_flag)
             {
-                v24 = 1;
-                OBJS_Use(11);
+                b3_flag = 1;
+                OBJS_Use(S_MEGA_BOMB);
             }
         }
         else
         {
-            if (v24 == 1)
-                v24 = 0;
+            if (b3_flag == 1)
+                b3_flag = 0;
         }
+        
         if (startendwave != -1)
         {
             if (startendwave == 0)
                 end_wave = 1;
+            
             startendwave--;
         }
+        
         gl_cnt++;
+        
         TILE_Think();
         ENEMY_Think();
         ESHOT_Think();
@@ -996,17 +1041,21 @@ int Do_Game(void)
         SHOTS_Think();
         ANIMS_Think();
         OBJS_Think();
+        
         if (draw_player)
             SHADOW_Add(curship[playerpic + g_flash], playerx, playery);
+        
         TILE_Display();
         SHADOW_DisplayGround();
         ENEMY_DisplayGround();
         SHADOW_DisplaySky();
         ANIMS_DisplayGround();
+        
         ENEMY_DisplaySky();
         SHOTS_Display();
         BONUS_Display();
         ANIMS_DisplaySky();
+        
         if (draw_player)
         {
             FLAME_Down(player_cx - o_engine[playerpic] - 3, player_cy + 15, 4, gl_cnt % 2);
@@ -1014,14 +1063,16 @@ int Do_Game(void)
             GFX_PutSprite((texture_t*)GLB_GetItem(curship[playerpic + g_flash]), playerx, playery);
             g_flash = 0;
         }
+        
         ANIMS_DisplayHigh();
         ESHOT_Display();
+        
         if (fadeflag)
         {
-            if (fadecnt >= 19)
+            if (fadecnt >= FADE_FRAMES - 1)
             {
                 RAP_ClearSides();
-                g_mapleft = 16;
+                g_mapleft = MAP_LEFT;
                 GFX_SetPalette(gpal, 0);
                 fadeflag = 0;
                 g_oldsuper = -1;
@@ -1031,30 +1082,35 @@ int Do_Game(void)
             {
                 RAP_ClearSides();
                 retraceflag = 0;
-                GFX_FadeFrame(gpal, fadecnt, 20);
+                GFX_FadeFrame(gpal, fadecnt, FADE_FRAMES);
                 retraceflag = 0;
-                g_mapleft = shakes[fadecnt] + 16;
+                g_mapleft = shakes[fadecnt] + MAP_LEFT;
                 fadecnt++;
             }
         }
         else
         {
-            if (!v28)
+            if (!init_flag)
                 RAP_PaletteStuff();
         }
+        
         RAP_DisplayStats();
-        while (GFX_GetFrameCount() - v1c < 3)
+        
+        while (GFX_GetFrameCount() - local_cnt < 3)
         {
         }
-        v1c = GFX_GetFrameCount();
+        
+        local_cnt = GFX_GetFrameCount();
+        
         if (fadeflag)
             TILE_ShakeScreen();
         else
             TILE_DisplayScreen();
+        
         if (startfadeflag)
         {
-            SND_Patch(15, 127);
-            SND_Patch(8, 127);
+            SND_Patch(FX_GEXPLO, 127);
+            SND_Patch(FX_AIREXPLO, 127);
             retraceflag = 1;
             GFX_FadeOut(63, 60, 60, 1);
             GFX_FadeStart();
@@ -1063,20 +1119,23 @@ int Do_Game(void)
             fadecnt = 0;
             retraceflag = 0;
         }
-        if (reg_flag && keyboard[14])
+        
+        if (reg_flag && KBD_Key(SC_BACKSPACE))
         {
-            OBJS_Add(14);
-            OBJS_Add(16);
-            OBJS_Add(16);
-            OBJS_Add(16);
+            OBJS_Add(S_DEATH_RAY);
+            OBJS_Add(S_ENERGY);
+            OBJS_Add(S_ENERGY);
+            OBJS_Add(S_ENERGY);
             plr.score = 0;
         }
-        if (v28)
+        
+        if (init_flag)
         {
-            v28 = 0;
+            init_flag = 0;
             GFX_FadeIn(gpal, 64);
         }
-        if (keyboard[45] && keyboard[56])
+        
+        if (KBD_Key(SC_X) && KBD_Key(SC_ALT))
         {
             RAP_ClearSides();
             SWD_SetClearFlag(0);
@@ -1089,17 +1148,19 @@ int Do_Game(void)
             RAP_DisplayStats();
             SWD_SetClearFlag(1);
             IMS_StartAck();
-            buttons[0] = 0;
-            buttons[1] = 0;
-            buttons[2] = 0;
-            buttons[3] = 0;
-            v20 = 0;
-            v24 = 0;
+            BUT_1 = 0;
+            BUT_2 = 0;
+            BUT_3 = 0;
+            BUT_4 = 0;
+            b2_flag = 0;
+            b3_flag = 0;
         }
-        if (KBD_IsKey(1) || JOY_IsKeyInGameBack(Back))                                                                      //Fixed Line GamePad Abort Mission Screen 
+        
+        if (KBD_IsKey(SC_ESC) || JOY_IsKeyInGameBack(Back))                                                                      //Fixed Line GamePad Abort Mission Screen 
         {
             if (godmode)
                 end_wave = 1;
+            
             if (!demo_mode)
             {
                 SWD_SetClearFlag(0);
@@ -1107,8 +1168,8 @@ int Do_Game(void)
                 RAP_ClearSides();
                 if (WIN_AskBool("Abort Mission ?"))
                 {
-                    plr.score = v30;
-                    v2c = 1;
+                    plr.score = start_score;
+                    rval = 1;
                     break;
                 }
                 IPT_Start();
@@ -1118,34 +1179,41 @@ int Do_Game(void)
                 RAP_DisplayStats();
                 SWD_SetClearFlag(1);
                 IMS_StartAck();
-                buttons[0] = 0;
-                buttons[1] = 0;
-                buttons[2] = 0;
-                buttons[3] = 0;
-                v20 = 0;
-                v24 = 0;
+                BUT_1 = 0;
+                BUT_2 = 0;
+                BUT_3 = 0;
+                BUT_4 = 0;
+                b2_flag = 0;
+                b3_flag = 0;
             }
-            else if (demo_mode == 2)
+            else if (demo_mode == DEMO_PLAYBACK)
             {
-                v2c = 1;
+                rval = 1;
                 break;
             }
-            else if (demo_mode == 1)
+            else if (demo_mode == DEMO_RECORD)
                 break;
         }
     } while (!end_wave);
+    
     GFX_FadeOut(0, 0, 0, 32);
+    
     RAP_FreeMap();
     end_wave = 0;
-    memset(displaybuffer, 0, 0xfa00);
+    
+    memset(displaybuffer, 0, 64000);
     GFX_MarkUpdate(0, 0, 320, 200);
+    
     IPT_PauseControl(0);
+    
     GFX_DisplayUpdate();
     GFX_SetPalette(palette, 0);
     IPT_End();
-    if (demo_flag == 1)
+    
+    if (demo_flag == DEMO_RECORD)
         DEMO_SaveFile();
-    return v2c;
+    
+    return rval;
 }
 
 void RAP_InitMem(void)
