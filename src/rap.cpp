@@ -46,7 +46,7 @@ struct bday_t {
     int month;
     int day;
     int year;
-    const char *f_c;
+    const char *name;
 };
 
 int wRandSeed = 1;
@@ -96,9 +96,8 @@ char gdmodestr[] = "CASTLE";
 player_t plr;
 
 char* g_highmem;
-char* LASTSCR;
 
-texture_t *ptrtex;
+texture_t *cursor_pic;
 int draw_player;
 int fadeflag;
 int end_fadeflag;
@@ -209,6 +208,8 @@ ShutDown(
     int errcode
 )
 {
+    char* mem;
+
     if (!errcode && !godmode)
         WIN_Order();
 
@@ -219,12 +220,12 @@ ShutDown(
     //KBD_End();
     
     if (reg_flag)
-        LASTSCR = GLB_GetItem(FILE002_LASTSCR2_TXT); //Get ANSI Screen Fullversion from GLB to char*
+        mem = GLB_GetItem(FILE002_LASTSCR2_TXT);     //Get ANSI Screen Fullversion from GLB to char*
     else
-        LASTSCR = GLB_GetItem(FILE001_LASTSCR1_TXT); //Get ANSI Screen Shareware from GLB to char*
+        mem = GLB_GetItem(FILE001_LASTSCR1_TXT);     //Get ANSI Screen Shareware from GLB to char*
 
     closewindow();                                   //Close Main Window
-    I_LASTSCR();                                     //Call to display ANSI Screen 
+    I_LASTSCR(mem);                                  //Call to display ANSI Screen 
     GLB_FreeAll();
     IPT_CloJoy();                                    //Close Joystick
     SWD_End();
@@ -599,7 +600,7 @@ RAP_DisplayStats(
                     
                     if ((haptic) && (control == 2))
                     {
-                        IPT_CalJoyRumbleHigh();                                                                   //Rumble when Shield is low
+                        IPT_CalJoyRumbleHigh();                                                                   
                     }
                 }
             }
@@ -867,7 +868,7 @@ Do_Game(
         
         IPT_MovePlayer();
         
-        if (KBD_IsKey(SC_F1))                                                                   //Input Help Screen GamePad not implemented
+        if (KBD_IsKey(SC_F1))                                                                   
         {
             SWD_SetClearFlag(0);
             IPT_End();
@@ -888,7 +889,7 @@ Do_Game(
             b3_flag = 0;
         }
         
-        if (KBD_IsKey(SC_P) || JOY_IsKeyInGameStart(Start))                                                                  //Input Pause Screen
+        if (KBD_IsKey(SC_P) || JOY_IsKeyInGameStart(Start))                                                                  
         {
             while (IMS_IsAck())
             {
@@ -1156,7 +1157,7 @@ Do_Game(
             b3_flag = 0;
         }
         
-        if (KBD_IsKey(SC_ESC) || JOY_IsKeyInGameBack(Back))                                                                      //Fixed Line GamePad Abort Mission Screen 
+        if (KBD_IsKey(SC_ESC) || JOY_IsKeyInGameBack(Back))                                                                       
         {
             if (godmode)
                 end_wave = 1;
@@ -1216,24 +1217,40 @@ Do_Game(
     return rval;
 }
 
-void RAP_InitMem(void)
+/***************************************************************************
+RAP_InitMem() - Allocates memory for VM and GLB to use
+ ***************************************************************************/
+void 
+RAP_InitMem(
+    void
+)
 {
     unsigned int heapsize = 0x495FF0;                       
+    
     g_highmem = (char*)calloc(heapsize, 1);
+    
     VM_InitMemory(g_highmem, heapsize);
     GLB_UseVM();
 }
 
-int main(int argc, char *argv[])
+/***************************************************************************
+main() -
+ ***************************************************************************/
+int 
+main(
+    int argc, 
+    char *argv[]
+)
 {
-    char *shost, *reg_text, *pal;
-    int i, eps, v28, v20;
+    char *var1, *tptr, *pal;
+    int loop, numfiles, ptrflag, item;
 
-    shost = getenv("S_HOST");
+    var1 = getenv("S_HOST");
 
     InitScreen();
 
     RAP_InitLoadSave();
+    
     if (access(RAP_SetupFilename(), 0))
     {
         printf("\n\n** You must run SETUP first! **\n");
@@ -1244,7 +1261,7 @@ int main(int argc, char *argv[])
 
     godmode = 0;
 
-    if (shost != NULL && !strcmp(shost, gdmodestr))
+    if (var1 != NULL && !strcmp(var1, gdmodestr))
         godmode = 1;
     else
         godmode = 0;
@@ -1254,7 +1271,7 @@ int main(int argc, char *argv[])
         if (!strcmp(argv[1], "REC"))
         {
             DEMO_SetFileName(argv[2]);
-            demo_flag = 1;
+            demo_flag = DEMO_RECORD;
             printf("DEMO RECORD enabled\n");
         }
         else if (!strcmp(argv[1], "PLAY"))
@@ -1262,7 +1279,7 @@ int main(int argc, char *argv[])
             if (!access(argv[2], 0))
             {
                 DEMO_SetFileName(argv[2]);
-                demo_flag = 2;
+                demo_flag = DEMO_PLAYBACK;
                 printf("DEMO PLAYBACK enabled\n");
             }
         }
@@ -1270,12 +1287,15 @@ int main(int argc, char *argv[])
 
     if (godmode)
         printf("GOD mode enabled\n");
+    
     cur_diff = 0;
 
     if (!access("FILE0001.GLB", 0))
         gameflag[0] = 1;
+    
     if (!access("FILE0002.GLB", 0))
         gameflag[1] = 1;
+    
     if (!access("FILE0003.GLB", 0) && !access("FILE0004.GLB", 0))
     {
         gameflag[2] = 1;
@@ -1285,55 +1305,67 @@ int main(int argc, char *argv[])
     if (gameflag[1] + gameflag[2])
         reg_flag = 1;
 
-    eps = 0;
-    for (i = 0; i < 4; i++)
-        if (gameflag[i])
-            eps++;
+    numfiles = 0;
+    
+    for (loop = 0; loop < 4; loop++)
+    {
+        if (gameflag[loop])
+            numfiles++;
+    }
 
-    if (access("FILE0000.GLB", 0) || !eps)
+    if (access("FILE0000.GLB", 0) || !numfiles)
     {
         printf("All game data files NOT FOUND cannot proceed !!\n");
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
             "Raptor", "All game data files NOT FOUND cannot proceed !!", NULL);
         exit(0);
     }
+    
     printf("Init -\n");
     EXIT_Install(ShutDown);
+    
+    // ================================================
+    // SET UP B-DAY STUFF O RAMA
+    // ================================================
+
     memset(bday, 0, sizeof(bday));
-    bday[0].month = 5;
+    
+    bday[0].month = 5;   // Scott
     bday[0].day = 16;
     bday[0].year = 1994;
-    bday[0].f_c = "Scott Host";
+    bday[0].name = "Scott Host";
 
-    bday[1].month = 2;
+    bday[1].month = 2;   // Dave
     bday[1].day = 27;
     bday[1].year = 1996;
-    bday[1].f_c = "Dave T.";
+    bday[1].name = "Dave T.";
 
-    bday[2].month = 10;
+    bday[2].month = 10;  // JIM
     bday[2].day = 2;
     bday[2].year = 1995;
-    bday[2].f_c = "Jim M.";
+    bday[2].name = "Jim M.";
 
-    bday[3].month = 3;
+    bday[3].month = 3;   // BOBBY P.
     bday[3].day = 12;
     bday[3].year = 1995;
-    bday[3].f_c = "Bobby P.";
+    bday[3].name = "Bobby P.";
 
-    bday[4].month = 8;
+    bday[4].month = 8;   // RICH
     bday[4].day = 28;
     bday[4].year = 1995;
-    bday[4].f_c = "Rich F.";
+    bday[4].name = "Rich F.";
 
-    bday[5].month = 4;
+    bday[5].month = 4;   // Paul
     bday[5].day = 24;
     bday[5].year = 1996;
-    bday[5].f_c = "Paul R.";
+    bday[5].name = "Paul R.";
 
     RAP_Bday();
 
     if (bday_num != -1)
-        printf("Birthday() = %s\n", bday[bday_num].f_c);
+        printf("Birthday() = %s\n", bday[bday_num].name);
+
+    // ================================================
 
     if (access(RAP_SetupFilename(), 0))
         EXIT_Error("You Must run SETUP.EXE First !!");
@@ -1342,30 +1374,33 @@ int main(int argc, char *argv[])
         EXIT_Error("SETUP Error");
 
     fflush(stdout);
-
     KBD_Install();
     GFX_InitSystem();
     SWD_Install(0);
+    
     VIDEO_LoadPrefs();
     IPT_LoadPrefs();
+    
     switch (control)
     {
     default:
         printf("PTR_Init()-Auto\n");
         fflush(stdout);
-        v28 = PTR_Init(1);
+        ptrflag = PTR_Init(P_MOUSE);
         usekb_flag = 1;
         break;
+        
     case 2:
         printf("PTR_Init()-Joystick\n");
         fflush(stdout);
-        v28 = PTR_Init(2);
+        ptrflag = PTR_Init(P_JOYSTICK);
         usekb_flag = 0;
         break;
+    
     case 1:
         printf("PTR_Init()-Mouse\n");
         fflush(stdout);
-        v28 = PTR_Init(1);
+        ptrflag = PTR_Init(P_MOUSE);
         usekb_flag = 0;
         break;
     }
@@ -1375,54 +1410,68 @@ int main(int argc, char *argv[])
         printf("Registered EXE!\n");
         fflush(stdout);
     }
+    
     GLB_InitSystem(argv[0], 6, 0);
+    
     if (reg_flag)
     {
-        reg_text = GLB_GetItem(FILE000_ATENTION_TXT);
-        printf("%s\n", reg_text);
-        GLB_FreeItem(0);
+        tptr = GLB_GetItem(FILE000_ATENTION_TXT);
+        printf("%s\n", tptr);
+        GLB_FreeItem(FILE000_ATENTION_TXT);
     }
+    
     SND_InitSound();
     IPT_Init();
     GLB_FreeAll();
     RAP_InitMem();
+    
     printf("Loading Graphics\n");
+    
     pal = GLB_LockItem(FILE100_PALETTE_DAT);
     memset(pal, 0, 3);
     palette = pal;
     SHADOW_Init();
     FLAME_Init();
+    
     fflush(stdout);
-    if (v28)
+    
+    if (ptrflag)
     {
-        ptrtex = (texture_t*)GLB_LockItem(FILE112_CURSOR_PIC);
-        PTR_SetPic(ptrtex);
+        cursor_pic = (texture_t*)GLB_LockItem(FILE112_CURSOR_PIC);
+        PTR_SetPic(cursor_pic);
         PTR_SetPos(160, 100);
         PTR_DrawCursor(0);
     }
-    for (i = 0; i < 7; i++)
+    
+    // = SET UP SHIP PICTURES =========================
+    for (loop = 0; loop < 7; loop++)
     {
-        lship[i] = FILE11a_LPLAYER_PIC + i;
-        if (gameflag[1])
+        lship[loop] = FILE11a_LPLAYER_PIC + loop;
+        
+        if (GAME2)
         {
-            dship[i] = FILE245_DPLAYER_PIC + i;
-            fship[i] = FILE24c_FPLAYER_PIC + i;
+            dship[loop] = FILE245_DPLAYER_PIC + loop;
+            fship[loop] = FILE24c_FPLAYER_PIC + loop;
         }
     }
-    for (i = 0; i < 4; i++)
+    
+    // = LOAD IN FLAT LIBS  =========================
+    for (loop = 0; loop < 4; loop++)
     {
-        if (gameflag[i])
+        if (gameflag[loop])
         {
-            v20 = GLB_GetItemID(flatnames[i]);
-            flatlib[i] = (flat_t*)GLB_LockItem(v20);
+            item = GLB_GetItemID(flatnames[loop]);
+            flatlib[loop] = (flat_t*)GLB_LockItem(item);
         }
         else
-            flatlib[i] = NULL;
+            flatlib[loop] = NULL;
     }
-    for (i = 0; i < 11; i++)
+    
+    // = LOAD IN 0-9 $ SPRITE PICS  =========================
+    for (loop = 0; loop < 11; loop++)
     {
-        v20 = FILE105_N0_PIC + i;
-        numbers[i] = (texture_t*)GLB_LockItem(v20);
+        item = FILE105_N0_PIC + loop;
+        numbers[loop] = (texture_t*)GLB_LockItem(item);
     }
 
     FLAME_InitShades();
@@ -1434,19 +1483,23 @@ int main(int argc, char *argv[])
     BONUS_Init();
     ANIMS_Init();
     SND_Setup();
-    GFX_SetPalRange(0, 239);
+    
+    GFX_SetPalRange(0, ROTPAL_START - 1);
     GFX_InitVideo(palette);
     SHADOW_MakeShades();
+    
     RAP_ClearPlayer();
+    
     if (!godmode)
         INTRO_Credits();
-    if (demo_flag != 2)
+    
+    if (demo_flag != DEMO_PLAYBACK)
     {
-        SND_PlaySong(86, 1, 1);
+        SND_PlaySong(FILE056_RINTRO_MUS, 1, 1);
         INTRO_PlayMain();
-        SND_PlaySong(87, 1, 1);
+        SND_PlaySong(FILE057_MAINMENU_MUS, 1, 1);
     }
-    else if (demo_flag == 2)
+    else if (demo_flag == DEMO_PLAYBACK)
     {
         DEMO_LoadFile();
         DEMO_Play();
@@ -1457,6 +1510,7 @@ int main(int argc, char *argv[])
     game_wave[1] = 0;
     game_wave[2] = 0;
     game_wave[3] = 0;
+    
     do
     {
        WIN_MainMenu();

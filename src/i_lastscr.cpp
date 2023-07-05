@@ -35,7 +35,7 @@
 // 
 // Displays the text mode ending screen after the game quits
 //
-void I_LASTSCR(void)
+void I_LASTSCR(char* mem)
 {
     unsigned char* screendata;
     int y;
@@ -60,7 +60,7 @@ void I_LASTSCR(void)
     for (y = 0; y < TXT_SCREEN_H; ++y)
     {
         memcpy(screendata + (y * TXT_SCREEN_W * 2),
-            LASTSCR + (y * LASTSCR_W + indent) * 2,
+            mem + (y * LASTSCR_W + indent) * 2,
             TXT_SCREEN_W * 2);
     }
 
