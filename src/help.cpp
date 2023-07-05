@@ -122,7 +122,7 @@ HELP_Win(
         if ((KBD_IsKey(SC_ESC)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))
             break;
         
-        if (keyboard[SC_X] && keyboard[SC_ALT])
+        if (KBD_Key(SC_X) && KBD_Key(SC_ALT))
             WIN_AskExit();
 
         if (dlg.cur_act == S_FLD_COMMAND && dlg.cur_cmd == F_SELECT)

@@ -1390,14 +1390,14 @@ main(
         usekb_flag = 1;
         break;
         
-    case 2:
+    case I_JOYSTICK:
         printf("PTR_Init()-Joystick\n");
         fflush(stdout);
         ptrflag = PTR_Init(P_JOYSTICK);
         usekb_flag = 0;
         break;
     
-    case 1:
+    case I_MOUSE:
         printf("PTR_Init()-Mouse\n");
         fflush(stdout);
         ptrflag = PTR_Init(P_MOUSE);

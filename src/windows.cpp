@@ -817,7 +817,7 @@ WIN_Register(
             }
         }
         
-        if (keyboard[SC_ESC] || Back || BButton)
+        if (KBD_Key(SC_ESC) || Back || BButton)
         {
             rval = 0;
             fi_joy_count = 0;
@@ -825,7 +825,7 @@ WIN_Register(
             goto reg_exit;
         }
         
-        if (keyboard[SC_X] && keyboard[SC_ALT])
+        if (KBD_Key(SC_X) && KBD_Key(SC_ALT))
             WIN_AskExit();
 
         switch (dlg.keypress)
@@ -947,7 +947,7 @@ WIN_Register(
                     SWD_ShowAllWindows();
                     GFX_DisplayUpdate();
                 }
-                else if (dlg.keypress == SC_ENTER || keyboard[SC_ENTER])
+                else if (dlg.keypress == SC_ENTER || KBD_Key(SC_ENTER))
                 {
                     if (RAP_IsSaveFile(&tp))
                         WIN_Msg("Pilot NAME and CALLSIGN Used !");
@@ -1197,13 +1197,13 @@ WIN_Hangar(
                 }
             }
             
-            if (keyboard[SC_ESC] || Back || BButton)
+            if (KBD_Key(SC_ESC) || Back || BButton)
             {
                 opt = -99;
                 goto hangar_exit;
             }
             
-            if (keyboard[SC_X] && keyboard[SC_ALT])
+            if (KBD_Key(SC_X) && KBD_Key(SC_ALT))
                 WIN_AskExit();
             
             switch (dlg.keypress)
@@ -1532,7 +1532,7 @@ WIN_ShipComp(
             }
         }
         
-        if (keyboard[SC_X] && keyboard[SC_ALT])
+        if (KBD_Key(SC_X) && KBD_Key(SC_ALT))
             WIN_AskExit();
         
         switch (dlg.keypress)
@@ -2127,10 +2127,10 @@ WIN_MainMenu(
             PTR_DrawCursor(1);
         }
         
-        if (keyboard[SC_X] && keyboard[SC_ALT])
+        if (KBD_Key(SC_X) && KBD_Key(SC_ALT))
             WIN_AskExit();
         
-        if ((keyboard[SC_ESC] && ingameflag) || (Back && ingameflag) || (BButton && ingameflag))                                   
+        if ((KBD_Key(SC_ESC) && ingameflag) || (Back && ingameflag) || (BButton && ingameflag))                                   
             goto menu_exit;
         
         if ((dlg.keypress == SC_F1) || (JOY_IsKeyMenu(RightShoulder)))                                                         

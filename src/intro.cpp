@@ -863,7 +863,7 @@ INTRO_Credits(
         if (loop == 45)
             SND_PlaySong(FILE056_RINTRO_MUS, 1, 1);
         
-        if (keyboard[SC_ESC])
+        if (KBD_Key(SC_ESC))
             break;
         local_cnt = GFX_GetFrameCount();
         while (GFX_GetFrameCount() - local_cnt < 3)

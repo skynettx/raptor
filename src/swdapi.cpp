@@ -617,11 +617,11 @@ SWD_DoButton(
     switch (g_key)
     {
     case SC_TAB:
-        if (keyboard[SC_ALT])
+        if (KBD_Key(SC_ALT))
         {
             cur_act = S_WIN_COMMAND;
             cur_cmd = W_NEXT;
-            while (keyboard[SC_TAB]) {
+            while (KBD_Key(SC_TAB)) {
             }
         }
         else
@@ -835,9 +835,9 @@ SWD_FieldInput(
     switch (g_key)
     {
     case SC_TAB:
-        if (keyboard[SC_ALT])
+        if (KBD_Key(SC_ALT))
         {
-            while (keyboard[SC_TAB]) {
+            while (KBD_Key(SC_TAB)) {
             }
             cur_act = S_WIN_COMMAND;
             cur_cmd = W_NEXT;
@@ -903,13 +903,13 @@ SWD_FieldInput(
         break;
     
     default:
-        if (keyboard[SC_Y] && keyboard[SC_CTRL])
+        if (KBD_Key(SC_Y) && KBD_Key(SC_CTRL))
         {
             curpos = 0;
             flag = 1;
             *wrkbuf = 0;
         }
-        else if (!keyboard[SC_ALT] && !keyboard[SC_CTRL] && g_key > 0 && curfld->maxchars-1 > curpos)
+        else if (!KBD_Key(SC_ALT) && !KBD_Key(SC_CTRL) && g_key > 0 && curfld->maxchars-1 > curpos)
         {
             if (g_ascii > 31 && g_ascii < 127)
             {
@@ -1496,7 +1496,7 @@ SWD_IsButtonDown(
     void
 )
 {
-    if (keyboard[SC_ENTER])
+    if (KBD_Key(SC_ENTER))
         return 1;
     
     if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                       
@@ -2501,7 +2501,7 @@ SWD_Dialog(
                 sx = cur_mx - curwin->x;
                 sy = cur_my - curwin->y;
                 
-                keyboard[SC_ENTER] = 0;
+                KBD_Key(SC_ENTER) = 0;
                 lastscan = SC_NONE;
                 SWD_ShowAllWindows();
                 while (mouseb1)
