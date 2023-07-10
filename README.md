@@ -6,10 +6,19 @@ Click on the thumbnail to watch some videos showing the project in action
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Nt2HfchiudY/0.jpg)](https://www.youtube.com/channel/UCedmTTlonJK5DvkiMpA_teQ)
 ## Information
-Original Raptor Call of The Shadows author Scott Host is working on a new modernized version of the classic called Raptor Remixed. If you are a Raptor fan it would be cool if you would support the project on Kickstarter. For more information visit [www.mking.com](https://www.mking.com)
+Original Raptor Call Of The Shadows author Scott Host is working on a new modernized version of the classic called Raptor Remixed. If you are a Raptor fan it would be cool if you would support the project on Kickstarter. For more information visit [www.mking.com](https://www.mking.com)
+
+## Quick start
+Release builds are available for Windows and macOS.
+All release builds contain only the assets (GLB files) of the shareware version 1.2.
+If you want to play the full version you have to get the assets (GLB files) of the full version 1.2 yourself and copy them to the installation directory.
+To download the latest release build for your platform, click [Download](https://github.com/skynettx/raptor/releases/latest).
+Then install the downloaded release build on your system by following the instructions of the installer.
+That's it now Raptor is ready to play.
+For those who want to build themselves or who want more configuration information, continue below otherwise you're done here.
 
 ## Installing
-You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or fullversion.
+You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or full version.
 Important only the DOS version v1.2 is compatible!
 You have to take care of these files yourself.
 
@@ -35,7 +44,7 @@ You have to take care of these files yourself.
    raptor.exe (under Windows) or raptor (under Linux or macOS)
    ```
 
-### Fullversion
+### Full version
 1. Copy the following files to Raptor directory:  
    ```
    FILE0000.GLB  
@@ -69,8 +78,8 @@ You can build or download [Raptor Setup](https://github.com/skynettx/raptorsetup
 Rename the `SETUP(ADLIB).INI` or the `SETUP(MIDI).INI` file to `SETUP.INI` in Raptor directory.  
 If you want Midi over the TinySoundFont lib rename the `TimGM6mb.sf2` to `SoundFont.sf2` or specify the filename in the `SETUP.INI` file:  
 `SoundFont=SoundFont.sf2`  
-You can use any other GM compatible soundfont in sf2 format. For a better Midi sound quality I recommend the [FluidR3_GM.sf2](https://musescore.org/node/101).
-This font is 140 mb so it is not in the repository.  
+You can use any other GM compatible soundfont in sf2 format. For a better Midi sound quality I recommend the FluidR3_GM.sf2.
+This font is 140 MB in size, so it is not in the repository.  
 To play with one of the following input devices set `Control=0` under the [Setup] section in the `SETUP.INI` file to:  
 `Control=0` Keyboard  
 `Control=1` Mouse  

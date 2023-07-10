@@ -1,3 +1,3 @@
 #pragma once
 
-void I_LASTSCR(void);
+void I_LASTSCR(char* mem);

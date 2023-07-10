@@ -370,7 +370,7 @@ STORE_Enter(
         
         SWD_Dialog(&dlg);
         
-        if (keyboard[SC_X] && keyboard[SC_ALT])
+        if (KBD_Key(SC_X) && KBD_Key(SC_ALT))
             WIN_AskExit();
         
         if (dlg.viewactive)

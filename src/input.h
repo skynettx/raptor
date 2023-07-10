@@ -8,6 +8,11 @@ enum ITYPE
 	I_FORCE
 };
 
+#define BUT_1 ( buttons[0] )
+#define BUT_2 ( buttons[1] )
+#define BUT_3 ( buttons[2] )
+#define BUT_4 ( buttons[3] )
+
 extern int buttons[4];
 extern int control;
 extern int haptic;

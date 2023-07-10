@@ -47,7 +47,6 @@ extern int g_oldsuper, g_oldshield;
 extern int playerx, playery;
 extern char gdmodestr[];
 extern int playerbasepic;
-extern char* LASTSCR;
 
 struct player_t {
     char name[20];
@@ -75,6 +74,9 @@ struct player_t {
 #define GAME1 ( gameflag[0] )
 #define GAME2 ( gameflag[1] )
 #define GAME3 ( gameflag[2] + gameflag[3] )
+
+#define SHIELD_COLOR_RUN 9
+#define SHIELD_LOW       10
 
 #define PLAYERWIDTH  32
 #define PLAYERHEIGHT 32

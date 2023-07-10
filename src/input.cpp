@@ -77,16 +77,16 @@ IPT_GetButtons(
     }
 #endif
     
-    if (keyboard[k_Fire])
+    if (KBD_Key(k_Fire))
         buttons[0] = 1;
     
-    if (keyboard[k_FireSp])
+    if (KBD_Key(k_FireSp))
         buttons[1] = 1;
     
-    if (keyboard[k_ChangeSp])
+    if (KBD_Key(k_ChangeSp))
         buttons[2] = 1;
     
-    if (keyboard[k_Mega])
+    if (KBD_Key(k_Mega))
         buttons[3] = 1;
 }
 
@@ -240,9 +240,9 @@ IPT_GetKeyBoard(
     void
 )
 {
-    if (keyboard[k_Left] || keyboard[k_Right])
+    if (KBD_Key(k_Left) || KBD_Key(k_Right))
     {
-        if (keyboard[k_Left])
+        if (KBD_Key(k_Left))
         {
             if (g_addx >= 0)
                 g_addx = -1;
@@ -250,7 +250,7 @@ IPT_GetKeyBoard(
             if (-g_addx > MAX_ADDX)
                 g_addx = -MAX_ADDX;
         }
-        else if (keyboard[k_Right])
+        else if (KBD_Key(k_Right))
         {
             if (g_addx <= 0)
                 g_addx = 1;
@@ -265,9 +265,9 @@ IPT_GetKeyBoard(
             g_addx /= 2;
     }
     
-    if (keyboard[k_Up] || keyboard[k_Down])
+    if (KBD_Key(k_Up) || KBD_Key(k_Down))
     {
-        if (keyboard[k_Up])
+        if (KBD_Key(k_Up))
         {
             if (g_addy >= 0)
                 g_addy = -1;
@@ -275,7 +275,7 @@ IPT_GetKeyBoard(
             if (-g_addy > MAX_ADDY)
                 g_addy = -MAX_ADDY;
         }
-        else if (keyboard[k_Down])
+        else if (KBD_Key(k_Down))
         {
             if (g_addy <= 0)
                 g_addy = 1;
