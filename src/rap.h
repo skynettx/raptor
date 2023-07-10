@@ -162,11 +162,11 @@ extern player_t plr;
 
 int wrand(void);
 
-void InitMobj(mobj_t *m);
-void MoveMobj(mobj_t* m);
-int MoveSobj(mobj_t* m, int a2);
+void InitMobj(mobj_t *cur);
+void MoveMobj(mobj_t* cur);
+int MoveSobj(mobj_t* cur, int speed);
 void RAP_FreeMap(void);
 void RAP_LoadMap(void);
 int Do_Game(void);
 int RAP_LoadWin(void);
-void ShutDown(int a1);
+void ShutDown(int errcode);
