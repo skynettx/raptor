@@ -18,7 +18,7 @@ That's it now Raptor is ready to play.
 For those who want to build themselves or who want more configuration information, continue below otherwise you're done here.
 
 ## Installing
-You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or fullversion.
+You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or full version.
 Important only the DOS version v1.2 is compatible!
 You have to take care of these files yourself.
 
@@ -44,7 +44,7 @@ You have to take care of these files yourself.
    raptor.exe (under Windows) or raptor (under Linux or macOS)
    ```
 
-### Fullversion
+### Full version
 1. Copy the following files to Raptor directory:  
    ```
    FILE0000.GLB  
@@ -78,8 +78,8 @@ You can build or download [Raptor Setup](https://github.com/skynettx/raptorsetup
 Rename the `SETUP(ADLIB).INI` or the `SETUP(MIDI).INI` file to `SETUP.INI` in Raptor directory.  
 If you want Midi over the TinySoundFont lib rename the `TimGM6mb.sf2` to `SoundFont.sf2` or specify the filename in the `SETUP.INI` file:  
 `SoundFont=SoundFont.sf2`  
-You can use any other GM compatible soundfont in sf2 format. For a better Midi sound quality I recommend the [FluidR3_GM.sf2](https://musescore.org/node/101).
-This font is 140 mb so it is not in the repository.  
+You can use any other GM compatible soundfont in sf2 format. For a better Midi sound quality I recommend the FluidR3_GM.sf2.
+This font is 140 MB in size, so it is not in the repository.  
 To play with one of the following input devices set `Control=0` under the [Setup] section in the `SETUP.INI` file to:  
 `Control=0` Keyboard  
 `Control=1` Mouse  
