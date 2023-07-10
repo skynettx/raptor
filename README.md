@@ -6,7 +6,16 @@ Click on the thumbnail to watch some videos showing the project in action
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Nt2HfchiudY/0.jpg)](https://www.youtube.com/channel/UCedmTTlonJK5DvkiMpA_teQ)
 ## Information
-Original Raptor Call of The Shadows author Scott Host is working on a new modernized version of the classic called Raptor Remixed. If you are a Raptor fan it would be cool if you would support the project on Kickstarter. For more information visit [www.mking.com](https://www.mking.com)
+Original Raptor Call Of The Shadows author Scott Host is working on a new modernized version of the classic called Raptor Remixed. If you are a Raptor fan it would be cool if you would support the project on Kickstarter. For more information visit [www.mking.com](https://www.mking.com)
+
+## Quick start
+Release builds are available for Windows and macOS.
+All release builds contain only the assets (GLB files) of the shareware version 1.2.
+If you want to play the full version you have to get the assets (GLB files) of the full version 1.2 yourself and copy them to the installation directory.
+To download the latest release build for your platform, click [Download](https://github.com/skynettx/raptor/releases/latest).
+Then install the downloaded release build on your system by following the instructions of the installer.
+That's it now Raptor is ready to play.
+For those who want to build themselves or who want more configuration information, continue below otherwise you're done here.
 
 ## Installing
 You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or fullversion.
