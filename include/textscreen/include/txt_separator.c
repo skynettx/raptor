@@ -54,19 +54,35 @@ static void TXT_SeparatorDrawer(TXT_UNCAST_ARG(separator))
 
     TXT_GetXY(&x, &y);
 
+    // Draw special separator with custom hight, width and color argument else draw standard separator
     // Draw separator.  Go back one character and draw two extra
     // to overlap the window borders.
 
-    TXT_DrawSeparator(x-2, y, w + 4);
+    if (separator->specialsep == 1)
+        TXT_DrawSpecialSeparator(x, y, w + separator->w, separator->h, separator->sepcolor, 1);
+    else
+        TXT_DrawSeparator(x - 2, y, w + 4, 0, 0);
 
     if (separator->label != NULL)
     {
-        TXT_GotoXY(x, y);
+        if (separator->specialsep == 1)
+        {
+            TXT_GotoXY(x + 1, y);
 
-        TXT_FGColor(TXT_COLOR_BRIGHT_GREEN);
-        TXT_DrawString(" ");
-        TXT_DrawString(separator->label);
-        TXT_DrawString(" ");
+            TXT_FGColor(TXT_COLOR_BRIGHT_GREEN);
+
+            TXT_DrawString(separator->label);
+        }
+        else
+        {
+            TXT_GotoXY(x, y);
+
+            TXT_FGColor(TXT_COLOR_BRIGHT_GREEN);
+
+            TXT_DrawString(" ");
+            TXT_DrawString(separator->label);
+            TXT_DrawString(" ");
+        }
     }
 }
 
@@ -102,11 +118,32 @@ txt_widget_class_t txt_separator_class =
     NULL,
 };
 
+txt_separator_t* TXT_NewSpecialSeparator(const char* label, int w, int h, int sepcolor)
+{
+    txt_separator_t* separator;
+
+    separator = malloc(sizeof(txt_separator_t));
+
+    separator->sepcolor = sepcolor;
+    separator->specialsep = 1;
+    separator->w = w;
+    separator->h = h;
+    
+    TXT_InitWidget(separator, &txt_separator_class);
+
+    separator->label = NULL;
+    TXT_SetSeparatorLabel(separator, label);
+
+    return separator;
+}
+
 txt_separator_t *TXT_NewSeparator(const char *label)
 {
     txt_separator_t *separator;
 
     separator = malloc(sizeof(txt_separator_t));
+
+    separator->specialsep = 0;
 
     TXT_InitWidget(separator, &txt_separator_class);
 

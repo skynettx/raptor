@@ -15,11 +15,11 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="../../SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/include/SDL2" />
+					<Add directory="../../SDL2-devel-2.28.2-mingw/SDL2-2.28.2/i686-w64-mingw32/include/SDL2" />
 				</Compiler>
 				<Linker>
 					<Add option="-lmingw32 -lSDL2main -lSDL2" />
-					<Add directory="../../SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/lib" />
+					<Add directory="../../SDL2-devel-2.28.2-mingw/SDL2-2.28.2/i686-w64-mingw32/lib" />
 				</Linker>
 			</Target>
 			<Target title="Win (32 bit) Release">
@@ -31,12 +31,12 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
-					<Add directory="../../SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/include/SDL2" />
+					<Add directory="../../SDL2-devel-2.28.2-mingw/SDL2-2.28.2/i686-w64-mingw32/include/SDL2" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lmingw32 -lSDL2main -lSDL2" />
-					<Add directory="../../SDL2-devel-2.0.14-mingw/SDL2-2.0.14/i686-w64-mingw32/lib" />
+					<Add directory="../../SDL2-devel-2.28.2-mingw/SDL2-2.28.2/i686-w64-mingw32/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux (32 bit) Debug">
@@ -119,12 +119,12 @@
 				<Compiler>
 					<Add option="-m64" />
 					<Add option="-g" />
-					<Add directory="../../SDL2-devel-2.0.14-mingw/SDL2-2.0.14/x86_64-w64-mingw32/include/SDL2" />
+					<Add directory="../../SDL2-devel-2.28.2-mingw/SDL2-2.28.2/x86_64-w64-mingw32/include/SDL2" />
 				</Compiler>
 				<Linker>
 					<Add option="-m64" />
 					<Add option="-lmingw32 -lSDL2main -lSDL2" />
-					<Add directory="../../SDL2-devel-2.0.14-mingw/SDL2-2.0.14/x86_64-w64-mingw32/lib" />
+					<Add directory="../../SDL2-devel-2.28.2-mingw/SDL2-2.28.2/x86_64-w64-mingw32/lib" />
 				</Linker>
 			</Target>
 			<Target title="Win (64 bit) Release">
@@ -137,13 +137,13 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-m64" />
-					<Add directory="../../SDL2-devel-2.0.14-mingw/SDL2-2.0.14/x86_64-w64-mingw32/include/SDL2" />
+					<Add directory="../../SDL2-devel-2.28.2-mingw/SDL2-2.28.2/x86_64-w64-mingw32/include/SDL2" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-m64" />
 					<Add option="-lmingw32 -lSDL2main -lSDL2" />
-					<Add directory="../../SDL2-devel-2.0.14-mingw/SDL2-2.0.14/x86_64-w64-mingw32/lib" />
+					<Add directory="../../SDL2-devel-2.28.2-mingw/SDL2-2.28.2/x86_64-w64-mingw32/lib" />
 				</Linker>
 			</Target>
 		</Build>

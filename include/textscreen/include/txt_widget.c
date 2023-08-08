@@ -94,6 +94,10 @@ void TXT_InitWidget(TXT_UNCAST_ARG(widget), txt_widget_class_t *widget_class)
     // Align left by default
 
     widget->align = TXT_HORIZ_LEFT;
+
+    // No helplabel by default
+
+    widget->is_helplabel_set = 0;
 }
 
 void TXT_SignalConnect(TXT_UNCAST_ARG(widget),
@@ -305,23 +309,69 @@ int TXT_HoveringOverWidget(TXT_UNCAST_ARG(widget))
     // Is the mouse cursor within the bounds of the widget?
 
     TXT_GetMousePosition(&x, &y);
-
+    
     return (x >= widget->x && x < widget->x + widget->w
          && y >= widget->y && y < widget->y + widget->h);
+}
+
+void TXT_SetHelpLabel(TXT_UNCAST_ARG(widget), const char* helplabel)
+{
+    TXT_CAST_ARG(txt_widget_t, widget);
+
+    widget->helplabel = strdup(helplabel);
+
+    widget->is_helplabel_set = 1;
 }
 
 void TXT_SetWidgetBG(TXT_UNCAST_ARG(widget))
 {
     TXT_CAST_ARG(txt_widget_t, widget);
+    txt_window_t* active_window;
+   
+    active_window = TXT_GetActiveWindow();
 
+    if (widget->helplabel == NULL)
+    {
+        widget->helplabel = "";
+    }
+
+    // When helplabel is not set for widget draw nothing
+
+    if (widget->is_helplabel_set != 1)
+    {
+        TXT_SetHelpLabel(widget, "");
+    }
+    
+    // When in active window no widget is hovering or focused deactivate helplabel 
+    
+    if (!TXT_ContainsWidget(active_window, widget))
+    {
+        TXT_DrawHelpLabel("");
+    }
+    
     if (widget->focused)
     {
         TXT_FGColor(TXT_COLOR_BLACK);
         TXT_BGColor(TXT_COLOR_GREY, 0);
+        
+        // Set helplabel when widget focused
+
+        if (!TXT_HoveringOverWidget(active_window) && widget->is_helplabel_set == 1)
+        {
+            TXT_DrawHelpLabel(widget->helplabel);
+        }
     }
+    
     else if (TXT_HoveringOverWidget(widget))
     {
         TXT_BGColor(TXT_HOVER_BACKGROUND, 0);
+    }
+    
+    if (TXT_HoveringOverWidget(widget) && widget->is_helplabel_set == 1)
+    {
+        // Set helplabel when mouse hovering over widget
+        
+        TXT_DrawHelpLabel(widget->helplabel);
     }
     else
     {

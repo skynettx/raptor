@@ -40,6 +40,7 @@ struct txt_label_s
     unsigned int w, h;
     int fgcolor;
     int bgcolor;
+    int customlabel;
 };
 
 /**
@@ -50,6 +51,15 @@ struct txt_label_s
  */
 
 txt_label_t *TXT_NewLabel(const char *label);
+
+/**
+ * Create a new label widget at position +1 on x axis.
+ *
+ * @param label         String to display in the widget (UTF-8 format).
+ * @return              Pointer to the new label widget.
+ */
+
+txt_label_t* TXT_NewSpecialLabel(const char* label);
 
 /**
  * Set the string displayed in a label widget.

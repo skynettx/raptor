@@ -41,6 +41,8 @@ static TxtIdleCallback periodic_callback = NULL;
 static void *periodic_callback_data;
 static unsigned int periodic_callback_period;
 
+static char *help_label;
+
 void TXT_AddDesktopWindow(txt_window_t *win)
 {
     // Previously-top window loses focus:
@@ -147,7 +149,7 @@ int TXT_LowerWindow(txt_window_t *window)
     return 0;
 }
 
-static void DrawDesktopBackground(const char *title)
+static void DrawDesktopBackground(const char *title, const char* title_help)
 {
     int i;
     unsigned char *screendata;
@@ -169,7 +171,7 @@ static void DrawDesktopBackground(const char *title)
 
     p = screendata;
 
-    for (i=0; i<TXT_SCREEN_W; ++i)
+    for (i = 0; i<TXT_SCREEN_W; ++i)
     {
         *p++ = ' ';
         *p++ = TXT_COLOR_BLACK | (TXT_COLOR_GREY << 4);
@@ -177,7 +179,7 @@ static void DrawDesktopBackground(const char *title)
 
     p = screendata + (TXT_SCREEN_H - 1) * TXT_SCREEN_W * 2;
 
-    for (i=0; i<TXT_SCREEN_W; ++i)
+    for (i = 0; i<TXT_SCREEN_W; ++i)
     {
         *p++ = ' ';
         *p++ = TXT_COLOR_BLACK | (TXT_COLOR_GREY << 4);
@@ -191,6 +193,15 @@ static void DrawDesktopBackground(const char *title)
 
     TXT_PutChar(' ');
     TXT_Puts(title);
+
+    // Help Text on bottom banner
+    
+    TXT_GotoXY(0, 24);
+    TXT_FGColor(TXT_COLOR_DARK_GREY);
+    TXT_BGColor(TXT_COLOR_GREY, 0);
+
+    TXT_DrawString(" ");
+    TXT_DrawString(title_help);
 }
 
 static void DrawHelpIndicator(void)
@@ -224,6 +235,12 @@ static void DrawHelpIndicator(void)
     TXT_DrawString("=Help ");
 }
 
+void TXT_DrawHelpLabel(const char* title)
+{
+    free(help_label);
+    help_label = strdup(title);
+}
+
 void TXT_SetDesktopTitle(const char *title)
 {
     free(desktop_title);
@@ -235,6 +252,7 @@ void TXT_DrawDesktop(void)
 {
     txt_window_t *active_window;
     const char *title;
+    const char* title_help;
     int i;
 
     TXT_InitClipArea();
@@ -244,7 +262,12 @@ void TXT_DrawDesktop(void)
     else
         title = desktop_title;
 
-    DrawDesktopBackground(title);
+    if (help_label == NULL)
+        title_help = "";
+    else
+        title_help = help_label;
+
+    DrawDesktopBackground(title, title_help);
 
     active_window = TXT_GetActiveWindow();
     if (active_window != NULL && active_window->help_url != NULL)
@@ -287,8 +310,8 @@ static void DesktopInputEvent(int c)
                 TXT_OpenWindowHelpURL(active_window);
             }
             break;
-
-        default:
+        
+       default:
             break;
     }
 

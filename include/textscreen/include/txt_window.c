@@ -58,6 +58,58 @@ void TXT_SetWindowAction(txt_window_t *window,
     }
 }
 
+txt_window_t *TXT_NewCustomWindow(const char *title, int titlecolor, int active_bgcolor, int inactive_bgcolor, int active_fgcolor, int inactive_fgcolor, int framecolor, int sepcolor)
+{
+    int i;
+
+    txt_window_t* win;
+
+    win = malloc(sizeof(txt_window_t));
+
+    TXT_InitTable(&win->table, 1);
+
+    if (title == NULL)
+    {
+        win->title = NULL;
+    }
+    else
+    {
+        win->title = strdup(title);
+    }
+
+    win->x = TXT_SCREEN_W / 2;
+    win->y = TXT_SCREEN_H / 2;
+    win->horiz_align = TXT_HORIZ_CENTER;
+    win->vert_align = TXT_VERT_CENTER;
+    win->key_listener = NULL;
+    win->mouse_listener = NULL;
+    win->help_url = NULL;
+    win->titlecolor = titlecolor;
+    win->active_bgcolor = active_bgcolor;
+    win->inactive_bgcolor = inactive_bgcolor;
+    win->active_fgcolor = active_fgcolor;
+    win->inactive_fgcolor = inactive_fgcolor;
+    win->framecolor = framecolor;
+    win->sepcolor = sepcolor;
+    win->customwin = 1;
+
+    TXT_AddWidget(win, TXT_NewSeparator(NULL));
+    
+    for (i = 0; i < 3; ++i)
+    {
+        win->actions[i] = NULL;
+    }
+
+    TXT_AddDesktopWindow(win);
+
+    // Default actions
+
+    TXT_SetWindowAction(win, TXT_HORIZ_LEFT, TXT_NewWindowEscapeAction(win));
+    TXT_SetWindowAction(win, TXT_HORIZ_RIGHT, TXT_NewWindowSelectAction(win));
+
+    return win;
+}
+
 txt_window_t *TXT_NewWindow(const char *title)
 {
     int i;
@@ -84,9 +136,10 @@ txt_window_t *TXT_NewWindow(const char *title)
     win->key_listener = NULL;
     win->mouse_listener = NULL;
     win->help_url = NULL;
+    win->customwin = 0;
 
     TXT_AddWidget(win, TXT_NewSeparator(NULL));
-
+    
     for (i=0; i<3; ++i)
     {
         win->actions[i] = NULL;
@@ -335,37 +388,36 @@ void TXT_DrawWindow(txt_window_t *window)
 
     TXT_LayoutWindow(window);
 
-    if (window->table.widget.focused)
+    if (window->table.widget.focused && window->customwin != 1)
     {
         TXT_BGColor(TXT_ACTIVE_WINDOW_BACKGROUND, 0);
+        TXT_FGColor(TXT_COLOR_BRIGHT_WHITE);
     }
-    else
+    else if (window->customwin != 1)
     {
         TXT_BGColor(TXT_INACTIVE_WINDOW_BACKGROUND, 0);
+        TXT_FGColor(TXT_COLOR_BRIGHT_WHITE);
     }
 
-    if (window->table.widget.focused)
-        TXT_FGColor(TXT_COLOR_BRIGHT_WHITE);
-
-    else
-        TXT_FGColor(TXT_COLOR_DARK_GREY);
+    if (window->table.widget.focused && window->customwin == 1)
+    {
+        TXT_BGColor(window->active_bgcolor, 0);
+        TXT_FGColor(window->active_fgcolor);
+    }
+    else if (window->customwin == 1)
+    {
+        TXT_BGColor(window->inactive_bgcolor, 0);
+        TXT_FGColor(window->inactive_fgcolor);
+    }
 
     // Draw the window
 
-    if (window->table.widget.focused)
-    {
-        TXT_DrawWindowFrame(window->title,
+    TXT_DrawWindowFrame(window->title,
             window->window_x, window->window_y,
-            window->window_w, window->window_h);
-    }
-    
-    else
-    {
-        TXT_DrawWindowFrameInActive(window->title,
-            window->window_x, window->window_y,
-            window->window_w, window->window_h);
-    }
-
+            window->window_w, window->window_h,
+            window->titlecolor, window->framecolor, 
+            window->customwin);
+  
     // Draw all widgets
 
     TXT_DrawWidget(window);
@@ -377,18 +429,10 @@ void TXT_DrawWindow(txt_window_t *window)
     if (widgets->y + widgets->h < window->window_y + window->window_h - 1)
     {
         // Separator for action area
-        if (window->table.widget.focused)
-        {
-            TXT_DrawSeparator(window->window_x, widgets->y + widgets->h,
-                window->window_w);
-        }
-
-        else
-        {
-            TXT_DrawSeparatorInActive(window->window_x, widgets->y + widgets->h,
-                window->window_w);
-        }
-
+        
+        TXT_DrawSeparator(window->window_x, widgets->y + widgets->h,
+                window->window_w, window->sepcolor, window->customwin);
+      
         // Action area at the window bottom
 
         DrawActionArea(window);
@@ -597,6 +641,27 @@ void TXT_OpenWindowHelpURL(txt_window_t *window)
     {
         TXT_OpenURL(window->help_url);
     }
+}
+
+txt_window_t* TXT_CustomMessageBox(const char* title, const char* message, int titlecolor, int active_bgcolor, int inactive_bgcolor, int active_fgcolor, int inactive_fgcolor, int framecolor, int sepcolor, ...)
+{
+    txt_window_t* window;
+    char buf[256];
+    va_list args;
+
+    va_start(args, sepcolor);
+    TXT_vsnprintf(buf, sizeof(buf), message, args);
+    va_end(args);
+
+    window = TXT_NewCustomWindow(title, titlecolor, active_bgcolor, inactive_bgcolor, active_fgcolor, inactive_fgcolor, framecolor, sepcolor);
+    TXT_AddWidget(window, TXT_NewLabel(buf));
+
+    TXT_SetWindowAction(window, TXT_HORIZ_LEFT, NULL);
+    TXT_SetWindowAction(window, TXT_HORIZ_CENTER,
+        TXT_NewWindowEscapeAction(window));
+    TXT_SetWindowAction(window, TXT_HORIZ_RIGHT, NULL);
+
+    return window;
 }
 
 txt_window_t *TXT_MessageBox(const char *title, const char *message, ...)
