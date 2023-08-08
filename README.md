@@ -30,9 +30,9 @@ You have to take care of these files yourself.
    ```
 2. Copy the `raptor.exe` (Windows) or `raptor` (Linux or macOS) and `SETUP(ADLIB).INI or SETUP(MIDI).INI` files from build directory to Raptor directory. 
    For Midi support over TinySoundFont copy the soundfont `TimGM6mb.sf2` from `include\TimGM6mb\` to Raptor directory.
-   Under Windows copy the `SDL.dll` from `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x86\`
-   `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64\` folder or from `include\SDL2-devel-2.0.14-mingw\SDL2-2.0.14\i686-w64-mingw32\bin\` 
-   `include\SDL2-devel-2.0.14-mingw\SDL2-2.0.14\x86_64-w64-mingw32\bin\`folder (depending on which version you prefer) to Raptor directory.
+   Under Windows copy the `SDL.dll` from `include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x86\`
+   `include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x64\` folder or from `include\SDL2-devel-2.28.2-mingw\SDL2-2.28.2\i686-w64-mingw32\bin\` 
+   `include\SDL2-devel-2.28.2-mingw\SDL2-2.28.2\x86_64-w64-mingw32\bin\`folder (depending on which version you prefer) to Raptor directory.
    Under Linux install lib-sdl2 from the packagemanager of your respective distro. When you use macOS install lib-sdl2 from dmg or from a packagemanager like brew etc. 
 3. The final folder should look like this:  
    ```
@@ -55,9 +55,9 @@ You have to take care of these files yourself.
    ```
 2. Copy the `raptor.exe` (Windows) or `raptor` (Linux or macOS) and `SETUP(ADLIB).INI or SETUP(MIDI).INI` files from build directory to Raptor directory.
    For Midi support over TinySoundFont copy the soundfont `TimGM6mb.sf2` from `include\TimGM6mb\` to Raptor directory.
-   Under Windows copy the `SDL.dll` from `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x86\`
-   `include\SDL2-devel-2.0.14-VC\SDL2-2.0.14\lib\x64\` folder or from `include\SDL2-devel-2.0.14-mingw\SDL2-2.0.14\i686-w64-mingw32\bin\` 
-   `include\SDL2-devel-2.0.14-mingw\SDL2-2.0.14\x86_64-w64-mingw32\bin\`folder (depending on which version you prefer) to Raptor directory.
+   Under Windows copy the `SDL.dll` from `include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x86\`
+   `include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x64\` folder or from `include\SDL2-devel-2.28.2-mingw\SDL2-2.28.2\i686-w64-mingw32\bin\` 
+   `include\SDL2-devel-2.28.2-mingw\SDL2-2.28.2\x86_64-w64-mingw32\bin\`folder (depending on which version you prefer) to Raptor directory.
    Under Linux install lib-sdl2 from the packagemanager of your respective distro. When you use macOS install lib-sdl2 from dmg or from a packagemanager like brew etc.
 3. The final folder should look like this:  
    ```
