@@ -102,6 +102,14 @@ struct txt_widget_s
     // Pointer up to parent widget that contains this widget.
 
     txt_widget_t *parent;
+
+    // Set helplabel to widget
+
+    const char* helplabel;
+
+    // Call helplabel draw function only when helplabel is set for widget
+
+    int is_helplabel_set;
 };
 
 void TXT_InitWidget(TXT_UNCAST_ARG(widget), txt_widget_class_t *widget_class);
@@ -174,6 +182,15 @@ void TXT_SetWidgetBG(TXT_UNCAST_ARG(widget));
  */
 
 int TXT_ContainsWidget(TXT_UNCAST_ARG(haystack), TXT_UNCAST_ARG(needle));
+
+/**
+* Set helplabel on left side of bottom banner
+* 
+*  @ param widget The widget
+*  @ param helplabel The helplabel to show on bottom banner
+*/
+
+void TXT_SetHelpLabel(TXT_UNCAST_ARG(widget), const char* helplabel);
 
 #endif /* #ifndef TXT_WIDGET_H */
 

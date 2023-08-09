@@ -75,7 +75,10 @@ static void TXT_LabelDrawer(TXT_UNCAST_ARG(label))
 
         // Draw this line
 
-        TXT_GotoXY(origin_x, origin_y + y);
+        if (label->customlabel == 1)
+            TXT_GotoXY(origin_x + 1, origin_y + y);
+        else
+            TXT_GotoXY(origin_x, origin_y + y);
 
         // Gap at the start
 
@@ -172,6 +175,28 @@ void TXT_SetLabel(txt_label_t *label, const char *value)
     }
 }
 
+txt_label_t* TXT_NewSpecialLabel(const char* text)
+{
+    txt_label_t* label;
+
+    label = malloc(sizeof(txt_label_t));
+
+    TXT_InitWidget(label, &txt_label_class);
+    label->label = NULL;
+    label->lines = NULL;
+
+    // Default colors
+
+    label->bgcolor = -1;
+    label->fgcolor = -1;
+
+    label->customlabel = 1;
+
+    TXT_SetLabel(label, text);
+
+    return label;
+}
+
 txt_label_t *TXT_NewLabel(const char *text)
 {
     txt_label_t *label;
@@ -186,6 +211,8 @@ txt_label_t *TXT_NewLabel(const char *text)
 
     label->bgcolor = -1;
     label->fgcolor = -1;
+
+    label->customlabel = 0;
 
     TXT_SetLabel(label, text);
 

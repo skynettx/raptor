@@ -38,9 +38,27 @@ struct txt_separator_s
 {
     txt_widget_t widget;
     char *label;
+    int specialsep;
+    int sepcolor;
+    int w;
+    int h;
 };
 
 extern txt_widget_class_t txt_separator_class;
+
+
+/**
+ * Create a new horizontal and vertical separator widget.
+ *
+ * @param label         Label to display on the separator (UTF-8 format).
+ *                      If this is set to NULL, no label is displayed.
+ * @param w             Width of separator
+ * @param h             Hidth of separator
+ * @param sepcolor      Color of separator
+ * @return              The new separator widget.
+ */
+
+txt_separator_t* TXT_NewSpecialSeparator(const char* label, int w, int h, int sepcolor);
 
 /**
  * Create a new horizontal separator widget.

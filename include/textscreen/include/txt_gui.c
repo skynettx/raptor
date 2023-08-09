@@ -71,15 +71,15 @@ void TXT_DrawDesktopBackground(const char *title)
 
     p = screendata;
 
-    for (i=0; i<TXT_SCREEN_W; ++i)
+    for (i = 0; i<TXT_SCREEN_W; ++i)
     {
         *p++ = ' ';
         *p++ = TXT_COLOR_BLACK | (TXT_COLOR_GREY << 4);
     }
 
     p = screendata + (TXT_SCREEN_H - 1) * TXT_SCREEN_W * 2;
-
-    for (i=0; i<TXT_SCREEN_W; ++i)
+    
+    for (i = 0; i<TXT_SCREEN_W; ++i)
     {
         *p++ = ' ';
         *p++ = TXT_COLOR_BLACK | (TXT_COLOR_GREY << 4);
@@ -119,74 +119,22 @@ void TXT_DrawShadow(int x, int y, int w, int h)
     }
 }
 
-void TXT_DrawWindowFrameInActive(const char* title, int x, int y, int w, int h)
+void TXT_DrawWindowFrame(const char *title, int x, int y, int w, int h, int titlecolor, int framecolor, int customwin)
 {
     txt_saved_colors_t colors;
     int x1, y1;
     int bx, by;
 
     TXT_SaveColors(&colors);
-    TXT_FGColor(TXT_COLOR_DARK_GREY);
-
-    for (y1 = y; y1 < y + h; ++y1)
+    
+    if (customwin == 1)
     {
-        // Select the appropriate row and column in the borders
-        // array to pick the appropriate character to draw at
-        // this location.
-        //
-        // Draw a horizontal line on the third line down, so we
-        // draw a box around the title.
-
-        by = y1 == y ? 0 :
-            y1 == y + 2 && title != NULL ? 2 :
-            y1 == y + h - 1 ? 3 : 1;
-
-        for (x1 = x; x1 < x + w; ++x1)
-        {
-            bx = x1 == x ? 0 :
-                x1 == x + w - 1 ? 3 : 1;
-
-            if (VALID_X(x1) && VALID_Y(y1))
-            {
-                TXT_GotoXY(x1, y1);
-                TXT_PutChar(borders[by][bx]);
-            }
-        }
+        TXT_FGColor(framecolor);
     }
-
-    // Draw the title
-
-    if (title != NULL)
+    else
     {
-        TXT_GotoXY(x + 1, y + 1);
-        TXT_BGColor(TXT_COLOR_GREY, 0);
-        TXT_FGColor(TXT_COLOR_DARK_GREY);
-
-        for (x1 = 0; x1 < w - 2; ++x1)
-        {
-            TXT_DrawString(" ");
-        }
-
-        TXT_GotoXY(x + (w - TXT_UTF8_Strlen(title)) / 2, y + 1);
-        TXT_DrawString(title);
+        TXT_FGColor(TXT_COLOR_BRIGHT_CYAN);
     }
-
-    // Draw the window's shadow.
-
-    TXT_DrawShadow(x + 2, y + h, w, 1);
-    TXT_DrawShadow(x + w, y + 1, 2, h);
-
-    TXT_RestoreColors(&colors);
-}
-
-void TXT_DrawWindowFrame(const char *title, int x, int y, int w, int h)
-{
-    txt_saved_colors_t colors;
-    int x1, y1;
-    int bx, by;
-
-    TXT_SaveColors(&colors);
-    TXT_FGColor(TXT_COLOR_BRIGHT_CYAN);
 
     for (y1=y; y1<y+h; ++y1)
     {
@@ -220,7 +168,15 @@ void TXT_DrawWindowFrame(const char *title, int x, int y, int w, int h)
     {
         TXT_GotoXY(x + 1, y + 1);
         TXT_BGColor(TXT_COLOR_GREY, 0);
-        TXT_FGColor(TXT_COLOR_BLUE);
+        
+        if (customwin == 1)
+        {
+            TXT_FGColor(titlecolor);
+        }
+        else
+        {
+            TXT_FGColor(TXT_COLOR_BLUE);
+        }
 
         for (x1=0; x1<w-2; ++x1)
         {
@@ -239,52 +195,59 @@ void TXT_DrawWindowFrame(const char *title, int x, int y, int w, int h)
     TXT_RestoreColors(&colors);
 }
 
-void TXT_DrawSeparatorInActive(int x, int y, int w)
+void TXT_DrawSpecialSeparator(int x, int y, int w, int h, int sepcolor, int customwin)
 {
     txt_saved_colors_t colors;
-    unsigned char* data;
+    
+    int y1;
+    int by;
+    int bx;
+    
     int x1;
     int b;
 
-    data = TXT_GetScreenData();
-
     TXT_SaveColors(&colors);
-    TXT_FGColor(TXT_COLOR_DARK_GREY);
+
+    if (customwin == 1)
+    {
+        TXT_FGColor(sepcolor);
+    }
+    else
+    {
+        TXT_FGColor(TXT_COLOR_BRIGHT_CYAN);
+    }
 
     if (!VALID_Y(y))
     {
         return;
     }
 
-    data += (y * TXT_SCREEN_W + x) * 2;
-
-    for (x1 = x; x1 < x + w; ++x1)
+    for (y1 = y; y1 < y + h; ++y1)
     {
-        TXT_GotoXY(x1, y);
+        // Select the appropriate row and column in the borders
+        // array to pick the appropriate character to draw at
+        // this location.
+       
+        by = y1 == y ? 0 :
+             y1 == y + h - 1 ? 3 : 1;
 
-        b = x1 == x ? 0 :
-            x1 == x + w - 1 ? 3 :
-            1;
-
-        if (VALID_X(x1))
+        for (x1 = x; x1 < x + w; ++x1)
         {
-            // Read the current value from the screen
-            // Check that it matches what the window should look like if
-            // there is no separator, then apply the separator
-
-            if (*data == borders[1][b])
+            bx = x1 == x ? 0 :
+                 x1 == x + w - 1 ? 3 : 1;
+            
+            if (VALID_X(x1) && VALID_Y(y1))
             {
-                TXT_PutChar(borders[2][b]);
+                TXT_GotoXY(x1, y1);
+                TXT_PutChar(borders[by][bx]);
             }
         }
-
-        data += 2;
     }
 
     TXT_RestoreColors(&colors);
 }
 
-void TXT_DrawSeparator(int x, int y, int w)
+void TXT_DrawSeparator(int x, int y, int w, int sepcolor, int customwin)
 {
     txt_saved_colors_t colors;
     unsigned char *data;
@@ -294,7 +257,15 @@ void TXT_DrawSeparator(int x, int y, int w)
     data = TXT_GetScreenData();
 
     TXT_SaveColors(&colors);
-    TXT_FGColor(TXT_COLOR_BRIGHT_CYAN);
+    
+    if (customwin == 1)
+    {
+        TXT_FGColor(sepcolor);
+    }
+    else
+    {
+        TXT_FGColor(TXT_COLOR_BRIGHT_CYAN);
+    }
 
     if (!VALID_Y(y))
     {

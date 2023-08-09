@@ -88,8 +88,59 @@ struct txt_window_s
 
     // URL of a webpage with help about this window. If set, a help key
     // indicator is shown while this window is active.
+    
     const char *help_url;
+
+    // Title color of the window
+
+    int titlecolor;
+
+    // Background color of the active window
+
+    int active_bgcolor;
+
+    // Background color of the inactive window
+
+    int inactive_bgcolor;
+
+    // Foreground color of the  active window
+
+    int active_fgcolor;
+
+    // Foreground color of the inactive window
+
+    int inactive_fgcolor;
+    
+    // Frame color of the window 
+
+    int framecolor;
+
+    // Seperator color of the window
+
+    int sepcolor;
+
+    // True when TXT_NewCustomWindow is set
+
+    int customwin;
 };
+
+/**
+ * Open a new custom window.
+ *
+ * @param title               Title to display in the titlebar of the new window
+ *                            (UTF-8 format).
+ * @param titlecolor          Set color of title to window.
+ * @param active_bgcolor      Set color of background to active window.
+ * @param inactive_bgcolor    Set color of background to inactive window.
+ * @param active_fgcolor      Set color of foreground to active window.
+ * @param inactive_fgcolor    Set color of foreground to inactive window.
+ * @param framecolor          Set color of frame to window.
+ * @param sepcolor            Set color of separator to window.
+ * @return                    Pointer to a new @ref txt_window_t structure.
+ *                            representing the new window.
+ */
+
+txt_window_t* TXT_NewCustomWindow(const char* title, int titlecolor, int active_bgcolor, int inactive_bgcolor, int active_fgcolor, int inactive_fgcolor, int framecolor, int sepcolor);
 
 /**
  * Open a new window.
@@ -198,6 +249,23 @@ void TXT_SetMouseListener(txt_window_t *window,
  */
 
 txt_window_t *TXT_MessageBox(const char *title, const char *message, ...);
+
+/**
+ * Open a window displaying a message.
+ *
+ * @param title               Title of the window (UTF-8 format).
+ * @param message             The message to display in the window (UTF-8 format).
+ * @param titlecolor          Set color of title to window.
+ * @param active_bgcolor      Set color of background to active window.
+ * @param inactive_bgcolor    Set color of background to inactive window.
+ * @param active_fgcolor      Set color of foreground to active window.
+ * @param inactive_fgcolor    Set color of foreground to inactive window.
+ * @param framecolor          Set color of frame to window.
+ * @param sepcolor            Set color of seperator to window.
+ * @return                    The new window.
+ */
+
+txt_window_t* TXT_CustomMessageBox(const char* title, const char* message, int titlecolor, int active_bgcolor, int inactive_bgcolor, int active_fgcolor, int inactive_fgcolor, int framecolor, int sepcolor, ...);
 
 /**
  * Set the help URL for the given window.
