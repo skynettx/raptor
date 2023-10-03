@@ -1417,7 +1417,7 @@ void I_InitGraphics(uint8_t *pal)
 
     SetSDLVideoDriver();
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     {
         EXIT_Error("Failed to initialize video: %s", SDL_GetError());
     }
