@@ -1394,7 +1394,10 @@ main(
         printf("PTR_Init()-Joystick\n");
         fflush(stdout);
         ptrflag = PTR_Init(P_JOYSTICK);
-        usekb_flag = 0;
+        if (joy_ipt_MenuNew)
+            usekb_flag = 1;
+        else
+            usekb_flag = 0;
         break;
     
     case I_MOUSE:
