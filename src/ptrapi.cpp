@@ -89,12 +89,20 @@ PTR_MouseHandler(
     if (cur_mx < 0)
         cur_mx = 0;
     else if (cur_mx >= SCREENWIDTH)
+    {
         cur_mx = SCREENWIDTH - 1;
+        if (!g_drawcursor || fullscreen)
+            I_SetMousePos(cur_mx, cur_my);
+    }
     
     if (cur_my < 0)
         cur_my = 0;
     else if (cur_my >= SCREENHEIGHT)
+    {
         cur_my = SCREENHEIGHT - 1;
+        if (!g_drawcursor || fullscreen)
+            I_SetMousePos(cur_mx, cur_my);
+    }
 
     if (old_x != cur_mx || old_y != cur_my)
     {
