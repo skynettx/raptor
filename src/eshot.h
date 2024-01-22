@@ -18,7 +18,7 @@ enum ESHOT_TYPE
 
 struct plib_t {
     int item;                                // BASE ITEM NUMBER
-    texture_t *pic[10];                      // POINTER TO PICS
+    char *pic[10];                           // POINTER TO PICS
     int num_frames;                          // NUMBER OF FRAMES                    
     int smokeflag;                           // TRUE = SMOKETRAIL                       
     int speed;                               // SPEED OF SHOT
@@ -30,7 +30,7 @@ struct plib_t {
 struct eshot_t {
     eshot_t *prev;                           // LINK LIST PREV
     eshot_t *next;                           // LINK LIST NEXT
-    texture_t *pic;                          // POINTER TO CUR FRAME PIC
+    char *pic;                               // POINTER TO CUR FRAME PIC
     int curframe;                            // CURRENT ANIM FRAME
     int x;                                   // CUR SHOT CENTER X
     int y;                                   // CUR SHOT CENTER Y

@@ -127,7 +127,8 @@ SWD_GetLine(
     const char *cbrks = "\n\v\r \t,;\b";
     const char *cmd;
     int curpos, loop, item, x, y, col;
-    texture_t *pic;
+    char *pic;
+    GFX_PIC* h;
     
     if (inmem)
         text = inmem;
@@ -161,9 +162,11 @@ SWD_GetLine(
                 item = GLB_GetItemID(cmd);
                 if (item == -1)
                     break;
-                pic = (texture_t*)GLB_GetItem(item);
+                pic = (char*)GLB_GetItem(item);
                 cmd = strtok(NULL, cbrks);
                 
+                h = (GFX_PIC*)pic;
+
                 if (!cmd)
                 {
                     x = textdraw_x;
@@ -182,7 +185,7 @@ SWD_GetLine(
                 if (x > textcmd_x2 || y > textcmd_y2)
                     break;
                 
-                textdraw_x += pic->width + 1;
+                textdraw_x += h->width + 1;
                 textdraw_y = y;
                 
                 GFX_PutImage(pic, x, y, 0);
@@ -247,7 +250,7 @@ SWD_FillText () - Fills Text from GLB intro an AREA
  ***************************************************************************/
 void 
 SWD_FillText(
-    font_t *font,          // INPUT : pointer to FONT
+    FONT *font,            // INPUT : pointer to FONT
     int item,              // INPUT : GLB text Item
     int color,             // INPUT : field color
     int x,                 // INPUT : x position
@@ -306,7 +309,7 @@ SWD_PutField(
     swdfield_t *curfld     // INPUT : pointer to field data
 )
 {
-    font_t *fld_font;
+    FONT *fld_font;
     char *fld_text;
     int fontheight;
     int draw_style;
@@ -318,9 +321,10 @@ SWD_PutField(
     int text_y;
     int rval;
     int loop;
-    texture_t *pic;
-    
-    fld_font = (font_t*)GLB_GetItem(curfld->fontid);
+    char *pic;
+    GFX_PIC *h;
+
+    fld_font = (FONT*)GLB_GetItem(curfld->fontid);
     fld_text = (char*)curfld + curfld->txtoff;
     fontheight = fld_font->height;
     draw_style = 0;
@@ -355,7 +359,7 @@ SWD_PutField(
         switch (curfld->opt)
         {
         case FLD_BUTTON:
-            pic = (texture_t*)GLB_GetItem(curfld->item);
+            pic = (char*)GLB_GetItem(curfld->item);
             
             if (curfld->picflag == TEXTURE)
             {
@@ -370,7 +374,7 @@ SWD_PutField(
             break;
         
         case FLD_DRAGBAR:
-            pic = (texture_t*)GLB_GetItem(curfld->item);
+            pic = (char*)GLB_GetItem(curfld->item);
             
             if (curfld->picflag == TEXTURE)
             {
@@ -388,7 +392,7 @@ SWD_PutField(
             break;
         
         case FLD_ICON:
-            pic = (texture_t*)GLB_GetItem(curfld->item);
+            pic = (char*)GLB_GetItem(curfld->item);
             
             if (!pic)
                 break;
@@ -398,7 +402,10 @@ SWD_PutField(
                 GFX_PutTexture(pic, fld_x, fld_y, curfld->lx, curfld->ly);
                 goto PutField_Exit;
             }
-            if (curfld->lx < pic->width || curfld->ly < pic->height)
+            
+            h = (GFX_PIC*)pic;
+
+            if (curfld->lx < h->width || curfld->ly < h->height)
             {
                 GFX_ScalePic(pic, fld_x, fld_y, curfld->lx, curfld->ly, 0);
             }
@@ -410,7 +417,7 @@ SWD_PutField(
         
         case FLD_MARK:
         case FLD_CLOSE:
-            pic = (texture_t*)GLB_GetItem(curfld->item);
+            pic = (char*)GLB_GetItem(curfld->item);
             GFX_PutImage(pic, fld_x, fld_y, draw_style);
             break;
         
@@ -541,21 +548,21 @@ SWD_PutField(
     if (curfld->bstatus && curfld->opt != FLD_INPUT)
     {
         if (curfld->picflag == PICTURE)
-            pic = (texture_t*)GLB_GetItem(curfld->item);
+            h = (GFX_PIC*)GLB_GetItem(curfld->item);
         else
-            pic = NULL;
+            h = NULL;
         
         if (curfld->bstatus == DOWN)
         {
-            if (pic && pic->x == 0)
-                GFX_ShadeShape(DARK, pic, fld_x, fld_y);
+            if (h && h->type == 0)
+                GFX_ShadeShape(DARK, (char*)h, fld_x, fld_y);
             else
                 GFX_ShadeArea(DARK, fld_x, fld_y, curfld->lx, curfld->ly);
         }
         else if (curfld->bstatus == UP)
         {
-            if (pic && pic->x == 0)
-                GFX_ShadeShape(LIGHT, pic, fld_x, fld_y);
+            if (h && h->type == 0)
+                GFX_ShadeShape(LIGHT, (char*)h, fld_x, fld_y);
             else
                 GFX_ShadeArea(LIGHT, fld_x, fld_y, curfld->lx, curfld->ly);
         }
@@ -684,11 +691,11 @@ SWD_FieldInput(
 )
 {
     static int curpos;
-    font_t *fld_font;
+    FONT *fld_font;
     char *wrkbuf;
     int flag;
     flag = 0;
-    fld_font = (font_t*)GLB_GetItem(curfld->fontid);
+    fld_font = (FONT*)GLB_GetItem(curfld->fontid);
     wrkbuf = (char*)curfld + curfld->txtoff;
     
     curpos = strlen(wrkbuf);
@@ -1354,10 +1361,13 @@ SWD_ShowAllFields(
 )
 {
     int loop, fy, fx;
-    texture_t *picdata;
-    swdfield_t *fld = (swdfield_t*)((char*)inptr + inptr->fldofs);
+    int numflds = 0;
+    char *picdata;
+    GFX_PIC* pich;
+    swd_t* header = (swd_t*)inptr;
+    swdfield_t *fld = (swdfield_t*)((char*)inptr + header->fldofs);
     
-    for (loop = 0; loop < inptr->numflds; loop++)
+    /*for (loop = 0; loop < inptr->numflds; loop++)
     {
         if (fld[loop].opt)
         {
@@ -1388,6 +1398,43 @@ SWD_ShowAllFields(
         }
     }
     
+    return loop;*/
+
+    for (loop = 0; loop < header->numflds; loop++, fld++, numflds++)
+    {
+        if (fld->opt != FLD_OFF)
+        {
+            fx = header->x + fld->x;
+            fy = header->y + fld->y;
+
+            if (fld->saveflag && fld->sptr)
+            {
+                picdata = (char*)fld->sptr;
+                pich = (GFX_PIC*)picdata;
+                picdata += sizeof(GFX_PIC);
+                pich->width = (short)fld->lx;
+                pich->height = (short)fld->ly;
+                GFX_GetScreen(picdata, fx, fy, fld->lx, fld->ly);
+            }
+
+            if (fld->shadow)
+            {
+                if (fld->picflag != SEE_THRU)
+                    GFX_LightBox(UPPER_RIGHT, fx - 1, fy + 1, fld->lx, fld->ly);
+                else
+                {
+                    if (fld->item != -1)
+                    {
+                        picdata = GLB_GetItem(fld->item);
+                        GFX_ShadeShape(DARK, picdata, fx - 1, fy + 1);
+                    }
+                }
+            }
+
+            SWD_PutField(header, fld);
+        }
+    }
+    
     return loop;
 }
 
@@ -1401,7 +1448,7 @@ SWD_PutWin(
 {
     static wdlg_t wdlg;
     swd_t *cwin;
-    texture_t *pic;
+    char *pic;
     int ly, y2, x, lx, y;
     cwin = g_wins[handle].win;
     ly = 8;
@@ -1416,7 +1463,7 @@ SWD_PutWin(
         {
             if (cwin->picflag == SEE_THRU && cwin->item != -1)
             {
-                pic = (texture_t*)GLB_GetItem(cwin->item);
+                pic = (char*)GLB_GetItem(cwin->item);
                 GFX_ShadeShape(DARK, pic, x, y);
             }
             else
@@ -1438,7 +1485,7 @@ SWD_PutWin(
         case PICTURE:
             if (cwin->item != -1)
             {
-                pic = (texture_t*)GLB_GetItem(cwin->item);
+                pic = (char*)GLB_GetItem(cwin->item);
                 GFX_PutImage(pic, cwin->x, cwin->y, 0);
             }
             break;
@@ -1446,7 +1493,7 @@ SWD_PutWin(
         case SEE_THRU:
             if (cwin->item != -1)
             {
-                pic = (texture_t*)GLB_GetItem(cwin->item);
+                pic = (char*)GLB_GetItem(cwin->item);
                 GFX_PutImage(pic, cwin->x, cwin->y, 1);
             }
             break;
@@ -1454,7 +1501,7 @@ SWD_PutWin(
         case TEXTURE:
             if (cwin->item != -1)
             {
-                pic = (texture_t*)GLB_GetItem(cwin->item);
+                pic = (char*)GLB_GetItem(cwin->item);
                 GFX_PutTexture(pic, cwin->x, cwin->y, cwin->lx, cwin->ly);
                 GFX_LightBox(UPPER_RIGHT, cwin->x, cwin->y, cwin->lx, cwin->ly);
             }
@@ -1753,7 +1800,7 @@ SWD_InitWindow(
                         if (pic_size < 0 || pic_size > 64000)
                             EXIT_Error("SWD Error: pic save to big...");
                         
-                        curfld[loop].sptr = (texture_t*)malloc(pic_size);
+                        curfld[loop].sptr = (char*)malloc(pic_size);
                         
                         if (!curfld[loop].sptr)
                             EXIT_Error("SWD Error: out of memory");

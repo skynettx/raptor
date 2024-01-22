@@ -147,7 +147,7 @@ struct swdfield_t {
     int lx;                      // WIDTH IN PIXELS
     int ly;                      // HEIGHT IN PIXELS
     int txtoff;                  // OFFSET TO TEXT DATA ( BYTES )
-    texture_t *sptr;             // SEG POINTER TO SAVE INFO
+    char *sptr;                  // SEG POINTER TO SAVE INFO
 }; 
 
 struct swdfield_32_t {

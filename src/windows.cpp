@@ -176,10 +176,10 @@ WIN_OptDraw(
         return;
     
     SWD_GetFieldXYL(opt_window, OPTS_VMUSIC, &x, &y, &lx, &ly);
-    GFX_PutSprite((texture_t*)GLB_GetItem(FILE127_SLIDE_PIC), x + opt_vol[MUSIC_VOL] - 2, y);
+    GFX_PutSprite((char*)GLB_GetItem(FILE127_SLIDE_PIC), x + opt_vol[MUSIC_VOL] - 2, y);
     
     SWD_GetFieldXYL(opt_window, OPTS_VFX, &x, &y, &lx, &ly);
-    GFX_PutSprite((texture_t*)GLB_GetItem(FILE127_SLIDE_PIC), x + opt_vol[FX_VOL] - 2, y);
+    GFX_PutSprite((char*)GLB_GetItem(FILE127_SLIDE_PIC), x + opt_vol[FX_VOL] - 2, y);
 }
 
 /***************************************************************************

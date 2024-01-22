@@ -34,7 +34,7 @@ enum GFX_TYPE
 #define CLIP_YTOP      8
 #define CLIP_YBOTTOM   16
 
-struct texture_t {
+/*struct texture_t {
 
     int x;                   // x
     int y;                   // y
@@ -50,6 +50,30 @@ struct font_t {
     short offset[256];      // offset
     char width[256];        // width
     char charofs[1];        // data
+};*/
+
+struct GFX_PIC
+{
+    GFX_TYPE type;          // type of picture
+    int opt1;               // option 1
+    int opt2;               // option 2
+    int width;              // width of pic
+    int height;             // heigth of pic
+};
+
+struct GFX_SPRITE
+{
+    int x;                  // X POS OF SEG
+    int y;                  // Y POS OF SEG
+    int offset;             // OFFSET FROM X, Y
+    int length;             // LENGTH OF LINE
+};
+
+struct FONT
+{
+    int height;
+    short charofs[256];
+    char width[256];
 };
 
 extern char *displaybuffer;
@@ -85,9 +109,9 @@ void GFX_SetPalRange(int start, int end);
 void GFX_MakeLightTable(char *palette, char *ltable, int level);
 void GFX_MakeGreyTable(char *palette, char *ltable);
 void GFX_GetScreen(char *outmem, int x, int y, int lx, int ly);
-void GFX_PutTexture(texture_t *intxt, int x, int y, int lx, int ly);
+void GFX_PutTexture(char *intxt, int x, int y, int lx, int ly);
 void GFX_ShadeArea(int opt, int x, int y, int lx, int ly);
-void GFX_ShadeShape(int opt, texture_t* mask, int x, int y);
+void GFX_ShadeShape(int opt, char* mask, int x, int y);
 void GFX_VShadeLine(int opt, int x, int y, int ly);
 void GFX_HShadeLine(int opt, int x, int y, int lx);
 void GFX_LightBox(int opt, int x, int y, int lx, int ly);
@@ -95,23 +119,23 @@ void GFX_ColorBox(int x, int y, int lx, int ly, int color);
 void GFX_HLine(int x, int y, int lx, int color);
 void GFX_VLine(int x, int y, int ly, int color);
 void GFX_Line(int x, int y, int x2, int y2, int color);
-void GFX_ScalePic(texture_t *buffin, int x, int y, int new_lx, int new_ly, int see_thru);
+void GFX_ScalePic(char *buffin, int x, int y, int new_lx, int new_ly, int see_thru);
 void GFX_DisplayUpdate(void);
-void GFX_PutImage(texture_t *image, int x, int y, int see_thru);
-void GFX_PutSprite(texture_t *inmem, int x, int y);
+void GFX_PutImage(char *image, int x, int y, int see_thru);
+void GFX_PutSprite(char *inmem, int x, int y);
 void GFX_MarkUpdate(int x, int y, int lx, int ly);
 void GFX_ForceUpdate(int x, int y, int lx, int ly);
 void GFX_SetFrameHook(void (*func)(void (*)(void)));
 void GFX_WaitUpdate(int count);
 void GFX_DisplayScreen(void);
-void GFX_DrawSprite(char *dest, texture_t *inmem);
+void GFX_DrawSprite(char *dest, char *inmem);
 void GFX_DrawChar(char *dest, char *inmem, int width, int height, int addx, int color);
 void GFX_Shade(char *outmem, int maxlen, char *dtable);
 void GFX_PutPic(void);
 void GFX_PutMaskPic(void);
-int GFX_StrPixelLen(font_t *infont, char *instr, int maxloop);
-int GFX_Print(int printx, int printy, char *str, font_t* infont, int basecolor);
-void GFX_ShadeSprite(char *dest, texture_t *inmem, char *dtable);
+int GFX_StrPixelLen(FONT* infont, char *instr, int maxloop);
+int GFX_Print(int printx, int printy, char *str, FONT* infont, int basecolor);
+void GFX_ShadeSprite(char *dest, char *inmem, char *dtable);
 void GFX_ScaleLine(char *outmem, char *inmem);
 void GFX_CScaleLine(char *outmem, char *inmem);
 void GFX_3D_SetView(int x, int y, int z);

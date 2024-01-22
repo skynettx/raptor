@@ -20,9 +20,9 @@ shot_t *free_shots;
 int shotnum;
 int shothigh;
 
-texture_t *detpow[4];
-texture_t *laspow[4];
-texture_t *lashit[4];
+char *detpow[4];
+char *laspow[4];
+char *lashit[4];
 
 shot_lib_t shot_lib[LAST_WEAPON + 1];
 
@@ -131,17 +131,17 @@ SHOTS_Init(
     
     for (i = 0; i < 4; i++)
     {
-        detpow[i] = (texture_t*)GLB_LockItem(FILE139_DETHPOW_BLK + i);
+        detpow[i] = (char*)GLB_LockItem(FILE139_DETHPOW_BLK + i);
     }
     
     for (i = 0; i < 4; i++)
     {
-        laspow[i] = (texture_t*)GLB_LockItem(FILE13d_LASERPOW_BLK + i);
+        laspow[i] = (char*)GLB_LockItem(FILE13d_LASERPOW_BLK + i);
     }
     
     for (i = 0; i < 4; i++)
     {
-        lashit[i] = (texture_t*)GLB_LockItem(FILE1f1_DRAYHIT_BLK + i);
+        lashit[i] = (char*)GLB_LockItem(FILE1f1_DRAYHIT_BLK + i);
     }
     
     memset(shot_lib, 0, sizeof(shot_lib));
@@ -167,9 +167,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_ALL;
@@ -195,9 +195,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_AIR;
@@ -223,9 +223,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_GRALL;
@@ -252,9 +252,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_ALL;
@@ -281,9 +281,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_GRALL;
@@ -310,9 +310,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     // slib->f_78 = slib->f_74->f_c >> 1;
     // slib->f_7c = slib->f_74->f_10 >> 1;
     slib->ht = S_ALL;
@@ -339,9 +339,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_AIR;
@@ -368,9 +368,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_AIR;
@@ -397,9 +397,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_GROUND;
@@ -426,9 +426,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_GTILE;
@@ -455,9 +455,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_SUCK;
@@ -485,9 +485,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_ALL;
@@ -515,9 +515,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_ALL;
@@ -545,9 +545,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_AIR;
@@ -575,9 +575,9 @@ SHOTS_Init(
     for (i = 0; i < slib->numframes; i++)
     {
         item = slib->lumpnum + i;
-        slib->pic[i] = (texture_t*)GLB_LockItem(item);
+        slib->pic[i] = (char*)GLB_LockItem(item);
     }
-    slib->h = slib->pic[0];
+    slib->h = (GFX_PIC*)slib->pic[0];
     slib->hlx = slib->h->width >> 1;
     slib->hly = slib->h->height >> 1;
     slib->ht = S_GRALL;
@@ -1258,7 +1258,7 @@ SHOTS_Display(
 {
     int loop, x, y;
     shot_t *shot;
-    texture_t *h;
+    GFX_PIC *h;
     
     for (shot = first_shots.next; shot != &last_shots; shot = shot->next)
     {
@@ -1290,13 +1290,13 @@ SHOTS_Display(
             else
                 GFX_PutSprite(laspow[shot->cnt], shot->x, shot->y);
             
-            h = lashit[shot->cnt];
+            h = (GFX_PIC*)lashit[shot->cnt];
             
             x = shot->x - (h->width >> 2);
             y = shot->move.y2 - 8;
             
             if (y > 0)
-                GFX_PutSprite(h, x, y);
+                GFX_PutSprite((char*)h, x, y);
             
             shot->cnt++;
             shot->cnt = shot->cnt % 4;

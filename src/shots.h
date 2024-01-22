@@ -24,7 +24,7 @@ enum BEAM_TYPE
 
 struct shot_lib_t {
     int lumpnum;                            // LUMPNUM OF PIC(S)
-    texture_t *pic[10];                     // POINTER TO PIC
+    char *pic[10];                          // POINTER TO PIC
     int shadow;                             // SHADOW ON/OFF
     int type;                               // SHOT TYPE
     int hits;                               // DAMAGE SHOT WILL DO
@@ -43,7 +43,7 @@ struct shot_lib_t {
     int fplry;                              // FOLLOW PLAYER Y POS
     int meffect;                            // TRACK MOVE TO FIND HIT ?
     int beam;                               // BEAM WEAPON TYPE
-    texture_t *h;
+    GFX_PIC *h;
     int hlx;
     int hly;
 };
@@ -51,7 +51,7 @@ struct shot_lib_t {
 struct shot_t {
     shot_t* prev;                           // Link List Prev
     shot_t* next;                           // Link List Next
-    texture_t *pic;                         // pointer to cur frame pic
+    char *pic;                              // pointer to cur frame pic
     int x;                                  // cur shot center x
     int y;                                  // cur shot center y
     mobj_t move;                            // MOVE stuff
@@ -65,7 +65,7 @@ struct shot_t {
     int cnt;
 };
 
-extern texture_t *lashit[4];
+extern char *lashit[4];
 
 int SHOTS_PlayerShoot(int type);
 void SHOTS_Clear(void);

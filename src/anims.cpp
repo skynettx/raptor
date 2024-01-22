@@ -110,7 +110,7 @@ ANIMS_Register(
 )
 {
     animlib_t *cur;
-    texture_t *h;
+    GFX_PIC *h;
     int handle;
     handle = curlib;
     
@@ -127,7 +127,7 @@ ANIMS_Register(
     cur->transparent = transparent;
     cur->adir = adir;
     
-    h = (texture_t*)GLB_LockItem(item);
+    h = (GFX_PIC*)GLB_LockItem(item);
     cur->xoff = h->width >> 1;
     cur->yoff = h->height >> 1;
     GLB_FreeItem(item);
@@ -401,17 +401,17 @@ ANIMS_DisplayGround(
 )
 {
     anim_t *cur;
-    texture_t *pic;
+    char *pic;
 
     for (cur = first_anims.next; &last_anims != cur; cur = cur->next)
     {
         if (cur->groundflag)
             continue;
         
-        pic = (texture_t*)GLB_GetItem(cur->item);
+        pic = (char*)GLB_GetItem(cur->item);
         
         if (cur->lib->transparent)
-            GFX_ShadeShape(1, pic, cur->dx, cur->dy);
+            GFX_ShadeShape(LIGHT, pic, cur->dx, cur->dy);
         else
             GFX_PutSprite(pic, cur->dx, cur->dy);
     }
@@ -426,17 +426,17 @@ ANIMS_DisplaySky(
 )
 {
     anim_t *cur;
-    texture_t *pic;
+    char *pic;
 
     for (cur = first_anims.next; &last_anims != cur; cur = cur->next)
     {
         if (cur->groundflag != MID_AIR)
             continue;
         
-        pic = (texture_t*)GLB_GetItem(cur->item);
+        pic = (char*)GLB_GetItem(cur->item);
         
         if (cur->lib->transparent)
-            GFX_ShadeShape(1, pic, cur->dx, cur->dy);
+            GFX_ShadeShape(LIGHT, pic, cur->dx, cur->dy);
         
         else
             GFX_PutSprite(pic, cur->dx, cur->dy);
@@ -452,17 +452,17 @@ ANIMS_DisplayHigh(
 )
 {
     anim_t *cur;
-    texture_t *pic;
+    char *pic;
 
     for (cur = first_anims.next; &last_anims != cur; cur = cur->next)
     {
         if (cur->groundflag != HIGH_AIR)
             continue;
         
-        pic = (texture_t*)GLB_GetItem(cur->item);
+        pic = (char*)GLB_GetItem(cur->item);
         
         if (cur->lib->transparent)
-            GFX_ShadeShape(1, pic, cur->dx, cur->dy);
+            GFX_ShadeShape(LIGHT, pic, cur->dx, cur->dy);
         else
             GFX_PutSprite(pic, cur->dx, cur->dy);
     }

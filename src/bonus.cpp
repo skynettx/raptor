@@ -110,14 +110,14 @@ BONUS_Init(
 )
 {
     int loop;
-    texture_t *h;
+    GFX_PIC *h;
 
     for (loop = 0; loop < 4; loop++)
     {
         glow[loop] = FILE125_ICNGLW_BLK + loop;
     }
     
-    h = (texture_t*)GLB_CacheItem(FILE125_ICNGLW_BLK);
+    h = (GFX_PIC*)GLB_CacheItem(FILE125_ICNGLW_BLK);
     
     glow_lx = h->width;
     glow_ly = h->height;
@@ -268,11 +268,11 @@ BONUS_Display(
     {
         if (!cur->dflag)
         {
-            GFX_PutSprite((texture_t*)GLB_GetItem(cur->item), cur->bx, cur->by);
-            GFX_ShadeShape(1, (texture_t*)GLB_GetItem(glow[cur->curglow]), cur->gx, cur->gy);
+            GFX_PutSprite((char*)GLB_GetItem(cur->item), cur->bx, cur->by);
+            GFX_ShadeShape(LIGHT, (char*)GLB_GetItem(glow[cur->curglow]), cur->gx, cur->gy);
         }
         else
-            GFX_PutSprite((texture_t*)GLB_GetItem(FILE10f_N$_PIC), cur->bx, cur->by);
+            GFX_PutSprite((char*)GLB_GetItem(FILE10f_N$_PIC), cur->bx, cur->by);
     }
 }
 

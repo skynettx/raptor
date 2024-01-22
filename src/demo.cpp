@@ -110,7 +110,7 @@ DEMO_DisplayStats(
         return;
     
     sprintf(temp, "REC %d", MAX_DEMO - cur_play);
-    GFX_Print(MAP_LEFT + 5, 20, temp, (font_t*)GLB_GetItem(FILE104_FONT2_FNT), 84);
+    GFX_Print(MAP_LEFT + 5, 20, temp, (FONT*)GLB_GetItem(FILE104_FONT2_FNT), 84);
     
 }
 

@@ -605,7 +605,7 @@ OBJS_DisplayStats(
     if (plr.sweapon != -1)
     {
         item = obj_lib[plr.sweapon].item;
-        GFX_PutSprite((texture_t*)GLB_GetItem(item), MAP_RIGHT - 18, MAP_TOP);
+        GFX_PutSprite((char*)GLB_GetItem(item), MAP_RIGHT - 18, MAP_TOP);
     }
     
     if (p_objs[S_SUPER_SHIELD])
@@ -614,7 +614,7 @@ OBJS_DisplayStats(
         maxloop = OBJS_GetTotal(S_SUPER_SHIELD);
         for (loop = 0; loop < maxloop; loop++)
         {
-            GFX_PutSprite((texture_t*)GLB_GetItem(FILE1e0_SMSHIELD_PIC), x, 1);
+            GFX_PutSprite((char*)GLB_GetItem(FILE1e0_SMSHIELD_PIC), x, 1);
             x += 13;
         }
     }
@@ -624,7 +624,7 @@ OBJS_DisplayStats(
         x = MAP_LEFT + 2;
         for (loop = 0; loop < p_objs[S_MEGA_BOMB]->num; loop++)
         {
-            GFX_PutSprite((texture_t*)GLB_GetItem(FILE1df_SMBOMB_PIC), x, 186);
+            GFX_PutSprite((char*)GLB_GetItem(FILE1df_SMBOMB_PIC), x, 186);
             x += 13;
         }
     }

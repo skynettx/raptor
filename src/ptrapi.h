@@ -21,7 +21,7 @@ void PTR_ResetJoyStick(void);
 void PTR_SetPos(int x, int y);
 void PTR_Pause(int flag);
 void PTR_DrawCursor(int flag);
-void PTR_SetPic(texture_t *newp);
+void PTR_SetPic(char *newp);
 int PTR_Init(int type);
 
 void PTR_Erase(void);

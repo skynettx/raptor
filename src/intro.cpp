@@ -747,13 +747,13 @@ INTRO_Taiwan(
 )
 {
     int local_cnt, loop;
-    texture_t *pic1;
+    char *pic1;
     char *pal1;
     local_cnt = GFX_GetFrameCount();
     
     framecount = 0;
     
-    pic1 = (texture_t*)GLB_GetItem(FILE12f_TAIWARN_PIC);
+    pic1 = (char*)GLB_GetItem(FILE12f_TAIWARN_PIC);
     pal1 = GLB_GetItem(FILE130_TAIPAL_DAT);
     
     GFX_FadeOut(0, 0, 0, 5);
@@ -787,14 +787,14 @@ INTRO_Credits(
     void
 )
 {
-    texture_t *pic1, *pic2;
+    char *pic1, *pic2;
     char *pal1, *pal2;
     int local_cnt, loop;
     local_cnt = GFX_GetFrameCount();
     
     framecount = 0;
     
-    pic1 = (texture_t*)GLB_GetItem(FILE12b_APOGEE_PIC);
+    pic1 = (char*)GLB_GetItem(FILE12b_APOGEE_PIC);
     pal1 = GLB_GetItem(FILE12c_POGPAL_DAT);
     
     GFX_FadeOut(0, 0, 0, 5);
@@ -842,7 +842,7 @@ INTRO_Credits(
     memset(displayscreen, 0, 64000);
     memset(displaybuffer, 0, 64000);
     
-    pic2 = (texture_t*)GLB_GetItem(FILE12d_CYGNUS_PIC);
+    pic2 = (char*)GLB_GetItem(FILE12d_CYGNUS_PIC);
     pal2 = GLB_GetItem(FILE12e_CYGPAL_DAT);
     
     GFX_PutImage(pic2, 0, 0, 0);

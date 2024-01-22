@@ -372,12 +372,12 @@ ENEMY_Add(
     slib_t *curlib;
     enemy_t *newe;
     char *pic;
-    texture_t *h;
+    GFX_PIC *h;
     curlib = &slib[sprite->game][sprite->slib];
     
     newe = ENEMY_Get();
     pic = GLB_GetItem(curlib->item);
-    h = (texture_t*)pic;
+    h = (GFX_PIC*)pic;
     
     newe->item = curlib->item;
     newe->width = h->width;
@@ -1181,7 +1181,7 @@ ENEMY_DisplayGround(
     {
         if (!spt->groundflag)
             continue;
-        GFX_PutSprite((texture_t*)GLB_GetItem(spt->item), spt->x, spt->y);
+        GFX_PutSprite((char*)GLB_GetItem(spt->item), spt->x, spt->y);
     }
 }
 
@@ -1201,7 +1201,7 @@ ENEMY_DisplaySky(
         if (spt->groundflag)
             continue;
         
-        GFX_PutSprite((texture_t*)GLB_GetItem(spt->item), spt->x, spt->y);
+        GFX_PutSprite((char*)GLB_GetItem(spt->item), spt->x, spt->y);
         
         for (i = 0; i < spt->lib->numengs; i++)
         {
