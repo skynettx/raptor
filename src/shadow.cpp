@@ -37,7 +37,6 @@ SHADOW_Draw(
     GFX_SPRITE *ah;
     int lx, ly, oldsy, sx, sy, ox, oy, x2, y2, oldy, drawflag;
 
-    //h = (texture_t*)pic;
     x -= 10;
     y += 20;
     
@@ -60,20 +59,17 @@ SHADOW_Draw(
     if (!GFX_ClipLines(0, &ox, &oy, &lx, &ly))
         return;
     
-    //pic += 0x14;
     pic += sizeof(GFX_PIC);
     
     ah = (GFX_SPRITE*)pic;
     
     while (ah->offset != -1)
     {
-        //pic += 16;
         pic += sizeof(GFX_SPRITE);
         
         ox = ah->x + x;
         oy = ah->y + y;
         
-        //x2 = ox + ah->width - 1;
         x2 = ox + ah->length - 1;
         y2 = oy + 1;
         
@@ -110,7 +106,6 @@ SHADOW_Draw(
         
         oldsy = sy;
         
-        //pic += ah->width;
         pic += ah->length;
         
         ah = (GFX_SPRITE*)pic;

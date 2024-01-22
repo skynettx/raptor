@@ -1367,39 +1367,6 @@ SWD_ShowAllFields(
     swd_t* header = (swd_t*)inptr;
     swdfield_t *fld = (swdfield_t*)((char*)inptr + header->fldofs);
     
-    /*for (loop = 0; loop < inptr->numflds; loop++)
-    {
-        if (fld[loop].opt)
-        {
-            fx = inptr->x + fld[loop].x;
-            fy = inptr->y + fld[loop].y;
-            
-            if (fld[loop].saveflag && fld[loop].sptr)
-            {
-                fld[loop].sptr->width = (short)fld[loop].lx;
-                fld[loop].sptr->height = (short)fld[loop].ly;
-                GFX_GetScreen(fld[loop].sptr->charofs, fx, fy, fld[loop].lx, fld[loop].ly);
-            }
-            
-            if (fld[loop].shadow)
-            {
-                if (fld[loop].picflag != SEE_THRU)
-                {
-                    GFX_LightBox(UPPER_RIGHT, fx - 1, fy + 1, fld[loop].lx, fld[loop].ly);
-                }
-                else if (fld[loop].item != -1)
-                {
-                    picdata = (texture_t*)GLB_GetItem(fld[loop].item);
-                    GFX_ShadeShape(DARK, picdata, fx - 1, fy + 1);
-                }
-            }
-            
-            SWD_PutField(inptr, &fld[loop]);
-        }
-    }
-    
-    return loop;*/
-
     for (loop = 0; loop < header->numflds; loop++, fld++, numflds++)
     {
         if (fld->opt != FLD_OFF)

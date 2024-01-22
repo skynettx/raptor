@@ -34,24 +34,6 @@ enum GFX_TYPE
 #define CLIP_YTOP      8
 #define CLIP_YBOTTOM   16
 
-/*struct texture_t {
-
-    int x;                   // x
-    int y;                   // y
-    int offset;              // marker
-    int width;               // width
-    int height;              // height
-    char charofs[1];         // data
-};
-
-struct font_t {
-
-    int height;             // height
-    short offset[256];      // offset
-    char width[256];        // width
-    char charofs[1];        // data
-};*/
-
 struct GFX_PIC
 {
     GFX_TYPE type;          // type of picture

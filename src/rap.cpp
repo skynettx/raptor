@@ -622,7 +622,6 @@ RAP_DisplayStats(
             {
                 pic = GLB_GetItem(FILE111_WEPDEST_PIC);
                 h = (GFX_PIC*)pic;
-                //h = pic = (texture_t*)GLB_GetItem(FILE111_WEPDEST_PIC);
                 GFX_PutSprite(pic, (320 - h->width) >> 1, MAP_BOTTOM - 9);
             }
             
@@ -631,7 +630,6 @@ RAP_DisplayStats(
             
             pic = GLB_GetItem(FILE110_SHLDLOW_PIC);
             h = (GFX_PIC*)pic;
-            //h = pic = (texture_t*)GLB_GetItem(FILE110_SHLDLOW_PIC);
             GFX_PutSprite(pic, (320 - h->width) >> 1, MAP_BOTTOM);
         }
     }

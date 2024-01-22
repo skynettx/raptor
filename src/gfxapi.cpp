@@ -591,7 +591,6 @@ GFX_PutTexture(
             {
                 if (loopx <= x2 && loopx + h->width > 0)
                 {
-                    //buf = intxt->charofs;
                     buf = intxt + sizeof(GFX_PIC);
                     new_lx = h->width;
                     new_ly = h->height;
@@ -690,7 +689,6 @@ GFX_ShadeShape(
     int lx = h->width;
     int ly = h->height;
     
-    //texture_t *ah = (texture_t*)inmem->charofs;
     inmem += sizeof(GFX_PIC);
 
     rval = GFX_ClipLines(NULL, &ox, &oy, &lx, &ly);
@@ -717,7 +715,6 @@ GFX_ShadeShape(
     case 1:
         dest = displaybuffer + ox + ylookup[oy];
         GFX_ShadeSprite(dest, inmem, cur_table);
-        //GFX_ShadeSprite(&displaybuffer[x + ylookup[y]], ah, cur_table);
         break;
     
     case 2:
@@ -740,7 +737,6 @@ GFX_ShadeShape(
             inmem += ah->length;
 
             ah = (GFX_SPRITE*)inmem;
-            //ah = (texture_t*)((char*)ah + 16 + ah->width);
         }
         break;
     }
@@ -1119,19 +1115,12 @@ GFX_ScalePic(
     GFX_PIC* h = (GFX_PIC*)buffin;
     char *dest = displaybuffer;
     int accum_x, accum_y, i;
-    //char *pic = buffin->charofs;
     char *pic = buffin + sizeof(GFX_PIC);
     int addx = (h->width<<16) / new_lx;
     int addy = (h->height<<16) / new_ly;
     accum_x = 0;
     accum_y = 0;
     
-    /*if (!buffin->x)
-    {
-        GFX_PutSprite(buffin, x, y);
-        return;
-    }*/
-
     if (h->type == GSPRITE)
     {
         GFX_PutSprite(buffin, x, y);
@@ -1381,40 +1370,11 @@ GFX_PutImage(
     int see_thru           // INPUT : true = masked, false = put block
 )
 {
-    //char *get_image;
-
     GFX_PIC* h = (GFX_PIC*)image;
     
     gfx_lx = h->width;
     gfx_ly = h->height;
     
-    /*if (image->x == GSPRITE)
-    {
-        GFX_PutSprite(image, x, y);
-        return;
-    }
-
-    get_image = image->charofs;
-    
-    if (!GFX_ClipLines(&get_image, &x, &y, &gfx_lx, &gfx_ly))
-        return;
-    
-    GFX_MarkUpdate(x, y, gfx_lx, gfx_ly);
-    
-    gfx_xp = x;
-    gfx_yp = y;
-    
-    gfx_inmem = get_image;
-    gfx_imga = image->width;
-    
-    if (see_thru == 0)
-    {
-        gfx_imga -= gfx_lx;
-        GFX_PutPic();
-    }
-    else
-        GFX_PutMaskPic();*/
-
     if (h->type == GSPRITE)
     {
         GFX_PutSprite(image, x, y);
@@ -1457,8 +1417,6 @@ GFX_PutSprite(
     GFX_PIC *h = (GFX_PIC*)inmem;
     GFX_SPRITE *ah;
     char rval;
-    //char *get_inmem;
-    //texture_t *ah;
     char* dest;
     char *outline;
     int ox = x;
@@ -1466,42 +1424,6 @@ GFX_PutSprite(
     int lx = h->width;
     int ly = h->height;
     
-    /*rval = GFX_ClipLines(NULL, &ox, &oy, &lx, &ly);
-    
-    if (!rval)
-        return;
-    
-    switch (rval)
-    {
-    case 1:
-        GFX_DrawSprite(&displaybuffer[ox + ylookup[oy]], (texture_t*)inmem->charofs);
-        break;
-    
-    case 2:
-        ah = (texture_t*)inmem->charofs;
-        while (ah->offset != -1)
-        {
-            ox = x + ah->x;
-            oy = y + ah->y;
-            
-            get_inmem = (char*)ah + 16;
-            
-            if (oy > SCREENHEIGHT)
-                break;
-            
-            lx = ah->width;
-            ly = 1;
-            
-            outline = get_inmem;
-            
-            if (GFX_ClipLines(&outline, &ox, &oy, &lx, &ly))
-                memcpy(&displaybuffer[ox + ylookup[oy]], outline, lx);
-            
-            ah = (texture_t*)(get_inmem + ah->width);
-        }
-        break;
-    }*/
-
     rval = GFX_ClipLines(NULL, &ox, &oy, &lx, &ly);
     
     if (!rval) 
@@ -1558,36 +1480,12 @@ GFX_OverlayImage(
     int y                   // INPUT : y position
 )
 {
-    //char *get_baseimage, *get_overimage;
     GFX_PIC* bh = (GFX_PIC*)baseimage;
     GFX_PIC* oh = (GFX_PIC*)overimage;
     int addnum, loop, i;
     int x2 = x + oh->width - 1;
     int y2 = y + oh->height - 1;
     
-    /*if (x < 0 || y < 0)
-        return;
-    
-    if (x2 >= baseimage->width || y2 >= baseimage->height)
-        return;
-    
-    get_baseimage = &baseimage->charofs[x + baseimage->width * y];
-    addnum = overimage->width - baseimage->width;
-    get_overimage = overimage->charofs;
-    
-    for (loop = 0; loop < overimage->height; loop++)
-    {
-        for (i = 0; i < overimage->width; i++)
-        {
-            if (i != 255)
-                *get_baseimage = *get_overimage;
-            
-            get_baseimage++;
-            get_overimage++;
-        }
-        get_baseimage += addnum;
-    }*/
-
     if (x >= 0 && y >= 0 && x2 < bh->width && y2 < bh->height)
     {
         baseimage += sizeof(GFX_PIC);
@@ -1647,21 +1545,9 @@ GFX_PutChar(
     int lx = font->width[inchar];
     int addx;
     int ly = font->height;
-    //char* cdata = &font->charofs[font->offset[inchar]];
     char* cdata = source + font->charofs[inchar];
     addx = lx;
     
-    /*if (!GFX_ClipLines(&cdata, &x, &y, &lx, &ly))
-        return 0;
-    
-    dest = &displaybuffer[x + ylookup[y]];
-    
-    GFX_MarkUpdate(x, y, lx, ly);
-    
-    GFX_DrawChar(dest, cdata, lx, ly, addx - lx, basecolor);
-    
-    return lx;*/
-
     if (GFX_ClipLines(&cdata, &x, &y, &lx, &ly))
     {
         dest = displaybuffer + x + ylookup[y];
@@ -1690,27 +1576,6 @@ GFX_Print(
     int basecolor             // INPUT : basecolor of font
 )
 {
-    /*unsigned char ch;
-    int length, lx, cwidth;
-    
-    basecolor--;
-    length = strlen(str);
-    lx = 0;
-    
-    if (!length)
-        return 0;
-    
-    while ((ch = *str++) != 0)
-    {
-        if (infont->offset[ch] == -1)
-            continue;
-        
-        cwidth = GFX_PutChar(x, y, ch, infont, basecolor);
-        lx += cwidth + fontspacing;
-        x += infont->width[ch] + fontspacing;
-    }
-    return lx;*/
-
     FONT* font = infont;
     int lx = 0;
     int cwidth;
@@ -1786,7 +1651,6 @@ GFX_3D_PutImage(
     {
         GFX_MarkUpdate(x, y, h->width, h->height);
         GFX_PutImage(image, x, y, see_thru);
-        //return;
     }
     else
     {

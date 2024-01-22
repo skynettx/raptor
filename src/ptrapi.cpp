@@ -423,31 +423,6 @@ PTR_SetPic(
     char* pic;
     int loop;
     
-    /*cursoroffsetx = 0;
-    cursoroffsety = 0;
-    
-    if (ptractive)
-    {
-        for (loop = 0; loop < CURSORSIZE; loop++)
-        {
-            cursorpic[loop] = newp->charofs[loop];
-            if ((uint8_t)newp->charofs[loop] == HOTSPOTCOLOR)
-            {
-                cursoroffsetx = loop % CURSORWIDTH;
-                cursoroffsety = loop / CURSORWIDTH;
-                cursorpic[loop] = newp->charofs[loop + 1];
-            }
-        }
-        
-        if (cursoroffsetx > 16)
-            cursoroffsetx = 0;
-        
-        if (cursoroffsety > 16)
-            cursoroffsety = 0;
-        
-        ptrupdate = 1;
-    }*/
-
     cursoroffsetx = 0;
     cursoroffsety = 0;
 
@@ -459,7 +434,7 @@ PTR_SetPic(
         for (loop = 0; loop < CURSORSIZE; loop++, newp++, pic++)
         {
              *pic = *newp;
-             //cursorpic[loop] = newp->charofs[loop];
+             
              if (*newp == (char)HOTSPOTCOLOR)
              {
                   cursoroffsetx = loop % CURSORWIDTH;
