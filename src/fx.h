@@ -1,12 +1,25 @@
 #pragma once
 
-enum {
+#define SND_CLOSE    40
+#define SND_FAR      500
+
+enum 
+{
     FXHAND_PCS = 0x0000,
     FXHAND_GSS1 = 0x4000,
     // FXHAND_GSS2 = 0x8000,
     FXHAND_DSP = 0xc000,
     FXHAND_MASK = 0x3fff,
     FXHAND_TMASK = 0xc000,
+};
+
+enum SND_TYPE
+{
+    SND_NONE,
+    SND_PC,
+    SND_MIDI,
+    SND_CANVAS,
+    SND_DIGITAL
 };
 
 enum DEFX
@@ -60,8 +73,8 @@ extern int sys_midi, alsaclient, alsaport;
 int SND_InitSound(void);
 void SND_DeInit(void);
 void SND_Setup(void);
-void SND_PlaySong(int a1, int a2, int a3);
-int SND_SongPlaying(void);
+void SND_PlaySong(int item, int chainflag, int fadeflag);
+int SND_IsSongPlaying(void);
 void SND_Lock(void);
 void SND_Unlock(void);
 void SND_FadeOutSong(void);
@@ -70,7 +83,7 @@ void SND_CacheFX(void);
 void SND_CacheGFX(void);
 void SND_CacheIFX(void);
 void SND_3DPatch(int, int, int);
-void SND_Patch(int a1, int a2);
-int SND_IsPatchPlaying(int a1);
-void SND_StopPatch(int a1);
+void SND_Patch(int type, int xpos);
+int SND_IsPatchPlaying(int type);
+void SND_StopPatch(int type);
 void SND_StopPatches(void);

@@ -415,19 +415,19 @@ MUS_Init(
     
     switch (card)
     {
-    case CARD_NONE:
+    case M_NONE:
         music_device = NULL;
         break;
     
-    case CARD_ADLIB:
-    case CARD_MV:
-    case CARD_BLASTER:
+    case M_ADLIB:
+    case M_PAS:
+    case M_SB:
         music_device = &mus_device_fm;
         break;
     
-    case CARD_MPU1:
-    case CARD_MPU2:
-    case CARD_MPU3:
+    case M_WAVE:
+    case M_CANVAS:
+    case M_GMIDI:
     default:
         if (sys_midi)
         {

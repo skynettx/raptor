@@ -827,7 +827,7 @@ INTRO_Credits(
     }
     else
     {
-        while (SND_SongPlaying() && !IMS_IsAck()) {
+        while (SND_IsSongPlaying() && !IMS_IsAck()) {
             I_GetEvent();
         }
     }
