@@ -82,7 +82,7 @@ void SND_FreeFX(void);
 void SND_CacheFX(void);
 void SND_CacheGFX(void);
 void SND_CacheIFX(void);
-void SND_3DPatch(int, int, int);
+void SND_3DPatch(int type, int x, int y);
 void SND_Patch(int type, int xpos);
 int SND_IsPatchPlaying(int type);
 void SND_StopPatch(int type);
