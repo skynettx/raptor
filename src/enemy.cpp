@@ -255,7 +255,7 @@ void ENEMY_LoadLib(
             if (!slib[loop])
                 EXIT_Error("ENEMY_LoadSprites() - memory");
             
-            numslibs[loop] = GLB_GetItemSize(spriteitm[loop]);
+            numslibs[loop] = GLB_ItemSize(spriteitm[loop]);
             numslibs[loop] /= sizeof(slib_t);
         }
     }

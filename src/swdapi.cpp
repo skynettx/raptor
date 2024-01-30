@@ -279,7 +279,7 @@ SWD_FillText(
     textcmd_y2 = y + ly - 1;
     textcmd_line = x;
     
-    sizerec = GLB_GetItemSize(item);
+    sizerec = GLB_ItemSize(item);
     
     len = SWD_GetLine(text);
     
@@ -1592,7 +1592,7 @@ SWD_ReformatFieldData(
     int handle
 )
 {
-    int fileLen = GLB_GetItemSize(handle);
+    int fileLen = GLB_ItemSize(handle);
     int len = sizeof(swd_t) + (header->numflds * sizeof(swdfield_t));
     int oldLen = sizeof(swd_t) + (header->numflds * sizeof(swdfield_32_t));
     int eof = fileLen - oldLen;

@@ -160,7 +160,7 @@ DEMO_GLBFile(
 )
 {
     char *mem = GLB_GetItem(item);
-    int size = GLB_GetItemSize(item);
+    int size = GLB_ItemSize(item);
     
     if (!mem)
         return;
