@@ -420,7 +420,7 @@ GLB_InitSystem(
 /*************************************************************************
  GLB_Load() Loads a file to a pointer from a .GLB file
  *************************************************************************/
-uint32_t                          // RETURN : size of item read
+int                               // RETURN : size of item read
 GLB_Load(
 	char* inmem,                  // INPUT: memory pointer or NULL
 	int filenum,                  // INPUT: file number
@@ -615,9 +615,9 @@ GLB_UnlockItem(
 /***************************************************************************
  GLB_IsLabel () - tests to see if ID is a label or an Item
  ***************************************************************************/
-bool                       // RETURN: TRUE = Label
+int                        // RETURN: TRUE = Label
 GLB_IsLabel(
-	uint32_t handle        // INPUT : handle of item
+	int handle             // INPUT : handle of item
 )
 {
 	ITEM_H itm;
@@ -642,7 +642,7 @@ GLB_IsLabel(
  ***************************************************************************/
 void
 GLB_ReadItem(
-	uint32_t handle,              // INPUT : handle of item
+	int handle,                   // INPUT : handle of item
 	char* mem                     // INPUT : pointer to memory
 )
 {
@@ -712,7 +712,7 @@ GLB_GetItemID(
 /***************************************************************************
  GLB_GetPtr() - Returns a pointer to item ( handle )
  ***************************************************************************/
-uint8_t*                        // RETURN: pointer to item
+char*                           // RETURN: pointer to item
 GLB_GetPtr(
 	int handle                  // INPUT : handle of item
 )
