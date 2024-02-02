@@ -11,11 +11,11 @@
 #include "objects.h"
 #include "fileids.h"
 
-shot_t shots[MAX_SHOTS];
+SHOTS shots[MAX_SHOTS];
 
-shot_t first_shots, last_shots;
+SHOTS first_shots, last_shots;
 
-shot_t *free_shots;
+SHOTS *free_shots;
 
 int shotnum;
 int shothigh;
@@ -24,7 +24,7 @@ char *detpow[4];
 char *laspow[4];
 char *lashit[4];
 
-shot_lib_t shot_lib[LAST_WEAPON + 1];
+SHOT_LIB shot_lib[LAST_WEAPON + 1];
 
 /***************************************************************************
 SHOTS_Clear () * Clears out SHOTS Linklist
@@ -63,12 +63,12 @@ SHOTS_Clear(
 /*-------------------------------------------------------------------------*
 SHOTS_Get () - gets a Free SHOT OBJECT from linklist
  *-------------------------------------------------------------------------*/
-shot_t 
+SHOTS
 *SHOTS_Get(
     void
 )
 {
-    shot_t *news;
+    SHOTS *news;
     
     if (!free_shots)
         return NULL;
@@ -80,7 +80,7 @@ shot_t
     news = free_shots;
     free_shots = free_shots->next;
     
-    memset(news, 0, sizeof(shot_t));
+    memset(news, 0, sizeof(SHOTS));
     
     news->next = &last_shots;
     news->prev = last_shots.prev;
@@ -93,12 +93,12 @@ shot_t
 /*-------------------------------------------------------------------------*
 SHOTS_Remove () - Removes SHOT OBJECT from linklist
  *-------------------------------------------------------------------------*/
-shot_t 
+SHOTS
 *SHOTS_Remove(
-    shot_t *sh
+    SHOTS *sh
 )
 {
-    shot_t *next;
+    SHOTS *next;
     
     shotnum--;
     
@@ -107,7 +107,7 @@ shot_t
     sh->next->prev = sh->prev;
     sh->prev->next = sh->next;
     
-    memset(sh, 0, sizeof(shot_t));
+    memset(sh, 0, sizeof(SHOTS));
     
     sh->next = free_shots;
     
@@ -125,7 +125,7 @@ SHOTS_Init(
 )
 {
     int i, item;
-    shot_lib_t *slib;
+    SHOT_LIB *slib;
     
     SHOTS_Clear();
     
@@ -591,9 +591,9 @@ SHOTS_PlayerShoot(
     int type               // INPUT : OBJECT TYPE
 )
 {
-    shot_lib_t *lib;
-    shot_t *cur;
-    enemy_t *enemy;
+    SHOT_LIB *lib;
+    SHOTS *cur;
+    SPRITE_SHIP *enemy;
 
     lib = &shot_lib[type];
     
@@ -1003,9 +1003,9 @@ SHOTS_Think(
     void
 )
 {
-    shot_lib_t *lib;
-    shot_t *shot;
-    enemy_t *enemy;
+    SHOT_LIB *lib;
+    SHOTS *shot;
+    SPRITE_SHIP *enemy;
     int i;
 
     lib = shot_lib;
@@ -1257,7 +1257,7 @@ SHOTS_Display(
 )
 {
     int loop, x, y;
-    shot_t *shot;
+    SHOTS *shot;
     GFX_PIC *h;
     
     for (shot = first_shots.next; shot != &last_shots; shot = shot->next)

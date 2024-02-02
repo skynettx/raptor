@@ -167,7 +167,7 @@ WIN_OptDraw() -
  ***************************************************************************/
 void 
 WIN_OptDraw(
-    wdlg_t *dlg
+    SWD_DLG *dlg
 )
 {
     int x, y, lx, ly;
@@ -190,7 +190,7 @@ WIN_Opts(
     void
 )
 {
-    wdlg_t dlg;
+    SWD_DLG dlg;
     int x, y, lx, ly;
     int kbactive, patchflag, curd, cur_field;
     int new_vol;
@@ -564,7 +564,7 @@ WIN_AskBool(
     int dchold;
     int ask_window;
     int px, py, lx, ly;
-    wdlg_t dlg;
+    SWD_DLG dlg;
 
     rval = 0;
     dchold = g_drawcursor;
@@ -694,7 +694,7 @@ WIN_AskDiff(
     void
 )
 {
-    wdlg_t dlg;
+    SWD_DLG dlg;
     int rval, ask_window;
     int px, py, lx, ly;
 
@@ -763,9 +763,9 @@ WIN_Register(
     void
 )
 {
-    wdlg_t dlg;
+    SWD_DLG dlg;
     int cur_id, opt, oldopt, rval, window, diff, loop;
-    player_t tp;
+    PLAYEROBJ tp;
 
     cur_id = 0;
     opt = -1;
@@ -1021,7 +1021,7 @@ reg_exit:
             tp.fintrain = 1;
         }
         
-        memcpy(&plr, &tp, sizeof(player_t));
+        memcpy(&plr, &tp, sizeof(PLAYEROBJ));
         RAP_SetPlayerDiff();
         OBJS_Add(S_FORWARD_GUNS);
         OBJS_Add(S_ENERGY);
@@ -1070,7 +1070,7 @@ WIN_Hangar(
 )
 {
     char temp[44];
-    wdlg_t dlg;
+    SWD_DLG dlg;
     int opt, oldopt, pos, kflag, local_cnt, pic_cnt, window;
     int x, y, lx, ly;
     int poslookup[4] = {
@@ -1446,7 +1446,7 @@ WIN_ShipComp(
     void
 )
 {
-    wdlg_t dlg;
+    SWD_DLG dlg;
     int rval, secret1, secret2, secret3, secret, cz1, cz2;
     int window;
     int px, py, lx, ly;
@@ -2047,7 +2047,7 @@ WIN_MainMenu(
     int window;
     int cur_opt;
     char cz1;
-    wdlg_t dlg;
+    SWD_DLG dlg;
 
     cz1 = ltable[0];
     cur_opt = 0;

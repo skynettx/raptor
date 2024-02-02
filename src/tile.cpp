@@ -18,12 +18,12 @@ short hits[MAP_SIZE];
 short tdead[MAP_SIZE];
 short money[MAP_SIZE];
 
-tdel_t tdel[MAX_TILEDELAY];
+TILEDELAY tdel[MAX_TILEDELAY];
 
-tdel_t first_delay;
-tdel_t last_delay;
+TILEDELAY first_delay;
+TILEDELAY last_delay;
 
-tdel_t *free_delay;
+TILEDELAY *free_delay;
 
 int tileloopy;
 char *tilepic;
@@ -45,8 +45,8 @@ int startflat[4];
 int tilepos;
 int tileyoff;
 
-tspot_t tspots[MAX_STILES];
-tspot_t *lastspot;
+TILESPOT tspots[MAX_STILES];
+TILESPOT *lastspot;
 int spark_delay;
 int flare_delay;
 
@@ -79,12 +79,12 @@ TClear(
 /*-------------------------------------------------------------------------*
 TGet () - Get a TDELAY object
  *-------------------------------------------------------------------------*/
-tdel_t 
+TILEDELAY
 *TGet(
     void
 )
 {
-    tdel_t *newtd;
+    TILEDELAY *newtd;
     
     if (!free_delay)
         EXIT_Error("TILEDELAY_Get() - Max ");
@@ -92,7 +92,7 @@ tdel_t
     newtd = free_delay;
     free_delay = free_delay->next;
     
-    memset(newtd, 0, sizeof(tdel_t));
+    memset(newtd, 0, sizeof(TILEDELAY));
     
     newtd->next = &last_delay;
     newtd->prev = last_delay.prev;
@@ -105,19 +105,19 @@ tdel_t
 /*-------------------------------------------------------------------------*
 TRemove () - Remove a TDELAY Object from link list
  *-------------------------------------------------------------------------*/
-tdel_t 
+TILEDELAY
 *TRemove(
-    tdel_t *sh
+    TILEDELAY *sh
 )
 {
-    tdel_t *next;
+    TILEDELAY *next;
     
     next = sh->prev;
     
     sh->next->prev = sh->prev;
     sh->prev->next = sh->next;
     
-    memset(sh, 0, sizeof(tdel_t));
+    memset(sh, 0, sizeof(TILEDELAY));
     
     sh->next = free_delay;
     
@@ -241,7 +241,7 @@ TILE_CacheLevel(
 )
 {
     int loop, game, item;
-    flat_t *lib;
+    FLATS *lib;
     
     TClear();
     g_mapleft = MAP_LEFT;
@@ -313,7 +313,7 @@ TILE_DamageAll(
     void
 )
 {
-    tspot_t *ts;
+    TILESPOT *ts;
     ts = tspots;
     
     do
@@ -337,8 +337,8 @@ TILE_Think(
 )
 {
     int ty, tx, y, x, mapspot, loopy, loopx;
-    tspot_t *ts;
-    tdel_t *td;
+    TILESPOT *ts;
+    TILEDELAY *td;
 
     y = tileyoff;
     mapspot = tilepos;
@@ -421,7 +421,7 @@ TILE_Display(
 )
 {
     char *pic;
-    tspot_t *ts;
+    TILESPOT *ts;
 
     ts = tspots;
     
@@ -470,7 +470,7 @@ TILE_IsHit(
     int y                  // INOUT : y screen pos, out tile y
 )
 {
-    tspot_t *ts = tspots;
+    TILESPOT *ts = tspots;
     
     while (ts != lastspot)
     {
@@ -510,7 +510,7 @@ TILE_Bomb(
     int y                  // INOUT : y screen pos, out tile y
 )
 {
-    tspot_t *ts = tspots;
+    TILESPOT *ts = tspots;
     
     while (ts != lastspot)
     {
@@ -540,11 +540,11 @@ TILE_Explode () - Sets the Tile to show explosion tile
  ***************************************************************************/
 void 
 TILE_Explode(
-    tspot_t *ts,           // INPUT : tilespot of explosion
+    TILESPOT *ts,          // INPUT : tilespot of explosion
     int delay              // INPUT : frames to delay
 )
 {
-    tdel_t *td;
+    TILEDELAY *td;
     
     if (ts->mapspot != -1 && ts->mapspot >= tilepos)
     {

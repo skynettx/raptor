@@ -2,7 +2,7 @@
 
 #include "gfxapi.h"
 
-enum CMD
+typedef enum
 {
     C_IDLE,
     F_DOWN,
@@ -22,9 +22,9 @@ enum CMD
     W_MOVE,
     W_CLOSE,
     W_CLOSE_ALL
-};
+}CMD;
 
-enum ACT
+typedef enum
 {
     S_IDLE,
     S_FLD_COMMAND,
@@ -33,38 +33,38 @@ enum ACT
     S_REDRAW,
     S_UPDATE,
     S_END
-};
+}ACT;
 
-enum FCMD
+typedef enum
 {
     R_IDLE,
     R_CLOSED,
     R_CLOSE_ALL,
     R_END_DIALOG
-};
+}FCMD;
 
-enum DSTYLE 
+typedef enum  
 {
     FILL,
     TEXTURE,
     PICTURE,
     SEE_THRU,
     INVISABLE
-};
+}DSTYLE;
 
-enum BUTTON
+typedef enum
 { 
     NORMAL, 
     UP, 
     DOWN 
-};
+}BUTTON;
 
-enum INPUTOPT
+typedef enum
 { 
     I_NORM, 
     I_TOUPPER, 
     I_NUMERIC 
-};
+}INPUTOPT;
 
 #define FLD_OFF 0       // 0
 #define FLD_TEXT 1      // 1
@@ -91,7 +91,7 @@ enum INPUTOPT
 #define MAX_WINDOWS 12
 #define MAX_FONTS 2
 
-struct swd_t
+typedef struct
 {
     int version;                 // VERSION NUMBER ( not used )
     int swdsize;                 // SIZE OF WIN/FIELD AND TEXT ( not used )
@@ -117,9 +117,10 @@ struct swd_t
     int lx;                      // WIDTH IN PIXELS
     int ly;                      // HEIGHT IN PIXELS
     int shadow;                  // SHADOW TRUE/FALSE
-};
+}SWIN;
 
-struct swdfield_t {
+typedef struct 
+{
     int opt;                     // FIELD TYPE
     int id;                      // FIELD ID
     int hotkey;                  // SCAN CODE OF HOT KEY
@@ -148,9 +149,10 @@ struct swdfield_t {
     int ly;                      // HEIGHT IN PIXELS
     int txtoff;                  // OFFSET TO TEXT DATA ( BYTES )
     char *sptr;                  // SEG POINTER TO SAVE INFO
-}; 
+}SFIELD;
 
-struct swdfield_32_t {
+typedef struct 
+{
     int opt;                     // FIELD TYPE
     int id;                      // FIELD ID
     int hotkey;                  // SCAN CODE OF HOT KEY
@@ -179,9 +181,10 @@ struct swdfield_32_t {
     int ly;                      // HEIGHT IN PIXELS
     int txtoff;                  // OFFSET TO TEXT DATA ( BYTES )
     int PlaceHolder;             // PLACEHOLDER TO KEEP SIZE
-}; 
+}SFIELD32; 
 
-struct wdlg_t {
+typedef struct
+{
     int window;
     int field;
     int cur_act;
@@ -198,14 +201,15 @@ struct wdlg_t {
     int sfield;
     int sx;
     int sy;
-};
+}SWD_DLG;
 
-struct window_t {
+typedef struct 
+{
     int gitem;                   // GLB ITEM ID
     int flag;                    // TRUE = in use ,FALSE = not in use
     int viewflag;                // TRUE = has viewarea(s) FALSE = none
-    swd_t *win;                  // POINTER TO WINDOW
-};
+    SWIN *win;                   // POINTER TO WINDOW
+}SWD_WIN;
 
 extern int usekb_flag;
 extern int g_button_flag;
@@ -214,8 +218,8 @@ extern bool fi_sec_field;
 
 void SWD_Install(int moveflag);
 void SWD_End(void);
-void SWD_Dialog(wdlg_t *swd_dlg);
-swd_t* SWD_ReformatFieldData(swd_t* header, int handle);
+void SWD_Dialog(SWD_DLG *swd_dlg);
+SWIN* SWD_ReformatFieldData(SWIN *header, int handle);
 int SWD_InitMasterWindow(int handle);
 int SWD_ShowAllWindows(void);
 void SWD_SetWindowPtr(int handle);
@@ -226,7 +230,7 @@ void SWD_DestroyWindow(int handle);
 int SWD_InitWindow(int handle);
 void SWD_SetActiveField(int handle, int field_id);
 int SWD_GetFieldXYL(int handle, int field_id, int* x, int* y, int* lx, int* ly);
-void SWD_SetWinDrawFunc(int handle, void (*infunc)(wdlg_t*));
+void SWD_SetWinDrawFunc(int handle, void (*infunc)(SWD_DLG*));
 void SWD_SetFieldPtr(int handle, int field);
 int SWD_GetFieldText(int handle, int field_id, char *out_text);
 int SWD_GetFieldItem(int handle, int field_id);

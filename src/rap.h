@@ -48,7 +48,8 @@ extern int playerx, playery;
 extern char gdmodestr[];
 extern int playerbasepic;
 
-struct player_t {
+typedef struct 
+{
     char name[20];
     char callsign[12];
     int id_pic;
@@ -60,7 +61,7 @@ struct player_t {
     int diff[4];                          // DIFFICULTY LEVEL
     int trainflag;
     int fintrain;
-};
+}PLAYEROBJ;
 
 #define END_DURATION ( 20 * 3 )
 #define END_EXPLODE  ( 24 )
@@ -97,7 +98,8 @@ struct player_t {
 
 #define MAX_ONSCREEN 30
 
-struct mobj_t {
+typedef struct 
+{
     int x;
     int y;
     int x2;
@@ -109,9 +111,9 @@ struct mobj_t {
     int maxloop;
     int err;
     int done;
-};
+}MOVEOBJ;
 
-enum FLIGHT_TYPE
+typedef enum
 {
     F_REPEAT,
     F_LINEAR,
@@ -119,16 +121,16 @@ enum FLIGHT_TYPE
     F_GROUND,
     F_GROUNDLEFT,
     F_GROUNDRIGHT,
-};
+}FLIGHT_TYPE;
 
-enum ANIMTYPE
+typedef enum
 {
     GANIM_NORM,
     GANIM_SHOOT,
     GANIM_MULTI
-};
+}ANIMTYPE;
 
-enum EXP_TYPE
+typedef enum
 {
     EXP_AIRSMALL1, // 0  
     EXP_AIRMED,    // 1 NORMAL AIR    ( norm )
@@ -141,30 +143,31 @@ enum EXP_TYPE
     EXP_ENERGY,    // 8 ENERGY SHIP BLOWING UP
     EXP_PLATOON,   // 9 ONE LITTLE PERSON BLWING UP
     EXP_AIRSMALL2  // 10  
-};
+}EXP_TYPE;
 
-enum KEYOPTS
+typedef enum
 {
     K_OK,
     K_NEXTFRAME,
     K_SKIPALL,
     K_EXITDOS
-};
+}KEYOPTS;
 
-struct flat_t {
+typedef struct 
+{
     int linkflat; 
     short bonus; 
     short bounty;
-};
+}FLATS;
 
-extern flat_t *flatlib[4];
-extern player_t plr;
+extern FLATS *flatlib[4];
+extern PLAYEROBJ plr;
 
 int wrand(void);
 
-void InitMobj(mobj_t *cur);
-void MoveMobj(mobj_t* cur);
-int MoveSobj(mobj_t* cur, int speed);
+void InitMobj(MOVEOBJ *cur);
+void MoveMobj(MOVEOBJ *cur);
+int MoveSobj(MOVEOBJ *cur, int speed);
 void RAP_FreeMap(void);
 void RAP_LoadMap(void);
 int Do_Game(void);

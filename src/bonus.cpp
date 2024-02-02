@@ -8,9 +8,9 @@
 #include "fx.h"
 #include "fileids.h"
 
-bonus_t bons[MAX_BONUS];
-bonus_t first_bonus, last_bonus;
-bonus_t *free_bonus;
+BONUS bons[MAX_BONUS];
+BONUS first_bonus, last_bonus;
+BONUS *free_bonus;
 static int energy_count;
 static int glow[4];
 static int glow_lx, glow_ly;
@@ -51,12 +51,12 @@ BONUS_Clear(
 /*-------------------------------------------------------------------------*
 BONUS_Get () - Gets A Free BONUS from Link List
  *-------------------------------------------------------------------------*/
-bonus_t 
+BONUS
 *BONUS_Get(
     void
 )
 {
-    bonus_t *newb;
+    BONUS *newb;
     
     if (!free_bonus)
         return NULL;
@@ -64,7 +64,7 @@ bonus_t
     newb = free_bonus;
     free_bonus = free_bonus->next;
     
-    memset(newb, 0, sizeof(bonus_t));
+    memset(newb, 0, sizeof(BONUS));
     
     newb->next = &last_bonus;
     newb->prev = last_bonus.prev;
@@ -77,12 +77,12 @@ bonus_t
 /*-------------------------------------------------------------------------*
 BONUS_Remove () Removes BONUS from Link List
  *-------------------------------------------------------------------------*/
-bonus_t 
+BONUS
 *BONUS_Remove(
-    bonus_t *sh
+    BONUS *sh
 )
 {
-    bonus_t *next;
+    BONUS *next;
     
     if (sh->type == S_ITEMBUY6)
         energy_count--;
@@ -92,7 +92,7 @@ bonus_t
     sh->next->prev = sh->prev;
     sh->prev->next = sh->next;
     
-    memset(sh, 0, sizeof(bonus_t));
+    memset(sh, 0, sizeof(BONUS));
     
     sh->next = free_bonus;
     
@@ -139,7 +139,7 @@ BONUS_Add(
     int y                  // INPUT : Y POSITION
 )
 {
-    bonus_t *cur;
+    BONUS *cur;
     
     if (type >= S_LAST_OBJECT)
         return;
@@ -172,7 +172,7 @@ BONUS_Think(
 )
 {
     int x, y, x2, y2;
-    bonus_t *cur;
+    BONUS *cur;
     static int gcnt;
 
     x = playerx;
@@ -262,7 +262,7 @@ BONUS_Display(
     void
 )
 {
-    bonus_t *cur;
+    BONUS *cur;
     
     for (cur = first_bonus.next; &last_bonus != cur; cur = cur->next)
     {

@@ -1,34 +1,35 @@
 #pragma once
 #include "rap.h"
 
-enum EDIR
+typedef enum
 {
     E_FORWARD,
     E_BACKWARD
-};
+}EDIR;
 
-enum KAMI
+typedef enum
 {
     KAMI_FLY,
     KAMI_CHASE,
     KAMI_END
-};
+}KAMI;
 
-enum GANIM
+typedef enum
 {
     GANIM_DONE,
     GANIM_OFF,
     GANIM_ON
-};
+}GANIM;
 
-enum MULTI
+typedef enum
 {
     MULTI_OFF,
     MULTI_START,
     MULTI_END
-};
+}MULTI;
 
-struct slib_t {
+typedef struct 
+{
     char iname[16];                         // ITEM NAME
     int item;                               // * GLB ITEM #
     int bonus;                              // BONUS # ( -1 == NONE )
@@ -64,13 +65,14 @@ struct slib_t {
     short shooty[MAX_GUNS];                 // Y POS SHOOT FROM
     short flightx[MAX_FLIGHT];              // FLIGHT X POS
     short flighty[MAX_FLIGHT];              // FLIGHT Y POS
-}; // size 0x210
+}SPRITE;
 
-struct enemy_t {
-    enemy_t *prev;
-    enemy_t *next;
+typedef struct SPRITE_SHIP_S 
+{
+    struct SPRITE_SHIP_S *prev;
+    struct SPRITE_SHIP_S *next;
     int item;                         // GLB item of current frame
-    slib_t *lib;                      // SPRITE LIB POS
+    SPRITE *lib;                      // SPRITE LIB POS
     int sx;                           // START X
     int sy;                           // START Y
     int x;                            // CENTER X POS;
@@ -88,7 +90,7 @@ struct enemy_t {
     int hits;                         // *
     int groundflag;                   // *
     int doneflag;
-    mobj_t move;
+    MOVEOBJ move;
     int countdown;
     int curframe;
     int eframe;
@@ -102,7 +104,7 @@ struct enemy_t {
     int multi;
     int speed;
     int suckagain;
-};
+}SPRITE_SHIP;
 
 #define E_NUM_DIFF    4
 
@@ -122,14 +124,14 @@ struct enemy_t {
 #define EB_HARD_LEVEL  32
 #define EB_NOT_USED    64
 
-extern enemy_t first_enemy, last_enemy;
+extern SPRITE_SHIP first_enemy, last_enemy;
 void ENEMY_Clear(void);
 void ENEMY_LoadLib(void);
 void ENEMY_LoadSprites(void);
 void ENEMY_FreeSprites(void);
-enemy_t *ENEMY_GetRandom(void);
-enemy_t *ENEMY_GetRandomAir(void);
-enemy_t *ENEMY_DamageEnergy(int x, int y, int damage);
+SPRITE_SHIP *ENEMY_GetRandom(void);
+SPRITE_SHIP *ENEMY_GetRandomAir(void);
+SPRITE_SHIP *ENEMY_DamageEnergy(int x, int y, int damage);
 int ENEMY_DamageAll(int x, int y, int damage);
 int ENEMY_DamageGround(int x, int y, int damage);
 int ENEMY_DamageAir(int x, int y, int damage);

@@ -5,7 +5,7 @@
 
 #define MAX_SHOTS 70
 
-enum HIT_TYPE
+typedef enum
 {
     S_ALL,
     S_AIR,
@@ -13,16 +13,17 @@ enum HIT_TYPE
     S_GRALL,
     S_GTILE,
     S_SUCK
-};
+}HIT_TYPE;
 
-enum BEAM_TYPE
+typedef enum
 {
     S_SHOOT,
     S_LINE,
     S_BEAM
-};
+}BEAM_TYPE;
 
-struct shot_lib_t {
+typedef struct 
+{
     int lumpnum;                            // LUMPNUM OF PIC(S)
     char *pic[10];                          // POINTER TO PIC
     int shadow;                             // SHADOW ON/OFF
@@ -46,24 +47,25 @@ struct shot_lib_t {
     GFX_PIC *h;
     int hlx;
     int hly;
-};
+}SHOT_LIB;
 
-struct shot_t {
-    shot_t* prev;                           // Link List Prev
-    shot_t* next;                           // Link List Next
+typedef struct SHOTS_S
+{
+    struct SHOTS_S *prev;                   // Link List Prev
+    struct SHOTS_S *next;                   // Link List Next
     char *pic;                              // pointer to cur frame pic
     int x;                                  // cur shot center x
     int y;                                  // cur shot center y
-    mobj_t move;                            // MOVE stuff
+    MOVEOBJ move;                           // MOVE stuff
     int speed;                              // cur speed
     int curframe;                           // current anim frame
     int doneflag;                           // shot done = TRUE
     int delayflag;                          // DEALAYED ANIM START
     int startx;                             // PLAYER X OFFSET;
     int starty;                             // PLAYER Y OFFSET;
-    shot_lib_t *lib;
+    SHOT_LIB *lib;
     int cnt;
-};
+}SHOTS;
 
 extern char *lashit[4];
 

@@ -8,55 +8,55 @@
 #define SCREENWIDTH  320
 #define SCREENHEIGHT 200
 
-enum CORNER
+typedef enum
 {
     UPPER_LEFT,
     UPPER_RIGHT,
     LOWER_LEFT,
     LOWER_RIGHT
-};
+}CORNER;
 
-enum SHADE
+typedef enum
 {
     DARK,
     LIGHT,
     GREY
-};
+}SHADE;
 
-enum GFX_TYPE
+typedef enum
 {
     GSPRITE,
     GPIC
-};
+}GFX_TYPE;
 
 #define CLIP_XRIGHT    2
 #define CLIP_XLEFT     4
 #define CLIP_YTOP      8
 #define CLIP_YBOTTOM   16
 
-struct GFX_PIC
+typedef struct
 {
     GFX_TYPE type;          // type of picture
     int opt1;               // option 1
     int opt2;               // option 2
     int width;              // width of pic
     int height;             // heigth of pic
-};
+}GFX_PIC;
 
-struct GFX_SPRITE
+typedef struct
 {
     int x;                  // X POS OF SEG
     int y;                  // Y POS OF SEG
     int offset;             // OFFSET FROM X, Y
     int length;             // LENGTH OF LINE
-};
+}GFX_SPRITE;
 
-struct FONT
+typedef struct
 {
     int height;
     short charofs[256];
     char width[256];
-};
+}FONT;
 
 extern char *displaybuffer;
 extern char *displayscreen;

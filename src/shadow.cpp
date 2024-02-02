@@ -8,17 +8,18 @@
 char sdtablemem[516];
 char *sdtable;
 
-struct shad_t {
+typedef struct 
+{
     int item;
     int x;
     int y;
-};
+}SHADOW;
 
 #define MAX_SHADOWS 50
 #define MAX_GSHADOWS 25
 
-shad_t shads[MAX_SHADOWS];
-shad_t gshads[MAX_GSHADOWS];
+SHADOW shads[MAX_SHADOWS];
+SHADOW gshads[MAX_GSHADOWS];
 int num_shadows, num_gshadows;
 
 #define MAXZ  1280;
@@ -147,7 +148,7 @@ SHADOW_Add(
     int y                   // INPUT : y position
 )
 {
-    shad_t *cur;
+    SHADOW *cur;
     cur = &shads[num_shadows];
     
     if (num_shadows < MAX_SHADOWS)
@@ -170,7 +171,7 @@ SHADOW_GAdd(
     int y                  // INPUT : y position
 )
 {
-    shad_t *cur;
+    SHADOW *cur;
     cur = &gshads[num_gshadows];
     
     if (num_gshadows < MAX_GSHADOWS)
@@ -192,7 +193,7 @@ SHADOW_DisplaySky(
 )
 {
     char *pic;
-    shad_t *cur;
+    SHADOW *cur;
     cur = shads;
     
     if (opt_detail < 1)
@@ -217,7 +218,7 @@ SHADOW_DisplayGround(
 )
 {
     char *pic;
-    shad_t *cur;
+    SHADOW *cur;
     cur = gshads;
     
     if (opt_detail < 1)

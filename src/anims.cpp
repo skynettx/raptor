@@ -11,10 +11,10 @@
 #define MAX_ANIMLIB 25
 #define MAX_ANIMS   100
 
-anim_t first_anims, last_anims, anims[MAX_ANIMS];
-anim_t *free_anims;
+ANIMS first_anims, last_anims, anims[MAX_ANIMS];
+ANIMS *free_anims;
 
-animlib_t animlib[MAX_ANIMLIB];
+ANIMLIB animlib[MAX_ANIMLIB];
 int curlib;
 
 int adir[3] = {
@@ -48,12 +48,12 @@ ANIMS_Clear(
 /*-------------------------------------------------------------------------*
 ANIMS_Get () - Gets A Free ANIM from Link List
  *-------------------------------------------------------------------------*/
-anim_t 
+ANIMS
 *ANIMS_Get(
     void
 )
 {
-    anim_t *newa;
+    ANIMS *newa;
     
     if (!free_anims)
         return NULL;
@@ -61,7 +61,7 @@ anim_t
     newa = free_anims;
     free_anims = free_anims->next;
     
-    memset(newa, 0, sizeof(anim_t));
+    memset(newa, 0, sizeof(ANIMS));
     
     newa->next = &last_anims;
     newa->prev = last_anims.prev;
@@ -75,19 +75,19 @@ anim_t
 /*-------------------------------------------------------------------------*
 ANIMS_Remove () Removes ANIM from Link List
  *-------------------------------------------------------------------------*/
-anim_t 
+ANIMS
 *ANIMS_Remove(
-    anim_t *anim
+    ANIMS *anim
 )
 {
-    anim_t *next;
+    ANIMS *next;
     
     next = anim->prev;
     
     anim->next->prev = anim->prev;
     anim->prev->next = anim->next;
     
-    memset(anim, 0, sizeof(anim_t));
+    memset(anim, 0, sizeof(ANIMS));
     
     anim->next = free_anims;
     
@@ -109,7 +109,7 @@ ANIMS_Register(
     int adir               // INPUT : Anim Direction
 )
 {
-    animlib_t *cur;
+    ANIMLIB*cur;
     GFX_PIC *h;
     int handle;
     handle = curlib;
@@ -194,7 +194,7 @@ ANIMS_CachePics(
 {
     int loop;
     unsigned int frames;
-    animlib_t *cur;
+    ANIMLIB *cur;
     
     cur = animlib;
     
@@ -217,7 +217,7 @@ ANIMS_FreePics(
 {
     int loop;
     unsigned int frames;
-    animlib_t *cur;
+    ANIMLIB *cur;
     
     cur = animlib;
     
@@ -240,8 +240,8 @@ ANIMS_StartAnim(
     int y                  // INPUT : y position
 )
 {
-    animlib_t *lib;
-    anim_t *cur;
+    ANIMLIB *lib;
+    ANIMS *cur;
     lib = &animlib[handle];
     
     cur = ANIMS_Get();
@@ -264,7 +264,7 @@ ANIMS_StartGAnim(
     int y                   // INPUT : y position
 )
 {
-    anim_t *cur;
+    ANIMS *cur;
     
     cur = ANIMS_Get();
     if (!cur)
@@ -281,14 +281,14 @@ ANIMS_StartEAnim () - Start An ANIM Playing locked onto ENEMY
  ***************************************************************************/
 void 
 ANIMS_StartEAnim(
-    enemy_t *en,            // INPUT : pointer to ENEMY
+    SPRITE_SHIP *en,        // INPUT : pointer to ENEMY
     int handle,             // INPUT : ANIM handle
     int x,                  // INPUT : x position
     int y                   // INPUT : y position
 )
 {
-    animlib_t *lib;
-    anim_t *cur;
+    ANIMLIB *lib;
+    ANIMS *cur;
     lib = &animlib[handle];
     
     cur = ANIMS_Get();
@@ -312,8 +312,8 @@ ANIMS_StartAAnim(
     int y                   // INPUT : y position
 )
 {
-    animlib_t *lib;
-    anim_t *cur;
+    ANIMLIB *lib;
+    ANIMS *cur;
     lib = &animlib[handle];
     
     cur = ANIMS_Get();
@@ -334,8 +334,8 @@ ANIMS_Think(
     void
 )
 {
-    anim_t *cur;
-    animlib_t *lib;
+    ANIMS *cur;
+    ANIMLIB *lib;
 
     for (cur = first_anims.next; &last_anims != cur; cur = cur->next)
     {
@@ -400,7 +400,7 @@ ANIMS_DisplayGround(
     void
 )
 {
-    anim_t *cur;
+    ANIMS *cur;
     char *pic;
 
     for (cur = first_anims.next; &last_anims != cur; cur = cur->next)
@@ -425,7 +425,7 @@ ANIMS_DisplaySky(
     void
 )
 {
-    anim_t *cur;
+    ANIMS *cur;
     char *pic;
 
     for (cur = first_anims.next; &last_anims != cur; cur = cur->next)
@@ -451,7 +451,7 @@ ANIMS_DisplayHigh(
     void
 )
 {
-    anim_t *cur;
+    ANIMS *cur;
     char *pic;
 
     for (cur = first_anims.next; &last_anims != cur; cur = cur->next)

@@ -238,7 +238,7 @@ STORE_Enter(
 )
 {
     int update, opt, oldopt, max_items, pos, cost, loop, num;
-    wdlg_t dlg;
+    SWD_DLG dlg;
     char youhave[50], coststr[50];
 
     update = 0;

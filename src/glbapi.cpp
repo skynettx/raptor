@@ -42,7 +42,7 @@ static bool fVmem = 0;
 /*
 * define file descriptor used to access file.
 */
-struct ITEMINFO
+typedef struct
 {
 	char name[16];
 	VM_OWNER vm_mem;
@@ -50,40 +50,40 @@ struct ITEMINFO
 	uint32_t offset;
 	uint32_t flags;
 	uint32_t lock_cnt;
-};
+}ITEMINFO;
 
-struct FILEDESC
+typedef struct
 {
 	char filepath[PATH_MAX];
 	ITEMINFO* item;
 	int      items;
 	FILE     *handle;
 	const char *permissions;
-};
+}FILEDESC;
 
-struct ITEM_ID
+typedef struct
 {
 	uint16_t itemnum;
 	uint16_t filenum;
-};
+}ITEM_ID;
 
-union ITEM_H
+typedef union
 {
 	ITEM_ID id;
 	uint32_t handle;
-};
+}ITEM_H;
 
 static FILEDESC  filedesc[MAX_GLB_FILES];
 
 #define ITF_LOCKED  0x80000000L
 #define ITF_ENCODED 0x40000000L
 
-enum FI_MODE 
+typedef enum
 { 
 	FI_CACHE, 
 	FI_DISCARD, 
 	FI_LOCK 
-};
+}FI_MODE;
 
 /***************************************************************************
   GLB_EnCrypt - Encrypt Data

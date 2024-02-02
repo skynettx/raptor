@@ -5,13 +5,13 @@
 
 #define MAX_BLOCKS  63
 
-struct MCBL
+typedef struct
 {
     uint32_t size;
     VM_OWNER* owner;
-};
+}MCBL;
 
-struct POOL
+typedef struct
 {
     uint8_t* blk[MAX_BLOCKS];
     MCBL* last_mcb[MAX_BLOCKS];
@@ -19,7 +19,7 @@ struct POOL
     MCBL* rover;
     uint32_t discarded;
     uint32_t age;
-};
+}POOL;
 
 #define BLK_FREE    0x80000000L
 #define BLK_SIZE    0x00FFFFFFL

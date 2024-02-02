@@ -13,16 +13,16 @@ enum
     FXHAND_TMASK = 0xc000,
 };
 
-enum SND_TYPE
+typedef enum
 {
     SND_NONE,
     SND_PC,
     SND_MIDI,
     SND_CANVAS,
     SND_DIGITAL
-};
+}SND_TYPE;
 
-enum DEFX
+typedef enum
 {
     FX_THEME,
     FX_MON1,
@@ -61,7 +61,7 @@ enum DEFX
     FX_NOSHOOT,
     FX_PULSE,
     FX_LAST_SND
-};
+}DEFX;
 
 extern int music_volume;
 extern int fx_volume;

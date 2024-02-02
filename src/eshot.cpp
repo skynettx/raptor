@@ -28,13 +28,13 @@ enum LIB_PIC
 };
 
 int eshotnum, eshothigh;
-eshot_t first_eshot, last_eshot;
-eshot_t eshots[MAX_ESHOT];
-eshot_t *free_eshot;
+ESHOT first_eshot, last_eshot;
+ESHOT eshots[MAX_ESHOT];
+ESHOT *free_eshot;
 
 char *elaspow[4];
 
-plib_t plib[LIB_LASTPIC];
+ESHOT_LIB plib[LIB_LASTPIC];
 
 static int xpos[16] = {
     -1, 0, 1, 2, 3, 3, 3, 2, 1, 0, -1, -2, -3, -3, -3, -2
@@ -77,12 +77,12 @@ ESHOT_Clear(
 /*-------------------------------------------------------------------------*
 ESHOT_Get () - gets a Free ESHOT OBJECT from linklist
  *-------------------------------------------------------------------------*/
-eshot_t 
+ESHOT
 *ESHOT_Get(
     void
 )
 {
-    eshot_t *newes;
+    ESHOT *newes;
     
     if (!free_eshot)
         return NULL;
@@ -94,7 +94,7 @@ eshot_t
     newes = free_eshot;
     free_eshot = free_eshot->next;
     
-    memset(newes, 0, sizeof(eshot_t));
+    memset(newes, 0, sizeof(ESHOT));
     
     newes->next = &last_eshot;
     newes->prev = last_eshot.prev;
@@ -107,12 +107,12 @@ eshot_t
 /*-------------------------------------------------------------------------*
 ESHOT_Remove () - Removes SHOT OBJECT from linklist
  *-------------------------------------------------------------------------*/
-eshot_t 
+ESHOT
 *ESHOT_Remove(
-    eshot_t *sh
+    ESHOT *sh
 )
 {
-    eshot_t *next;
+    ESHOT *next;
     
     eshotnum--;
     
@@ -121,7 +121,7 @@ eshot_t
     sh->next->prev = sh->prev;
     sh->prev->next = sh->next;
     
-    memset(sh, 0, sizeof(eshot_t));
+    memset(sh, 0, sizeof(ESHOT));
     
     sh->next = free_eshot;
     
@@ -138,7 +138,7 @@ ESHOT_Init(
     void
 )
 {
-    plib_t *cur;
+    ESHOT_LIB *cur;
     GFX_PIC *h;
     int loop;
     
@@ -239,14 +239,14 @@ ESHOT_Shoot() - Shoots ENEMY GUNS
  ***************************************************************************/
 void 
 ESHOT_Shoot(
-    enemy_t *enemy,        // INPUT : pointer to Enemy stuff
+    SPRITE_SHIP *enemy,    // INPUT : pointer to Enemy stuff
     int gun_num            // INPUT : gun number to shoot
 )
 {
     int x;
     int y;
     int g_shoot_type;
-    eshot_t *cur;
+    ESHOT *cur;
     
     x = enemy->x + enemy->lib->shootx[gun_num];
     y = enemy->y + enemy->lib->shooty[gun_num];
@@ -390,8 +390,8 @@ ESHOT_Think(
     void
 )
 {
-    eshot_t *shot;
-    plib_t *lib;
+    ESHOT *shot;
+    ESHOT_LIB *lib;
     int dx, dy;
 
     for (shot = first_eshot.next; shot!=&last_eshot; shot = shot->next)
@@ -510,7 +510,7 @@ ESHOT_Display(
     void
 )
 {
-    eshot_t *shot;
+    ESHOT *shot;
     int loop, y;
     GFX_PIC *h;
     

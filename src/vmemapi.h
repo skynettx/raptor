@@ -3,11 +3,11 @@
 #define ASSERT(exp)	((void)0)
 #define ASIZE(a) (sizeof(a)/sizeof((a)[0]))
 
-struct VM_OWNER
+typedef struct
 {
     char* obj;
     uint32_t age;
-};
+}VM_OWNER;
 
 void VM_InitMemory(char *memory, int size);
 void *VM_Malloc(uint32_t size, VM_OWNER *owner, bool discard);

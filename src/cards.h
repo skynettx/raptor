@@ -1,6 +1,6 @@
 #pragma once
 
-enum SCARD
+typedef enum
 {
     M_NONE = 0,// 0
     M_PC,      // 1
@@ -13,4 +13,4 @@ enum SCARD
     M_GMIDI,   // 8
     M_AWE,     // 9
     M_LAST     // 10
-};
+}SCARD;

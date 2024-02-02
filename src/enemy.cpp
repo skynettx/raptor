@@ -26,7 +26,7 @@ int spriteitm[4] = {
      FILE1fc_SPRITE1_ITM, FILE200_SPRITE2_ITM, FILE300_SPRITE3_ITM, FILE400_SPRITE4_ITM
 };
 
-slib_t *slib[4];
+SPRITE *slib[4];
 
 int cur_visable;
 int boss_sound;
@@ -36,22 +36,22 @@ int numslibs[4];
 int numboss, numships;
 int end_waveflag;
 
-enemy_t ships[30];
-enemy_t last_enemy, first_enemy;
-enemy_t *free_enemy;
+SPRITE_SHIP ships[30];
+SPRITE_SHIP last_enemy, first_enemy;
+SPRITE_SHIP *free_enemy;
 
-csprite_t *end_enemy, *cur_enemy;
+CSPRITE *end_enemy, *cur_enemy;
 
 int tiley;
 
-enemy_t *onscreen[MAX_ONSCREEN], *rscreen[MAX_ONSCREEN];
+SPRITE_SHIP *onscreen[MAX_ONSCREEN], *rscreen[MAX_ONSCREEN];
 
 /***************************************************************************
    MoveEobj() - gets next postion for an Object at speed
  ***************************************************************************/
 int 
 MoveEobj(
-    mobj_t *cur,           // INPUT : pointer to MOVEOBJ
+    MOVEOBJ *cur,          // INPUT : pointer to MOVEOBJ
     int speed              // INPUT : speed to plot at
 )      
 {
@@ -120,8 +120,8 @@ ENEMY_FreeSprites(
 )
 {
     int loop, i;
-    csprite_t *curfld;
-    slib_t *curlib;
+    CSPRITE *curfld;
+    SPRITE *curlib;
 
     for (loop = 0; loop < 4; loop++)
     {
@@ -153,8 +153,8 @@ ENEMY_LoadSprites(
 )
 {
     int loop, i, item;
-    csprite_t *curfld;
-    slib_t *curlib;
+    CSPRITE *curfld;
+    SPRITE *curlib;
     
     ENEMY_Clear();
     cur_visable = 0;
@@ -250,13 +250,13 @@ void ENEMY_LoadLib(
     {
         if (spriteflag[loop])
         {
-            slib[loop] = (slib_t*)GLB_LockItem(spriteitm[loop]);
+            slib[loop] = (SPRITE*)GLB_LockItem(spriteitm[loop]);
             
             if (!slib[loop])
                 EXIT_Error("ENEMY_LoadSprites() - memory");
             
             numslibs[loop] = GLB_ItemSize(spriteitm[loop]);
-            numslibs[loop] /= sizeof(slib_t);
+            numslibs[loop] /= sizeof(SPRITE);
         }
     }
 }
@@ -303,12 +303,12 @@ void ENEMY_Clear(
 /*-------------------------------------------------------------------------*
 ENEMY_Get() - Gets An Free Enemy from link list
  *-------------------------------------------------------------------------*/
-enemy_t 
+SPRITE_SHIP
 *ENEMY_Get(
     void
 )
 {
-    enemy_t *sh;
+    SPRITE_SHIP *sh;
     
     if (!free_enemy)
         EXIT_Error("ENEMY_Get() - Max Sprites");
@@ -318,7 +318,7 @@ enemy_t
     sh = free_enemy;
     free_enemy = free_enemy->next;
     
-    memset(sh, 0, sizeof(enemy_t));
+    memset(sh, 0, sizeof(SPRITE_SHIP));
     
     sh->next = &last_enemy;
     sh->prev = last_enemy.prev;
@@ -331,12 +331,12 @@ enemy_t
 /*-------------------------------------------------------------------------*
 ENEMY_Remove () - Removes an Enemy OBJECT from linklist
  *-------------------------------------------------------------------------*/
-enemy_t 
+SPRITE_SHIP
 *ENEMY_Remove(
-    enemy_t *sh
+    SPRITE_SHIP *sh
 )
 {
-    enemy_t *next;
+    SPRITE_SHIP *next;
     
     if (sh->lib->bossflag)
         numboss--;
@@ -351,7 +351,7 @@ enemy_t
     sh->next->prev = sh->prev;
     sh->prev->next = sh->next;
     
-    memset(sh, 0, sizeof(enemy_t));
+    memset(sh, 0, sizeof(SPRITE_SHIP));
     sh->item = -1;
     
     sh->next = free_enemy;
@@ -366,11 +366,11 @@ ENEMY_Add () - Adds Enemy to attack player
  *-------------------------------------------------------------------------*/
 void 
 ENEMY_Add(
-    csprite_t *sprite
+    CSPRITE *sprite
 )
 {
-    slib_t *curlib;
-    enemy_t *newe;
+    SPRITE *curlib;
+    SPRITE_SHIP *newe;
     char *pic;
     GFX_PIC *h;
     curlib = &slib[sprite->game][sprite->slib];
@@ -483,7 +483,7 @@ ENEMY_Add(
 /***************************************************************************
 ENEMY_GetRandom () - Returns a random ship thats visable
  ***************************************************************************/
-enemy_t 
+SPRITE_SHIP
 *ENEMY_GetRandom(
     void
 )
@@ -501,7 +501,7 @@ enemy_t
 /***************************************************************************
 ENEMY_GetRandomAir () - Returns a random ship thats visable
  ***************************************************************************/
-enemy_t 
+SPRITE_SHIP
 *ENEMY_GetRandomAir(
     void
 )
@@ -542,7 +542,7 @@ ENEMY_DamageAll(
 )
 {
     int loop;
-    enemy_t *cur;
+    SPRITE_SHIP *cur;
     
     for (loop = 0; loop < cur_visable; loop++)
     {
@@ -569,7 +569,7 @@ ENEMY_DamageGround(
 )
 {
     int loop;
-    enemy_t *cur;
+    SPRITE_SHIP *cur;
     
     for (loop = 0; loop < cur_visable; loop++)
     {
@@ -601,7 +601,7 @@ ENEMY_DamageAir(
 )
 {
     int loop;
-    enemy_t *cur;
+    SPRITE_SHIP *cur;
     
     for (loop = 0; loop < cur_visable; loop++)
     {
@@ -625,7 +625,7 @@ ENEMY_DamageAir(
 /***************************************************************************
 ENEMY_DamageEnergy () - Tests to see if hit occured at x/y and applys damage
  ***************************************************************************/
-enemy_t 
+SPRITE_SHIP
 *ENEMY_DamageEnergy(
     int x,                 // INPUT : x position
     int y,                 // INPUT : y position
@@ -633,7 +633,7 @@ enemy_t
 )
 {
     int loop;
-    enemy_t *cur;
+    SPRITE_SHIP *cur;
     
     for (loop = 0; loop < cur_visable; loop++)
     {
@@ -674,9 +674,9 @@ void ENEMY_Think(
     void
 )
 {
-    csprite_t *old_enemy;
-    enemy_t *sprite;
-    slib_t *curlib;
+    CSPRITE *old_enemy;
+    SPRITE_SHIP *sprite;
+    SPRITE *curlib;
     int speed, loop, x, y, suben, area;
     
     if (boss_sound)
@@ -1175,7 +1175,7 @@ ENEMY_DisplayGround(
     void
 )
 {
-    enemy_t *spt;
+    SPRITE_SHIP *spt;
     
     for (spt = first_enemy.next; &last_enemy != spt; spt = spt->next)
     {
@@ -1194,7 +1194,7 @@ ENEMY_DisplaySky(
 )
 {
     int i;
-    enemy_t *spt;
+    SPRITE_SHIP *spt;
     
     for (spt = first_enemy.next; &last_enemy != spt; spt = spt->next)
     {
@@ -1222,7 +1222,7 @@ ENEMY_GetBaseDamage(
 {
     static int nums;
     int total, damage;
-    enemy_t *spt;
+    SPRITE_SHIP *spt;
 
     total = 0;
     nums = 0;

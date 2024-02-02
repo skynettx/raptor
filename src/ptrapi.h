@@ -2,12 +2,12 @@
 #include "common.h"
 #include "gfxapi.h"
 
-enum PTRTYPE
+typedef enum
 {
 	P_AUTO,
 	P_MOUSE,
 	P_JOYSTICK
-};
+}PTRTYPE;
 
 extern int mouseb1, mouseb2, mouseb3;
 extern int cur_mx, cur_my;

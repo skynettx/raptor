@@ -1,19 +1,19 @@
 #pragma once
 #include <stdint.h>
 
-struct KEYFILE
+typedef struct
 {
 	uint32_t opt;           // option (encode on/off)
 	uint32_t offset;        // offset into file
 	uint32_t filesize;      // filesize
 	char name[16];          // text name ( end with null )
-};
+}KEYFILE;
 
-struct ITEMS
+typedef struct
 {
 	uint16_t itemnum;
 	uint16_t filenum;
-};
+}ITEMS;
 
 #define  MAX_GLB_FILES       0x000F
 #define  SEED                0x0019
@@ -37,7 +37,7 @@ int GLB_ReadFile(const char *name, char *buffer);
 void GLB_SaveFile(char *name, char *buffer, int length);
 int GLB_Load(char *inmem, int filenum, int itemnum);
 int GLB_IsLabel(int handle);
-void GLB_ReadItem(int handle, char* mem);
-//char* GLB_GetPtr(int handle);
+void GLB_ReadItem(int handle, char *mem);
+//char *GLB_GetPtr(int handle);
 //void GLB_SetItemPointer(int a1, char* a2);
 //void GLB_SetItemSize(int a1, int a2);

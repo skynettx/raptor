@@ -93,7 +93,7 @@ char *numbers[11];
 
 char gdmodestr[] = "CASTLE";
 
-player_t plr;
+PLAYEROBJ plr;
 
 char* g_highmem;
 
@@ -157,7 +157,7 @@ char flatnames[4][14] = {
     "FLATSG4_ITM"
 };
 
-flat_t *flatlib[4];
+FLATS *flatlib[4];
 
 /***************************************************************************
 RAP_Bday() - Get system date
@@ -311,7 +311,7 @@ Rot_Color(
  ***************************************************************************/
 void 
 InitMobj(
-    mobj_t *cur            // INPUT : pointer to MOVEOBJ
+    MOVEOBJ *cur            // INPUT : pointer to MOVEOBJ
 )
 {
     cur->done = 0;
@@ -349,7 +349,7 @@ InitMobj(
  ***************************************************************************/
 void 
 MoveMobj(
-    mobj_t *cur            // INPUT : pointer to MOVEOBJ
+    MOVEOBJ *cur            // INPUT : pointer to MOVEOBJ
 )
 {
     if (cur->maxloop == 0)
@@ -389,7 +389,7 @@ MoveMobj(
  ***************************************************************************/
 int 
 MoveSobj(
-    mobj_t *cur,           // INPUT : pointer to MOVEOBJ
+    MOVEOBJ *cur,          // INPUT : pointer to MOVEOBJ
     int speed              // INPUT : speed to plot at
 )
 {
@@ -1467,7 +1467,7 @@ main(
         if (gameflag[loop])
         {
             item = GLB_GetItemID(flatnames[loop]);
-            flatlib[loop] = (flat_t*)GLB_LockItem(item);
+            flatlib[loop] = (FLATS*)GLB_LockItem(item);
         }
         else
             flatlib[loop] = NULL;

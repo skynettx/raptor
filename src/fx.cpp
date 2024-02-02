@@ -26,7 +26,7 @@ int fx_gus;
 int fx_channels;
 int sys_midi, alsaclient, alsaport;
 
-struct fxitem_t 
+typedef struct
 {
     int item;         // GLB ITEM
     int pri;          // PRIORITY 0=LOW
@@ -36,9 +36,9 @@ struct fxitem_t
     int vol;          // VOLUME
     int gcache;       // CACHE FOR IN GAME USE ?
     int odig;         // TRUE = ONLY PLAY DIGITAL
-};
+}DFX;
 
-fxitem_t fx_items[FX_LAST_SND];
+DFX fx_items[FX_LAST_SND];
 int fx_loaded;
 
 SDL_AudioDeviceID fx_dev;
@@ -235,7 +235,7 @@ SND_Setup(
 )
 {
     int loop;
-    fxitem_t *lib;
+    DFX *lib;
     
     memset(fx_items, 0, sizeof(fx_items));
     
@@ -667,7 +667,7 @@ SND_FreeFX(
 )
 {
     int loop;
-    fxitem_t *lib;
+    DFX *lib;
     
     SND_StopPatches();
     
@@ -689,7 +689,7 @@ SND_CacheFX(
 )
 {
     int loop;
-    fxitem_t *lib;
+    DFX *lib;
     
     for (loop = 0; loop < FX_LAST_SND; loop++)
     {
@@ -709,7 +709,7 @@ SND_CacheGFX(
 )
 {
     int loop;
-    fxitem_t *lib;
+    DFX *lib;
     
     SND_StopPatches();
     
@@ -731,7 +731,7 @@ SND_CacheIFX(
 )
 {
     int loop;
-    fxitem_t *lib;
+    DFX *lib;
     
     SND_StopPatches();
     
@@ -823,7 +823,7 @@ SND_Patch(
 {
     char *patch;
     int rnd, numsnds, volume;
-    fxitem_t *curfld;
+    DFX *curfld;
     int loop;
     
     if (fx_volume < 1)
@@ -880,7 +880,7 @@ SND_3DPatch(
     int loop;
     int dx, dy, dist, volume, vol, getdxdy;
     char *patch;
-    fxitem_t *curfld;
+    DFX *curfld;
     
     if (fx_volume < 1)
         return;
@@ -956,7 +956,7 @@ SND_IsPatchPlaying(
     int type                 // INPUT : position in fxitems
 )
 {
-    fxitem_t *curfld;
+    DFX *curfld;
     
     curfld = &fx_items[type];
     
@@ -974,7 +974,7 @@ SND_StopPatch(
     int type               // INPUT : DFX type patch to play
 )
 {
-    fxitem_t *curfld;
+    DFX *curfld;
     
     curfld = &fx_items[type];
     
@@ -995,7 +995,7 @@ SND_StopPatches(
 )
 {
     int loop;
-    fxitem_t *curfld;
+    DFX *curfld;
     
     curfld = fx_items;
     
