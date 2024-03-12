@@ -1,37 +1,39 @@
 #pragma once
 
-enum FRAMETYPE
+typedef enum
 {
     M_ANIM,
     M_PIC,
     M_SEE_THRU
-};
+}FRAMETYPE;
 
-enum FRAMEOPT
+typedef enum
 {
     M_NORM,
     M_FADEIN,
     M_FADEOUT,
     M_PALETTE,
     M_ERASE
-};
+}FRAMEOPT;
 
-enum SONGOPTS
+typedef enum
 {
     S_PLAY,
     S_FADEIN,
     S_FADEOUT,
     S_STOP
-};
+}SONGOPTS;
 
-struct movanim_t {
-    unsigned short f_0;
-    unsigned short f_2;
-    unsigned short f_4;
-    unsigned short f_6;
-};
+typedef struct 
+{
+    unsigned short opt;
+    unsigned short fill;
+    unsigned short offset;
+    unsigned short length;
+}ANIMLINE;
 
-struct movie_t {
+typedef struct
+{
     int opt;                   // TYPE OF DRAWING REQUIRED
     int framerate;             // FRAME RATE OF UPDATE
     int numframes;             // NUMBER OF FRAMES LEFT
@@ -50,8 +52,8 @@ struct movie_t {
     int soundfx;               // SOUND FX START
     int fx_vol;                // SOUND FX VOLUME
     int fx_xpos;               // SOUND FX XPOS
-};
+}FRAME;
 
-void ANIM_Render(movanim_t *inmem);
+void ANIM_Render(ANIMLINE *inmem);
 void MOVIE_BPatch(int soundfx);
-int MOVIE_Play(movie_t *frame, int numplay, char *palette);
+int MOVIE_Play(FRAME *frame, int numplay, char *palette);

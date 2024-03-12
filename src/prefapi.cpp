@@ -1,4 +1,3 @@
-#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 #include "common.h"
@@ -14,350 +13,488 @@ char* ltoa(long i, char* s, int dummy_radix) {
     return s;
 }
 #endif // __GNUC__
-#ifdef _MSC_VER
-#include <windows.h>
-#define PATH_MAX MAX_PATH
-#endif // _MSC_VER
 
-static int INI_OpenFile(const char *section, const char *key, const char *defaultValue, char *value, int length, const char *filename)
+static char ProfilePath[260];
+
+/***************************************************************************
+   GetPrivateProfileString() -
+ ***************************************************************************/
+static int                        // RETURN: 1 Found, 0 Not Found
+GetPrivateProfileString(
+    const char* section,          // INPUT : Name of section
+    const char* option,           // INPUT : Name of preference option
+    const char* def,              // INPUT : Default value for preference
+    char* buf,                    // OUTPUT: buffer to place preference  
+    int buflen,                   // INPUT : Maximum size of buffer
+    const char* file              // INPUT : File to retrieve data from
+)
 {
-    char *va;
-    char v9c[128];
-    short v10, i;
-    FILE *vs;
+    char buffer[128];
+    char* token;
+    FILE* fptr;
+    short found = 0;
+    short len;
 
-    v10 = 0;
-    vs = fopen(filename, "r");
-    if (vs)
+    if ((fptr = fopen(file, "r")) != NULL)
     {
-
-        while (!v10 && fgets(v9c, 128, vs) != 0)
+        len = strlen(section);
+        
+        while (!found && fgets(buffer, sizeof(buffer), fptr))
         {
-            if (v9c[0] == '[')
+            if (buffer[0] == '[')
             {
-                for (i = 0; v9c[i] != 0 && v9c[i] != ']'; i++) {
-                }
-                if (v9c[i] == ']')
-                {
-                    v9c[i] = '\0';
-                    if (!strcmp(v9c + 1, section))
-                        v10 = 1;
-                }
+                for (len = 0; buffer[len] != '\0' && buffer[len] != ']'; ++len)
+                    ;
+                
+                if (buffer[len] != ']')
+                    continue;
+                
+                buffer[len] = '\0';
+                
+                if (strcmp(buffer + 1, section) == 0)
+                    found = 1;
             }
         }
 
-        while (v10 && fgets(v9c, 128, vs) != 0)
+        while (found && fgets(buffer, sizeof(buffer), fptr))
         {
-            if (v9c[0] == '[')
+            if (buffer[0] == '[')
+                found = 0;
+            
+            else if ((token = strtok(buffer, "=\r\n")) != NULL)
             {
-                v10 = 0;
-                continue;
-            }
-            va = strtok(v9c, "=\r\n");
-            if (va)
-            {
-                if (!strcmp(va, key))
+                if (strcmp(token, option) == 0)
                 {
-                    fclose(vs);
-                    va = strtok(NULL, "\r\n");
-                    if (va)
+                    fclose(fptr);
+                    token = strtok(NULL, "\r\n");
+                    
+                    if (token)
                     {
-                        strncpy(value, va, length);
-                        value[length-1] = '\0';
+                        strncpy(buf, token, buflen);
+                        buf[buflen - 1] = '\0';
                     }
                     else
-                        value[0] = '\0';
+                        buf[0] = '\0';
+                    
                     return 1;
                 }
             }
         }
-        fclose(vs);
+        fclose(fptr);
     }
-    if (defaultValue)
-        strncpy(value, defaultValue, length);
+
+    if (def)
+        strncpy(buf, def, buflen);
     else
-        value[0] = '\0';
+        buf[0] = '\0';
+    
     return 0;
 }
 
-static int INI_SaveFile(const char *section, const char *key, const char *value, const char *filename)
+/***************************************************************************
+   WritePrivateProfileString() -
+ ***************************************************************************/
+static int                           // RETURN: 1 Success, 0 Failure
+WritePrivateProfileString(
+    const char* section,             // INPUT : Name of section 
+    const char* option,              // INPUT : Name of preference option
+    const char* buf,                 // OUTPUT: preference to write
+    const char* file                 // INPUT : File to retrieve data from
+)
 {
-    char *va;
-    char va8[128];
-    FILE *vs;
-    short vc, i;
-    int v28, vbp, vd, v10, l, v1c, v18, vdi, v20;
+    char buffer[128];
+    char* token;
+    FILE* fptr;
+    short found = 0;
+    short len;
+    int pos1, pos2, pos3;
+    int exist_len, new_len, delta;
+    int size;
+    int cnt;
 
-    vc = 0;
-    if (!section || !*section)
+    if (section == NULL || *section == '\0')
         return 0;
-    vs = fopen(filename, "rb+");
-    if (!vs)
-    {
-        vs = fopen(filename, "wb+");
-        if (!vs)
-            return 0;
-        fseek(vs, 0, SEEK_SET);
-    }
-    v10 = 0;
 
-    while (!vc && fgets(va8, 128, vs) != 0)
+    if ((fptr = fopen(file, "rb+")) == NULL)
     {
-        if (va8[0] == '\r' || va8[0] == '\n')
+        if ((fptr = fopen(file, "wb+")) == NULL)
+            return 0;
+        
+        fseek(fptr, 0, SEEK_SET);
+    }
+
+    // Search for section
+    pos3 = 0;
+    
+    while (!found && fgets(buffer, sizeof(buffer), fptr))
+    {
+        if (buffer[0] == '\r' || buffer[0] == '\n')
             continue;
-        if (va8[0] == '[')
+        
+        if (buffer[0] == '[')
         {
-            for (i = 0; va8[i] != 0 && va8[i] != ']'; i++) {
-            }
-            if (va8[i] == ']')
-            {
-                va8[i] = '\0';
-                if (!strcmp(va8 + 1, section))
-                {
-                    vc = 1;
-                    break;
-                }
-            }
-            else
+            for (len = 0; buffer[len] != '\0' && buffer[len] != ']'; ++len)
+                ;
+            
+            if (buffer[len] != ']')
                 continue;
-        }
-        v10 = ftell(vs);
-    }
-    if (!vc)
-    {
-        fseek(vs, 0, SEEK_END);
-        if (!key || !*key)
-        {
-            fclose(vs);
-            return 1;
-        }
-        fprintf(vs, "\r\n[%s]\r\n", section);
-        v28 = vbp = ftell(vs);
-    }
-    else
-    {
-        v28 = ftell(vs);
-        while (fgets(va8, 128, vs) != 0)
-        {
-            vbp = ftell(vs);
-            if (va8[0] == '[')
+            
+            buffer[len] = '\0';
+            
+            if (strcmp(buffer + 1, section) == 0)
             {
-                vc = 0;
+                found = 1;
                 break;
             }
-            va = strtok(va8, "=\r\n");
-            if (va)
-            {
-                if (!strcmp(va, key))
-                {
-                    va = strtok(NULL, "=\r\n");
-                    if (!strcmp(value, va))
-                    {
-                        fclose(vs);
-                        return 1;
-                    }
-                    vc = 1;
-                    break;
-                }
-                else
-                    v28 = vbp;
-            }
         }
+        pos3 = ftell(fptr);
     }
-    if (!vc)
+    
+    // POS3 = Beginning of section
+    if (!found)        // Create the new section
     {
-        if (vbp == v28)
-        {
-            if (!key || !*key || !value || !*value)
-            {
-                fclose(vs);
-                return 1;
-            }
-            fseek(vs, 0, SEEK_END);
-            fprintf(vs, "%s=%s\r\n", key, value);
-            fclose(vs);
-            return 1;
-        }
+        fseek(fptr, 0, SEEK_END);
+        
+        if (option && *option != '\0')
+            fprintf(fptr, "\r\n[%s]\r\n", section);
         else
         {
-            if (key && *key)
-                vd = 0;
-            else
+            fclose(fptr);
+            return 1;   // Delete section that doesn't exist
+        }
+
+        found = 0;
+        pos1 = pos2 = ftell(fptr);
+    }
+    else
+    {   // Search section for option
+        pos1 = ftell(fptr);
+        
+        while (fgets(buffer, sizeof(buffer), fptr))
+        {
+            pos2 = ftell(fptr);
+            
+            if (buffer[0] == '[')   // Option not found
             {
-                vd = v28 - v10;
-                vbp = v28;
+                found = 0;
+                break;
+            }
+            else if ((token = strtok(buffer, "=\r\n")) != NULL)
+            {
+                if (strcmp(token, option) == 0) // Option found
+                {
+                    if (strcmp(buf, strtok(NULL, "=\r\n")) == 0)
+                    {
+                        fclose(fptr);
+                        return 1;    // Option value is the same
+                    }
+                    found = 1;
+                    break;
+                }
+                pos1 = pos2;
             }
         }
     }
-    else
+    
+    // POS3 = Beginning of section
+    // POS2 = Current Position after last line read
+    // POS1 = Point before current line, the existing option if found
+    if (!found)            // Option doesn't exist
     {
-        vd = vbp - v28;
-    }
-    if (key && *key && value && *value)
-    {
-        sprintf(va8, "%s=%s\r\n", key, value);
-        l = strlen(va8);
+        if (pos1 == pos2)  // At end of file, append and exit
+        {
+            if (option && *option != '\0' && buf && *buf != '\0')
+            {
+                fseek(fptr, 0, SEEK_END);
+                fprintf(fptr, "%s=%s\r\n", option, buf);
+            }
+            fclose(fptr);
+            return 1;
+        }
+        
+        if (option && *option != '\0')
+            exist_len = 0;
+        else
+        {                   // Deleting the section
+            exist_len = pos1 - pos3;
+            pos2 = pos1;    // Last line read was next section, don't delete
+        }
     }
     else
-        l = 0;
-    v1c = l - vd;
-    if (key && *key)
-        v10 = v28;
-    if (v1c < 0)
+        exist_len = pos2 - pos1;
+
+    if (option && *option != '\0' && buf && *buf != '\0')
+    {
+        sprintf(buffer, "%s=%s\r\n", option, buf);
+        new_len = strlen(buffer);
+    }
+    else
+        new_len = 0;
+    
+    delta = new_len - exist_len;
+    
+    if (option && *option != '\0')
+        pos3 = pos1;            // Remember where the new line goes
+
+    // POS3 = Beginning of text to remove
+    // POS2 = Current Position after text to remove
+    // POS1 = Point before current line, the existing option if found
+    if (delta < 0)         // Shrink file
     {
         while (1)
         {
-            fseek(vs, vbp, SEEK_SET);
-            vdi = fread(va8, 1, 128, vs);
-            if (!vdi)
+            fseek(fptr, pos2, SEEK_SET);
+            
+            if ((cnt = fread(buffer, sizeof(char), sizeof(buffer), fptr)) == 0)
                 break;
-            v18 = ftell(vs);
-            fseek(vs, v1c + vbp, SEEK_SET);
-            vbp = v18;
-            fwrite(va8, 1, vdi, vs);
+            
+            pos1 = ftell(fptr);
+            fseek(fptr, pos2 + delta, SEEK_SET);
+            fwrite(buffer, sizeof(char), cnt, fptr);
+            pos2 = pos1;
         }
-        fseek(vs, v1c, SEEK_END);
+        fseek(fptr, delta, SEEK_END);
+        pos1 = ftell(fptr);
+        
         #ifdef _MSC_VER
-        _chsize(fileno(vs), ftell(vs));
+        chsize(fileno(fptr), pos1);
         #endif
         #ifdef __GNUC__
-        ftruncate(fileno(vs), ftell(vs));
+        ftruncate(fileno(fptr), pos1);
         #endif
-
-
     }
-    else if (v1c > 0)
-    {
-        fseek(vs, 0, SEEK_END);
-        v20  = ftell(vs);
-        vbp = 128;
+    else if (delta > 0)    // Expand file, starting at the end
+    {                       // ...working backwards
+        size = sizeof(buffer);
+        fseek(fptr, 0, SEEK_END);
+        pos2 = pos1 = ftell(fptr);
+        
         while (1)
         {
-            int vd1;
-            vd1 = v20 - vbp;
-            if (vd1 < v10)
+            pos2 = pos2 - size;
+            
+            if (pos2 < pos3)   // Moved to left of line that changed
             {
-                vbp = v20 - v10;
-                if (vbp <= 0)
+                size = pos1 - pos3;  // Calculate what is left
+                
+                if (size <= 0)
                     break;
-                vd1 = v10;
+                
+                pos2 = pos3;
             }
-            v20 = vd1;
-            fseek(vs, v20, SEEK_SET);
-            vdi = fread(va8, 1, vbp, vs);
-            if (!vdi)
+            fseek(fptr, pos2, SEEK_SET);
+            pos1 = pos2;
+            
+            if ((cnt = fread(buffer, sizeof(char), (size_t)size, fptr)) == 0)
                 break;
-            fseek(vs, v1c + v20, SEEK_SET);
-            fwrite(va8, 1, vdi, vs);
-            fflush(vs);
+            
+            fseek(fptr, pos2 + delta, SEEK_SET);
+            fwrite(buffer, sizeof(char), cnt, fptr);
         }
     }
-    if (key && *key && value && *value)
+
+    if (option && *option != '\0' && buf && *buf != '\0')
     {
-        fseek(vs, v10, SEEK_SET);
-        fprintf(vs, "%s=%s\r\n", key, value);
+        fseek(fptr, pos3, SEEK_SET);
+        fprintf(fptr, "%s=%s\r\n", option, buf);
     }
-    fclose(vs);
+
+    fclose(fptr);
+    
     return 1;
 }
 
-static char preference[PATH_MAX];
-
-int INI_InitPreference(const char *section)
+/***************************************************************************
+   INI_InitPreference() - Specify the preference program file
+ ***************************************************************************/
+int                             // RETURN: 1 File found, 0 File not found
+INI_InitPreference(
+    const char* profile         // INPUT : Profile buffer
+)
 {
-    if (section)
-        strcpy(preference, section);
-    return !access(preference, 4);
-}
+    if (profile)
+        strcpy(ProfilePath, profile);
 
-int INI_GetPreferenceLong(const char *section, const char *key, int defValue)
-{
-    char s1[20], s2[20];
-    ltoa(defValue, s1, 10);
-    INI_GetPreference(section, key, s2, 20, s1);
-    return atol(s2);
-}
-
-int INI_GetPreferenceHex(const char* section, const char* key, int defValue)
-{
-    char s1[32], s2[32];
-    unsigned int t;
-
-    ltoa(defValue, s1, 10);
-    INI_GetPreference(section, key, s2, 32, s1);
-    sscanf(s2, "%x", &t);
-
-    return t & 0xFF;
-}
-
-int INI_GetPreferenceBool(const char *section, const char *key, short defvalue)
-{
-    char s2[10];
-    if (defvalue)
-        INI_GetPreference(section, key, s2, 10, "TRUE");
-    else
-        INI_GetPreference(section, key, s2, 10, "FALSE");
-        
-    if (s2[0] == '1' || !strcmp(s2, "TRUE"))
+    if (access(ProfilePath, 04) == 0)
         return 1;
-    if (s2[0] == '0' || !strcmp(s2, "FALSE"))
-        return 0;
-    return atoi(s2);
+
+    return 0;
 }
 
-char *INI_GetPreference(const char *section, const char *key, char *retValue, int lenght, const char *defValue)
+/***************************************************************************
+   INI_GetPreferenceLong() - Retrieve a long integer value from the program file
+ ***************************************************************************/
+int                             // RETURN: Value retrieved
+INI_GetPreferenceLong(
+    const char* section,        // INPUT : Name of section
+    const char* option,         // INPUT : Name of preference option  
+    int def                     // INPUT : Default value for preference
+)
 {
-    if (!section || !key || !retValue)
+    char buffer[20];
+    char Def[20];
+
+    ltoa(def, Def, 10);
+    INI_GetPreference(section, option, buffer, sizeof(buffer), Def);
+    
+    return(atol(buffer));
+}
+
+/***************************************************************************
+   INI_GetPreferenceHex() - Retrieve a Hex value from the program file
+ ***************************************************************************/
+int                            // RETURN: Value retrieved
+INI_GetPreferenceHex(
+    const char* section,       // INPUT : Name of section  
+    const char* option,        // INPUT : Name of preference option
+    int def                    // INPUT : Default value for preference
+)
+{
+    char buffer[32];
+    char Def[32];
+
+    ltoa(def, Def, 10);
+    INI_GetPreference(section, option, buffer, sizeof(buffer), Def);
+    sscanf(buffer, "%x", &def);
+    
+    return (def);
+}
+
+/***************************************************************************
+   INI_GetPreferenceBool() - Retrieve a boolean value from the program file
+ ***************************************************************************/
+int                             // RETURN: 1 for 1, 0 for 0
+INI_GetPreferenceBool(
+    const char* section,        // INPUT : Name of section  
+    const char* option,         // INPUT : Name of preference option
+    short def                   // INPUT : Default value for preference
+)
+{
+    char buffer[10];
+
+    if (def)
+        INI_GetPreference(section, option, buffer, sizeof(buffer), "TRUE");
+    else
+        INI_GetPreference(section, option, buffer, sizeof(buffer), "FALSE");
+    
+    if (buffer[0] == '1' || strcmp(buffer, "TRUE") == 0)
+        return 1;
+    
+    if (buffer[0] == '0' || strcmp(buffer, "FALSE") == 0)
+        return 0;
+    
+    return(atoi(buffer));
+}
+
+/***************************************************************************
+   INI_GetPreference() - Retrieve a character string from the program file
+ ***************************************************************************/
+char*                       // RETURN: Pointer to character buffer
+INI_GetPreference(
+    const char* section,    // INPUT : Name of section      
+    const char* option,     // INPUT : Name of preference option      
+    char* buf,              // OUTPUT: buffer to place preference 
+    int buflen,             // INPUT : Maximum size of buffer          
+    const char* def         // INPUT : Default value for preference
+)
+{
+    if (section == NULL || option == NULL || buf == NULL)
     {
-        if (retValue)
-            *retValue = 0;
+        buf[0] = '\0';
         return NULL;
     }
-    INI_OpenFile(section, key, defValue, retValue, lenght, preference);
-    return retValue;
+
+    GetPrivateProfileString(section, option, def, buf, buflen, ProfilePath);
+
+    return buf;
 }
 
-int INI_PutPreferenceLong(const char *section, const char *key, int value)
+/***************************************************************************
+   INI_PutPreferenceLong() - Write a long integer value to the program file
+ ***************************************************************************/
+int                             // RETURN: SUCCESS 1, FAIL 0
+INI_PutPreferenceLong(
+    const char* section,        // INPUT : Name of section   
+    const char* option,         // INPUT : Name of preference option
+    int val                     // INPUT : Value to write                 
+)
 {
-    char s1[32];
-    if (value == -1)
+    char buffer[32];
+
+    if (val == -1)
     {
-        INI_DeletePreference(section, key);
-        return 0;
+        INI_DeletePreference(section, option);
+        return(0);
     }
-    ltoa(value, s1, 10);
-    return INI_PutPreference(section, key, s1);
+
+    ltoa(val, buffer, 10);
+    
+    return(INI_PutPreference(section, option, buffer));
 }
 
-int INI_PutPreferenceHex(const char *section, const char *key, int value)
+/***************************************************************************
+   INI_PutPreferenceHex() - Write a Hex value to the program file
+ ***************************************************************************/
+int                            // RETURN: SUCCESS 1, FAIL 0
+INI_PutPreferenceHex(
+    const char* section,       // INPUT : Name of section                 
+    const char* option,        // INPUT : Name of preference option       
+    int val                    // INPUT : Value to write                 
+)
 {
-    char s1[36];
-    if (value == -1)
+    char buffer[32];
+
+    if (val == -1)
     {
-        INI_DeletePreference(section, key);
-        return 0;
+        INI_DeletePreference(section, option);
+        return(0);
     }
-    sprintf(s1, "%x", value);
-    return INI_PutPreference(section, key, s1);
+
+    sprintf(buffer, "%x", val);
+
+    return(INI_PutPreference(section, option, buffer));
 }
 
-int INI_PutPreferenceBool(const char *section, const char *key, short value)
+/***************************************************************************
+   INI_PutPreferenceBool() - Write a Boolean value to the program file
+ ***************************************************************************/
+int                             // RETURN: SUCCESS 1, FAIL 0
+INI_PutPreferenceBool(
+    const char* section,        // INPUT : Name of section           
+    const char* option,         // INPUT : Name of preference option       
+    short val                   // INPUT : Value to write               
+)
 {
-    if (value)
-        return INI_PutPreference(section, key, "TRUE");
-    return INI_PutPreference(section, key, "FALSE");
+    return(INI_PutPreference(section, option, (val) ? "TRUE" : "FALSE"));
 }
 
-int INI_PutPreference(const char *section, const char *key, const char *value)
+/***************************************************************************
+   INI_PutPreference() - Write a string value to the program file
+ ***************************************************************************/
+int                         // RETURN: SUCCESS 1, FAIL 0
+INI_PutPreference(
+    const char* section,    // INPUT : Name of section                
+    const char* option,     // INPUT : Name of preference option       
+    const char* val         // INPUT : Value to write                  
+)
 {
-    if (!section || !key || !value)
+    if (section == NULL || option == NULL || val == NULL)
         return 0;
-    return INI_SaveFile(section, key, value, preference);
+
+    return(WritePrivateProfileString(section, option, val, ProfilePath));
 }
 
-int INI_DeletePreference(const char *section, const char *key)
+/***************************************************************************
+   INI_DeletePreference() - Delete a preference from the program file
+ ***************************************************************************/
+int                            // RETURN: SUCCESS 1, FAIL 0
+INI_DeletePreference(
+    const char* section,       // INPUT : Name of section                
+    const char* option         // INPUT : Name of preference option
+)
 {
-    if (!section)
+    if (section == NULL)       // If option is NULL, entire section deleted */
         return 0;
-    return INI_SaveFile(section, key, NULL, preference);
+
+    return(WritePrivateProfileString(section, option, NULL, ProfilePath));
 }

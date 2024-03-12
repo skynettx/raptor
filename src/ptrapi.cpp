@@ -417,34 +417,39 @@ PTR_DrawCursor(
  ***************************************************************************/
 void 
 PTR_SetPic(
-    texture_t *newp         // INPUT : pointer to new Cursor picture
+    char *newp         // INPUT : pointer to new Cursor picture
 )
 {
+    char* pic;
     int loop;
     
     cursoroffsetx = 0;
     cursoroffsety = 0;
-    
+
     if (ptractive)
     {
-        for (loop = 0; loop < CURSORSIZE; loop++)
+        newp += sizeof(GFX_PIC);
+        pic = (char*)cursorpic;
+        
+        for (loop = 0; loop < CURSORSIZE; loop++, newp++, pic++)
         {
-            cursorpic[loop] = newp->charofs[loop];
-            if ((uint8_t)newp->charofs[loop] == HOTSPOTCOLOR)
-            {
-                cursoroffsetx = loop % CURSORWIDTH;
-                cursoroffsety = loop / CURSORWIDTH;
-                cursorpic[loop] = newp->charofs[loop + 1];
-            }
+             *pic = *newp;
+             
+             if (*newp == (char)HOTSPOTCOLOR)
+             {
+                  cursoroffsetx = loop % CURSORWIDTH;
+                  cursoroffsety = loop / CURSORWIDTH;
+                  *pic = *(newp + 1);
+             }
         }
-        
-        if (cursoroffsetx > 16)
-            cursoroffsetx = 0;
-        
-        if (cursoroffsety > 16)
-            cursoroffsety = 0;
-        
-        ptrupdate = 1;
+
+     if (cursoroffsetx > 16)
+         cursoroffsetx = 0;
+
+     if (cursoroffsety > 16)
+         cursoroffsety = 0;
+
+     ptrupdate = 1;
     }
 }
 

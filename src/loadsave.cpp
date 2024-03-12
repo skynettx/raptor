@@ -46,8 +46,8 @@ int curplr_diff = 2;
 static const char *fmt = "CHAR%04u.FIL";
 static const char* cdfmt = "%s\\CHAR%04u.FIL";
 
-map_t *mapmem;
-csprite_t *csprite;
+MAZELEVEL *mapmem;
+CSPRITE *csprite;
 char *ml;
 
 /***************************************************************************
@@ -211,10 +211,10 @@ RAP_IsSaveFile() - Returns True if thier is a sopt to save a character
  ***************************************************************************/
 int 
 RAP_IsSaveFile(
-    player_t *in_plr
+    PLAYEROBJ *in_plr
 )
 {
-    player_t tp;
+    PLAYEROBJ tp;
     char temp[PATH_MAX];
     int rval, loop;
     FILE *handle;
@@ -255,7 +255,7 @@ RAP_LoadPlayer(
     char filename[PATH_MAX];
     int rval, loop;
     FILE *handle;
-    object_t inobj;
+    OBJ inobj;
 
     rval = 0;
     
@@ -321,7 +321,7 @@ RAP_SavePlayer(
     int rval;
     char filename[PATH_MAX];
     FILE *handle;
-    object_t *cur;
+    OBJ *cur;
 
     rval = 0;
     
@@ -361,9 +361,9 @@ RAP_SavePlayer(
     
     for (cur = first_objs.next; &last_objs != cur; cur = cur->next)
     {
-        GLB_EnCrypt(gdmodestr, cur, sizeof(object_t));
-        fwrite(cur, 1, sizeof(object_t), handle);
-        GLB_DeCrypt(gdmodestr, cur, sizeof(object_t));
+        GLB_EnCrypt(gdmodestr, cur, sizeof(OBJ));
+        fwrite(cur, 1, sizeof(OBJ), handle);
+        GLB_DeCrypt(gdmodestr, cur, sizeof(OBJ));
     }
     
     rval = 1;
@@ -396,8 +396,8 @@ RAP_LoadMap(
     
     ml = GLB_LockItem(map_item);
     
-    mapmem = (map_t*)ml;
-    csprite = (csprite_t*)(ml + sizeof(map_t));
+    mapmem = (MAZELEVEL*)ml;
+    csprite = (CSPRITE*)(ml + sizeof(MAZELEVEL));
 
     ENEMY_LoadLib();
     SND_CacheGFX();
@@ -452,8 +452,8 @@ RAP_LoadWin(
     char filenames[MAX_SAVE][PATH_MAX];
     char temp[PATH_MAX];
     int update, pos, oldpos, fndflag, rval, loop, window, addnum;
-    player_t tplr;
-    wdlg_t dlg;
+    PLAYEROBJ tplr;
+    SWD_DLG dlg;
     update = 1;
     pos = -1;
     oldpos = -2;

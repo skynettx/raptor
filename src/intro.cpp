@@ -11,7 +11,7 @@
 #include "windows.h"
 #include "fileids.h"
 
-movie_t frm[90];
+FRAME frm[90];
 
 /***************************************************************************
 INTRO_City () - Shows City with planes flying into it
@@ -24,7 +24,7 @@ INTRO_City(
     int loop;
     int maxframes = 30;
     int framecnt = maxframes - 1;
-    movie_t *cur = frm;
+    FRAME *cur = frm;
     
     for (loop = 0; loop < maxframes; loop++, cur++)
     {
@@ -84,7 +84,7 @@ INTRO_Side1(
     int loop;
     int maxframes = 20;
     int framecnt = maxframes - 1;
-    movie_t *cur = frm;
+    FRAME *cur = frm;
     
     MOVIE_BPatch(FX_JETSND);
     
@@ -127,7 +127,7 @@ INTRO_Pilot(
     int loop;
     int maxframes = 21;
     int framecnt = maxframes - 1;
-    movie_t *cur = frm;
+    FRAME *cur = frm;
     
     MOVIE_BPatch(FX_IJETSND);
     
@@ -170,7 +170,7 @@ INTRO_Explosion(
     int loop;
     int maxframes = 22;
     int framecnt = maxframes - 1;
-    movie_t *cur = frm;
+    FRAME *cur = frm;
     
     MOVIE_BPatch(FX_EJETSND);
     
@@ -236,7 +236,7 @@ INTRO_Side2(
     int loop, opt;
     int maxframes = 20;
     int framecnt = maxframes - 1;
-    movie_t *cur = frm;
+    FRAME *cur = frm;
     
     MOVIE_BPatch(FX_JETSND);
     
@@ -314,7 +314,7 @@ INTRO_Base(
 )
 {
     int loop, maxframes, framecnt;
-    movie_t *cur;
+    FRAME *cur;
     maxframes = 30;
     framecnt = maxframes - 1;
     cur = frm;
@@ -363,7 +363,7 @@ INTRO_Landing(
 )
 {
     int loop, maxframes, framecnt;
-    movie_t *cur;
+    FRAME *cur;
     maxframes = 33;
     framecnt = maxframes - 1;
     cur = frm;
@@ -410,7 +410,7 @@ INTRO_Death2(
 )
 {
     int loop, maxframes, framecnt;
-    movie_t *cur;
+    FRAME *cur;
     maxframes = 6;
     framecnt = maxframes - 1;
     cur = frm;
@@ -457,7 +457,7 @@ INTRO_Death1(
 )
 {
     int loop, maxframes, framecnt;
-    movie_t* cur;
+    FRAME *cur;
     maxframes = 30;
     framecnt = maxframes - 1;
     cur = frm;
@@ -515,7 +515,7 @@ INTRO_Game1End(
 )
 {
     int loop, maxframes, framecnt;
-    movie_t* cur;
+    FRAME *cur;
     maxframes = 5;
     framecnt = maxframes - 1;
     cur = frm;
@@ -564,7 +564,7 @@ INTRO_Game2End(
 )
 {
     int loop, maxframes, framecnt;
-    movie_t* cur;
+    FRAME *cur;
     maxframes = 25;
     framecnt = maxframes - 1;
     cur = frm;
@@ -625,7 +625,7 @@ INTRO_Game3End(
 )
 {
     int loop, maxframes, framecnt;
-    movie_t* cur;
+    FRAME *cur;
     maxframes = 39;
     framecnt = maxframes - 1;
     cur = frm;
@@ -747,13 +747,13 @@ INTRO_Taiwan(
 )
 {
     int local_cnt, loop;
-    texture_t *pic1;
+    char *pic1;
     char *pal1;
     local_cnt = GFX_GetFrameCount();
     
     framecount = 0;
     
-    pic1 = (texture_t*)GLB_GetItem(FILE12f_TAIWARN_PIC);
+    pic1 = (char*)GLB_GetItem(FILE12f_TAIWARN_PIC);
     pal1 = GLB_GetItem(FILE130_TAIPAL_DAT);
     
     GFX_FadeOut(0, 0, 0, 5);
@@ -787,14 +787,14 @@ INTRO_Credits(
     void
 )
 {
-    texture_t *pic1, *pic2;
+    char *pic1, *pic2;
     char *pal1, *pal2;
     int local_cnt, loop;
     local_cnt = GFX_GetFrameCount();
     
     framecount = 0;
     
-    pic1 = (texture_t*)GLB_GetItem(FILE12b_APOGEE_PIC);
+    pic1 = (char*)GLB_GetItem(FILE12b_APOGEE_PIC);
     pal1 = GLB_GetItem(FILE12c_POGPAL_DAT);
     
     GFX_FadeOut(0, 0, 0, 5);
@@ -827,7 +827,7 @@ INTRO_Credits(
     }
     else
     {
-        while (SND_SongPlaying() && !IMS_IsAck()) {
+        while (SND_IsSongPlaying() && !IMS_IsAck()) {
             I_GetEvent();
         }
     }
@@ -842,7 +842,7 @@ INTRO_Credits(
     memset(displayscreen, 0, 64000);
     memset(displaybuffer, 0, 64000);
     
-    pic2 = (texture_t*)GLB_GetItem(FILE12d_CYGNUS_PIC);
+    pic2 = (char*)GLB_GetItem(FILE12d_CYGNUS_PIC);
     pal2 = GLB_GetItem(FILE12e_CYGPAL_DAT);
     
     GFX_PutImage(pic2, 0, 0, 0);

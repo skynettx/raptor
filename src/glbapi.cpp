@@ -30,493 +30,872 @@ char* strupr(char* s)
 #define PATH_MAX MAX_PATH
 #endif // _MSC_VER
 
-char prefix[] = "FILE";
-char exePath[PATH_MAX];
-const char *serial = "32768GLB";
+#define _SCOTTGAME
 
-struct fitem_t {
-    char name[16];
-    meminfo_t mem;
-    int length;
-    int offset;
-    int flags;
-    int lock;
-};
+static const char* serial = "32768GLB";
+static char exePath[PATH_MAX];
+static int num_glbs;
+static KEYFILE g_key;
+static char prefix[5] = "FILE";
+static bool fVmem = 0;
 
-struct filedesc_t {
-    char path[PATH_MAX];
-    fitem_t *items;
-    int itemcount;
-    FILE *handle;
-    const char *mode;
-};
-
-int fVmem = 0;
-int num_glbs = 0;
-
-#define GLBMAXFILES 15
-
-filedesc_t filedesc[GLBMAXFILES];
-
-#pragma pack(push, 1)
-struct glbitem_t {
-    int crypt;
-    int offset;
-    int length;
-    char name[16];
-};
-#pragma pack(pop)
-
-void GLB_EnCrypt(const char *key, void *buf, int size)
+/*
+* define file descriptor used to access file.
+*/
+typedef struct
 {
-    char *data = (char*)buf;
-    int keylen, vbx;
-    char vc, vd;
-    keylen = strlen(key);
-    vbx = 25 % keylen;
-    vc = key[vbx];
-    while (size--)
-    {
-        vd = (*data + key[vbx] + vc) % 256;
-        *data++ = vd;
-        vc = vd;
-        if (++vbx >= keylen)
-            vbx = 0;
-    }
+	char name[16];
+	VM_OWNER vm_mem;
+	uint32_t size;
+	uint32_t offset;
+	uint32_t flags;
+	uint32_t lock_cnt;
+}ITEMINFO;
+
+typedef struct
+{
+	char filepath[PATH_MAX];
+	ITEMINFO* item;
+	int      items;
+	FILE     *handle;
+	const char *permissions;
+}FILEDESC;
+
+typedef struct
+{
+	uint16_t itemnum;
+	uint16_t filenum;
+}ITEM_ID;
+
+typedef union
+{
+	ITEM_ID id;
+	uint32_t handle;
+}ITEM_H;
+
+static FILEDESC  filedesc[MAX_GLB_FILES];
+
+#define ITF_LOCKED  0x80000000L
+#define ITF_ENCODED 0x40000000L
+
+typedef enum
+{ 
+	FI_CACHE, 
+	FI_DISCARD, 
+	FI_LOCK 
+}FI_MODE;
+
+/***************************************************************************
+  GLB_EnCrypt - Encrypt Data
+ ***************************************************************************/
+void
+GLB_EnCrypt(
+	const char* key,             // INPUT : Key that will allow Decryption
+	void* buf,                   // INPUT : Buffer to Encrypt
+	int length                   // INPUT : Length of Buffer
+)
+{
+	char* buffer = (char*)buf;
+	int klen = strlen(key);
+	int prev_byte;
+	int kidx;
+
+	kidx = SEED % klen;
+	prev_byte = key[kidx];
+	
+	while (length--)
+	{
+		prev_byte = (*buffer + key[kidx] + prev_byte) % 256;
+		*buffer++ = prev_byte;
+
+		if (++kidx >= klen)
+			kidx = 0;
+	}
 }
 
-void GLB_DeCrypt(const char *key, void *buf, int size)
+/***************************************************************************
+  GLB_DeCrypt - Decrypt Data
+ ***************************************************************************/
+void
+GLB_DeCrypt(
+	const char* key,             // INPUT : Key that will allow Decryption
+	void* buf,                   // INPUT : Buffer to Encrypt
+	int length                   // INPUT : Length of Buffer
+)
 {
-    char *data = (char*)buf;
-    int keylen, vbx;
-    char vc, vd;
-    keylen = strlen(key);
-    vbx = 25 % keylen;
-    vc = key[vbx];
-    while (size--)
-    {
-        vd = *data;
-        *data++ = (vd - key[vbx] - vc) % 256;
-        vc = vd;
-        if (++vbx >= keylen)
-            vbx = 0;
-    }
+	char* buffer = (char*)buf;
+	int klen = strlen(key);
+	int prev_byte;
+	int kidx;
+	char dchr;
+
+	kidx = SEED % klen;
+	prev_byte = key[kidx];
+	
+	while (length--)
+	{
+		dchr = (*buffer - key[kidx] - prev_byte) % 256;
+		prev_byte = *buffer;
+		*buffer++ = dchr;
+
+		if (++kidx >= klen)
+			kidx = 0;
+	}
 }
 
-FILE *GLB_FindFile(int a1, int a2, const char *mode)
+/*------------------------------------------------------------------------
+   GLB_FindFile() - Finds a file, opens it, and stores it's path
+ ------------------------------------------------------------------------*/
+static FILE*
+GLB_FindFile(
+	int	return_on_failure,	         // INPUT : Don't bomb if file not open
+	int	filenum,                     // INPUT : file number
+	const char *permissions		     // INPUT : file access permissions
+)
 {
-    FILE *h;
-    char buffer[PATH_MAX];
-    sprintf(buffer, "%s%04u.GLB", prefix, a2);
-    h = fopen(buffer, mode);
-    if (h == NULL)
-    {
-        sprintf(buffer, "%s%s%04u.GLB", exePath, prefix, a2);
-        h = fopen(buffer, mode);
-        if (h == NULL)
-        {
-            if (a1)
-                return NULL;
-            sprintf(buffer, "%s%04u.GLB", prefix, a2);
-            EXIT_Error("GLB_FindFile: %s, Error #%d,%s", buffer, errno, strerror(errno));
-        }
-    }
-    strcpy(filedesc[a2].path, buffer);
-    filedesc[a2].mode = mode;
-    filedesc[a2].handle = h;
-    return h;
+	const char* routine = "GLB_FindFile";
+	char filename[PATH_MAX];
+	FILE *handle;
+	FILEDESC* fd;
+	
+	/*
+	* Scott, the ASSERT function is a macro that will be compiled-out when
+	* not debugging ( DEBUG not defined ), otherwise it calls EXIT_Assert
+	* if the expression is false ( which bails out of your program and displays
+	* the expression, file & line number of the assertion ).  This is a standard
+	* way of checking variables for correct boundries during development, and
+	* makes it easy to remove extra logic for doing so by recompiling without
+	* DEBUG defined.
+	*/
+	ASSERT(filenum >= 0 && filenum < MAX_GLB_FILES);
+	
+	/*
+	* create a file name and attempt to open it local first, then if it
+	* fails use the exe path and try again.
+	*/
+	sprintf(filename, "%s%04u.GLB", prefix, filenum);
+	if ((handle = fopen(filename, permissions)) == NULL)
+	{
+		sprintf(filename, "%s%s%04u.GLB", exePath, prefix, filenum);
+		
+		if ((handle = fopen(filename, permissions)) == NULL)
+		{
+			if (return_on_failure)
+				return NULL;
+
+			sprintf(filename, "%s%04u.GLB", prefix, filenum);
+			EXIT_Error("GLB_FindFile: %s, Error #%d,%s",
+				filename, errno, strerror(errno));
+		}
+	}
+	
+	/*
+	* Keep file handle
+	*/
+	fd = &filedesc[filenum];
+
+	strcpy(fd->filepath, filename);
+	fd->permissions = permissions;
+	fd->handle = handle;
+
+	return handle;
 }
 
-FILE *GLB_OpenFile(int a1, int a2, const char *mode)
+/*------------------------------------------------------------------------
+   GLB_OpenFile() - Opens & Caches file handle
+ ------------------------------------------------------------------------*/
+static FILE*
+GLB_OpenFile(
+	int	return_on_failure,	     // INPUT : Don't bomb if file not open
+	int	filenum,                 // INPUT : file number
+	const char *permissions		 // INPUT : file access permissions
+)
 {
-    filedesc_t *fd = &filedesc[a2];
-    if (!fd->handle)
-        return GLB_FindFile(a1, a2, mode);
-    if (strcmp(mode, fd->mode) != 0)
-    {
-        fclose(fd->handle);
-        fd->handle = fopen(fd->path, mode);
-        if (fd->handle == NULL)
-        {
-            if (a1)
-                return NULL;
-            EXIT_Error("GLB_OpenFile: %s, Error #%d,%s", fd->path, errno, strerror(errno));
-        }
-    }
-    else
-        fseek(fd->handle, 0, SEEK_SET);
-    return fd->handle;
+	FILEDESC* fd;
+
+	ASSERT(filenum >= 0 && filenum < MAX_GLB_FILES);
+
+	fd = &filedesc[filenum];
+
+	if (fd->handle == 0)
+		return GLB_FindFile(return_on_failure, filenum, permissions);
+	else if (fd->permissions != permissions)
+	{
+		fclose(fd->handle);
+		
+		if ((fd->handle = fopen(fd->filepath, permissions)) == NULL)
+		{
+			if (return_on_failure)
+				return NULL;
+
+			EXIT_Error("GLB_OpenFile: %s, Error #%d,%s",
+				fd->filepath, errno, strerror(errno));
+		}
+	}
+	else
+	{
+		fseek(fd->handle, 0L, SEEK_SET);
+	}
+	
+	return fd->handle;
 }
 
-void FUN_00276c8(void)
+/*------------------------------------------------------------------------
+   GLB_CloseFiles() - Closes all cached files.
+ ------------------------------------------------------------------------*/
+static void
+GLB_CloseFiles(
+	void
+)
 {
-    int i;
-    for (i = 0; i < GLBMAXFILES; i++)
-    {
-        if (filedesc[i].handle)
-        {
-            fclose(filedesc[i].handle);
-            filedesc[i].handle = NULL;
-        }
-    }
+	int j;
+
+	for (j = 0; j < MAX_GLB_FILES; j++)
+	{
+		if (filedesc[j].handle)
+		{
+			fclose(filedesc[j].handle);
+			filedesc[j].handle = 0;
+		}
+	}
 }
 
-int GLB_NumItems(int a1)
+/*------------------------------------------------------------------------
+   GLB_NumItems() - Returns number of items in a .GLB file
+ ------------------------------------------------------------------------*/
+static int
+GLB_NumItems(
+	int filenum
+)
 {
-    glbitem_t head;
-    FILE *handle;
-    handle = GLB_OpenFile(1, a1, "rb");
-    if (handle == NULL)
-        return 0;
-    fseek(handle, 0, SEEK_SET);
-    if (!fread(&head, sizeof(head), 1, handle))
-        EXIT_Error("GLB_NumItems: Read failed!");
-    GLB_DeCrypt(serial, &head, sizeof(head));
-    return head.offset;
+	KEYFILE key;
+	FILE *handle;
+
+	ASSERT(filenum >= 0 && filenum < num_glbs);
+
+	handle = GLB_OpenFile(1, filenum, "rb");
+	
+	if (handle == NULL)
+		return 0;
+
+	fseek(handle, 0L, SEEK_SET);
+	
+	if (!fread(&key, sizeof(KEYFILE), 1, handle))
+	{
+		EXIT_Error("GLB_NumItems: Read failed!");
+	}
+
+#ifdef _SCOTTGAME
+	GLB_DeCrypt(serial, (uint8_t*)&key, sizeof(KEYFILE));
+#endif
+
+	return ((int)key.offset);
 }
 
-void GLB_LoadIDT(filedesc_t *a1)
+/*--------------------------------------------------------------------------
+ GLB_LoadIDT() Loads a item descriptor table from a GLB file.
+ --------------------------------------------------------------------------*/
+static void
+GLB_LoadIDT(
+	FILEDESC* fd               // INPUT: file to load
+)
 {
-    glbitem_t buf[10];
-    fitem_t *ve;
-    int i, j, k;
-    FILE *v30 = a1->handle;
-    ve = a1->items;
-    fseek(v30, sizeof(glbitem_t), SEEK_SET);
-    for (i = 0; i < a1->itemcount; i += j)
-    {
-        j = a1->itemcount - i;
-        if ((unsigned int)j > 10)
-            j = 10;
-        fread(buf, sizeof(glbitem_t), j, v30);
-        for (k = 0; k < j; k++)
-        {
-            GLB_DeCrypt(serial, &buf[k], sizeof(glbitem_t));
-            if (buf[k].crypt == 1)
-                ve->flags |= 0x40000000;
-            ve->length = buf[k].length;
-            ve->offset = buf[k].offset;
-            memcpy(ve->name, buf[k].name, 16);
-            ve++;
-        }
-    }
+	FILE *handle;
+	int j;
+	int k;
+	int n;
+	KEYFILE key[10];
+	ITEMINFO* ii;
+
+	handle = fd->handle;
+	ii = fd->item;
+
+	fseek(handle, sizeof(KEYFILE), SEEK_SET);
+	
+	for (j = 0; j < fd->items; )
+	{
+		k = fd->items - j;
+		
+		if (k > ASIZE(key))
+			k = ASIZE(key);
+
+		fread(key, sizeof(KEYFILE), k, handle);
+		
+		for (n = 0; n < k; n++)
+		{
+#ifdef _SCOTTGAME
+			GLB_DeCrypt(serial, (void*)&key[n], sizeof(KEYFILE));
+#endif
+			if (key[n].opt == GLB_ENCODED)
+				ii->flags |= ITF_ENCODED;
+
+			ii->size = key[n].filesize;
+			ii->offset = key[n].offset;
+			memcpy(ii->name, key[n].name, sizeof(ii->name));
+			ii++;
+		}
+		j += k;
+	}
 }
 
-void GLB_UseVM(void)
+/*************************************************************************
+   GLB_UseVM - Use virtual memory functions for heap managment.
+ *************************************************************************/
+void
+GLB_UseVM(
+	void
+)
 {
-    fVmem = 1;
+	fVmem = 1;
 }
 
-int GLB_InitSystem(const char *a1, int a2, const char *a3)
+/*************************************************************************
+   GLB_InitSystem() - Starts up .GLB file system
+ *************************************************************************/
+int			                   // Returns number of GLB resources opened.
+GLB_InitSystem(
+	const char* exepath,       // INPUT: Where program was run from
+	int innum,                 // INPUT: MAX .GLB FILES TO LOOK FOR
+	const char* iprefix        // INPUT: FILENAME PREFIX ( NULL for "FILE" )
+)
 {
-    int i, j, k;
-    filedesc_t *fd;
-    char *t;
-    memset(exePath, 0, sizeof(exePath));
-    strcpy(exePath, a1);
-    t = strrchr(exePath, '\\');
-    if (t)
-        t[1] = '\0';
-    num_glbs = a2;
+	int	opened;
+	int	filenum;
+	int num;
+	char* p;
+	FILEDESC* fd;
+	
+	/*
+	* Extract path from program source of execution.
+	*/
+	memset(exePath, 0, sizeof(exePath));
+	strcpy(exePath, exepath);
+	
+	if ((p = strrchr(exePath, '\\')) != NULL)
+		*(p + 1) = '\0';
 
-    if (a3)
-    {
-        strcpy(prefix, a3);
-        strupr(prefix);
-    }
-    memset(filedesc, 0, sizeof(filedesc));
-    k = 0;
-    for (i = 0; i < num_glbs; i++)
-    {
-        fd = &filedesc[i];
-        j = GLB_NumItems(i);
-        if (j)
-        {
-            fd->itemcount = j;
-            fd->items = (fitem_t*)calloc(j, sizeof(fitem_t));
-            if (!fd->items)
-                EXIT_Error("GLB_NumItems: memory ( init )");
-            GLB_LoadIDT(fd);
-            k++;
-        }
-    }
-    return k;
+	num_glbs = innum;
+	ASSERT(num_glbs >= 1 && num_glbs <= MAX_GLB_FILES);
+
+	if (iprefix)
+	{
+		ASSERT(strlen(iprefix) < sizeof(prefix) - 1);
+
+		strcpy(prefix, iprefix);
+		strupr(prefix);
+	}
+	memset(filedesc, 0, sizeof(filedesc));
+	
+	/*
+	* Next, read in header of each file and allocate cache
+	*/
+	opened = 0;
+	for (filenum = 0; filenum < num_glbs; filenum++)
+	{
+		fd = &filedesc[filenum];
+		
+		if ((num = GLB_NumItems(filenum)) != 0)
+		{
+			fd->items = num;
+			
+			/*
+			 * Note: calloc zeros out all memory that it allocates
+			*/
+			fd->item = (ITEMINFO*)calloc(num, sizeof(ITEMINFO));
+			
+			if (fd->item == NULL)
+				EXIT_Error("GLB_NumItems: memory ( init )");
+			
+			/*
+			* Load Item Descriptor Table for file
+			*/
+			GLB_LoadIDT(fd);
+			opened++;
+		}
+	}
+	
+	return (opened);
 }
 
-int FUN_000279ec(char *a1, int a2, int a3)
+/*************************************************************************
+ GLB_Load() Loads a file to a pointer from a .GLB file
+ *************************************************************************/
+int                               // RETURN : size of item read
+GLB_Load(
+	char* inmem,                  // INPUT: memory pointer or NULL
+	int filenum,                  // INPUT: file number
+	int itemnum                   // INPUT: item in file number
+)
 {
-    fitem_t *fi;
-    FILE *handle = filedesc[a2].handle;
-    if (!handle)
-        return 0;
+	FILE *handle;
+	ITEMINFO* ii;
 
+	ASSERT(filenum >= 0 && filenum < num_glbs);
 
-    fi = &filedesc[a2].items[a3];
-    if (a1)
-    {
-        if (fi->mem.ptr && a1 != fi->mem.ptr)
-        {
-            memcpy(a1, fi->mem.ptr, fi->length);
-        }
-        else
-        {
-            fseek(handle, fi->offset, SEEK_SET);
-            fread(a1, fi->length, 1, handle);
-            if (fi->flags & 0x40000000)
-                GLB_DeCrypt(serial, a1, fi->length);
-        }
-    }
-    return fi->length;
+	handle = filedesc[filenum].handle;
+	
+	if (handle == 0)
+		return 0;
+
+	ASSERT(itemnum < (WORD)filedesc[filenum].items);
+
+	ii = filedesc[filenum].item;
+	ii += itemnum;
+
+	if (inmem != NULL)
+	{
+		if (ii->vm_mem.obj != NULL && inmem != ii->vm_mem.obj)
+			memcpy(inmem, ii->vm_mem.obj, ii->size);
+		else
+		{
+			fseek(handle, ii->offset, SEEK_SET);
+			fread(inmem, ii->size, 1, handle);
+#ifdef _SCOTTGAME
+			if (ii->flags & ITF_ENCODED)
+			{
+				GLB_DeCrypt(serial, inmem, ii->size);
+			}
+#endif
+		}
+	}
+	
+	return ii->size;
 }
 
-char *GLB_FetchItem(int a1, int a2)
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
+ GLB_FetchItem() - Loads item into memory only if free core exists.
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
+static char*
+GLB_FetchItem(
+	uint32_t handle,
+	FI_MODE	mode
+)
 {
-    int vb;
-    meminfo_t *vd;
-    char *m;
-    fitem_t *fi;
-    if (a1 == -1)
-    {
-        EXIT_Error("GLB_FetchItem: empty handle.");
-        return NULL;
-    }
-    uint16_t f = (a1 >> 16) & 0xffff;
-    uint16_t n = (a1 >> 0) & 0xffff;
-    fi = &filedesc[f].items[n];
-    if (a2 == 2)
-        fi->flags |= 0x80000000;
-    if (!fi->mem.ptr)
-    {
-        fi->lock = 0;
-        if (fi->length)
-        {
-            if (fVmem)
-            {
-                vb = a2 != 0;
-                if (fi->flags & 0x80000000)
-                    vd = NULL;
-                else
-                    vd = &fi->mem;
-                m = VM_Malloc(fi->length, vd, vb);
-            }
-            else
-                m = (char*)calloc(fi->length, 1);
-            if (a2 == 2)
-                fi->lock = 1;
-            fi->mem.ptr = m;
-            if (fi->mem.ptr)
-            {
-                FUN_000279ec(fi->mem.ptr, f, n);
-            }
-        }
-    }
-    else if (a2 == 2)
-    {
-        if (fVmem)
-        {
-            fi->lock++;
-            VM_Lock(fi->mem.ptr);
-        }
-    }
-    if (!fi->mem.ptr && a2 != 0)
-        EXIT_Error("GLB_FetchItem: failed on %d bytes, mode=%d.", fi->length, a2);
-    if (a2 == 1)
-    {
-        if (fVmem)
-            VM_Touch(&fi->mem);
-    }
-    return fi->mem.ptr;
+	char* obj;
+	ITEM_H itm;
+	ITEMINFO* ii;
+
+	if (handle == ~0)
+	{
+		EXIT_Error("GLB_FetchItem: empty handle.");
+		return NULL;
+	}
+
+	itm.handle = handle;
+
+	ASSERT(itm.id.filenum < (WORD)num_glbs);
+	ASSERT(itm.id.itemnum < (WORD)filedesc[itm.id.filenum].items);
+
+	ii = filedesc[itm.id.filenum].item;
+	ii += itm.id.itemnum;
+
+	if (mode == FI_LOCK)
+		ii->flags |= ITF_LOCKED;
+
+	if ((obj = ii->vm_mem.obj) == NULL)
+	{
+		ii->lock_cnt = 0;
+		
+		if (ii->size == 0)
+			ii->vm_mem.obj = NULL;
+		else
+		{
+			if (fVmem)
+			{
+				obj = (char*)VM_Malloc(ii->size,
+					(ii->flags & ITF_LOCKED) ? NULL : &ii->vm_mem,
+					(mode == FI_CACHE) ? 0 : 1);
+			}
+			else
+			{
+				obj = (char*)calloc(ii->size, sizeof(uint8_t));
+			}
+			
+			if (mode == FI_LOCK)
+				ii->lock_cnt = 1;
+			
+			ii->vm_mem.obj = obj;
+			
+			if (obj != NULL)
+			{
+				GLB_Load(obj, itm.id.filenum, itm.id.itemnum);
+			}
+		}
+	}
+	else if (mode == FI_LOCK && fVmem)
+	{
+		ii->lock_cnt++;
+		VM_Lock(obj);
+	}
+	
+	if (ii->vm_mem.obj == NULL && mode != FI_CACHE)
+	{
+		EXIT_Error("GLB_FetchItem: failed on %d bytes, mode=%d.", ii->size, mode);
+	}
+	
+	if (mode == FI_DISCARD && fVmem)
+		VM_Touch(&ii->vm_mem);
+
+	return ii->vm_mem.obj;
 }
 
-char *GLB_CacheItem(int a1)
+/***************************************************************************
+ GLB_CacheItem() - Loads item into memory only if free core exists.
+ ***************************************************************************/
+char*
+GLB_CacheItem(
+	int handle
+)
 {
-    return GLB_FetchItem(a1, 0);
+	return GLB_FetchItem(handle, FI_CACHE);
 }
 
-char *GLB_GetItem(int a1)
+/***************************************************************************
+ GLB_GetItem() - Loads and allocates memory for a .GLB item
+ ***************************************************************************/
+char*
+GLB_GetItem(
+	int handle               // INPUT : handle of item
+)
 {
-    return GLB_FetchItem(a1, 1);
+	return GLB_FetchItem(handle, FI_DISCARD);
 }
 
-char *GLB_LockItem(int a1)
+/***************************************************************************
+ GLB_LockItem () - Keeps Item From being discarded.
+ ***************************************************************************/
+char*
+GLB_LockItem(
+	int handle
+)
 {
-    return GLB_FetchItem(a1, 2);
+	return GLB_FetchItem(handle, FI_LOCK);
 }
 
-void GLB_UnlockItem(int a1)
+/***************************************************************************
+ GLB_UnlockItem () - Allows item to be discarded from memory.
+ ***************************************************************************/
+void
+GLB_UnlockItem(
+	int handle
+)
 {
-    fitem_t *fi;
-    if (a1 == -1)
-        return;
-    uint16_t f = (a1 >> 16) & 0xffff;
-    uint16_t n = (a1 >> 0) & 0xffff;
-    fi = &filedesc[f].items[n];
-    if (fi->mem.ptr && fVmem)
-    {
-        if (!fi->lock || !--fi->lock)
-        {
-            fi->flags &= ~0x80000000;
-            VM_Unlock(fi->mem.ptr, &fi->mem);
-        }
-    }
-    else
-        fi->flags &= ~0x80000000;
+	ITEM_H itm;
+	ITEMINFO* ii;
+
+	if (handle == ~0)
+		return;
+
+	itm.handle = handle;
+
+	ASSERT(itm.id.filenum < (WORD)num_glbs);
+	ASSERT(itm.id.itemnum < (WORD)filedesc[itm.id.filenum].items);
+
+	ii = filedesc[itm.id.filenum].item;
+	ii += itm.id.itemnum;
+
+	if (ii->vm_mem.obj != NULL && fVmem)
+	{
+		if (ii->lock_cnt)
+		{
+			ii->lock_cnt--;
+			
+			if (ii->lock_cnt)
+				return;
+		}
+		ii->flags &= ~ITF_LOCKED;
+		VM_Unlock(ii->vm_mem.obj, &ii->vm_mem);
+	}
+	else
+	{
+		ii->flags &= ~ITF_LOCKED;
+	}
 }
 
-fitem_t *FUN_00027c50(int a1)
+/***************************************************************************
+ GLB_IsLabel () - tests to see if ID is a label or an Item
+ ***************************************************************************/
+int                        // RETURN: TRUE = Label
+GLB_IsLabel(
+	int handle             // INPUT : handle of item
+)
 {
-    if (a1 == -1)
-        return NULL;
-    uint16_t f = (a1 >> 16) & 0xffff;
-    uint16_t n = (a1 >> 0) & 0xffff;
-    return &filedesc[f].items[n];
+	ITEM_H itm;
+	ITEMINFO* ii;
+
+	if (handle == ~0)
+		return 0;
+
+	itm.handle = handle;
+
+	ASSERT(itm.id.filenum < (WORD)num_glbs);
+	ASSERT(itm.id.itemnum < (WORD)filedesc[itm.id.filenum].items);
+
+	ii = filedesc[itm.id.filenum].item;
+	ii += itm.id.itemnum;
+
+	return (ii->size == 0 ? 1 : 0);
 }
 
-void FUN_00027c9c(int a1, char *a2)
+/***************************************************************************
+ GLB_ReadItem() - Loads Item into user memory for a .GLB item
+ ***************************************************************************/
+void
+GLB_ReadItem(
+	int handle,                   // INPUT : handle of item
+	char* mem                     // INPUT : pointer to memory
+)
 {
-    if (a1 == -1)
-        return;
-    uint16_t f = (a1 >> 16) & 0xffff;
-    uint16_t n = (a1 >> 0) & 0xffff;
-    if (a2)
-        FUN_000279ec(a2, f, n);
+	ITEM_H   itm;
+	ITEMINFO* ii;
+
+	if (handle == ~0)
+		return;
+
+	ASSERT(mem != NULL);
+
+	itm.handle = handle;
+
+	ASSERT(itm.id.filenum < (WORD)num_glbs);
+	ASSERT(itm.id.itemnum < (WORD)filedesc[itm.id.filenum].items);
+
+	ii = filedesc[itm.id.filenum].item;
+	ii += itm.id.itemnum;
+	
+	if (mem != NULL)
+	{
+		GLB_Load(mem, itm.id.filenum, itm.id.itemnum);
+	}
 }
 
-int GLB_GetItemID(const char *a1)
+/***************************************************************************
+   GLB_GetItemID () - Gets Item ID from the text name
+ ***************************************************************************/
+int                              // RETURN: Handle
+GLB_GetItemID(
+	const char* in_name          // INPUT : pointer to text name
+)
 {
-    fitem_t *fi;
-    int fc;
-    int i, j;
-    if (*a1 != ' ' && *a1 != '\0')
-    {
-        for (i = 0; i < num_glbs; i++)
-        {
-            fi = filedesc[i].items;
-            fc = filedesc[i].itemcount;
-            for (j = 0; j < fc; j++, fi++)
-            {
-                if (!strcmp(a1, fi->name))
-                {
-                    return (i << 16) | j;
-                }
-            }
-        }
-    }
-    return -1;
+	ITEMINFO* ii;
+	ITEM_H itm;
+	int filenum;
+	int itemnum;
+	int maxloop;
+
+	ASSERT(in_name != NULL);
+
+	itm.handle = ~0;
+	if (*in_name != ' ' && *in_name != '\0')
+	{
+		for (filenum = 0; filenum < num_glbs; filenum++)
+		{
+			maxloop = filedesc[filenum].items;
+			ii = filedesc[filenum].item;
+			
+			for (itemnum = 0; itemnum < maxloop; itemnum++)
+			{
+				if (strcmp(ii->name, in_name) == 0)
+				{
+					itm.id.filenum = filenum;
+					itm.id.itemnum = itemnum;
+					return itm.handle;
+				}
+				ii++;
+			}
+		}
+	}
+	
+	return itm.handle;
 }
 
-void GLB_FreeItem(int a1)
+#if 0  
+/***************************************************************************
+ GLB_GetPtr() - Returns a pointer to item ( handle )
+ ***************************************************************************/
+char*                           // RETURN: pointer to item
+GLB_GetPtr(
+	int handle                  // INPUT : handle of item
+)
 {
-    filedesc_t *fd;
-    fitem_t *fi;
-    if (a1 == -1)
-        return;
-    uint16_t f = (a1 >> 16) & 0xffff;
-    uint16_t n = (a1 >> 0) & 0xffff;
-    fd = &filedesc[f];
-    if (n >= (unsigned short)fd->itemcount)
-    {
-        EXIT_Error("GLB_FreeItem - item out of range: %d > %d file %d.\n", n, fd->itemcount, f);
-    }
-    fi = &fd->items[n];
-    if (fi->mem.ptr)
-    {
-        fi->flags &= ~0x80000000;
-        if (fVmem)
-            VM_Free(fi->mem.ptr);
-        else
-            free(fi->mem.ptr);
-        fi->mem.ptr = NULL;
-    }
+	ITEM_H itm;
+	ITEMINFO* ii;
+
+	if (handle == ~0)
+		return NULL;
+
+	itm.handle = handle;
+
+	ASSERT(itm.id.filenum < (uint16_t)num_glbs);
+	ASSERT(itm.id.itemnum < (uint16_t)filedesc[itm.id.filenum].items);
+
+	ii = filedesc[itm.id.filenum].item;
+	ii += itm.id.itemnum;
+	
+	return ii->memory;
+}
+#endif 
+
+/***************************************************************************
+ GLB_FreeItem() - Frees memory for items and places items < MAX SIZE
+ ***************************************************************************/
+void
+GLB_FreeItem(
+	int handle               // INPUT : handle of item
+)
+{
+	ITEM_H itm;
+	ITEMINFO* ii;
+
+	if (handle == ~0)
+		return;
+
+	itm.handle = handle;
+
+	ASSERT(itm.id.filenum < (uint16_t)num_glbs);
+	
+	if (itm.id.itemnum >= (uint16_t)filedesc[itm.id.filenum].items)
+	{
+		EXIT_Error("GLB_FreeItem - item out of range: %d > %d file %d.\n",
+			itm.id.itemnum, filedesc[itm.id.filenum].items, itm.id.filenum);
+	}
+	//   ASSERT( itm.id.itemnum < ( WORD ) filedesc[ itm.id.filenum ].items );
+
+	ii = filedesc[itm.id.filenum].item;
+	ii += itm.id.itemnum;
+	
+	if (ii->vm_mem.obj != NULL)
+	{
+		ii->flags &= ~ITF_LOCKED;
+		
+		if (fVmem)
+			VM_Free(ii->vm_mem.obj);
+		else
+			free(ii->vm_mem.obj);
+		
+		ii->vm_mem.obj = NULL;
+	}
 }
 
-void GLB_FreeAll(void)
+/***************************************************************************
+ GLB_FreeAll() - Frees All memory used by GLB items
+ ***************************************************************************/
+void
+GLB_FreeAll(
+	void
+)
 {
-    int i, j;
-    fitem_t *fi;
-    for (i = 0; i < num_glbs; i++)
-    {
-        fi = filedesc[i].items;
-        for (j = 0; j < filedesc[i].itemcount; j++)
-        {
-            if (fi->mem.ptr && !(fi->flags & 0x80000000))
-            {
-                if (fVmem)
-                    VM_Free(fi->mem.ptr);
-                else
-                    free(fi->mem.ptr);
-                fi->mem.ptr = NULL;
-            }
-            fi++;
-        }
-    }
+	int		filenum;
+	int		itemnum;
+	ITEMINFO* ii;
+
+	for (filenum = 0; filenum < num_glbs; filenum++)
+	{
+		ii = filedesc[filenum].item;
+		
+		for (itemnum = 0; itemnum < filedesc[filenum].items; itemnum++)
+		{
+			if (ii->vm_mem.obj && (ii->flags & ITF_LOCKED) == 0)
+			{
+				if (fVmem)
+					VM_Free(ii->vm_mem.obj);
+				else
+					free(ii->vm_mem.obj);
+				
+				ii->vm_mem.obj = NULL;
+			}
+			ii++;
+		}
+	}
 }
 
-int GLB_GetItemSize(int a1)
+/***************************************************************************
+ GLB_ItemSize() - Returns Size of Item
+ ***************************************************************************/
+int                               // RETURN: sizeof ITEM
+GLB_ItemSize(
+	int handle                    // INPUT : handle of item
+)
 {
-    uint16_t f = (a1 >> 16) & 0xffff;
-    uint16_t n = (a1 >> 0) & 0xffff;
-    return filedesc[f].items[n].length;
+	ITEM_H itm;
+	ITEMINFO* ii;
+
+	if (handle == ~0)
+		return 0;
+
+	itm.handle = handle;
+
+	ASSERT(itm.id.filenum < (WORD)num_glbs);
+	ASSERT(itm.id.itemnum < (WORD)filedesc[itm.id.filenum].items);
+
+	ii = filedesc[itm.id.filenum].item;
+	ii += itm.id.itemnum;
+	
+	return ii->size;
 }
 
-void GLB_SetItemSize(int a1, int a2)
+/***************************************************************************
+   GLB_ReadFile () reads in a normal file
+ ***************************************************************************/
+int                             // RETURN: size of record
+GLB_ReadFile(
+	const char* name,           // INPUT : filename
+	char* buffer                // OUTPUT: pointer to buffer or NULL
+)
 {
-    uint16_t f = (a1 >> 16) & 0xffff;
-    uint16_t n = (a1 >> 0) & 0xffff;
-    filedesc[f].items[n].length = a2;
+	char fqp[PATH_MAX];
+	FILE *handle;
+	uint32_t sizerec;
+
+	if (access(name, 0) == -1)
+	{
+		strcpy(fqp, exePath);
+		strcat(fqp, name);
+		name = fqp;
+	}
+	
+	if ((handle = fopen(name, "rb")) == NULL)
+		EXIT_Error("LoadFile: Open failed!");
+
+	fseek(handle, 0, SEEK_END);
+	sizerec = ftell(handle);
+
+	if (buffer && sizerec)
+	{
+		if (!fread(buffer, sizerec, 1, handle))
+		{
+			fclose(handle);
+			EXIT_Error("GLB_LoadFile: Load failed!");
+		}
+	}
+
+	fclose(handle);
+
+	return (sizerec);
 }
 
-void GLB_SetItemPointer(int a1, char* a2)
+/***************************************************************************
+   GLB_SaveFile () saves buffer to a normal file ( filename )
+ ***************************************************************************/
+void
+GLB_SaveFile(
+	char* name,                // INPUT : filename
+	char* buffer,              // INPUT : pointer to buffer
+	int length                 // INPUT : length of buffer
+)
 {
-    uint16_t f = (a1 >> 16) & 0xffff;
-    uint16_t n = (a1 >> 0) & 0xffff;
-    filedesc[f].items[n].mem.ptr = a2;
+	FILE *handle;
+
+	if ((handle = fopen(name, "wb")) == NULL)
+		EXIT_Error("SaveFile: Open failed!");
+
+	if (length)
+	{
+		if (!fwrite(buffer, length, 1, handle))
+		{
+			fclose(handle);
+			EXIT_Error("GLB_SaveFile: Write failed!");
+		}
+	}
+	
+	fclose(handle);
 }
-
-int GLB_ReadFile(const char *a1, char *a2)
-{
-    FILE *handle;
-    int l;
-    char f_a0[PATH_MAX];
-    if (access(a1, 0) == -1)
-    {
-        strcpy(f_a0, exePath);
-        strcat(f_a0, a1);
-        a1 = f_a0;
-    }
-    handle = fopen(a1, "rb");
-    if (handle == NULL)
-        EXIT_Error("LoadFile: Open failed!");
-    fseek(handle, 0, SEEK_END);
-    l = ftell(handle);
-    rewind(handle);
-    if (a2 && l)
-    {
-        if (!fread(a2, l, 1, handle))
-        {
-            fclose(handle);
-            EXIT_Error("GLB_LoadFile: Load failed!");
-        }
-    }
-    fclose(handle);
-    return l;
-}
-
-void GLB_SaveFile(char *a1, char *a2, int a3)
-{
-    FILE *handle;
-
-    handle = fopen(a1, "wb");
-    if (handle == NULL)
-        EXIT_Error("SaveFile: Open failed!");
-    if (a3)
-    {
-        if (!fwrite(a2, a3, 1, handle))
-        {
-            fclose(handle);
-            EXIT_Error("GLB_SaveFile: Write failed!");
-        }
-    }
-    fclose(handle);
-}
-

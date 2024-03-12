@@ -89,15 +89,15 @@ int curship[16];
 int lship[8];
 int dship[8];
 int fship[8];
-texture_t *numbers[11];
+char *numbers[11];
 
 char gdmodestr[] = "CASTLE";
 
-player_t plr;
+PLAYEROBJ plr;
 
 char* g_highmem;
 
-texture_t *cursor_pic;
+char *cursor_pic;
 int draw_player;
 int fadeflag;
 int end_fadeflag;
@@ -157,7 +157,7 @@ char flatnames[4][14] = {
     "FLATSG4_ITM"
 };
 
-flat_t *flatlib[4];
+FLATS *flatlib[4];
 
 /***************************************************************************
 RAP_Bday() - Get system date
@@ -311,7 +311,7 @@ Rot_Color(
  ***************************************************************************/
 void 
 InitMobj(
-    mobj_t *cur            // INPUT : pointer to MOVEOBJ
+    MOVEOBJ *cur            // INPUT : pointer to MOVEOBJ
 )
 {
     cur->done = 0;
@@ -349,7 +349,7 @@ InitMobj(
  ***************************************************************************/
 void 
 MoveMobj(
-    mobj_t *cur            // INPUT : pointer to MOVEOBJ
+    MOVEOBJ *cur            // INPUT : pointer to MOVEOBJ
 )
 {
     if (cur->maxloop == 0)
@@ -389,7 +389,7 @@ MoveMobj(
  ***************************************************************************/
 int 
 MoveSobj(
-    mobj_t *cur,           // INPUT : pointer to MOVEOBJ
+    MOVEOBJ *cur,          // INPUT : pointer to MOVEOBJ
     int speed              // INPUT : speed to plot at
 )
 {
@@ -505,7 +505,8 @@ RAP_DisplayStats(
 {
     char temp[24];
     int super, shield, loop, x, y;
-    texture_t *pic, *h;
+    char* pic;
+    GFX_PIC *h;
     static int damage = -1;
     static int blinkflag = 1;
 
@@ -619,14 +620,16 @@ RAP_DisplayStats(
         {
             if (damage)
             {
-                h = pic = (texture_t*)GLB_GetItem(FILE111_WEPDEST_PIC);
+                pic = GLB_GetItem(FILE111_WEPDEST_PIC);
+                h = (GFX_PIC*)pic;
                 GFX_PutSprite(pic, (320 - h->width) >> 1, MAP_BOTTOM - 9);
             }
             
             if (startendwave == -1)
                 SND_Patch(FX_WARNING, 127);
             
-            h = pic = (texture_t*)GLB_GetItem(FILE110_SHLDLOW_PIC);
+            pic = GLB_GetItem(FILE110_SHLDLOW_PIC);
+            h = (GFX_PIC*)pic;
             GFX_PutSprite(pic, (320 - h->width) >> 1, MAP_BOTTOM);
         }
     }
@@ -1061,7 +1064,7 @@ Do_Game(
         {
             FLAME_Down(player_cx - o_engine[playerpic] - 3, player_cy + 15, 4, gl_cnt % 2);
             FLAME_Down(player_cx + o_engine[playerpic] - 2, player_cy + 15, 4, gl_cnt % 2);
-            GFX_PutSprite((texture_t*)GLB_GetItem(curship[playerpic + g_flash]), playerx, playery);
+            GFX_PutSprite((char*)GLB_GetItem(curship[playerpic + g_flash]), playerx, playery);
             g_flash = 0;
         }
         
@@ -1440,7 +1443,7 @@ main(
     
     if (ptrflag)
     {
-        cursor_pic = (texture_t*)GLB_LockItem(FILE112_CURSOR_PIC);
+        cursor_pic = (char*)GLB_LockItem(FILE112_CURSOR_PIC);
         PTR_SetPic(cursor_pic);
         PTR_SetPos(160, 100);
         PTR_DrawCursor(0);
@@ -1464,7 +1467,7 @@ main(
         if (gameflag[loop])
         {
             item = GLB_GetItemID(flatnames[loop]);
-            flatlib[loop] = (flat_t*)GLB_LockItem(item);
+            flatlib[loop] = (FLATS*)GLB_LockItem(item);
         }
         else
             flatlib[loop] = NULL;
@@ -1474,7 +1477,7 @@ main(
     for (loop = 0; loop < 11; loop++)
     {
         item = FILE105_N0_PIC + loop;
-        numbers[loop] = (texture_t*)GLB_LockItem(item);
+        numbers[loop] = (char*)GLB_LockItem(item);
     }
 
     FLAME_InitShades();

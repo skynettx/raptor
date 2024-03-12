@@ -2,12 +2,12 @@
 #include "common.h"
 #include "gfxapi.h"
 
-enum PTRTYPE
+typedef enum
 {
 	P_AUTO,
 	P_MOUSE,
 	P_JOYSTICK
-};
+}PTRTYPE;
 
 extern int mouseb1, mouseb2, mouseb3;
 extern int cur_mx, cur_my;
@@ -21,7 +21,7 @@ void PTR_ResetJoyStick(void);
 void PTR_SetPos(int x, int y);
 void PTR_Pause(int flag);
 void PTR_DrawCursor(int flag);
-void PTR_SetPic(texture_t *newp);
+void PTR_SetPic(char *newp);
 int PTR_Init(int type);
 
 void PTR_Erase(void);
