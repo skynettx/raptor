@@ -28,7 +28,7 @@ IPT_CalJoy(
 	void
 )
 {
-	SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC);
+	SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC);
 
 	MaxJoysticks = SDL_NumJoysticks();
 	ControllerIndex = 0;

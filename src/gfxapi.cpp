@@ -49,7 +49,7 @@ void GFX_InitTimer(void)
 #if SDL_VERSION_ATLEAST(2, 0, 5)
     SDL_SetHint(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, "1");
 #endif
-    SDL_Init(SDL_INIT_TIMER);
+    SDL_InitSubSystem(SDL_INIT_TIMER);
     timer_init = 1;
 }
 

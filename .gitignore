@@ -6,3 +6,4 @@ Makefile
 bin
 build
 .vscode
+*.user

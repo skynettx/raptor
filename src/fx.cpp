@@ -89,7 +89,7 @@ SND_InitSound(
     if (fx_init)
         return 0;
 
-    if (SDL_Init(SDL_INIT_AUDIO) < 0)
+    if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
         return 0;
 
     spec.freq = fx_freq;
