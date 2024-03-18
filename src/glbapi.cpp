@@ -858,6 +858,7 @@ GLB_ReadFile(
 
 	fseek(handle, 0, SEEK_END);
 	sizerec = ftell(handle);
+	rewind(handle);
 
 	if (buffer && sizerec)
 	{
