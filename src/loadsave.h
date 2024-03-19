@@ -1,28 +1,30 @@
 #pragma once
-
+#include <boost/endian.hpp>
 #include "rap.h"
 
-typedef struct 
+using namespace boost::endian;
+
+typedef struct
 {
-    int link;
-    int slib;
-    int x;
-    int y;
-    int game;
-    int level;
+    little_int32_t link;
+    little_int32_t slib;
+    little_int32_t x;
+    little_int32_t y;
+    little_int32_t game;
+    little_int32_t level;
 }CSPRITE;
 
-typedef struct 
+typedef struct
 {
-    short flats;
-    short fgame;
+    little_int16_t flats;
+    little_int16_t fgame;
 }MAZEDATA;
 
-typedef struct 
+typedef struct
 {
-    int sizerec;
-    int spriteoff;
-    int numsprites;
+    little_int32_t sizerec;
+    little_int32_t spriteoff;
+    little_int32_t numsprites;
     MAZEDATA map[MAP_SIZE];
 }MAZELEVEL;
 

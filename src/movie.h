@@ -1,4 +1,7 @@
 #pragma once
+#include <boost/endian.hpp>
+
+using namespace boost::endian;
 
 typedef enum
 {
@@ -24,12 +27,12 @@ typedef enum
     S_STOP
 }SONGOPTS;
 
-typedef struct 
+typedef struct
 {
-    unsigned short opt;
-    unsigned short fill;
-    unsigned short offset;
-    unsigned short length;
+    little_uint16_t opt;
+    little_uint16_t fill;
+    little_uint16_t offset;
+    little_uint16_t length;
 }ANIMLINE;
 
 typedef struct

@@ -1,5 +1,8 @@
 #pragma once
+#include <boost/endian.hpp>
 #include "rap.h"
+
+using namespace boost::endian;
 
 typedef enum
 {
@@ -28,46 +31,46 @@ typedef enum
     MULTI_END
 }MULTI;
 
-typedef struct 
+typedef struct
 {
-    char iname[16];                         // ITEM NAME
-    int item;                               // * GLB ITEM #
-    int bonus;                              // BONUS # ( -1 == NONE )
-    int exptype;                            // EXPLOSION TYPE 
-    int shootspace;                         // SLOWDOWN SPEED
-    int ground;                     //NOT USED IS ON GROUND
-    int suck;                               // CAN SUCK WEAPON AFFECT
-    int frame_rate;                         // FRAME RATE
-    int num_frames;                         // NUM FRAMES
-    int countdown;                          // COUNT DOWN TO START ANIM
-    int rewind;                             // FRAMES TO REWIND
-    int animtype;                           // FREE SPACE FOR LATER USE
-    int shadow;                             // USE SHADOW ( TRUE/FALSE )
-    int bossflag;                           // SHOULD THIS BE CONSIDERED A BOSS
-    int hits;                               // HIT POINTS
-    int money;                              // $$ AMOUNT WHEN KILLED
-    int shootstart;                         // SHOOT START OFFSET
-    int shootcnt;                           // HOW MANY TO SHOOT
-    int shootframe;                         // FRAME RATE TO SHOOT
-    int movespeed;                          // MOVEMENT SPEED
-    int numflight;                          // NUMBER OF FLIGHT POSITIONS
-    int repos;                              // REPEAT TO POSITION
-    int flighttype;                         // FLIGHT TYPE
-    int numguns;                            // NUMBER OF GUNS
-    int numengs;                            // NUMBER OF ENGINES
-    int sfx;                        //NOT USED SFX # TO PLAY
-    int song;                               // SONG # TO PLAY
-    short shoot_type[MAX_GUNS];             // ENEMY SHOOT TYPE
-    short engx[MAX_GUNS];                   // X POS ENGINE FLAME
-    short engy[MAX_GUNS];                   // Y POS ENGINE FLAME
-    short englx[MAX_GUNS];                  // WIDTH OF ENGINE FLAME
-    short shootx[MAX_GUNS];                 // X POS SHOOT FROM
-    short shooty[MAX_GUNS];                 // Y POS SHOOT FROM
-    short flightx[MAX_FLIGHT];              // FLIGHT X POS
-    short flighty[MAX_FLIGHT];              // FLIGHT Y POS
+    char iname[16];                                    // ITEM NAME
+    little_int32_t item;                               // * GLB ITEM #
+    little_int32_t bonus;                              // BONUS # ( -1 == NONE )
+    little_int32_t exptype;                            // EXPLOSION TYPE
+    little_int32_t shootspace;                         // SLOWDOWN SPEED
+    little_int32_t ground;                     //NOT USED IS ON GROUND
+    little_int32_t suck;                               // CAN SUCK WEAPON AFFECT
+    little_int32_t frame_rate;                         // FRAME RATE
+    little_int32_t num_frames;                         // NUM FRAMES
+    little_int32_t countdown;                          // COUNT DOWN TO START ANIM
+    little_int32_t rewind;                             // FRAMES TO REWIND
+    little_int32_t animtype;                           // FREE SPACE FOR LATER USE
+    little_int32_t shadow;                             // USE SHADOW ( TRUE/FALSE )
+    little_int32_t bossflag;                           // SHOULD THIS BE CONSIDERED A BOSS
+    little_int32_t hits;                               // HIT POINTS
+    little_int32_t money;                              // $$ AMOUNT WHEN KILLED
+    little_int32_t shootstart;                         // SHOOT START OFFSET
+    little_int32_t shootcnt;                           // HOW MANY TO SHOOT
+    little_int32_t shootframe;                         // FRAME RATE TO SHOOT
+    little_int32_t movespeed;                          // MOVEMENT SPEED
+    little_int32_t numflight;                          // NUMBER OF FLIGHT POSITIONS
+    little_int32_t repos;                              // REPEAT TO POSITION
+    little_int32_t flighttype;                         // FLIGHT TYPE
+    little_int32_t numguns;                            // NUMBER OF GUNS
+    little_int32_t numengs;                            // NUMBER OF ENGINES
+    little_int32_t sfx;                        //NOT USED SFX # TO PLAY
+    little_int32_t song;                               // SONG # TO PLAY
+    little_int16_t shoot_type[MAX_GUNS];               // ENEMY SHOOT TYPE
+    little_int16_t engx[MAX_GUNS];                     // X POS ENGINE FLAME
+    little_int16_t engy[MAX_GUNS];                     // Y POS ENGINE FLAME
+    little_int16_t englx[MAX_GUNS];                    // WIDTH OF ENGINE FLAME
+    little_int16_t shootx[MAX_GUNS];                   // X POS SHOOT FROM
+    little_int16_t shooty[MAX_GUNS];                   // Y POS SHOOT FROM
+    little_int16_t flightx[MAX_FLIGHT];                // FLIGHT X POS
+    little_int16_t flighty[MAX_FLIGHT];                // FLIGHT Y POS
 }SPRITE;
 
-typedef struct SPRITE_SHIP_S 
+typedef struct SPRITE_SHIP_S
 {
     struct SPRITE_SHIP_S *prev;
     struct SPRITE_SHIP_S *next;
@@ -78,7 +81,7 @@ typedef struct SPRITE_SHIP_S
     int x;                            // CENTER X POS;
     int y;                            // Y POS
     int x2;                           // WIDTH
-    int y2;                           // HEIGHT           
+    int y2;                           // HEIGHT
     int width;                        // WIDTH
     int height;                       // HEIGHT
     int hlx;                          // WIDTH/2

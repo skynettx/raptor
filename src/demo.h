@@ -1,4 +1,7 @@
 #pragma once
+#include <boost/endian.hpp>
+
+using namespace boost::endian;
 
 #pragma pack(push, 1)
 
@@ -13,10 +16,10 @@ typedef struct
     char b2;
     char b3;
     char b4;
-    short px;
-    short py;
-    short playerpic;
-    short fil;
+    little_int16_t px;
+    little_int16_t py;
+    little_int16_t playerpic;
+    little_int16_t fil;
 }RECORD;
 #pragma pack(pop)
 

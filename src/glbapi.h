@@ -1,12 +1,15 @@
 #pragma once
 #include <stdint.h>
+#include <boost/endian.hpp>
+
+using namespace boost::endian;
 
 typedef struct
 {
-	uint32_t opt;           // option (encode on/off)
-	uint32_t offset;        // offset into file
-	uint32_t filesize;      // filesize
-	char name[16];          // text name ( end with null )
+    little_uint32_t opt;           // option (encode on/off)
+    little_uint32_t offset;        // offset into file
+    little_uint32_t filesize;      // filesize
+    char name[16];                 // text name ( end with null )
 }KEYFILE;
 
 typedef struct

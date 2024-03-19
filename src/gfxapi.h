@@ -1,4 +1,5 @@
 #pragma once
+#include <boost/endian.hpp>
 
 #define G3D_DIST 200
 
@@ -7,6 +8,8 @@
 
 #define SCREENWIDTH  320
 #define SCREENHEIGHT 200
+
+using namespace boost::endian;
 
 typedef enum
 {
@@ -36,25 +39,25 @@ typedef enum
 
 typedef struct
 {
-    GFX_TYPE type;          // type of picture
-    int opt1;               // option 1
-    int opt2;               // option 2
-    int width;              // width of pic
-    int height;             // heigth of pic
+    GFX_TYPE type;                     // type of picture
+    little_int32_t opt1;               // option 1
+    little_int32_t opt2;               // option 2
+    little_int32_t width;              // width of pic
+    little_int32_t height;             // heigth of pic
 }GFX_PIC;
 
 typedef struct
 {
-    int x;                  // X POS OF SEG
-    int y;                  // Y POS OF SEG
-    int offset;             // OFFSET FROM X, Y
-    int length;             // LENGTH OF LINE
+    little_int32_t x;                  // X POS OF SEG
+    little_int32_t y;                  // Y POS OF SEG
+    little_int32_t offset;             // OFFSET FROM X, Y
+    little_int32_t length;             // LENGTH OF LINE
 }GFX_SPRITE;
 
 typedef struct
 {
-    int height;
-    short charofs[256];
+    little_int32_t height;
+    little_int16_t charofs[256];
     char width[256];
 }FONT;
 

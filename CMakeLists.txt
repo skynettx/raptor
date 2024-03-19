@@ -11,6 +11,7 @@ project(raptor)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 include_directories(./src/)
+include_directories(./include/)
 include_directories(./include/textscreen/include/)
 include_directories(./include/TinySoundFont/)
 

@@ -23,7 +23,7 @@ static unsigned int lastTime = 0;
 /***************************************************************************
 IPT_CalJoy() - Open Gamecontroller
  ***************************************************************************/
-void 
+void
 IPT_CalJoy(
 	void
 )
@@ -47,16 +47,16 @@ IPT_CalJoy(
 		{
 			break;
 		}
-		
+
 		ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(JoystickIndex);
 		RumbleHandles[ControllerIndex] = SDL_HapticOpen(JoystickIndex);
-		
+
 		if (SDL_HapticRumbleInit(RumbleHandles[ControllerIndex]) != 0)
 		{
 			SDL_HapticClose(RumbleHandles[ControllerIndex]);
 			RumbleHandles[ControllerIndex] = 0;
 		}
-	    
+
 		ControllerIndex++;
 		GetJoyButtonMapping();
 	}
@@ -65,7 +65,7 @@ IPT_CalJoy(
 /***************************************************************************
 IPT_CloJoy() - Close Gamecontroller
  ***************************************************************************/
-void  
+void
 IPT_CloJoy(
 	void
 )
@@ -76,7 +76,7 @@ IPT_CloJoy(
 		{
 			if (RumbleHandles[ControllerIndex])
 				SDL_HapticClose(RumbleHandles[ControllerIndex]);
-			
+
 			SDL_GameControllerClose(ControllerHandles[ControllerIndex]);
 		}
 	}
@@ -85,7 +85,7 @@ IPT_CloJoy(
 /***************************************************************************
 I_HandleJoystickEvent() - Get current button or axis status
  ***************************************************************************/
-void 
+void
 I_HandleJoystickEvent(
 	SDL_Event *sdlevent
 )
@@ -114,11 +114,11 @@ I_HandleJoystickEvent(
 			TriggerLeft = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERLEFT) / 8000;
 			TriggerRight = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / 8000;
 		}
-		
-		if (sdlevent->type == SDL_CONTROLLERBUTTONUP) 
+
+		if (sdlevent->type == SDL_CONTROLLERBUTTONUP)
 			joy_ack = 0;
-		
-		if (sdlevent->type == SDL_CONTROLLERBUTTONDOWN) 
+
+		if (sdlevent->type == SDL_CONTROLLERBUTTONDOWN)
 			joy_ack = 1;
 	}
 }
@@ -126,7 +126,7 @@ I_HandleJoystickEvent(
 /***************************************************************************
 GetJoyButtonMapping() - Detect connected Gamecontroller and map buttons for it
  ***************************************************************************/
-void 
+void
 GetJoyButtonMapping(
 	void
 )
@@ -145,7 +145,7 @@ GetJoyButtonMapping(
 			XButtonconvert = 3;
 			YButtonconvert = 2;
 			break;
-		
+
 		case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO:
 		case SDL_CONTROLLER_TYPE_XBOX360:
 		case SDL_CONTROLLER_TYPE_XBOXONE:
@@ -154,7 +154,7 @@ GetJoyButtonMapping(
 			XButtonconvert = 2;
 			YButtonconvert = 3;
 			break;
-		
+
 		default:
 			if ((AButtonconvert == 0) && (BButtonconvert == 0) && (XButtonconvert == 0) && (YButtonconvert == 0))
 			{
@@ -165,13 +165,13 @@ GetJoyButtonMapping(
 			}
 			break;
 		}
-	}
+    }
 }
 
 /***************************************************************************
 IPT_CalJoyRumbleLow() - Gamecontroller rumbles low
  ***************************************************************************/
-void 
+void
 IPT_CalJoyRumbleLow(
 	void
 )
@@ -188,7 +188,7 @@ IPT_CalJoyRumbleLow(
 /***************************************************************************
 IPT_CalJoyRumbleMedium() - Gamecontroller rumbles medium
  ***************************************************************************/
-void 
+void
 IPT_CalJoyRumbleMedium(
 	void
 )
@@ -205,7 +205,7 @@ IPT_CalJoyRumbleMedium(
 /***************************************************************************
 IPT_CalJoyRumbleHigh() - Gamecontroller rumbles high
  ***************************************************************************/
-void 
+void
 IPT_CalJoyRumbleHigh(
 	void
 )
@@ -222,7 +222,7 @@ IPT_CalJoyRumbleHigh(
 /***************************************************************************
 JOY_Wait() - Waits for button to be released
  ***************************************************************************/
-void 
+void
 JOY_Wait(
 	int button
 )
@@ -236,7 +236,7 @@ JOY_Wait(
 /***************************************************************************
 JOY_IsKey() - Tests to see if button is down if so waits for release
  ***************************************************************************/
-int 
+int
 JOY_IsKey(
 	int button
 )
@@ -244,17 +244,17 @@ JOY_IsKey(
 	if (StickX || StickY || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
 	{
 		JOY_Wait(button);
-		
+
 		return 1;
 	}
-    
+
 	return 0;
 }
 
 /***************************************************************************
 JOY_IsKeyInGameStart() - Tests to see if button is down if so waits for release
  ***************************************************************************/
-int 
+int
 JOY_IsKeyInGameStart(
 	int button
 )
@@ -262,17 +262,17 @@ JOY_IsKeyInGameStart(
 	if (Start)
 	{
 		JOY_Wait(button);
-		
+
 		return 1;
 	}
-	
+
 	return 0;
 }
 
 /***************************************************************************
 JOY_IsKeyInGameBack() - Tests to see if button is down if so waits for release
  ***************************************************************************/
-int 
+int
 JOY_IsKeyInGameBack(
 	int button
 )
@@ -281,17 +281,17 @@ JOY_IsKeyInGameBack(
 	if (Back)
 	{
 		JOY_Wait(button);
-		
+
 		return 1;
 	}
-	
+
 	return 0;
 }
 
 /***************************************************************************
 JOY_IsKeyMenu() - Tests to see if button is down if so waits for release
  ***************************************************************************/
-int 
+int
 JOY_IsKeyMenu(
 	int button
 )
@@ -299,30 +299,30 @@ JOY_IsKeyMenu(
 	if (RightShoulder || Back || BButton)
 	{
 		JOY_Wait(button);
-		
+
 		return 1;
 	}
-	
+
 	return 0;
 }
 
 /***************************************************************************
 JOY_IsScroll() - Scroll cursor in menu
  ***************************************************************************/
-int 
+int
 JOY_IsScroll(
 	int scrollflag
 )
 {
 	unsigned int currentTime;
 	currentTime = SDL_GetTicks();
-	
+
 	if (currentTime > lastTime + 200)
 	{
 		lastTime = currentTime;
-		
+
 		return 1;
 	}
-	
+
 	return 0;
 }

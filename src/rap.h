@@ -1,4 +1,7 @@
 #pragma once
+#include <boost/endian.hpp>
+
+using namespace boost::endian;
 
 #define MAX_SHIELD 100
 #define MAX_SUPER  100
@@ -48,7 +51,7 @@ extern int playerx, playery;
 extern char gdmodestr[];
 extern int playerbasepic;
 
-typedef struct 
+typedef struct
 {
     char name[20];
     char callsign[12];
@@ -98,7 +101,7 @@ typedef struct
 
 #define MAX_ONSCREEN 30
 
-typedef struct 
+typedef struct
 {
     int x;
     int y;
@@ -132,17 +135,17 @@ typedef enum
 
 typedef enum
 {
-    EXP_AIRSMALL1, // 0  
+    EXP_AIRSMALL1, // 0
     EXP_AIRMED,    // 1 NORMAL AIR    ( norm )
     EXP_AIRLARGE,  // 2 bigger that 32 by 32
-    EXP_GRDSMALL,  // 3 smaller than 32 by 32          
+    EXP_GRDSMALL,  // 3 smaller than 32 by 32
     EXP_GRDMED,    // 4 NORMAL GROUND ( norm )
     EXP_GRDLARGE,  // 5 bigger than 32 by 32
-    EXP_BOSS,      // 6 BIG BOSS SHIP ( AIR ) 
+    EXP_BOSS,      // 6 BIG BOSS SHIP ( AIR )
     EXP_PERSON,    // 7 ONE LITTLE PERSON BLWING UP
     EXP_ENERGY,    // 8 ENERGY SHIP BLOWING UP
     EXP_PLATOON,   // 9 ONE LITTLE PERSON BLWING UP
-    EXP_AIRSMALL2  // 10  
+    EXP_AIRSMALL2  // 10
 }EXP_TYPE;
 
 typedef enum
@@ -153,11 +156,11 @@ typedef enum
     K_EXITDOS
 }KEYOPTS;
 
-typedef struct 
+typedef struct
 {
-    int linkflat; 
-    short bonus; 
-    short bounty;
+    little_int32_t linkflat;
+    little_int16_t bonus;
+    little_int16_t bounty;
 }FLATS;
 
 extern FLATS *flatlib[4];
