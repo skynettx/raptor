@@ -11,7 +11,7 @@ bool AButton, BButton, XButton, YButton;
 int16_t StickX, StickY, TriggerLeft, TriggerRight;
 
 SDL_GameController* ControllerHandles[MAX_CONTROLLERS];
-SDL_Haptic* RumbleHandles[MAX_CONTROLLERS] ;
+SDL_Haptic* RumbleHandles[MAX_CONTROLLERS];
 
 int MaxJoysticks;
 int ControllerIndex;
@@ -87,7 +87,7 @@ I_HandleJoystickEvent() - Get current button or axis status
  ***************************************************************************/
 void
 I_HandleJoystickEvent(
-	SDL_Event *sdlevent
+	SDL_Event* sdlevent
 )
 {
 	for (ControllerIndex = 0;
@@ -165,7 +165,7 @@ GetJoyButtonMapping(
 			}
 			break;
 		}
-    }
+	}
 }
 
 /***************************************************************************
@@ -198,7 +198,7 @@ IPT_CalJoyRumbleMedium(
 		++ControllerIndex)
 	{
 		if (ControllerHandles[ControllerIndex])
-		    SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0x7ffe, 0x7ffe, 1000);
+			SDL_GameControllerRumble(ControllerHandles[ControllerIndex], 0x7ffe, 0x7ffe, 1000);
 	}
 }
 

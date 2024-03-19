@@ -19,6 +19,7 @@
 					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/i686-w64-mingw32/include/SDL2" />
 					<Add directory="../include/textscreen/include" />
 					<Add directory="../include/TinySoundFont" />
+					<Add directory="../include" />
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
@@ -40,6 +41,7 @@
 					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/i686-w64-mingw32/include/SDL2" />
 					<Add directory="../include/textscreen/include" />
 					<Add directory="../include/TinySoundFont" />
+					<Add directory="../include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -64,6 +66,7 @@
 					<Add directory="/usr/include/SDL2" />
 					<Add directory="../include/textscreen/include" />
 					<Add directory="../include/TinySoundFont" />
+					<Add directory="../include" />
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
@@ -84,6 +87,7 @@
 					<Add directory="/usr/include/SDL2" />
 					<Add directory="../include/textscreen/include" />
 					<Add directory="../include/TinySoundFont" />
+					<Add directory="../include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -106,6 +110,7 @@
 					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/x86_64-w64-mingw32/include/SDL2" />
 					<Add directory="../include/textscreen/include" />
 					<Add directory="../include/TinySoundFont" />
+					<Add directory="../include" />
 				</Compiler>
 				<Linker>
 					<Add option="-m64" />
@@ -127,6 +132,7 @@
 					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/x86_64-w64-mingw32/include/SDL2" />
 					<Add directory="../include/textscreen/include" />
 					<Add directory="../include/TinySoundFont" />
+					<Add directory="../include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -151,6 +157,7 @@
 					<Add directory="/usr/include/SDL2" />
 					<Add directory="../include/textscreen/include" />
 					<Add directory="../include/TinySoundFont" />
+					<Add directory="../include" />
 				</Compiler>
 				<Linker>
 					<Add option="-m64" />
@@ -171,6 +178,7 @@
 					<Add directory="/usr/include/SDL2" />
 					<Add directory="../include/textscreen/include" />
 					<Add directory="../include/TinySoundFont" />
+					<Add directory="../include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
