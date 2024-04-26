@@ -440,7 +440,10 @@ MUS_Init(
             #endif // __linux__
             
             #ifdef __APPLE__
-            music_device = &mus_device_core;
+            if (core_dls_synth)
+                music_device = &mus_device_core;
+            else
+                music_device = &mus_device_corem;
             #endif // __APPLE__
         }
         else

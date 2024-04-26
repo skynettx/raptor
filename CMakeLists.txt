@@ -60,6 +60,7 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/mputsf.cpp
     src/mpualsa.cpp
     src/mpucore.cpp
+    src/mpucorem.cpp
 )
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     find_package(ALSA REQUIRED)
@@ -74,7 +75,9 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     find_library(AUDIO_TOOLBOX AudioToolbox)
     find_library(AUDIO_UNIT AudioUnit)
     find_library(FOUNDATION_LIBRARY Foundation)
-    target_link_libraries(raptor ${AUDIO_TOOLBOX} ${AUDIO_UNIT} ${FOUNDATION_LIBRARY}
+    find_library(COREMIDI_LIB CoreMIDI)
+    
+    target_link_libraries(raptor ${AUDIO_TOOLBOX} ${AUDIO_UNIT} ${FOUNDATION_LIBRARY} ${COREMIDI_LIB}
         textscreen
         SDL2::SDL2
         SDL2::SDL2main
