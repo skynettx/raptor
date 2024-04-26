@@ -56,7 +56,7 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/ptrapi.cpp
     src/loadsave.cpp
     src/enemy.cpp
-    src/mpuapi.cpp
+    src/mpuwinmm.cpp
     src/mputsf.cpp
     src/mpualsa.cpp
     src/mpucorea.cpp

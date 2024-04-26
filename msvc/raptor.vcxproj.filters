@@ -84,9 +84,6 @@
     <ClInclude Include="..\src\movie.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\mpuapi.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\musapi.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -209,9 +206,6 @@
     <ClCompile Include="..\src\movie.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\mpuapi.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\musapi.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -273,6 +267,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\src\mpucorea.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\mpuwinmm.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
