@@ -272,6 +272,9 @@
     <ClCompile Include="..\src\mpucore.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\mpucorem.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\rsrc\resource.rc">
