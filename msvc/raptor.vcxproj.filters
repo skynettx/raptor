@@ -269,10 +269,10 @@
     <ClCompile Include="..\src\mpualsa.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\mpucore.cpp">
+    <ClCompile Include="..\src\mpucorem.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\mpucorem.cpp">
+    <ClCompile Include="..\src\mpucorea.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

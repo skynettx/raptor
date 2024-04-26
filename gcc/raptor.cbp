@@ -242,7 +242,7 @@
 		<Unit filename="../src/mpualsa.cpp" />
 		<Unit filename="../src/mpuapi.cpp" />
 		<Unit filename="../src/mpuapi.h" />
-		<Unit filename="../src/mpucore.cpp" />
+		<Unit filename="../src/mpucorea.cpp" />
 		<Unit filename="../src/mpucorem.cpp" />
 		<Unit filename="../src/mputsf.cpp" />
 		<Unit filename="../src/musapi.cpp" />

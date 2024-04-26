@@ -59,7 +59,7 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/mpuapi.cpp
     src/mputsf.cpp
     src/mpualsa.cpp
-    src/mpucore.cpp
+    src/mpucorea.cpp
     src/mpucorem.cpp
 )
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -76,7 +76,6 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     find_library(AUDIO_UNIT AudioUnit)
     find_library(FOUNDATION_LIBRARY Foundation)
     find_library(COREMIDI_LIB CoreMIDI)
-    
     target_link_libraries(raptor ${AUDIO_TOOLBOX} ${AUDIO_UNIT} ${FOUNDATION_LIBRARY} ${COREMIDI_LIB}
         textscreen
         SDL2::SDL2
