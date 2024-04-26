@@ -68,7 +68,7 @@ extern int fx_volume;
 extern int dig_flag;
 extern int fx_freq;
 extern int fx_gus;
-extern int sys_midi, core_dls_synth, core_midi_port, alsaclient, alsaport;
+extern int sys_midi, winmm_mpu_device, core_dls_synth, core_midi_port, alsaclient, alsaport;
 
 int SND_InitSound(void);
 void SND_DeInit(void);
