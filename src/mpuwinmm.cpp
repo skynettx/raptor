@@ -213,7 +213,7 @@ AllNotesOffEvent(
     midiOutShortMsg((HMIDIOUT)mpu_stream, data);
 }
 
-musdevice_t mus_device_mpu = {
+musdevice_t mus_device_winmm = {
     MPU_Init,
     MPU_DeInit,
     NULL,

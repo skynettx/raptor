@@ -1359,7 +1359,7 @@ void AllOffEvent(unsigned int chan, unsigned int param){
     AllNotesOff(channel, param);
 }
 
-musdevice_t mus_device_fm = {
+musdevice_t mus_device_opl = {
     I_OPL_InitMusic,
     I_OPL_ShutdownMusic,
     I_OPL_Mix,

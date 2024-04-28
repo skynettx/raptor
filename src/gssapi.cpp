@@ -45,7 +45,7 @@ GSS_Init(
     case M_ADLIB:
     case M_PAS:
     case M_SB:
-        gss_device = &mus_device_fm;
+        gss_device = &mus_device_opl;
         break;
     
     case M_WAVE:
@@ -54,7 +54,7 @@ GSS_Init(
     default:
 
         #ifdef _WIN32
-        gss_device = &mus_device_mpu;
+        gss_device = &mus_device_winmm;
         #endif // _WIN32
         break;
     }

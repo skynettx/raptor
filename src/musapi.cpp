@@ -422,7 +422,7 @@ MUS_Init(
     case M_ADLIB:
     case M_PAS:
     case M_SB:
-        music_device = &mus_device_fm;
+        music_device = &mus_device_opl;
         break;
     
     case M_WAVE:
@@ -432,7 +432,7 @@ MUS_Init(
         if (sys_midi)
         {
             #ifdef _WIN32
-            music_device = &mus_device_mpu;
+            music_device = &mus_device_winmm;
             #endif // _WIN32
             
             #ifdef __linux__
@@ -441,7 +441,7 @@ MUS_Init(
             
             #ifdef __APPLE__
             if (core_dls_synth)
-                music_device = &mus_device_core;
+                music_device = &mus_device_corea;
             else
                 music_device = &mus_device_corem;
             #endif // __APPLE__
