@@ -96,7 +96,7 @@ System Midi support (Windows Multimedia, Linux ALSA, macOS CoreAudio and macOS C
 `sys_midi=1`  
 For Windows Multimedia under Windows, the MIDI device is set under the [Setup] section in `SETUP.INI` file:  
 `winmm_mpu_device=0`  
-Client and port for ALSA MIDI under Linux, is set under the [Setup] section in the SETUP.INI file:  
+Client and port for ALSA MIDI under Linux, is set under the [Setup] section in the `SETUP.INI` file:  
 `alsa_output_client=128`  
 `alsa_output_port=0`  
 To use a software synthesizer with ALSA MIDI, install for example timidity and soundfont-fluid from the packagemanager of your distro.  
@@ -104,7 +104,7 @@ CoreAudio support on macOS with software synthesizer DLS synth can be switched o
 `core_dls_synth=0`  
 `core_dls_synth=1`  
 If you want to use CoreMIDI under macOS, `core_dls_synth=0` must be switched off in the `SETUP.INI` file.  
-You can set the CoreMIDI port in the [Setup] section in the `SETUP.INI` file as follows:  
+You can set the CoreMIDI port under the [Setup] section in the `SETUP.INI` file as follows:  
 `core_midi_port=0`  
 To display the text mode ending screen after the game quits in fullscreen mode set under the [Video] section in the `SETUP.INI` file:  
 `txt_fullscreen=0`  
