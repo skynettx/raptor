@@ -1245,6 +1245,7 @@ main(
     char *argv[]
 )
 {
+    char glbpath[260];
     char *var1, *tptr, *pal;
     int loop, numfiles, ptrflag, item;
 
@@ -1254,6 +1255,13 @@ main(
 
     RAP_InitLoadSave();
     
+#if _WIN32 || __linux__ || __APPLE__
+    if (access(RAP_SetupFilename(), 0))
+    {
+        INI_InitPreference(RAP_SetupFilename());
+        RAP_WriteDefaultSetup();
+    }
+#else
     if (access(RAP_SetupFilename(), 0))
     {
         printf("\n\n** You must run SETUP first! **\n");
@@ -1261,6 +1269,7 @@ main(
             "Raptor", "** You must run SETUP first! **", NULL);
         exit(0);
     }
+#endif //_WIN32 || __linux__ || __APPLE__
 
     godmode = 0;
 
@@ -1293,13 +1302,13 @@ main(
     
     cur_diff = 0;
 
-    if (!access("FILE0001.GLB", 0))
+    if (!access("FILE0001.GLB", 0) || RAP_CheckFileInPath("FILE0001.GLB"))
         gameflag[0] = 1;
     
-    if (!access("FILE0002.GLB", 0))
+    if (!access("FILE0002.GLB", 0) || RAP_CheckFileInPath("FILE0002.GLB"))
         gameflag[1] = 1;
     
-    if (!access("FILE0003.GLB", 0) && !access("FILE0004.GLB", 0))
+    if (!access("FILE0003.GLB", 0) && !access("FILE0004.GLB", 0) || RAP_CheckFileInPath("FILE0003.GLB") && RAP_CheckFileInPath("FILE0004.GLB"))
     {
         gameflag[2] = 1;
         gameflag[3] = 1;
@@ -1316,7 +1325,7 @@ main(
             numfiles++;
     }
 
-    if (access("FILE0000.GLB", 0) || !numfiles)
+    if (access("FILE0000.GLB", 0) && !RAP_CheckFileInPath("FILE0000.GLB") || !numfiles)
     {
         printf("All game data files NOT FOUND cannot proceed !!\n");
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
@@ -1417,7 +1426,13 @@ main(
         fflush(stdout);
     }
     
+#if _WIN32 || __linux__ || __APPLE__
+    strcpy(glbpath, RAP_GetPath());
+
+    GLB_InitSystem(glbpath, 6 , 0);
+#else
     GLB_InitSystem(argv[0], 6, 0);
+#endif //_WIN32 || __linux__ || __APPLE__
     
     if (reg_flag)
     {

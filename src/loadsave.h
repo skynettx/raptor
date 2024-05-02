@@ -33,6 +33,9 @@ extern CSPRITE *csprite;
 
 const char* RAP_InitLoadSave(void);
 const char* RAP_SetupFilename(void);
+void RAP_WriteDefaultSetup(void);
+const char* RAP_GetPath(void);
+int RAP_CheckFileInPath(const char* filename);
 
 void RAP_ClearPlayer(void);
 int RAP_IsSaveFile(PLAYEROBJ *in_plr);

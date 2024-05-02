@@ -20,9 +20,11 @@
 #include "input.h"
 #include "fileids.h"
 #include "winids.h"
+#include "prefapi.h"
 
 #ifdef _WIN32
 #include <io.h>
+#include <direct.h>
 #endif // _WIN32
 #ifdef __GNUC__
 #include <unistd.h>
@@ -31,6 +33,10 @@
 #include <windows.h>
 #define PATH_MAX MAX_PATH
 #endif // _MSC_VER
+#ifdef __linux__
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif // __linux__
 
 #define MAX_SAVE  10
 
@@ -44,7 +50,8 @@ int map_item = -1;
 int curplr_diff = 2;
 
 static const char *fmt = "CHAR%04u.FIL";
-static const char* cdfmt = "%s\\CHAR%04u.FIL";
+static const char* cdfmt = "%sCHAR%04u.FIL";
+//static const char* cdfmt = "%s\\CHAR%04u.FIL";
 
 MAZELEVEL *mapmem;
 CSPRITE *csprite;
@@ -650,13 +657,48 @@ RAP_InitLoadSave(
     void
 )
 {
-    memset(cdpath, 0, sizeof(cdpath));
-    
-    cdflag = 0;
-    
-    strcpy(g_setup_ini, "SETUP.INI");
-    
+    char getpath[PATH_MAX];
+    char* gethome;
+#ifdef _WIN32
+    const char* setuppath = "\\AppData\\Roaming\\Raptor\\";
+    gethome = getenv("HOMEPATH");
+#endif // _WIN32
+#ifdef __linux__
+    const char* setuppath = "/.local/share/Raptor/";
+    gethome = getenv("HOME");
+#endif // __linux__
+#ifdef __APPLE__
+    const char* setuppath = "/Library/Application Support/Raptor/";
+    gethome = getenv("HOME");
+#endif // __APPLE__
+#if _WIN32 || __linux__ || __APPLE__
+    strcpy(getpath, gethome);
+    sprintf(getpath, "%s%s", getpath, setuppath);
+
+    if (access(getpath, 0))
+    {
+#ifdef _WIN32
+        _mkdir(getpath);
+#else
+        mkdir(getpath, 0755);
+#endif
+    }
+
+    strcpy(cdpath, getpath);
+    sprintf(getpath, "%s%s", getpath, "SETUP.INI");
+    cdflag = 1;
+    strcpy(g_setup_ini, getpath);
+
     return cdpath;
+#else
+    memset(cdpath, 0, sizeof(cdpath));
+
+    cdflag = 0;
+
+    strcpy(g_setup_ini, "SETUP.INI");
+
+    return cdpath;
+#endif // _WIN32 || __linux__ || __APPLE__
 }
 
 /***************************************************************************
@@ -668,4 +710,96 @@ RAP_SetupFilename(
 )
 {
     return g_setup_ini;
+}
+
+/***************************************************************************
+RAP_WriteDefaultSetup() - Writes default setup.ini
+ ***************************************************************************/
+void 
+RAP_WriteDefaultSetup(
+    void
+)
+{
+    INI_PutPreferenceLong("Setup", "Detail", 1);
+    INI_PutPreferenceLong("Setup", "Control", 0);
+    INI_PutPreferenceLong("Setup", "Haptic", 1);                           
+    INI_PutPreferenceLong("Setup", "joy_ipt_MenuNew", 0);         
+
+#if _WIN32 || __APPLE__
+    INI_PutPreferenceLong("Setup", "sys_midi", 1);
+#else
+    INI_PutPreferenceLong("Setup", "sys_midi", 0);
+#endif // _WIN32 __APPLE__
+ 
+    INI_PutPreferenceLong("Setup", "winmm_mpu_device", 0);       
+    INI_PutPreferenceLong("Setup", "core_dls_synth", 1);           
+    INI_PutPreferenceLong("Setup", "core_midi_port", 0);           
+    INI_PutPreferenceLong("Setup", "alsa_output_client", 128);           
+    INI_PutPreferenceLong("Setup", "alsa_output_port", 0);               
+    INI_PutPreference("Setup", "SoundFont", "SoundFont.sf2");
+    INI_PutPreferenceLong("Music", "Volume", 85);
+
+#if _WIN32 || __APPLE__
+    INI_PutPreferenceLong("Music", "CardType", 8);
+    INI_PutPreferenceLong("Music", "MidiPort", 330);
+#else
+    INI_PutPreferenceLong("Music", "CardType", 5);
+    INI_PutPreferenceLong("Music", "BasePort", 220);
+    INI_PutPreferenceLong("Music", "Irq", 7);
+    INI_PutPreferenceLong("Music", "Dma", 1);
+#endif // _WIN32 __APPLE__
+
+    INI_PutPreferenceLong("SoundFX", "Volume", 85);
+    INI_PutPreferenceLong("SoundFX", "CardType", 5);
+    INI_PutPreferenceLong("SoundFX", "BasePort", 220);
+    INI_PutPreferenceLong("SoundFX", "Irq", 7);
+    INI_PutPreferenceLong("SoundFX", "Dma", 1);
+    INI_PutPreferenceLong("SoundFX", "Channels", 4);
+    INI_PutPreferenceLong("Keyboard", "MoveUp", 72);
+    INI_PutPreferenceLong("Keyboard", "MoveDn", 80);
+    INI_PutPreferenceLong("Keyboard", "MoveLeft", 75);
+    INI_PutPreferenceLong("Keyboard", "MoveRight", 77);
+    INI_PutPreferenceLong("Keyboard", "Fire", 29);
+    INI_PutPreferenceLong("Keyboard", "FireSp", 56);
+    INI_PutPreferenceLong("Keyboard", "ChangeSp", 57);
+    INI_PutPreferenceLong("Keyboard", "MegaFire", 54);
+    INI_PutPreferenceLong("Mouse", "Fire", 0);
+    INI_PutPreferenceLong("Mouse", "FireSp", 1);
+    INI_PutPreferenceLong("Mouse", "ChangeSp", 2);
+    INI_PutPreferenceLong("JoyStick", "Fire", 0);
+    INI_PutPreferenceLong("JoyStick", "FireSp", 1);
+    INI_PutPreferenceLong("JoyStick", "ChangeSp", 2);
+    INI_PutPreferenceLong("JoyStick", "MegaFire", 3);
+    INI_PutPreferenceLong("Video", "fullscreen", 0);
+    INI_PutPreferenceLong("Video", "aspect_ratio_correct", 1);
+    INI_PutPreferenceLong("Video", "txt_fullscreen", 0);
+}
+
+/***************************************************************************
+RAP_GetPath() - Gets external path
+ ***************************************************************************/
+const char*
+RAP_GetPath(
+    void 
+)
+{
+    return cdpath;
+}
+
+/***************************************************************************
+RAP_CheckFileInPath() - Checks whether external path contains file
+ ***************************************************************************/
+int
+RAP_CheckFileInPath(
+    const char* filename
+)
+{
+    char buffer[PATH_MAX];
+
+    sprintf(buffer, "%s%s", cdpath, filename);
+
+    if (!access(buffer, 0))
+        return 1;
+    else
+        return 0;
 }
