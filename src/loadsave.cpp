@@ -33,10 +33,10 @@
 #include <windows.h>
 #define PATH_MAX MAX_PATH
 #endif // _MSC_VER
-#ifdef __linux__
+#if __linux__ || __APPLE__
 #include <sys/types.h>
 #include <sys/stat.h>
-#endif // __linux__
+#endif // __linux__ || __APPLE__
 
 #define MAX_SAVE  10
 
@@ -51,7 +51,6 @@ int curplr_diff = 2;
 
 static const char *fmt = "CHAR%04u.FIL";
 static const char* cdfmt = "%sCHAR%04u.FIL";
-//static const char* cdfmt = "%s\\CHAR%04u.FIL";
 
 MAZELEVEL *mapmem;
 CSPRITE *csprite;
