@@ -76,9 +76,9 @@ You have to take care of these files yourself.
 You can build or download [Raptor Setup](https://github.com/skynettx/raptorsetup.git) to create and edit the
 `SETUP.INI`, or edit it manually as follows.
 Rename the `SETUP(ADLIB).INI` or the `SETUP(MIDI).INI` file to `SETUP.INI` in Raptor directory.  
-If you want Midi over the TinySoundFont lib rename the `TimGM6mb.sf2` to `SoundFont.sf2` or specify the filename in the `SETUP.INI` file:  
+If you want MIDI over the TinySoundFont lib rename the `TimGM6mb.sf2` to `SoundFont.sf2` or specify the filename in the `SETUP.INI` file:  
 `SoundFont=SoundFont.sf2`  
-You can use any other GM compatible soundfont in sf2 format. For a better Midi sound quality I recommend the FluidR3_GM.sf2.
+You can use any other GM compatible soundfont in sf2 format. For a better MIDI sound quality I recommend the FluidR3_GM.sf2.
 This font is 140 MB in size, so it is not in the repository.  
 To play with one of the following input devices set `Control=0` under the [Setup] section in the `SETUP.INI` file to:  
 `Control=0` Keyboard  
@@ -91,13 +91,21 @@ If you want to turn off the menu pointer control via the joystick in mode `Contr
 input modes, set under the [Setup] section in the `SETUP.INI` file:  
 `joy_ipt_MenuNew=0`  
 `joy_ipt_MenuNew=1`  
-System Midi support (Windows Multimedia, Linux ALSA and macOS CoreAudio) can be switched off or on in the [Setup] section in the `SETUP.INI` file:  
+System MIDI support (Windows Multimedia, Linux ALSA, macOS CoreAudio and macOS CoreMIDI) can be switched off or on in the [Setup] section in the `SETUP.INI` file:  
 `sys_midi=0`  
 `sys_midi=1`  
-For ALSA Midi support on Linux, install timidity and soundfont-fluid from the packagemanager of your distro. When timidity is running
-get the timidity client and port with `aplaymidi -l` and set it in the [Setup] section in the `SETUP.INI` file:  
+For Windows Multimedia under Windows, the MIDI device is set under the [Setup] section in `SETUP.INI` file:  
+`winmm_mpu_device=0`  
+Client and port for ALSA MIDI under Linux, is set under the [Setup] section in the `SETUP.INI` file:  
 `alsa_output_client=128`  
 `alsa_output_port=0`  
+To use a software synthesizer with ALSA MIDI, install for example timidity and soundfont-fluid from the packagemanager of your distro.  
+CoreAudio support on macOS with software synthesizer DLS synth can be switched off or on under the [Setup] section in the `SETUP.INI` file:  
+`core_dls_synth=0`  
+`core_dls_synth=1`  
+If you want to use CoreMIDI under macOS, `core_dls_synth=0` must be switched off in the `SETUP.INI` file.  
+You can set the CoreMIDI port under the [Setup] section in the `SETUP.INI` file as follows:  
+`core_midi_port=0`  
 To display the text mode ending screen after the game quits in fullscreen mode set under the [Video] section in the `SETUP.INI` file:  
 `txt_fullscreen=0`  
 `txt_fullscreen=1`  

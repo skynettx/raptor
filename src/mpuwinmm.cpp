@@ -1,9 +1,11 @@
 #ifdef _WIN32
+#include <windows.h>
+#include <mmsystem.h>
+
 #include "SDL.h"
 #include "common.h"
 #include "musapi.h"
-#include <windows.h>
-#include <mmsystem.h>
+#include "fx.h"
 
 HMIDISTRM mpu_stream;
 UINT mpu_device;
@@ -24,7 +26,7 @@ MPU_Init(
     if (mpu_initcnt++ != 0)
         return 1;
 
-    mpu_device = device;
+    mpu_device = winmm_mpu_device;
 
     if (mpu_device > midiOutGetNumDevs() || midiOutGetDevCaps(mpu_device, &caps, sizeof(caps)))
         mpu_device = MIDI_MAPPER;
@@ -211,7 +213,7 @@ AllNotesOffEvent(
     midiOutShortMsg((HMIDIOUT)mpu_stream, data);
 }
 
-musdevice_t mus_device_mpu = {
+musdevice_t mus_device_winmm = {
     MPU_Init,
     MPU_DeInit,
     NULL,

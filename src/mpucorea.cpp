@@ -534,7 +534,7 @@ ControllerEvent(
     
 }
 
-musdevice_t mus_device_core = {
+musdevice_t mus_device_corea = {
     CORE_Init,
     CORE_DeInit,
     NULL,

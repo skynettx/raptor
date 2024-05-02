@@ -44,7 +44,6 @@
     <ClInclude Include="..\src\kbdapi.h" />
     <ClInclude Include="..\src\loadsave.h" />
     <ClInclude Include="..\src\movie.h" />
-    <ClInclude Include="..\src\mpuapi.h" />
     <ClInclude Include="..\src\musapi.h" />
     <ClInclude Include="..\src\m_misc.h" />
     <ClInclude Include="..\src\objects.h" />
@@ -87,9 +86,10 @@
     <ClCompile Include="..\src\movia_a.cpp" />
     <ClCompile Include="..\src\movie.cpp" />
     <ClCompile Include="..\src\mpualsa.cpp" />
-    <ClCompile Include="..\src\mpuapi.cpp" />
-    <ClCompile Include="..\src\mpucore.cpp" />
+    <ClCompile Include="..\src\mpucorea.cpp" />
+    <ClCompile Include="..\src\mpucorem.cpp" />
     <ClCompile Include="..\src\mputsf.cpp" />
+    <ClCompile Include="..\src\mpuwinmm.cpp" />
     <ClCompile Include="..\src\musapi.cpp" />
     <ClCompile Include="..\src\m_misc.cpp" />
     <ClCompile Include="..\src\objects.cpp" />
