@@ -20,6 +20,7 @@ For those who want to build themselves or who want more configuration informatio
 ## Installing
 You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or full version.
 Important only the DOS version v1.2 is compatible! You have to take care of these files yourself.  
+Please note that the old release build version 0.8.0 does not support the external system specific directory and manages all assets, config and save files in the current working directory.
 The assets can be loaded from the current working directory (Raptor directory) or from the external system specific directory.
 The external system specific directories are the following:
 ```
