@@ -40,6 +40,7 @@ struct txt_inputbox_s
     char *buffer;
     size_t buffer_len;
     unsigned int size;
+    unsigned int drawsize;
     int editing;
     void *value;
 };
@@ -70,6 +71,37 @@ txt_inputbox_t *TXT_NewInputBox(char **value, int size);
  */
 
 txt_inputbox_t *TXT_NewIntInputBox(int *value, int size);
+
+/**
+ * Create a new input box widget for controlling a string value
+ * with custom draw size.
+ *
+ * @param value         Pointer to a string variable that contains
+ *                      a pointer to the current value of the
+ *                      input box. The value should be allocated
+ *                      dynamically; when the string is changed it
+ *                      will be freed and the variable set to point
+ *                      to the new string value. String will be in
+ *                      UTF-8 format.
+ * @param size          Maximum number of characters that can be entered.
+ * @param drawsize      Draw width of the input box, in characters.
+ * @return              Pointer to the new input box widget.
+ */
+
+txt_inputbox_t* TXT_NewInputBoxCustomSize(char** value, int size, int drawsize);
+
+/**
+ * Create a new input box widget for controlling an integer value
+ * with custom draw size.
+ *
+ * @param value         Pointer to an integer variable containing
+ *                      the value of the input box.
+ * @param size          Maximum number of characters that can be entered.
+ * @param drawsize      Draw width of the input box, in characters.
+ * @return              Pointer to the new input box widget.
+ */
+
+txt_inputbox_t* TXT_NewIntInputBoxCustomSize(int* value, int size, int drawsize);
 
 #endif /* #ifndef TXT_INPUTBOX_H */
 
