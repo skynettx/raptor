@@ -48,6 +48,7 @@ int cdflag = 0;
 int filepos = -1;
 int map_item = -1;
 int curplr_diff = 2;
+int srwpos = 0;
 
 static const char *fmt = "CHAR%04u.FIL";
 static const char* cdfmt = "%sCHAR%04u.FIL";
@@ -55,6 +56,7 @@ static const char* cdfmt = "%sCHAR%04u.FIL";
 MAZELEVEL *mapmem;
 CSPRITE *csprite;
 char *ml;
+char* savebuffer;
 
 /***************************************************************************
 RAP_SetPlayerDiff () - Set Player Difficulty
@@ -251,6 +253,203 @@ RAP_IsSaveFile(
 }
 
 /***************************************************************************
+SaveRead8 () - Reads 8 bit unsigned char from save file buffer
+ ***************************************************************************/
+static unsigned char 
+SaveRead8(
+    void
+)
+{
+    unsigned char data = -1;
+    
+    memcpy(&data, &savebuffer[srwpos++], 1);
+ 
+    return data;
+}
+
+/***************************************************************************
+SaveWrite8 () - Writes 8 bit unsigned char to save file buffer
+ ***************************************************************************/
+static void 
+SaveWrite8(
+    unsigned char data
+)
+{
+    memcpy(&savebuffer[srwpos++], &data, 1);
+}
+
+/***************************************************************************
+SaveRead32 () - Reads 32 bit int from save file buffer
+ ***************************************************************************/
+static int 
+SaveRead32(
+    void
+)
+{
+    int convert;
+
+    convert = SaveRead8();
+    convert |= SaveRead8() << 8;
+    convert |= SaveRead8() << 16;
+    convert |= SaveRead8() << 24;
+    
+    return convert;
+}
+
+/***************************************************************************
+SaveWrite32 () - Writes 32 bit int to save file buffer
+ ***************************************************************************/
+static void 
+SaveWrite32(
+    int convert
+)
+{
+    SaveWrite8(convert & 0xff);
+    SaveWrite8((convert >> 8) & 0xff);
+    SaveWrite8((convert >> 16) & 0xff);
+    SaveWrite8((convert >> 24) & 0xff);
+}
+
+/***************************************************************************
+SaveReadPointer () - Reads a 32 bit pointer regardless of the architecture
+ ***************************************************************************/
+static void* 
+SaveReadPointer(
+    void
+)
+{
+    return (void*)(intptr_t)SaveRead32();
+}
+
+/***************************************************************************
+SaveWritePointer () - Writes a 32 bit pointer regardless of the architecture
+ ***************************************************************************/
+static void 
+SaveWritePointer(
+    const void* pointer
+)
+{
+    SaveWrite32((intptr_t)pointer);
+}
+
+/***************************************************************************
+ReadPlayer () - Reads Player Structure regardless of architecture
+ ***************************************************************************/
+static void 
+ReadPlayer(
+    void
+)
+{
+    int i;
+    
+    for (i = 0; i < 20; ++i)
+        plr.name[i] = SaveRead8();
+
+    for (i = 0; i < 12; ++i)
+        plr.callsign[i] = SaveRead8();
+
+    plr.id_pic = SaveRead32();
+    plr.score = SaveRead32();
+    plr.sweapon = SaveRead32();
+    plr.cur_game = SaveRead32();
+
+    for (i = 0; i < 3; ++i)
+        plr.game_wave[i] = SaveRead32();
+
+    plr.numobjs = SaveRead32();
+
+    for (i = 0; i < 4; ++i)
+        plr.diff[i] = SaveRead32();
+
+    plr.trainflag = SaveRead32();
+    
+    plr.fintrain = SaveRead32();
+}
+
+/***************************************************************************
+WritePlayer () - Writes Player Structure regardless of architecture
+ ***************************************************************************/
+static void 
+WritePlayer(
+    void
+)
+{
+    int i;
+
+    for (i = 0; i < 20; ++i)
+        SaveWrite8(plr.name[i]);
+
+    for (i = 0; i < 12; ++i)
+        SaveWrite8(plr.callsign[i]);
+
+    SaveWrite32(plr.id_pic);
+    SaveWrite32(plr.score);
+    SaveWrite32(plr.sweapon);
+    SaveWrite32(plr.cur_game);
+
+    for (i = 0; i < 3; ++i)
+        SaveWrite32(plr.game_wave[i]);
+
+    SaveWrite32(plr.numobjs);
+
+    for (i = 0; i < 4; ++i)
+        SaveWrite32(plr.diff[i]);
+
+    SaveWrite32(plr.trainflag);
+
+    SaveWrite32(plr.fintrain);
+}
+
+/***************************************************************************
+ReadObject () - Reads Object Structure regardless of architecture
+ ***************************************************************************/
+static void 
+ReadObject(
+    OBJ* inobj
+)
+{
+    inobj->prev = (OBJ*)SaveReadPointer();
+    inobj->next = (OBJ*)SaveReadPointer();
+
+    inobj->num = SaveRead32();
+    inobj->type = SaveRead32();
+
+    inobj->lib = (OBJ_LIB*)SaveReadPointer();
+
+    inobj->inuse = SaveRead32();
+}
+
+/***************************************************************************
+WriteObject () - Writes Object Structure regardless of architecture
+ ***************************************************************************/
+static void 
+WriteObject(
+    OBJ* inobj
+)
+{
+    SaveWritePointer(inobj->prev);
+    SaveWritePointer(inobj->next);
+
+    SaveWrite32(inobj->num);
+    SaveWrite32(inobj->type);
+
+    SaveWritePointer(inobj->lib);
+
+    SaveWrite32(inobj->inuse);
+}
+
+/***************************************************************************
+SaveResetReadWritePosition () - Resets read/write position in save file buffer
+ ***************************************************************************/
+static void 
+SaveResetReadWritePosition(
+    void
+)
+{
+    srwpos = 0;
+}
+
+/***************************************************************************
 RAP_LoadPlayer () - Loads player from disk
  ***************************************************************************/
 int 
@@ -259,6 +458,9 @@ RAP_LoadPlayer(
 )
 {
     char filename[PATH_MAX];
+    char* dchrplr;
+    char* dchrobj;
+    int size;
     int rval, loop;
     FILE *handle;
     OBJ inobj;
@@ -285,19 +487,42 @@ RAP_LoadPlayer(
         return 0;
     }
     
-    fread(&plr, 1, sizeof(plr), handle);
-    GLB_DeCrypt(gdmodestr, &plr, sizeof(plr));
+    fseek(handle, 0, SEEK_END);
+    size = ftell(handle);
+    fseek(handle, 0, SEEK_SET);
+    
+    dchrplr = (char*)malloc(sizeof(plr));
+    savebuffer = (char*)malloc(size);
+    dchrobj = (char*)malloc(size - sizeof(plr));
+    
+    fread(dchrplr, 1, sizeof(plr), handle);
+    fseek(handle, sizeof(plr), SEEK_SET);
+    
+    GLB_DeCrypt(gdmodestr, dchrplr, sizeof(plr));
+    
+    memcpy(savebuffer, dchrplr, sizeof(plr));
+    fread(dchrobj, 1, size - sizeof(plr), handle);
+    
+    GLB_DeCrypt(gdmodestr, dchrobj, size - sizeof(plr));
+    
+    memcpy(savebuffer + sizeof(plr), dchrobj, size - sizeof(plr));
+    
+    free(dchrplr);
+    free(dchrobj);
+
+    ReadPlayer();
     
     for (loop = 0; loop < plr.numobjs; loop++)
     {
-        fread(&inobj, 1, sizeof(inobj), handle);
-        GLB_DeCrypt(gdmodestr, &inobj, sizeof(inobj));
-        
+        ReadObject(&inobj);
+       
         if (!OBJS_Load(&inobj))
             break;
     }
     
     fclose(handle);
+    free(savebuffer);
+    SaveResetReadWritePosition();
     
     cur_game = plr.cur_game;
     game_wave[0] = plr.game_wave[0];
@@ -325,7 +550,10 @@ RAP_SavePlayer(
 )
 {
     int rval;
+    int size;
     char filename[PATH_MAX];
+    char* dchrplr;
+    char* dchrobj;
     FILE *handle;
     OBJ *cur;
 
@@ -361,20 +589,40 @@ RAP_SavePlayer(
         plr.numobjs++;
     }
     
-    GLB_EnCrypt(gdmodestr, &plr, sizeof(plr));
-    fwrite(&plr, 1, sizeof(plr), handle);
-    GLB_DeCrypt(gdmodestr, &plr, sizeof(plr));
+    size = plr.numobjs * 24 + sizeof(plr);
     
+    dchrplr = (char*)malloc(sizeof(plr));
+    savebuffer = (char*)malloc(size);
+    dchrobj = (char*)malloc(size - sizeof(plr));
+
+    WritePlayer();
+    
+    memcpy(dchrplr, savebuffer, sizeof(plr));
+    
+    GLB_EnCrypt(gdmodestr, dchrplr, sizeof(plr));
+   
     for (cur = first_objs.next; &last_objs != cur; cur = cur->next)
     {
-        GLB_EnCrypt(gdmodestr, cur, sizeof(OBJ));
-        fwrite(cur, 1, sizeof(OBJ), handle);
-        GLB_DeCrypt(gdmodestr, cur, sizeof(OBJ));
+        WriteObject(cur);
     }
     
+    memcpy(dchrobj, savebuffer + sizeof(plr), size - sizeof(plr));
+    
+    GLB_EnCrypt(gdmodestr, dchrobj, size - sizeof(plr));
+    
+    memcpy(savebuffer, dchrplr, sizeof(plr));
+    memcpy(savebuffer + sizeof(plr), dchrobj, size - sizeof(plr));
+    
+    free(dchrplr);
+    free(dchrobj);
+
+    fwrite(savebuffer, 1, size, handle);
+
     rval = 1;
     
     fclose(handle);
+    free(savebuffer);
+    SaveResetReadWritePosition();
     
     return rval;
 }
