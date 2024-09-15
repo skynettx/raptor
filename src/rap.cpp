@@ -1245,7 +1245,6 @@ main(
     char *argv[]
 )
 {
-    char glbpath[260];
     char *var1, *tptr, *pal;
     int loop, numfiles, ptrflag, item;
 
@@ -1427,9 +1426,7 @@ main(
     }
     
 #if _WIN32 || __linux__ || __APPLE__
-    strcpy(glbpath, RAP_GetPath());
-
-    GLB_InitSystem(glbpath, 6 , 0);
+    GLB_InitSystem(RAP_GetPath(), 6, 0);
 #else
     GLB_InitSystem(argv[0], 6, 0);
 #endif //_WIN32 || __linux__ || __APPLE__
