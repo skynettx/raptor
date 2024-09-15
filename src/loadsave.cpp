@@ -552,8 +552,8 @@ RAP_SavePlayer(
     int rval;
     int size;
     char filename[PATH_MAX];
-    char* dchrplr;
-    char* dchrobj;
+    char* echrplr;
+    char* echrobj;
     FILE *handle;
     OBJ *cur;
 
@@ -591,30 +591,30 @@ RAP_SavePlayer(
     
     size = plr.numobjs * 24 + sizeof(plr);
     
-    dchrplr = (char*)malloc(sizeof(plr));
+    echrplr = (char*)malloc(sizeof(plr));
     savebuffer = (char*)malloc(size);
-    dchrobj = (char*)malloc(size - sizeof(plr));
+    echrobj = (char*)malloc(size - sizeof(plr));
 
     WritePlayer();
     
-    memcpy(dchrplr, savebuffer, sizeof(plr));
+    memcpy(echrplr, savebuffer, sizeof(plr));
     
-    GLB_EnCrypt(gdmodestr, dchrplr, sizeof(plr));
+    GLB_EnCrypt(gdmodestr, echrplr, sizeof(plr));
    
     for (cur = first_objs.next; &last_objs != cur; cur = cur->next)
     {
         WriteObject(cur);
     }
     
-    memcpy(dchrobj, savebuffer + sizeof(plr), size - sizeof(plr));
+    memcpy(echrobj, savebuffer + sizeof(plr), size - sizeof(plr));
     
-    GLB_EnCrypt(gdmodestr, dchrobj, size - sizeof(plr));
+    GLB_EnCrypt(gdmodestr, echrobj, size - sizeof(plr));
     
-    memcpy(savebuffer, dchrplr, sizeof(plr));
-    memcpy(savebuffer + sizeof(plr), dchrobj, size - sizeof(plr));
+    memcpy(savebuffer, echrplr, sizeof(plr));
+    memcpy(savebuffer + sizeof(plr), echrobj, size - sizeof(plr));
     
-    free(dchrplr);
-    free(dchrobj);
+    free(echrplr);
+    free(echrobj);
 
     fwrite(savebuffer, 1, size, handle);
 
