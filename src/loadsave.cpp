@@ -51,12 +51,243 @@ int curplr_diff = 2;
 int srwpos = 0;
 
 static const char *fmt = "CHAR%04u.FIL";
-static const char* cdfmt = "%sCHAR%04u.FIL";
+static const char *cdfmt = "%sCHAR%04u.FIL";
 
 MAZELEVEL *mapmem;
 CSPRITE *csprite;
 char *ml;
-char* savebuffer;
+char *savebuffer;
+
+/***************************************************************************
+SaveRead8 () - Reads 8 bit unsigned char from save file buffer
+ ***************************************************************************/
+static unsigned char
+SaveRead8(
+    void
+)
+{
+    unsigned char data = -1;
+
+    memcpy(&data, &savebuffer[srwpos++], 1);
+
+    return data;
+}
+
+/***************************************************************************
+SaveWrite8 () - Writes 8 bit unsigned char to save file buffer
+ ***************************************************************************/
+static void
+SaveWrite8(
+    unsigned char data
+)
+{
+    memcpy(&savebuffer[srwpos++], &data, 1);
+}
+
+/***************************************************************************
+SaveRead32 () - Reads 32 bit int from save file buffer
+ ***************************************************************************/
+static int
+SaveRead32(
+    void
+)
+{
+    int convert;
+
+    convert = SaveRead8();
+    convert |= SaveRead8() << 8;
+    convert |= SaveRead8() << 16;
+    convert |= SaveRead8() << 24;
+
+    return convert;
+}
+
+/***************************************************************************
+SaveWrite32 () - Writes 32 bit int to save file buffer
+ ***************************************************************************/
+static void
+SaveWrite32(
+    int convert
+)
+{
+    SaveWrite8(convert & 0xff);
+    SaveWrite8((convert >> 8) & 0xff);
+    SaveWrite8((convert >> 16) & 0xff);
+    SaveWrite8((convert >> 24) & 0xff);
+}
+
+/***************************************************************************
+SaveReadPointer () - Reads a 32 bit pointer regardless of the architecture
+ ***************************************************************************/
+static void*
+SaveReadPointer(
+    void
+)
+{
+    return (void*)(intptr_t)SaveRead32();
+}
+
+/***************************************************************************
+SaveWritePointer () - Writes a 32 bit pointer regardless of the architecture
+ ***************************************************************************/
+static void
+SaveWritePointer(
+    const void *pointer
+)
+{
+    SaveWrite32((intptr_t)pointer);
+}
+
+/***************************************************************************
+ReadPlayerExt () - Reads external Player Structure regardless of architecture
+ ***************************************************************************/
+static void
+ReadPlayerExt(
+    void
+)
+{
+    int i;
+
+    for (i = 0; i < 20; ++i)
+        plr.name[i] = SaveRead8();
+
+    for (i = 0; i < 12; ++i)
+        plr.callsign[i] = SaveRead8();
+
+    plr.id_pic = SaveRead32();
+    plr.score = SaveRead32();
+    plr.sweapon = SaveRead32();
+    plr.cur_game = SaveRead32();
+
+    for (i = 0; i < 3; ++i)
+        plr.game_wave[i] = SaveRead32();
+
+    plr.numobjs = SaveRead32();
+
+    for (i = 0; i < 4; ++i)
+        plr.diff[i] = SaveRead32();
+
+    plr.trainflag = SaveRead32();
+
+    plr.fintrain = SaveRead32();
+}
+
+/***************************************************************************
+ReadPlayer () - Reads Player Structure regardless of architecture
+ ***************************************************************************/
+static void
+ReadPlayer(
+    PLAYEROBJ *tplr
+)
+{
+    int i;
+
+    for (i = 0; i < 20; ++i)
+        tplr->name[i] = SaveRead8();
+
+    for (i = 0; i < 12; ++i)
+        tplr->callsign[i] = SaveRead8();
+
+    tplr->id_pic = SaveRead32();
+    tplr->score = SaveRead32();
+    tplr->sweapon = SaveRead32();
+    tplr->cur_game = SaveRead32();
+
+    for (i = 0; i < 3; ++i)
+        tplr->game_wave[i] = SaveRead32();
+
+    tplr->numobjs = SaveRead32();
+
+    for (i = 0; i < 4; ++i)
+        tplr->diff[i] = SaveRead32();
+
+    tplr->trainflag = SaveRead32();
+
+    tplr->fintrain = SaveRead32();
+}
+
+/***************************************************************************
+WritePlayerExt () - Writes external Player Structure regardless of architecture
+ ***************************************************************************/
+static void
+WritePlayerExt(
+    void
+)
+{
+    int i;
+
+    for (i = 0; i < 20; ++i)
+        SaveWrite8(plr.name[i]);
+
+    for (i = 0; i < 12; ++i)
+        SaveWrite8(plr.callsign[i]);
+
+    SaveWrite32(plr.id_pic);
+    SaveWrite32(plr.score);
+    SaveWrite32(plr.sweapon);
+    SaveWrite32(plr.cur_game);
+
+    for (i = 0; i < 3; ++i)
+        SaveWrite32(plr.game_wave[i]);
+
+    SaveWrite32(plr.numobjs);
+
+    for (i = 0; i < 4; ++i)
+        SaveWrite32(plr.diff[i]);
+
+    SaveWrite32(plr.trainflag);
+
+    SaveWrite32(plr.fintrain);
+}
+
+/***************************************************************************
+ReadObject () - Reads Object Structure regardless of architecture
+ ***************************************************************************/
+static void
+ReadObject(
+    OBJ *inobj
+)
+{
+    inobj->prev = (OBJ*)SaveReadPointer();
+    inobj->next = (OBJ*)SaveReadPointer();
+
+    inobj->num = SaveRead32();
+    inobj->type = SaveRead32();
+
+    inobj->lib = (OBJ_LIB*)SaveReadPointer();
+
+    inobj->inuse = SaveRead32();
+}
+
+/***************************************************************************
+WriteObject () - Writes Object Structure regardless of architecture
+ ***************************************************************************/
+static void
+WriteObject(
+    OBJ *inobj
+)
+{
+    SaveWritePointer(inobj->prev);
+    SaveWritePointer(inobj->next);
+
+    SaveWrite32(inobj->num);
+    SaveWrite32(inobj->type);
+
+    SaveWritePointer(inobj->lib);
+
+    SaveWrite32(inobj->inuse);
+}
+
+/***************************************************************************
+SaveResetReadWritePosition () - Resets read/write position in save file buffer
+ ***************************************************************************/
+static void
+SaveResetReadWritePosition(
+    void
+)
+{
+    srwpos = 0;
+}
 
 /***************************************************************************
 RAP_SetPlayerDiff () - Set Player Difficulty
@@ -172,11 +403,15 @@ RAP_ReadFile(
         return 0;
     }
     
-    fread(buffer, 1, sizerec, handle);
+    savebuffer = (char*)malloc(sizerec);
+    fread(savebuffer, 1, sizerec, handle);
     
-    GLB_DeCrypt(gdmodestr, buffer, sizerec);
+    GLB_DeCrypt(gdmodestr, savebuffer, sizerec);
+    ReadPlayer((PLAYEROBJ*)buffer);
     
     fclose(handle);
+    free(savebuffer);
+    SaveResetReadWritePosition();
     
     return sizerec;
 }
@@ -239,8 +474,17 @@ RAP_IsSaveFile(
         
         if (handle)
         {
-            fread(&tp, 1, sizeof(tp), handle);
+            savebuffer = (char*)malloc(sizeof(tp));
+            fread(savebuffer, 1, sizeof(tp), handle);
+            
+            //GLB_DeCrypt(gdmodestr, savebuffer, sizeof(tp)); //missing in v1.2
+            
+            ReadPlayer(&tp);
+            
             fclose(handle);
+            free(savebuffer);
+            SaveResetReadWritePosition();
+            
             if (!strcmp(tp.name, in_plr->name) && !strcmp(tp.callsign, in_plr->callsign))
             {
                 rval = 1;
@@ -253,203 +497,6 @@ RAP_IsSaveFile(
 }
 
 /***************************************************************************
-SaveRead8 () - Reads 8 bit unsigned char from save file buffer
- ***************************************************************************/
-static unsigned char 
-SaveRead8(
-    void
-)
-{
-    unsigned char data = -1;
-    
-    memcpy(&data, &savebuffer[srwpos++], 1);
- 
-    return data;
-}
-
-/***************************************************************************
-SaveWrite8 () - Writes 8 bit unsigned char to save file buffer
- ***************************************************************************/
-static void 
-SaveWrite8(
-    unsigned char data
-)
-{
-    memcpy(&savebuffer[srwpos++], &data, 1);
-}
-
-/***************************************************************************
-SaveRead32 () - Reads 32 bit int from save file buffer
- ***************************************************************************/
-static int 
-SaveRead32(
-    void
-)
-{
-    int convert;
-
-    convert = SaveRead8();
-    convert |= SaveRead8() << 8;
-    convert |= SaveRead8() << 16;
-    convert |= SaveRead8() << 24;
-    
-    return convert;
-}
-
-/***************************************************************************
-SaveWrite32 () - Writes 32 bit int to save file buffer
- ***************************************************************************/
-static void 
-SaveWrite32(
-    int convert
-)
-{
-    SaveWrite8(convert & 0xff);
-    SaveWrite8((convert >> 8) & 0xff);
-    SaveWrite8((convert >> 16) & 0xff);
-    SaveWrite8((convert >> 24) & 0xff);
-}
-
-/***************************************************************************
-SaveReadPointer () - Reads a 32 bit pointer regardless of the architecture
- ***************************************************************************/
-static void* 
-SaveReadPointer(
-    void
-)
-{
-    return (void*)(intptr_t)SaveRead32();
-}
-
-/***************************************************************************
-SaveWritePointer () - Writes a 32 bit pointer regardless of the architecture
- ***************************************************************************/
-static void 
-SaveWritePointer(
-    const void* pointer
-)
-{
-    SaveWrite32((intptr_t)pointer);
-}
-
-/***************************************************************************
-ReadPlayer () - Reads Player Structure regardless of architecture
- ***************************************************************************/
-static void 
-ReadPlayer(
-    void
-)
-{
-    int i;
-    
-    for (i = 0; i < 20; ++i)
-        plr.name[i] = SaveRead8();
-
-    for (i = 0; i < 12; ++i)
-        plr.callsign[i] = SaveRead8();
-
-    plr.id_pic = SaveRead32();
-    plr.score = SaveRead32();
-    plr.sweapon = SaveRead32();
-    plr.cur_game = SaveRead32();
-
-    for (i = 0; i < 3; ++i)
-        plr.game_wave[i] = SaveRead32();
-
-    plr.numobjs = SaveRead32();
-
-    for (i = 0; i < 4; ++i)
-        plr.diff[i] = SaveRead32();
-
-    plr.trainflag = SaveRead32();
-    
-    plr.fintrain = SaveRead32();
-}
-
-/***************************************************************************
-WritePlayer () - Writes Player Structure regardless of architecture
- ***************************************************************************/
-static void 
-WritePlayer(
-    void
-)
-{
-    int i;
-
-    for (i = 0; i < 20; ++i)
-        SaveWrite8(plr.name[i]);
-
-    for (i = 0; i < 12; ++i)
-        SaveWrite8(plr.callsign[i]);
-
-    SaveWrite32(plr.id_pic);
-    SaveWrite32(plr.score);
-    SaveWrite32(plr.sweapon);
-    SaveWrite32(plr.cur_game);
-
-    for (i = 0; i < 3; ++i)
-        SaveWrite32(plr.game_wave[i]);
-
-    SaveWrite32(plr.numobjs);
-
-    for (i = 0; i < 4; ++i)
-        SaveWrite32(plr.diff[i]);
-
-    SaveWrite32(plr.trainflag);
-
-    SaveWrite32(plr.fintrain);
-}
-
-/***************************************************************************
-ReadObject () - Reads Object Structure regardless of architecture
- ***************************************************************************/
-static void 
-ReadObject(
-    OBJ* inobj
-)
-{
-    inobj->prev = (OBJ*)SaveReadPointer();
-    inobj->next = (OBJ*)SaveReadPointer();
-
-    inobj->num = SaveRead32();
-    inobj->type = SaveRead32();
-
-    inobj->lib = (OBJ_LIB*)SaveReadPointer();
-
-    inobj->inuse = SaveRead32();
-}
-
-/***************************************************************************
-WriteObject () - Writes Object Structure regardless of architecture
- ***************************************************************************/
-static void 
-WriteObject(
-    OBJ* inobj
-)
-{
-    SaveWritePointer(inobj->prev);
-    SaveWritePointer(inobj->next);
-
-    SaveWrite32(inobj->num);
-    SaveWrite32(inobj->type);
-
-    SaveWritePointer(inobj->lib);
-
-    SaveWrite32(inobj->inuse);
-}
-
-/***************************************************************************
-SaveResetReadWritePosition () - Resets read/write position in save file buffer
- ***************************************************************************/
-static void 
-SaveResetReadWritePosition(
-    void
-)
-{
-    srwpos = 0;
-}
-
-/***************************************************************************
 RAP_LoadPlayer () - Loads player from disk
  ***************************************************************************/
 int 
@@ -458,8 +505,8 @@ RAP_LoadPlayer(
 )
 {
     char filename[PATH_MAX];
-    char* dchrplr;
-    char* dchrobj;
+    char *dchrplr;
+    char *dchrobj;
     int size;
     int rval, loop;
     FILE *handle;
@@ -510,7 +557,7 @@ RAP_LoadPlayer(
     free(dchrplr);
     free(dchrobj);
 
-    ReadPlayer();
+    ReadPlayerExt();
     
     for (loop = 0; loop < plr.numobjs; loop++)
     {
@@ -552,8 +599,8 @@ RAP_SavePlayer(
     int rval;
     int size;
     char filename[PATH_MAX];
-    char* echrplr;
-    char* echrobj;
+    char *echrplr;
+    char *echrobj;
     FILE *handle;
     OBJ *cur;
 
@@ -595,7 +642,7 @@ RAP_SavePlayer(
     savebuffer = (char*)malloc(size);
     echrobj = (char*)malloc(size - sizeof(plr));
 
-    WritePlayer();
+    WritePlayerExt();
     
     memcpy(echrplr, savebuffer, sizeof(plr));
     
