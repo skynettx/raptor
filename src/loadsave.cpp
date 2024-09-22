@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include "SDL_filesystem.h"
 #include "common.h"
 #include "loadsave.h"
 #include "rap.h"
@@ -951,37 +952,23 @@ RAP_InitLoadSave(
     void
 )
 {
-    char getpath[PATH_MAX];
     char* gethome;
-#ifdef _WIN32
-    const char* setuppath = "\\AppData\\Roaming\\Raptor\\";
-    gethome = getenv("HOMEPATH");
-#endif // _WIN32
-#ifdef __linux__
-    const char* setuppath = "/.local/share/Raptor/";
-    gethome = getenv("HOME");
-#endif // __linux__
-#ifdef __APPLE__
-    const char* setuppath = "/Library/Application Support/Raptor/";
-    gethome = getenv("HOME");
-#endif // __APPLE__
+
 #if _WIN32 || __linux__ || __APPLE__
-    strcpy(getpath, gethome);
-    sprintf(getpath, "%s%s", getpath, setuppath);
+    gethome = SDL_GetPrefPath("", "Raptor");
 
-    if (access(getpath, 0))
+    if (gethome != NULL)
     {
-#ifdef _WIN32
-        _mkdir(getpath);
-#else
-        mkdir(getpath, 0755);
-#endif
+        strcpy(cdpath, gethome);
+        sprintf(gethome, "%s%s", gethome, "SETUP.INI");
+        cdflag = 1;
+        strcpy(g_setup_ini, gethome);
+        SDL_free(gethome);
     }
-
-    strcpy(cdpath, getpath);
-    sprintf(getpath, "%s%s", getpath, "SETUP.INI");
-    cdflag = 1;
-    strcpy(g_setup_ini, getpath);
+    else
+    {
+        EXIT_Error("Couldn't find home directory");
+    }
 
     return cdpath;
 #else
