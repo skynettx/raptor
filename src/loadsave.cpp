@@ -955,9 +955,9 @@ RAP_InitLoadSave(
     if (gethome != NULL)
     {
         strcpy(cdpath, gethome);
-        sprintf(gethome, "%s%s", gethome, "SETUP.INI");
-        cdflag = 1;
         strcpy(g_setup_ini, gethome);
+        sprintf(g_setup_ini, "%s%s", g_setup_ini, "SETUP.INI");
+        cdflag = 1;
         SDL_free(gethome);
     }
     else
