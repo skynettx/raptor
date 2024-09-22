@@ -25,7 +25,6 @@
 
 #ifdef _WIN32
 #include <io.h>
-#include <direct.h>
 #endif // _WIN32
 #ifdef __GNUC__
 #include <unistd.h>
@@ -34,10 +33,6 @@
 #include <windows.h>
 #define PATH_MAX MAX_PATH
 #endif // _MSC_VER
-#if __linux__ || __APPLE__
-#include <sys/types.h>
-#include <sys/stat.h>
-#endif // __linux__ || __APPLE__
 
 #define MAX_SAVE  10
 
