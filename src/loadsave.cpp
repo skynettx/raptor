@@ -952,9 +952,9 @@ RAP_InitLoadSave(
     void
 )
 {
-    char* gethome;
-
 #if _WIN32 || __linux__ || __APPLE__
+    char* gethome;
+    
     gethome = SDL_GetPrefPath("", "Raptor");
 
     if (gethome != NULL)
