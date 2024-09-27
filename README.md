@@ -20,8 +20,8 @@ For those who want to build themselves or who want more configuration informatio
 ## Installing
 You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or full version.
 Important only the DOS version v1.2 is compatible! You have to take care of these files yourself.  
-Please note that the old release build version 0.8.0 does not support the external system specific directory and manages all assets, config and save files in the current working directory.
 The assets can be loaded from the current working directory (Raptor directory) or from the external system specific directory.
+**Please note that the release build version 0.8.0 does not support the external system specific directory and manages all assets, config and save files in the current working directory.**
 The external system specific directories are the following:
 ```
  Windows: Users\Username\AppData\Roaming\Raptor\  
@@ -29,7 +29,7 @@ The external system specific directories are the following:
  macOS: ~/Library/Application Support/Raptor/
 ```
 The config file `SETUP.INI` and the save files are also loaded and saved in these folders.
-On other systems that are not officially supported, the Raptor directory is used for loading and writing the config file and the save files.  
+On other systems that are not officially supported, the Raptor directory is used for loading and saving the config file and the save files.  
 Copy the `raptor.exe` (Windows) or `raptor` (Linux or macOS) from build directory to Raptor directory. 
 For MIDI support over TinySoundFont copy the soundfont `TimGM6mb.sf2` from `include\TimGM6mb\` to Raptor directory.
 Under Windows copy the file `SDL.dll` from `include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x86\` for 32 bit installation or for 64 bit installation from 
@@ -117,7 +117,7 @@ make
 
 ## FAQ
 1. No audio under Linux:  
-Make sure you get all the necessary Alsa and or PulseAudio dependencies from the packagemanager of your distro. 
+Make sure you get all the necessary ALSA and or PulseAudio dependencies from the packagemanager of your distro. 
 2. Where can i change the video settings:  
 The video settings can be set in the config file `SETUP.INI`. To toggle fullscreen mode on edit under the [Video] section `fullscreen=0`
 to `fullscreen=1`. Or aspect ratio mode off `aspect_ratio_correct=1` to `aspect_ratio_correct=0`. 
