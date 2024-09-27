@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <boost/endian.hpp>
 
 #include "common.h"
 #include "opl3.h"
@@ -56,6 +57,8 @@
 #define GENMIDI_FLAG_FIXED      0x0001         /* fixed pitch */
 #define GENMIDI_FLAG_2VOICE     0x0004         /* double voice (OPL3) */
 
+using namespace boost::endian;
+
 using byte = uint8_t;
 
 opl3_chip opl;
@@ -77,12 +80,12 @@ struct genmidi_voice_t
     byte feedback;
     genmidi_op_t carrier;
     byte unused;
-    short base_note_offset;
+    little_int16_t base_note_offset;
 };
 
 struct genmidi_instr_t
 {
-    unsigned short flags;
+    little_uint16_t flags;
     byte fine_tuning;
     byte fixed_note;
 

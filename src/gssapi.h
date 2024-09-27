@@ -1,20 +1,23 @@
 #pragma once
 #include <stdint.h>
+#include <boost/endian.hpp>
+
+using namespace boost::endian;
 
 struct gss1_t {
-    int16_t format;
-    int16_t len;
-    int16_t bank;
-    int16_t patch;
+    little_int16_t format;
+    little_int16_t len;
+    little_int16_t bank;
+    little_int16_t patch;
     uint8_t data[1];
 };
 
 struct gss2_t {
-    int16_t format;
-    int16_t bank;
-    int16_t patch;
-    int16_t note;
-    int16_t len;
+    little_int16_t format;
+    little_int16_t bank;
+    little_int16_t patch;
+    little_int16_t note;
+    little_int16_t len;
 };
 
 extern int gsshack;

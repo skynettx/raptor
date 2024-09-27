@@ -1,10 +1,13 @@
 #include "SDL.h"
 #include <stdint.h>
+#include <boost/endian.hpp>
 #include "common.h"
 #include "musapi.h"
 #include "fx.h"
 #include "cards.h"
 #include "gssapi.h"
+
+using namespace boost::endian;
 
 static int musrate = 70;
 static int musfaderate = 50;
@@ -40,9 +43,9 @@ int music_chanvol2[16];
 #pragma pack(push, 1)
 struct mushead_t {
     char id[4];
-    uint16_t len;
-    uint16_t offset;
-    uint16_t channels;
+    little_uint16_t len;
+    little_uint16_t offset;
+    little_uint16_t channels;
 };
 #pragma pack(pop)
 

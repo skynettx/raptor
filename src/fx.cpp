@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <boost/endian.hpp>
 #include "SDL.h"
 #include "common.h"
 #include "glbapi.h"
@@ -13,6 +14,8 @@
 #include "rap.h"
 #include "gssapi.h"
 #include "fileids.h"
+
+using namespace boost::endian;
 
 int music_volume;
 int dig_flag;
@@ -775,7 +778,7 @@ SFX_PlayPatch(
     int priority
 )
 {
-    int type = *(int16_t*)patch;
+    int type = *(little_int16_t*)patch;
     
     switch (type)
     {

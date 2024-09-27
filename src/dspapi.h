@@ -1,9 +1,12 @@
 #pragma once
+#include <boost/endian.hpp>
+
+using namespace boost::endian;
 
 struct dsp_t {
-    int16_t format;
-    int16_t freq;
-    int32_t length;
+    little_int16_t format;
+    little_int16_t freq;
+    little_int32_t length;
     char data[1];
 };
 
