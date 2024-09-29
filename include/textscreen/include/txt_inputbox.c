@@ -113,7 +113,11 @@ static void TXT_InputBoxSizeCalc(TXT_UNCAST_ARG(inputbox))
 
     // Enough space for the box + cursor
 
-    inputbox->widget.w = inputbox->size + 1;
+    if(inputbox->drawsize)
+        inputbox->widget.w = inputbox->drawsize + 1;
+    else
+        inputbox->widget.w = inputbox->size + 1;
+    
     inputbox->widget.h = 1;
 }
 
@@ -333,6 +337,28 @@ static txt_inputbox_t *NewInputBox(txt_widget_class_t *widget_class,
     // but for a UTF-8 string, each character can take up to four
     // characters.
     inputbox->buffer_len = size * 4 + 1;
+    inputbox->drawsize = 0;
+    inputbox->buffer = malloc(inputbox->buffer_len);
+    inputbox->editing = 0;
+
+    return inputbox;
+}
+
+static txt_inputbox_t* NewInputBoxCustomSize(txt_widget_class_t* widget_class,
+    void* value, int size, int drawsize)
+{
+    txt_inputbox_t* inputbox;
+
+    inputbox = malloc(sizeof(txt_inputbox_t));
+
+    TXT_InitWidget(inputbox, widget_class);
+    inputbox->value = value;
+    inputbox->size = size;
+    // 'size' is the maximum number of characters that can be entered,
+    // but for a UTF-8 string, each character can take up to four
+    // characters.
+    inputbox->buffer_len = size * 4 + 1;
+    inputbox->drawsize = drawsize;
     inputbox->buffer = malloc(inputbox->buffer_len);
     inputbox->editing = 0;
 
@@ -347,5 +373,15 @@ txt_inputbox_t *TXT_NewInputBox(char **value, int size)
 txt_inputbox_t *TXT_NewIntInputBox(int *value, int size)
 {
     return NewInputBox(&txt_int_inputbox_class, value, size);
+}
+
+txt_inputbox_t* TXT_NewInputBoxCustomSize(char** value, int size, int drawsize)
+{
+    return NewInputBoxCustomSize(&txt_inputbox_class, value, size, drawsize);
+}
+
+txt_inputbox_t* TXT_NewIntInputBoxCustomSize(int* value, int size, int drawsize)
+{
+    return NewInputBoxCustomSize(&txt_int_inputbox_class, value, size, drawsize);
 }
 

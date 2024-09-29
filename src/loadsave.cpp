@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include "SDL_filesystem.h"
 #include "common.h"
 #include "loadsave.h"
 #include "rap.h"
@@ -20,6 +21,7 @@
 #include "input.h"
 #include "fileids.h"
 #include "winids.h"
+#include "prefapi.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -42,13 +44,246 @@ int cdflag = 0;
 int filepos = -1;
 int map_item = -1;
 int curplr_diff = 2;
+int srwpos = 0;
 
 static const char *fmt = "CHAR%04u.FIL";
-static const char* cdfmt = "%s\\CHAR%04u.FIL";
+static const char *cdfmt = "%sCHAR%04u.FIL";
 
 MAZELEVEL *mapmem;
 CSPRITE *csprite;
 char *ml;
+char *savebuffer;
+
+/***************************************************************************
+SaveRead8 () - Reads 8 bit unsigned char from save file buffer
+ ***************************************************************************/
+static unsigned char
+SaveRead8(
+    void
+)
+{
+    unsigned char data = -1;
+
+    memcpy(&data, &savebuffer[srwpos++], 1);
+
+    return data;
+}
+
+/***************************************************************************
+SaveWrite8 () - Writes 8 bit unsigned char to save file buffer
+ ***************************************************************************/
+static void
+SaveWrite8(
+    unsigned char data
+)
+{
+    memcpy(&savebuffer[srwpos++], &data, 1);
+}
+
+/***************************************************************************
+SaveRead32 () - Reads 32 bit int from save file buffer
+ ***************************************************************************/
+static int
+SaveRead32(
+    void
+)
+{
+    int convert;
+
+    convert = SaveRead8();
+    convert |= SaveRead8() << 8;
+    convert |= SaveRead8() << 16;
+    convert |= SaveRead8() << 24;
+
+    return convert;
+}
+
+/***************************************************************************
+SaveWrite32 () - Writes 32 bit int to save file buffer
+ ***************************************************************************/
+static void
+SaveWrite32(
+    int convert
+)
+{
+    SaveWrite8(convert & 0xff);
+    SaveWrite8((convert >> 8) & 0xff);
+    SaveWrite8((convert >> 16) & 0xff);
+    SaveWrite8((convert >> 24) & 0xff);
+}
+
+/***************************************************************************
+SaveReadPointer () - Reads a 32 bit pointer regardless of the architecture
+ ***************************************************************************/
+static void*
+SaveReadPointer(
+    void
+)
+{
+    return (void*)(intptr_t)SaveRead32();
+}
+
+/***************************************************************************
+SaveWritePointer () - Writes a 32 bit pointer regardless of the architecture
+ ***************************************************************************/
+static void
+SaveWritePointer(
+    const void *pointer
+)
+{
+    SaveWrite32((intptr_t)pointer);
+}
+
+/***************************************************************************
+ReadPlayerExt () - Reads external Player Structure regardless of architecture
+ ***************************************************************************/
+static void
+ReadPlayerExt(
+    void
+)
+{
+    int i;
+
+    for (i = 0; i < 20; ++i)
+        plr.name[i] = SaveRead8();
+
+    for (i = 0; i < 12; ++i)
+        plr.callsign[i] = SaveRead8();
+
+    plr.id_pic = SaveRead32();
+    plr.score = SaveRead32();
+    plr.sweapon = SaveRead32();
+    plr.cur_game = SaveRead32();
+
+    for (i = 0; i < 3; ++i)
+        plr.game_wave[i] = SaveRead32();
+
+    plr.numobjs = SaveRead32();
+
+    for (i = 0; i < 4; ++i)
+        plr.diff[i] = SaveRead32();
+
+    plr.trainflag = SaveRead32();
+
+    plr.fintrain = SaveRead32();
+}
+
+/***************************************************************************
+ReadPlayer () - Reads Player Structure regardless of architecture
+ ***************************************************************************/
+static void
+ReadPlayer(
+    PLAYEROBJ *tplr
+)
+{
+    int i;
+
+    for (i = 0; i < 20; ++i)
+        tplr->name[i] = SaveRead8();
+
+    for (i = 0; i < 12; ++i)
+        tplr->callsign[i] = SaveRead8();
+
+    tplr->id_pic = SaveRead32();
+    tplr->score = SaveRead32();
+    tplr->sweapon = SaveRead32();
+    tplr->cur_game = SaveRead32();
+
+    for (i = 0; i < 3; ++i)
+        tplr->game_wave[i] = SaveRead32();
+
+    tplr->numobjs = SaveRead32();
+
+    for (i = 0; i < 4; ++i)
+        tplr->diff[i] = SaveRead32();
+
+    tplr->trainflag = SaveRead32();
+
+    tplr->fintrain = SaveRead32();
+}
+
+/***************************************************************************
+WritePlayerExt () - Writes external Player Structure regardless of architecture
+ ***************************************************************************/
+static void
+WritePlayerExt(
+    void
+)
+{
+    int i;
+
+    for (i = 0; i < 20; ++i)
+        SaveWrite8(plr.name[i]);
+
+    for (i = 0; i < 12; ++i)
+        SaveWrite8(plr.callsign[i]);
+
+    SaveWrite32(plr.id_pic);
+    SaveWrite32(plr.score);
+    SaveWrite32(plr.sweapon);
+    SaveWrite32(plr.cur_game);
+
+    for (i = 0; i < 3; ++i)
+        SaveWrite32(plr.game_wave[i]);
+
+    SaveWrite32(plr.numobjs);
+
+    for (i = 0; i < 4; ++i)
+        SaveWrite32(plr.diff[i]);
+
+    SaveWrite32(plr.trainflag);
+
+    SaveWrite32(plr.fintrain);
+}
+
+/***************************************************************************
+ReadObject () - Reads Object Structure regardless of architecture
+ ***************************************************************************/
+static void
+ReadObject(
+    OBJ *inobj
+)
+{
+    inobj->prev = (OBJ*)SaveReadPointer();
+    inobj->next = (OBJ*)SaveReadPointer();
+
+    inobj->num = SaveRead32();
+    inobj->type = SaveRead32();
+
+    inobj->lib = (OBJ_LIB*)SaveReadPointer();
+
+    inobj->inuse = SaveRead32();
+}
+
+/***************************************************************************
+WriteObject () - Writes Object Structure regardless of architecture
+ ***************************************************************************/
+static void
+WriteObject(
+    OBJ *inobj
+)
+{
+    SaveWritePointer(inobj->prev);
+    SaveWritePointer(inobj->next);
+
+    SaveWrite32(inobj->num);
+    SaveWrite32(inobj->type);
+
+    SaveWritePointer(inobj->lib);
+
+    SaveWrite32(inobj->inuse);
+}
+
+/***************************************************************************
+SaveResetReadWritePosition () - Resets read/write position in save file buffer
+ ***************************************************************************/
+static void
+SaveResetReadWritePosition(
+    void
+)
+{
+    srwpos = 0;
+}
 
 /***************************************************************************
 RAP_SetPlayerDiff () - Set Player Difficulty
@@ -164,11 +399,15 @@ RAP_ReadFile(
         return 0;
     }
     
-    fread(buffer, 1, sizerec, handle);
+    savebuffer = (char*)malloc(sizerec);
+    fread(savebuffer, 1, sizerec, handle);
     
-    GLB_DeCrypt(gdmodestr, buffer, sizerec);
+    GLB_DeCrypt(gdmodestr, savebuffer, sizerec);
+    ReadPlayer((PLAYEROBJ*)buffer);
     
     fclose(handle);
+    free(savebuffer);
+    SaveResetReadWritePosition();
     
     return sizerec;
 }
@@ -231,8 +470,17 @@ RAP_IsSaveFile(
         
         if (handle)
         {
-            fread(&tp, 1, sizeof(tp), handle);
+            savebuffer = (char*)malloc(sizeof(tp));
+            fread(savebuffer, 1, sizeof(tp), handle);
+            
+            //GLB_DeCrypt(gdmodestr, savebuffer, sizeof(tp)); //missing in v1.2
+            
+            ReadPlayer(&tp);
+            
             fclose(handle);
+            free(savebuffer);
+            SaveResetReadWritePosition();
+            
             if (!strcmp(tp.name, in_plr->name) && !strcmp(tp.callsign, in_plr->callsign))
             {
                 rval = 1;
@@ -253,6 +501,9 @@ RAP_LoadPlayer(
 )
 {
     char filename[PATH_MAX];
+    char *dchrplr;
+    char *dchrobj;
+    int size;
     int rval, loop;
     FILE *handle;
     OBJ inobj;
@@ -279,19 +530,42 @@ RAP_LoadPlayer(
         return 0;
     }
     
-    fread(&plr, 1, sizeof(plr), handle);
-    GLB_DeCrypt(gdmodestr, &plr, sizeof(plr));
+    fseek(handle, 0, SEEK_END);
+    size = ftell(handle);
+    fseek(handle, 0, SEEK_SET);
+    
+    dchrplr = (char*)malloc(sizeof(plr));
+    savebuffer = (char*)malloc(size);
+    dchrobj = (char*)malloc(size - sizeof(plr));
+    
+    fread(dchrplr, 1, sizeof(plr), handle);
+    fseek(handle, sizeof(plr), SEEK_SET);
+    
+    GLB_DeCrypt(gdmodestr, dchrplr, sizeof(plr));
+    
+    memcpy(savebuffer, dchrplr, sizeof(plr));
+    fread(dchrobj, 1, size - sizeof(plr), handle);
+    
+    GLB_DeCrypt(gdmodestr, dchrobj, size - sizeof(plr));
+    
+    memcpy(savebuffer + sizeof(plr), dchrobj, size - sizeof(plr));
+    
+    free(dchrplr);
+    free(dchrobj);
+
+    ReadPlayerExt();
     
     for (loop = 0; loop < plr.numobjs; loop++)
     {
-        fread(&inobj, 1, sizeof(inobj), handle);
-        GLB_DeCrypt(gdmodestr, &inobj, sizeof(inobj));
-        
+        ReadObject(&inobj);
+       
         if (!OBJS_Load(&inobj))
             break;
     }
     
     fclose(handle);
+    free(savebuffer);
+    SaveResetReadWritePosition();
     
     cur_game = plr.cur_game;
     game_wave[0] = plr.game_wave[0];
@@ -319,7 +593,10 @@ RAP_SavePlayer(
 )
 {
     int rval;
+    int size;
     char filename[PATH_MAX];
+    char *echrplr;
+    char *echrobj;
     FILE *handle;
     OBJ *cur;
 
@@ -355,20 +632,40 @@ RAP_SavePlayer(
         plr.numobjs++;
     }
     
-    GLB_EnCrypt(gdmodestr, &plr, sizeof(plr));
-    fwrite(&plr, 1, sizeof(plr), handle);
-    GLB_DeCrypt(gdmodestr, &plr, sizeof(plr));
+    size = plr.numobjs * 24 + sizeof(plr);
     
+    echrplr = (char*)malloc(sizeof(plr));
+    savebuffer = (char*)malloc(size);
+    echrobj = (char*)malloc(size - sizeof(plr));
+
+    WritePlayerExt();
+    
+    memcpy(echrplr, savebuffer, sizeof(plr));
+    
+    GLB_EnCrypt(gdmodestr, echrplr, sizeof(plr));
+   
     for (cur = first_objs.next; &last_objs != cur; cur = cur->next)
     {
-        GLB_EnCrypt(gdmodestr, cur, sizeof(OBJ));
-        fwrite(cur, 1, sizeof(OBJ), handle);
-        GLB_DeCrypt(gdmodestr, cur, sizeof(OBJ));
+        WriteObject(cur);
     }
     
+    memcpy(echrobj, savebuffer + sizeof(plr), size - sizeof(plr));
+    
+    GLB_EnCrypt(gdmodestr, echrobj, size - sizeof(plr));
+    
+    memcpy(savebuffer, echrplr, sizeof(plr));
+    memcpy(savebuffer + sizeof(plr), echrobj, size - sizeof(plr));
+    
+    free(echrplr);
+    free(echrobj);
+
+    fwrite(savebuffer, 1, size, handle);
+
     rval = 1;
     
     fclose(handle);
+    free(savebuffer);
+    SaveResetReadWritePosition();
     
     return rval;
 }
@@ -650,13 +947,34 @@ RAP_InitLoadSave(
     void
 )
 {
-    memset(cdpath, 0, sizeof(cdpath));
+#if _WIN32 || __linux__ || __APPLE__
+    char* gethome;
     
-    cdflag = 0;
-    
-    strcpy(g_setup_ini, "SETUP.INI");
-    
+    gethome = SDL_GetPrefPath("", "Raptor");
+
+    if (gethome != NULL)
+    {
+        strcpy(cdpath, gethome);
+        strcpy(g_setup_ini, gethome);
+        sprintf(g_setup_ini, "%s%s", g_setup_ini, "SETUP.INI");
+        cdflag = 1;
+        SDL_free(gethome);
+    }
+    else
+    {
+        EXIT_Error("Couldn't find home directory");
+    }
+
     return cdpath;
+#else
+    memset(cdpath, 0, sizeof(cdpath));
+
+    cdflag = 0;
+
+    strcpy(g_setup_ini, "SETUP.INI");
+
+    return cdpath;
+#endif // _WIN32 || __linux__ || __APPLE__
 }
 
 /***************************************************************************
@@ -668,4 +986,96 @@ RAP_SetupFilename(
 )
 {
     return g_setup_ini;
+}
+
+/***************************************************************************
+RAP_WriteDefaultSetup() - Writes default setup.ini
+ ***************************************************************************/
+void 
+RAP_WriteDefaultSetup(
+    void
+)
+{
+    INI_PutPreferenceLong("Setup", "Detail", 1);
+    INI_PutPreferenceLong("Setup", "Control", 0);
+    INI_PutPreferenceLong("Setup", "Haptic", 1);                           
+    INI_PutPreferenceLong("Setup", "joy_ipt_MenuNew", 0);         
+
+#if _WIN32 || __APPLE__
+    INI_PutPreferenceLong("Setup", "sys_midi", 1);
+#else
+    INI_PutPreferenceLong("Setup", "sys_midi", 0);
+#endif // _WIN32 __APPLE__
+ 
+    INI_PutPreferenceLong("Setup", "winmm_mpu_device", 0);       
+    INI_PutPreferenceLong("Setup", "core_dls_synth", 1);           
+    INI_PutPreferenceLong("Setup", "core_midi_port", 0);           
+    INI_PutPreferenceLong("Setup", "alsa_output_client", 128);           
+    INI_PutPreferenceLong("Setup", "alsa_output_port", 0);               
+    INI_PutPreference("Setup", "SoundFont", "SoundFont.sf2");
+    INI_PutPreferenceLong("Music", "Volume", 85);
+
+#if _WIN32 || __APPLE__
+    INI_PutPreferenceLong("Music", "CardType", 8);
+    INI_PutPreferenceLong("Music", "MidiPort", 330);
+#else
+    INI_PutPreferenceLong("Music", "CardType", 5);
+    INI_PutPreferenceLong("Music", "BasePort", 220);
+    INI_PutPreferenceLong("Music", "Irq", 7);
+    INI_PutPreferenceLong("Music", "Dma", 1);
+#endif // _WIN32 __APPLE__
+
+    INI_PutPreferenceLong("SoundFX", "Volume", 85);
+    INI_PutPreferenceLong("SoundFX", "CardType", 5);
+    INI_PutPreferenceLong("SoundFX", "BasePort", 220);
+    INI_PutPreferenceLong("SoundFX", "Irq", 7);
+    INI_PutPreferenceLong("SoundFX", "Dma", 1);
+    INI_PutPreferenceLong("SoundFX", "Channels", 4);
+    INI_PutPreferenceLong("Keyboard", "MoveUp", 72);
+    INI_PutPreferenceLong("Keyboard", "MoveDn", 80);
+    INI_PutPreferenceLong("Keyboard", "MoveLeft", 75);
+    INI_PutPreferenceLong("Keyboard", "MoveRight", 77);
+    INI_PutPreferenceLong("Keyboard", "Fire", 29);
+    INI_PutPreferenceLong("Keyboard", "FireSp", 56);
+    INI_PutPreferenceLong("Keyboard", "ChangeSp", 57);
+    INI_PutPreferenceLong("Keyboard", "MegaFire", 54);
+    INI_PutPreferenceLong("Mouse", "Fire", 0);
+    INI_PutPreferenceLong("Mouse", "FireSp", 1);
+    INI_PutPreferenceLong("Mouse", "ChangeSp", 2);
+    INI_PutPreferenceLong("JoyStick", "Fire", 0);
+    INI_PutPreferenceLong("JoyStick", "FireSp", 1);
+    INI_PutPreferenceLong("JoyStick", "ChangeSp", 2);
+    INI_PutPreferenceLong("JoyStick", "MegaFire", 3);
+    INI_PutPreferenceLong("Video", "fullscreen", 0);
+    INI_PutPreferenceLong("Video", "aspect_ratio_correct", 1);
+    INI_PutPreferenceLong("Video", "txt_fullscreen", 0);
+}
+
+/***************************************************************************
+RAP_GetPath() - Gets external path
+ ***************************************************************************/
+const char*
+RAP_GetPath(
+    void 
+)
+{
+    return cdpath;
+}
+
+/***************************************************************************
+RAP_CheckFileInPath() - Checks whether external path contains file
+ ***************************************************************************/
+int
+RAP_CheckFileInPath(
+    const char* filename
+)
+{
+    char buffer[PATH_MAX];
+
+    sprintf(buffer, "%s%s", cdpath, filename);
+
+    if (!access(buffer, 0))
+        return 1;
+    else
+        return 0;
 }

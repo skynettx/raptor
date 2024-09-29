@@ -29,7 +29,7 @@ int id_pics[4] = {
 };
 
 int mainbut[2] = {
-    FILE124_BUTTON4_PIC, FILE135_SELLITEM_PIC
+    FILE134_BUYITEM_PIC, FILE135_SELLITEM_PIC
 };
 
 int buybut[2] = {
@@ -359,7 +359,7 @@ STORE_Enter(
             sprintf(youhave, "%07d", plr.score);
             SWD_SetFieldText(window, STOR_SCORE, youhave);
             
-            SWD_SetFieldItem(window, STOR_BUYIT, FILE134_BUYITEM_PIC);
+            SWD_SetFieldItem(window, STOR_BUYIT, mainbut[mode]);
             
             if (pos < S_LAST_OBJECT)
                 SWD_SetFieldItem(window, STOR_COMP, items[pos]);
