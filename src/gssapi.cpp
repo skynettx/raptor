@@ -4,6 +4,7 @@
 #include "musapi.h"
 #include "cards.h"
 #include "fx.h"
+#include "entypes.h"
 
 musdevice_t *gss_device;
 
@@ -122,13 +123,13 @@ GSS_Service(
             if (gss_device && gss_device->ControllerEvent)
             {
                 gss_device->ControllerEvent(14, 4, gss_sep >> 1);
-                gss_device->ControllerEvent(14, 1, gss->bank);
-                gss_device->ControllerEvent(14, 0, gss->patch);
+                gss_device->ControllerEvent(14, 1, LE_SHORT(gss->bank));
+                gss_device->ControllerEvent(14, 0, LE_SHORT(gss->patch));
             }
             if (gss_device && gss_device->PitchBendEvent)
                 gss_device->PitchBendEvent(14, 127);
         }
-        else if (gss_currentptr >= gss->len)
+        else if (gss_currentptr >= LE_SHORT(gss->len))
         {
             if (gss_lastnote)
             {
@@ -253,6 +254,7 @@ GSS_PlayPatch(
 )
 {
     int format = *(int16_t*)gss;
+    format = LE_LONG(format);
     int handle = (gss_handcnt++) & FXHAND_MASK;
     
     if (format != 1 && format != 2)
@@ -322,7 +324,7 @@ GSS_StopPatch(
         case 1:
         {
             gss1_t *gss = (gss1_t*)gss_ptr;
-            gss_currentptr = gss->len;
+            gss_currentptr = LE_SHORT(gss->len);
         }
         }
     }

@@ -7,6 +7,7 @@
 #include "objects.h"
 #include "fx.h"
 #include "fileids.h"
+#include "entypes.h"
 
 BONUS bons[MAX_BONUS];
 BONUS first_bonus, last_bonus;
@@ -119,8 +120,8 @@ BONUS_Init(
     
     h = (GFX_PIC*)GLB_CacheItem(FILE125_ICNGLW_BLK);
     
-    glow_lx = h->width;
-    glow_ly = h->height;
+    glow_lx = LE_LONG(h->width);
+    glow_ly = LE_LONG(h->height);
     
     GLB_CacheItem(FILE126_ICNGLW_BLK);
     GLB_CacheItem(FILE127_ICNGLW_BLK);

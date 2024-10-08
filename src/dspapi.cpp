@@ -2,6 +2,7 @@
 #include "common.h"
 #include "dspapi.h"
 #include "fx.h"
+#include "entypes.h"
 
 int dsp_init;
 int dsp_freq;
@@ -309,7 +310,7 @@ DSP_StartPatch(
     int i, lowpriority, samples, best, step, lvol, rvol;
     int handle = (dsp_cnt++) & FXHAND_MASK;
 
-    if (dsp->format != 3 || dsp->length <= 32)
+    if (LE_SHORT(dsp->format) != 3 || LE_LONG(dsp->length) <= 32)
         return -1;
 
     SND_Lock();
@@ -365,8 +366,8 @@ DSP_StartPatch(
         chan = &dsp_channels[best];
     }
 
-    samples = dsp->length - 32;
-    step = (pitchtable[pitch] * dsp->freq + dsp_freq / 2) / dsp_freq; // .8
+    samples = LE_LONG(dsp->length) - 32;
+    step = (pitchtable[pitch] * LE_SHORT(dsp->freq) + dsp_freq / 2) / dsp_freq; // .8
 
     lvol = (pantable[255 - sep] * volume) / 127;
     rvol = (pantable[sep] * volume) / 127;

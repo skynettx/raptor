@@ -27,6 +27,7 @@
 #include "i_oplmusic.h"
 #include "musapi.h"
 #include "fx.h"
+#include "entypes.h"
 
 // #define OPL_MIDI_DEBUG
 
@@ -738,9 +739,9 @@ static unsigned int FrequencyForVoice(opl_voice_t *voice)
     gm_voice = &voice->current_instr->voices[voice->current_instr_voice];
 
     // TODO: endian fix
-    if ((voice->current_instr->flags & GENMIDI_FLAG_FIXED) == 0)
+    if ((LE_USHORT(voice->current_instr->flags) & GENMIDI_FLAG_FIXED) == 0)
     {
-        note += (signed short) gm_voice->base_note_offset;
+        note += (signed short) LE_SHORT(gm_voice->base_note_offset);
     }
 
     // Avoid possible overflow due to base note offset:
@@ -855,7 +856,7 @@ static void VoiceKeyOn(opl_channel_data_t *channel,
     // the key, unless it is a fixed pitch instrument.
 
     // TODO: endian fix
-    if ((instrument->flags & GENMIDI_FLAG_FIXED) != 0)
+    if ((LE_USHORT(instrument->flags) & GENMIDI_FLAG_FIXED) != 0)
     {
         voice->note = instrument->fixed_note;
     }
@@ -925,7 +926,7 @@ static void KeyOnEvent(int chan, unsigned int key, unsigned int volume)
     }
 
     // TODO: endian fix
-    double_voice = (instrument->flags & GENMIDI_FLAG_2VOICE) != 0;
+    double_voice = (LE_USHORT(instrument->flags) & GENMIDI_FLAG_2VOICE) != 0;
 
     switch (opl_drv_ver)
     {
