@@ -62,12 +62,6 @@ typedef struct
 	const char *permissions;
 }FILEDESC;
 
-/*typedef struct
-{
-	uint16_t itemnum;
-	uint16_t filenum;
-}ITEM_ID;*/
-
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 typedef struct
 {

@@ -135,7 +135,7 @@ ENEMY_FreeSprites(
         curfld = &csprite[loop];
         curlib = &slib[LE_LONG(csprite[loop].game)][LE_LONG(csprite[loop].slib)];
         
-        if (cur_diff & LE_LONG(curfld->level))
+        if (cur_diff & curfld->level)
         {
             for (i = 0; i < LE_LONG(curlib->num_frames); i++)
             {
@@ -198,7 +198,7 @@ ENEMY_LoadSprites(
             break;
         }
         
-        if (cur_diff & LE_LONG(curfld->level))
+        if (cur_diff & curfld->level)
         {
             if (LE_LONG(curlib->item) != -1)
             {
@@ -694,7 +694,7 @@ void ENEMY_Think(
         {
             old_enemy = cur_enemy;
             
-            if (LE_LONG(cur_enemy->level) != EB_NOT_USED)
+            if (cur_enemy->level != EB_NOT_USED)
                 ENEMY_Add(cur_enemy);
             
             if (cur_enemy == end_enemy)
