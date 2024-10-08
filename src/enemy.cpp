@@ -704,7 +704,7 @@ void ENEMY_Think(
             }
             
             cur_enemy++;
-        } while (old_enemy->link != -1 && old_enemy->link != 1);
+        } while (LE_LONG(old_enemy->link) != -1 && LE_LONG(old_enemy->link) != 1);
     }
     
     cur_visable = 0;
@@ -719,7 +719,7 @@ void ENEMY_Think(
             
             if (sprite->frame_rate < 1)
             {
-                sprite->frame_rate = curlib->frame_rate;
+                sprite->frame_rate = LE_LONG(curlib->frame_rate);
                 
                 if (sprite->anim_on)
                 {
