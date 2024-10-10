@@ -200,6 +200,7 @@
 		<Unit filename="../src/dspapi.h" />
 		<Unit filename="../src/enemy.cpp" />
 		<Unit filename="../src/enemy.h" />
+		<Unit filename="../src/entypes.h" />
 		<Unit filename="../src/eshot.cpp" />
 		<Unit filename="../src/eshot.h" />
 		<Unit filename="../src/fileids.h" />
