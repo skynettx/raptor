@@ -237,9 +237,9 @@
 		<Unit filename="../src/loadsave.h" />
 		<Unit filename="../src/m_misc.cpp" />
 		<Unit filename="../src/m_misc.h" />
-		<Unit filename="../src/movia_a.cpp" />
 		<Unit filename="../src/movie.cpp" />
 		<Unit filename="../src/movie.h" />
+		<Unit filename="../src/movie_a.cpp" />
 		<Unit filename="../src/mpualsa.cpp" />
 		<Unit filename="../src/mpucorea.cpp" />
 		<Unit filename="../src/mpucorem.cpp" />
