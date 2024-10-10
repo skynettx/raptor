@@ -123,7 +123,7 @@ SWD_GetLine(
     const char *inmem
 )
 {
-    char temp[MAX_TEXT_LEN];
+    char temp[MAX_TEXT_LEN + 1];
     static const char *text;
     const char *cbrks = "\n\v\r \t,;\b";
     const char *cmd;
