@@ -7,6 +7,8 @@
 #define TSF_IMPLEMENTATION
 #include "tsf.h"
 
+#include "fx.h"
+
 #include "musapi.h"
 #include "prefapi.h"
 
@@ -17,14 +19,11 @@ AudioCallback() -
  ***************************************************************************/
 void 
 AudioCallback(
-    void* data, 
-    uint8_t* stream, 
+    int16_t *stream, 
     int len
 )
 {
-    int SampleCount = (len / (2 * sizeof(short))); //2 output channels
-    
-    tsf_render_short(g_TinySoundFont, (short*)stream, SampleCount, 0);
+    tsf_render_short(g_TinySoundFont, (short*)stream, len, 0);
 }
 
 /***************************************************************************
@@ -35,41 +34,31 @@ TSF_Init(
     int option
 )
 {
-    SDL_AudioSpec OutputAudioSpec;
-    OutputAudioSpec.freq = 44100;
-    OutputAudioSpec.format = AUDIO_S16SYS;
-    OutputAudioSpec.channels = 2;
-    OutputAudioSpec.samples = 512;
-    OutputAudioSpec.callback = AudioCallback;
-    
     char fn[128];
-    INI_GetPreference("Setup", "SoundFont", fn, 127, "SoundFont.sf2");
+    #ifdef __SWITCH__
+        strcpy(fn, RAP_SD_DIR "TimGM6mb.sf2");
+    #else
+        INI_GetPreference("Setup", "SoundFont", fn, 127, "TimGM6mb.sf2");
+        // Load the SoundFont from a file
+    #endif
 
-    // Load the SoundFont from a file
     g_TinySoundFont = tsf_load_filename(fn);
-    
+
     if (!g_TinySoundFont)
     {
         char errmsg[255];
         fprintf(stderr, "Could not load %s\n", fn);
         sprintf(errmsg,"Could not load %s\n", fn);
+        #ifndef SDL12
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
             "Raptor", errmsg, NULL);
+        #endif
         EXIT_Error("Could not load SoundFont.");
         return 0;
     }
-    
-    // Set the SoundFont rendering output mode
-    tsf_set_output(g_TinySoundFont, TSF_STEREO_INTERLEAVED, OutputAudioSpec.freq, 0.0f);
-    
 
-    // Request the desired audio output format
-    if (SDL_OpenAudio(&OutputAudioSpec, NULL) < 0)
-    {
-        fprintf(stderr, "Could not open the audio hardware or the desired audio output format\n");
-        EXIT_Error("Could not open the audio hardware or the desired audio output format.");
-        return 0;
-    }
+    // Set the SoundFont rendering output mode
+    tsf_set_output(g_TinySoundFont, TSF_STEREO_INTERLEAVED, fx_freq, 0.0f);
     
     return 1;
 }
@@ -166,36 +155,36 @@ AllNotesOffEvent(
     tsf_note_off_all(g_TinySoundFont);
 }
 
-/***************************************************************************
-SetChannelVolume() -
- ***************************************************************************/
-static void 
-SetChannelVolume(
-    unsigned int chan, 
-    unsigned int param
-)
-{
-    float volume = (float)param;
-    volume /= 127;
+// /***************************************************************************
+// SetChannelVolume() -
+//  ***************************************************************************/
+// static void 
+// SetChannelVolume(
+//     unsigned int chan, 
+//     unsigned int param
+// )
+// {
+//     float volume = (float)param;
+//     volume /= 127;
    
-    tsf_channel_set_volume(g_TinySoundFont, MPU_MapChannel(chan), volume);
-}
+//     tsf_channel_set_volume(g_TinySoundFont, MPU_MapChannel(chan), volume);
+// }
 
-/***************************************************************************
-SetChannelPan() -
- ***************************************************************************/
-static void 
-SetChannelPan(
-    unsigned int chan, 
-    unsigned int param
-)
-{
+// /***************************************************************************
+// SetChannelPan() -
+//  ***************************************************************************/
+// static void 
+// SetChannelPan(
+//     unsigned int chan, 
+//     unsigned int param
+// )
+// {
 
-    float pan = (float)param;
-    pan /= 127;
+//     float pan = (float)param;
+//     pan /= 127;
    
-    tsf_channel_set_pan(g_TinySoundFont, MPU_MapChannel(chan), pan);
-}
+//     tsf_channel_set_pan(g_TinySoundFont, MPU_MapChannel(chan), pan);
+// }
 
 /***************************************************************************
 ControllerEvent() -
@@ -218,7 +207,7 @@ ControllerEvent(
 musdevice_t mus_device_tsf = {
     TSF_Init,
     TSF_DeInit,
-    NULL,
+    AudioCallback,
 
     KeyOffEvent,
     KeyOnEvent,
@@ -226,4 +215,5 @@ musdevice_t mus_device_tsf = {
     PitchBendEvent,
     ProgramEvent,
     AllNotesOffEvent,
+    1
 };

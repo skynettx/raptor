@@ -1370,4 +1370,5 @@ musdevice_t mus_device_opl = {
     PitchBendEvent,
     ProgramChgEvent,
     AllOffEvent,
+    0
 };
