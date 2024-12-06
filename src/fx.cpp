@@ -117,7 +117,6 @@ SND_InitSound(
 
     dig_flag = 0;
     fx_device = SND_NONE;
-
     music_volume = INI_GetPreferenceLong("Music", "Volume", 127);
     music_card = INI_GetPreferenceLong("Music", "CardType", M_NONE);
     sys_midi = INI_GetPreferenceLong("Setup", "sys_midi", 0);
@@ -126,6 +125,10 @@ SND_InitSound(
     core_midi_port = INI_GetPreferenceLong("Setup", "core_midi_port", 0);
     alsaclient = INI_GetPreferenceLong("Setup", "alsa_output_client", 128);
     alsaport = INI_GetPreferenceLong("Setup", "alsa_output_port", 0);
+    music_samplesperloop = INI_GetPreferenceLong("Music", "SamplesPerLoop", 16);
+
+    if(music_samplesperloop < 1 || music_samplesperloop > spec.samples)
+        music_samplesperloop = 16;
 
     switch (music_card)
     {

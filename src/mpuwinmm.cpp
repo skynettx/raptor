@@ -223,7 +223,6 @@ musdevice_t mus_device_winmm = {
     ControllerEvent,
     PitchBendEvent,
     ProgramEvent,
-    AllNotesOffEvent,
-    0
+    AllNotesOffEvent
 };
 #endif // _WIN32
