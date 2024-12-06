@@ -13,6 +13,7 @@ struct musdevice_t {
     void (*PitchBendEvent)(unsigned int chan, int bend);
     void (*ProgramEvent)(unsigned int chan, unsigned int param);
     void (*AllNotesOffEvent)(unsigned int chan, unsigned int param);
+    int sampleDirect;
 };
 
 extern musdevice_t mus_device_opl, mus_device_winmm, mus_device_tsf, mus_device_alsa, mus_device_corea, mus_device_corem;

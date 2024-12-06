@@ -238,8 +238,9 @@ MUS_Reset(
                 
                 music_device->ControllerEvent(i, 3, newvol);
             }
-            if (music_device && music_device->AllNotesOffEvent)
-                music_device->AllNotesOffEvent(i,0);
+            
+        if (music_device && music_device->AllNotesOffEvent)
+            music_device->AllNotesOffEvent(i,0);
     }
 }
 
@@ -360,7 +361,6 @@ MUS_Service(
                                 param = music_vol;
                             if (music_device && music_device->ControllerEvent)
                                 music_device->ControllerEvent(chan, 3, param);
-                                break;
 
                         default:
                             break;
@@ -596,10 +596,14 @@ MUS_Mix(
     
     if (!music_init || !music_device || !music_device->Mix)
         return;
-    
+    if(music_device->sampleDirect)
+        music_device->Mix(stream, len);
+
     for (i = 0; i < len; i++)
     {
-        music_device->Mix(stream, 1);
+        if(!music_device->sampleDirect)
+            music_device->Mix(stream, 1);
+
         music_cnt += musrate;
         
         while (music_cnt >= fx_freq)
@@ -625,7 +629,8 @@ MUS_Mix(
                 GSS_Service();
             }
         }
-        stream += 2;
+        if(!music_device->sampleDirect)
+            stream += 2;
     }
 }
 
