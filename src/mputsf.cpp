@@ -35,12 +35,9 @@ TSF_Init(
 )
 {
     char fn[128];
-    #ifdef __SWITCH__
-        strcpy(fn, RAP_SD_DIR "TimGM6mb.sf2");
-    #else
-        INI_GetPreference("Setup", "SoundFont", fn, 127, "TimGM6mb.sf2");
-        // Load the SoundFont from a file
-    #endif
+
+    INI_GetPreference("Setup", "SoundFont", fn, 127, "TimGM6mb.sf2");
+    // Load the SoundFont from a file
 
     g_TinySoundFont = tsf_load_filename(fn);
 
@@ -214,6 +211,5 @@ musdevice_t mus_device_tsf = {
     ControllerEvent,
     PitchBendEvent,
     ProgramEvent,
-    AllNotesOffEvent,
-    1
+    AllNotesOffEvent
 };

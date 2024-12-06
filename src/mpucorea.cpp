@@ -544,7 +544,6 @@ musdevice_t mus_device_corea = {
     ControllerEvent,
     PitchBendEvent,
     ProgramEvent,
-	AllNotesOffEvent,
-    0
+	AllNotesOffEvent
 };    
 #endif

@@ -8,6 +8,8 @@
 
 static int musrate = 70;
 static int musfaderate = 50;
+
+int music_samplesperloop = 1;
 int music_init;
 int music_startoffset;
 int music_len;
@@ -592,25 +594,27 @@ MUS_Mix(
 )
 {
     int i;
-    
+    int mRate = musrate * music_samplesperloop;
+    int fRate = musfaderate * music_samplesperloop;
+    int gRate = gssrate * music_samplesperloop;
+    int SPLx2 = music_samplesperloop * 2;
+
     if (!music_init || !music_device || !music_device->Mix)
         return;
-    if(music_device->sampleDirect)
-        music_device->Mix(stream, len);
 
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len; i+=music_samplesperloop)
     {
-        if(!music_device->sampleDirect)
-            music_device->Mix(stream, 1);
 
-        music_cnt += musrate;
+        music_device->Mix(stream, music_samplesperloop);
+
+        music_cnt += mRate;
         
         while (music_cnt >= fx_freq)
         {
             music_cnt -= fx_freq;
             MUS_Service();
         }
-        music_cnt2 += musfaderate;
+        music_cnt2 += fRate;
         
         while (music_cnt2 >= fx_freq)
         {
@@ -620,7 +624,7 @@ MUS_Mix(
         
         if (gsshack)
         {
-            music_cnt3 += gssrate;
+            music_cnt3 += gRate;
             
             while (music_cnt3 >= fx_freq)
             {
@@ -628,8 +632,8 @@ MUS_Mix(
                 GSS_Service();
             }
         }
-        if(!music_device->sampleDirect)
-            stream += 2;
+        
+            stream += SPLx2;
     }
 }
 
