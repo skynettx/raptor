@@ -54,9 +54,25 @@ GSS_Init(
     case M_GMIDI:
     default:
 
-        #ifdef _WIN32
-        gss_device = &mus_device_winmm;
-        #endif // _WIN32
+        if (sys_midi)
+        {
+            #ifdef _WIN32
+            gss_device = &mus_device_winmm;
+            #endif // _WIN32
+            
+            #ifdef __linux__
+            gss_device = &mus_device_alsa;
+            #endif // __linux__
+            
+            #ifdef __APPLE__
+            if (core_dls_synth)
+                gss_device = &mus_device_corea;
+            else
+                gss_device = &mus_device_corem;
+            #endif // __APPLE__
+        }
+        else
+        gss_device = &mus_device_tsf;
         break;
     }
 
@@ -124,6 +140,10 @@ GSS_Service(
             {
                 gss_device->ControllerEvent(14, 4, gss_sep >> 1);
                 gss_device->ControllerEvent(14, 1, LE_SHORT(gss->bank));
+                
+                if (gss_device != &mus_device_opl)
+                    gss_device->ProgramEvent(14, LE_SHORT(gss->patch));
+                
                 gss_device->ControllerEvent(14, 0, LE_SHORT(gss->patch));
             }
             if (gss_device && gss_device->PitchBendEvent)
@@ -194,6 +214,8 @@ GSS_Mix(
 )
 {
     int i;
+    int gRate = gssrate * music_samplesperloop;
+    int SPLx2 = music_samplesperloop * 2;
     
     if (!gss_init)
         return;
@@ -201,17 +223,17 @@ GSS_Mix(
     if (!gss_init || !gss_device || !gss_device->Mix || gsshack)
         return;
 
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len; i+=music_samplesperloop)
     {
-        gss_device->Mix(stream, 1);
-        gss_cnt += gssrate;
+        gss_device->Mix(stream, music_samplesperloop);
+        gss_cnt += gRate;
         
         while (gss_cnt >= fx_freq)
         {
             gss_cnt -= fx_freq;
             GSS_Service();
         }
-        stream += 2;
+        stream += SPLx2;
     }
 }
 
