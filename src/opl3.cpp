@@ -954,12 +954,12 @@ static void OPL3_ChannelWriteC0(opl3_channel *channel, Bit8u data)
     }
     if (channel->chip->newm)
     {
-        channel->cha = ((data >> 4) & 0x01) ? ~0 : 0;
-        channel->chb = ((data >> 5) & 0x01) ? ~0 : 0;
+        channel->cha = ((data >> 4) & 0x01) ? UINT16_MAX : 0;
+        channel->chb = ((data >> 5) & 0x01) ? UINT16_MAX : 0;
     }
     else
     {
-        channel->cha = channel->chb = (Bit16u)~0;
+        channel->cha = channel->chb = UINT16_MAX;
     }
 }
 
