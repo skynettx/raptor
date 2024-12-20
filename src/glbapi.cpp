@@ -35,10 +35,16 @@ char* strupr(char* s)
 static const char* serial = "32768GLB";
 static char exePath[PATH_MAX];
 static int num_glbs;
-static KEYFILE g_key;
 static char prefix[5] = "FILE";
 static bool fVmem = 0;
 
+//This is the list of loctions to look for files in.
+static const char *lookNdirs[] = {
+	"",
+	exePath,
+	"soundfonts/",
+	NULL
+};
 /*
 * define file descriptor used to access file.
 */
@@ -153,8 +159,7 @@ GLB_FindFile(
 	const char *permissions		     // INPUT : file access permissions
 )
 {
-	const char* routine = "GLB_FindFile";
-	char filename[PATH_MAX];
+	char *filename;
 	FILE *handle;
 	FILEDESC* fd;
 	
@@ -173,22 +178,23 @@ GLB_FindFile(
 	* create a file name and attempt to open it local first, then if it
 	* fails use the exe path and try again.
 	*/
-	sprintf(filename, "%s%04u.GLB", prefix, filenum);
-	if ((handle = fopen(filename, permissions)) == NULL)
-	{
-		sprintf(filename, "%s%s%04u.GLB", exePath, prefix, filenum);
-		
-		if ((handle = fopen(filename, permissions)) == NULL)
-		{
-			if (return_on_failure)
-				return NULL;
+	int lookat = 0;
+	char *name = (char*)malloc((strlen(prefix)+9) * sizeof(char));
+	sprintf(name, "%s%04u.GLB", prefix, filenum);
+	filename = GLB_FindFilePath(name);
 
-			sprintf(filename, "%s%04u.GLB", prefix, filenum);
-			EXIT_Error("GLB_FindFile: %s, Error #%d,%s",
-				filename, errno, strerror(errno));
+	if(filename == NULL){
+		if (return_on_failure){
+			free(name);
+			return NULL;
 		}
+
+		EXIT_Error("GLB_FindFile: %s, Error #%d,%s", name, errno, strerror(errno));
 	}
-	
+	free(name);
+
+	handle = fopen(filename, permissions);
+
 	/*
 	* Keep file handle
 	*/
@@ -198,8 +204,11 @@ GLB_FindFile(
 	fd->permissions = permissions;
 	fd->handle = handle;
 
+	free(filename);
+
 	return handle;
 }
+
 
 /*------------------------------------------------------------------------
    GLB_OpenFile() - Opens & Caches file handle
@@ -243,7 +252,7 @@ GLB_OpenFile(
 /*------------------------------------------------------------------------
    GLB_CloseFiles() - Closes all cached files.
  ------------------------------------------------------------------------*/
-static void
+void
 GLB_CloseFiles(
 	void
 )
@@ -304,6 +313,7 @@ GLB_LoadIDT(
 	int j;
 	int k;
 	int n;
+	size_t flen;
 	KEYFILE key[10];
 	ITEMINFO* ii;
 
@@ -316,10 +326,10 @@ GLB_LoadIDT(
 	{
 		k = fd->items - j;
 		
-		if (k > ASIZE(key))
+		if (k > (int)ASIZE(key))
 			k = ASIZE(key);
 
-		fread(key, sizeof(KEYFILE), k, handle);
+		flen = fread(key, sizeof(KEYFILE), k, handle);
 		
 		for (n = 0; n < k; n++)
 		{
@@ -429,7 +439,7 @@ GLB_Load(
 {
 	FILE *handle;
 	ITEMINFO* ii;
-
+	size_t flen;
 	ASSERT(filenum >= 0 && filenum < num_glbs);
 
 	handle = filedesc[filenum].handle;
@@ -449,11 +459,11 @@ GLB_Load(
 		else
 		{
 			fseek(handle, ii->offset, SEEK_SET);
-			fread(inmem, ii->size, 1, handle);
+			flen = fread(inmem, ii->size, 1, handle);
 #ifdef _SCOTTGAME
 			if (ii->flags & ITF_ENCODED)
 			{
-				GLB_DeCrypt(serial, inmem, ii->size);
+				GLB_DeCrypt(serial, inmem, flen);
 			}
 #endif
 		}
@@ -475,7 +485,7 @@ GLB_FetchItem(
 	ITEM_H itm;
 	ITEMINFO* ii;
 
-	if (handle == ~0)
+	if (handle == ((uint32_t)~0))
 	{
 		EXIT_Error("GLB_FetchItem: empty handle.");
 		return NULL;
@@ -899,4 +909,43 @@ GLB_SaveFile(
 	}
 	
 	fclose(handle);
+}
+
+/***************************************************************************
+ * GLB_FindFilePath() - Finds the path to a filename by searching in multiple directories.
+ *
+ * This function iterates through the 'lookNdirs' array and tries to open each file path.
+ * The first path that is successfully opened is returned as a dynamically allocated string.
+ ***************************************************************************/
+char *
+GLB_FindFilePath(
+    char *file
+)
+{
+	char filename[PATH_MAX];
+
+	FILE *handle;
+
+	int lookat = 0;
+	
+	while(lookNdirs[lookat] != NULL){
+		sprintf(filename, "%s%s", lookNdirs[lookat], file);
+		lookat++;
+		if ((handle = fopen(filename, "r")) == NULL)
+		{
+			if(lookNdirs[lookat] == NULL)
+				return NULL;
+			
+		} else {
+			fclose(handle);
+			break;
+		}
+	}
+
+	char * retChar = (char*)malloc(strlen(filename)+1 * sizeof(char));
+	strcpy(retChar, filename);
+	
+	printf("Found: %s\n", filename);
+
+	return retChar;
 }

@@ -38,6 +38,7 @@ void GLB_SaveFile(char *name, char *buffer, int length);
 int GLB_Load(char *inmem, int filenum, int itemnum);
 int GLB_IsLabel(int handle);
 void GLB_ReadItem(int handle, char *mem);
+char * GLB_FindFilePath(char *file);
 //char *GLB_GetPtr(int handle);
 //void GLB_SetItemPointer(int a1, char* a2);
 //void GLB_SetItemSize(int a1, int a2);
