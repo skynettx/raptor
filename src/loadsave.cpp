@@ -526,9 +526,9 @@ RAP_LoadPlayer(
     memset(&plr, 0, sizeof(plr));
     
     if (cdflag)
-        snprintf(filename, sizeof(filename), CDFMT, cdpath, loop);
+        snprintf(filename, sizeof(filename), CDFMT, cdpath, filepos);
     else
-        snprintf(filename, sizeof(filename), FMT, loop);
+        snprintf(filename, sizeof(filename), FMT, filepos);
     
     handle = fopen(filename, "rb");
     
