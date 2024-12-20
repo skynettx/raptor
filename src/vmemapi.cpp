@@ -123,7 +123,7 @@ vm_DiscardMem(
 
     do
     {
-        oldage = lowsize = lowcnt = (uint32_t)~0;
+        oldage = lowsize = lowcnt = UINT32_MAX;
         low_mcb = NULL;
         mcb = (MCBL*)(pool.blk[0]);
         mem_freed = 0;

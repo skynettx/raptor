@@ -8,6 +8,7 @@
 #include "common.h"
 #include "glbapi.h"
 #include "vmemapi.h"
+#include "fileids.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -35,10 +36,16 @@ char* strupr(char* s)
 static const char* serial = "32768GLB";
 static char exePath[PATH_MAX];
 static int num_glbs;
-static KEYFILE g_key;
 static char prefix[5] = "FILE";
 static bool fVmem = 0;
 
+//This is the list of loctions to look for files in.
+static const char *lookNdirs[] = {
+	"",
+	exePath,
+	"soundfonts/",
+	NULL
+};
 /*
 * define file descriptor used to access file.
 */
@@ -153,8 +160,7 @@ GLB_FindFile(
 	const char *permissions		     // INPUT : file access permissions
 )
 {
-	const char* routine = "GLB_FindFile";
-	char filename[PATH_MAX];
+	char *filename;
 	FILE *handle;
 	FILEDESC* fd;
 	
@@ -173,22 +179,22 @@ GLB_FindFile(
 	* create a file name and attempt to open it local first, then if it
 	* fails use the exe path and try again.
 	*/
-	sprintf(filename, "%s%04u.GLB", prefix, filenum);
-	if ((handle = fopen(filename, permissions)) == NULL)
-	{
-		sprintf(filename, "%s%s%04u.GLB", exePath, prefix, filenum);
-		
-		if ((handle = fopen(filename, permissions)) == NULL)
-		{
-			if (return_on_failure)
-				return NULL;
+	char *name = (char*)malloc((strlen(prefix)+9) * sizeof(char));
+	sprintf(name, "%s%04u.GLB", prefix, filenum);
+	filename = GLB_FindFilePath(name);
 
-			sprintf(filename, "%s%04u.GLB", prefix, filenum);
-			EXIT_Error("GLB_FindFile: %s, Error #%d,%s",
-				filename, errno, strerror(errno));
+	if(filename == NULL){
+		if (return_on_failure){
+			free(name);
+			return NULL;
 		}
+
+		EXIT_Error("GLB_FindFile: %s, Error #%d,%s", name, errno, strerror(errno));
 	}
-	
+	free(name);
+
+	handle = fopen(filename, permissions);
+
 	/*
 	* Keep file handle
 	*/
@@ -198,8 +204,11 @@ GLB_FindFile(
 	fd->permissions = permissions;
 	fd->handle = handle;
 
+	free(filename);
+
 	return handle;
 }
+
 
 /*------------------------------------------------------------------------
    GLB_OpenFile() - Opens & Caches file handle
@@ -243,7 +252,7 @@ GLB_OpenFile(
 /*------------------------------------------------------------------------
    GLB_CloseFiles() - Closes all cached files.
  ------------------------------------------------------------------------*/
-static void
+void
 GLB_CloseFiles(
 	void
 )
@@ -281,9 +290,8 @@ GLB_NumItems(
 	fseek(handle, 0L, SEEK_SET);
 	
 	if (!fread(&key, sizeof(KEYFILE), 1, handle))
-	{
 		EXIT_Error("GLB_NumItems: Read failed!");
-	}
+	
 
 #ifdef _SCOTTGAME
 	GLB_DeCrypt(serial, (uint8_t*)&key, sizeof(KEYFILE));
@@ -316,10 +324,11 @@ GLB_LoadIDT(
 	{
 		k = fd->items - j;
 		
-		if (k > ASIZE(key))
+		if (k > (int)ASIZE(key))
 			k = ASIZE(key);
 
-		fread(key, sizeof(KEYFILE), k, handle);
+		if (!fread(key, sizeof(KEYFILE), k, handle))
+			EXIT_Error("GLB_NumItems: Read failed!");
 		
 		for (n = 0; n < k; n++)
 		{
@@ -429,7 +438,6 @@ GLB_Load(
 {
 	FILE *handle;
 	ITEMINFO* ii;
-
 	ASSERT(filenum >= 0 && filenum < num_glbs);
 
 	handle = filedesc[filenum].handle;
@@ -449,7 +457,9 @@ GLB_Load(
 		else
 		{
 			fseek(handle, ii->offset, SEEK_SET);
-			fread(inmem, ii->size, 1, handle);
+			if(!fread(inmem, ii->size, 1, handle))
+				EXIT_Error("GLB_Load: Failed to read data\n");
+			
 #ifdef _SCOTTGAME
 			if (ii->flags & ITF_ENCODED)
 			{
@@ -475,7 +485,7 @@ GLB_FetchItem(
 	ITEM_H itm;
 	ITEMINFO* ii;
 
-	if (handle == ~0)
+	if (handle == FILE_NULL)
 	{
 		EXIT_Error("GLB_FetchItem: empty handle.");
 		return NULL;
@@ -544,7 +554,7 @@ GLB_FetchItem(
  ***************************************************************************/
 char*
 GLB_CacheItem(
-	int handle
+	uint32_t handle
 )
 {
 	return GLB_FetchItem(handle, FI_CACHE);
@@ -555,7 +565,7 @@ GLB_CacheItem(
  ***************************************************************************/
 char*
 GLB_GetItem(
-	int handle               // INPUT : handle of item
+	uint32_t handle               // INPUT : handle of item
 )
 {
 	return GLB_FetchItem(handle, FI_DISCARD);
@@ -566,7 +576,7 @@ GLB_GetItem(
  ***************************************************************************/
 char*
 GLB_LockItem(
-	int handle
+	uint32_t handle
 )
 {
 	return GLB_FetchItem(handle, FI_LOCK);
@@ -577,13 +587,13 @@ GLB_LockItem(
  ***************************************************************************/
 void
 GLB_UnlockItem(
-	int handle
+	uint32_t handle
 )
 {
 	ITEM_H itm;
 	ITEMINFO* ii;
 
-	if (handle == ~0)
+	if (handle == FILE_NULL)
 		return;
 
 	itm.handle = handle;
@@ -617,13 +627,13 @@ GLB_UnlockItem(
  ***************************************************************************/
 int                        // RETURN: TRUE = Label
 GLB_IsLabel(
-	int handle             // INPUT : handle of item
+	uint32_t handle             // INPUT : handle of item
 )
 {
 	ITEM_H itm;
 	ITEMINFO* ii;
 
-	if (handle == ~0)
+	if (handle == FILE_NULL)
 		return 0;
 
 	itm.handle = handle;
@@ -642,14 +652,14 @@ GLB_IsLabel(
  ***************************************************************************/
 void
 GLB_ReadItem(
-	int handle,                   // INPUT : handle of item
+	uint32_t handle,                   // INPUT : handle of item
 	char* mem                     // INPUT : pointer to memory
 )
 {
 	ITEM_H   itm;
 	ITEMINFO* ii;
 
-	if (handle == ~0)
+	if (handle == FILE_NULL)
 		return;
 
 	ASSERT(mem != NULL);
@@ -684,7 +694,7 @@ GLB_GetItemID(
 
 	ASSERT(in_name != NULL);
 
-	itm.handle = ~0;
+	itm.handle = FILE_NULL;
 	if (*in_name != ' ' && *in_name != '\0')
 	{
 		for (filenum = 0; filenum < num_glbs; filenum++)
@@ -714,13 +724,13 @@ GLB_GetItemID(
  ***************************************************************************/
 char*                           // RETURN: pointer to item
 GLB_GetPtr(
-	int handle                  // INPUT : handle of item
+	uint32_t handle                  // INPUT : handle of item
 )
 {
 	ITEM_H itm;
 	ITEMINFO* ii;
 
-	if (handle == ~0)
+	if (handle == FILE_NULL)
 		return NULL;
 
 	itm.handle = handle;
@@ -740,13 +750,13 @@ GLB_GetPtr(
  ***************************************************************************/
 void
 GLB_FreeItem(
-	int handle               // INPUT : handle of item
+	uint32_t handle               // INPUT : handle of item
 )
 {
 	ITEM_H itm;
 	ITEMINFO* ii;
 
-	if (handle == ~0)
+	if (handle == FILE_NULL)
 		return;
 
 	itm.handle = handle;
@@ -813,13 +823,13 @@ GLB_FreeAll(
  ***************************************************************************/
 int                               // RETURN: sizeof ITEM
 GLB_ItemSize(
-	int handle                    // INPUT : handle of item
+	uint32_t handle                    // INPUT : handle of item
 )
 {
 	ITEM_H itm;
 	ITEMINFO* ii;
 
-	if (handle == ~0)
+	if (handle == FILE_NULL)
 		return 0;
 
 	itm.handle = handle;
@@ -899,4 +909,43 @@ GLB_SaveFile(
 	}
 	
 	fclose(handle);
+}
+
+/***************************************************************************
+ * GLB_FindFilePath() - Finds the path to a filename by searching in multiple directories.
+ *
+ * This function iterates through the 'lookNdirs' array and tries to open each file path.
+ * The first path that is successfully opened is returned as a dynamically allocated string.
+ ***************************************************************************/
+char *
+GLB_FindFilePath(
+    char *file
+)
+{
+	char filename[PATH_MAX];
+
+	FILE *handle;
+
+	int lookat = 0;
+	
+	while(lookNdirs[lookat] != NULL){
+		sprintf(filename, "%s%s", lookNdirs[lookat], file);
+		lookat++;
+		if ((handle = fopen(filename, "r")) == NULL)
+		{
+			if(lookNdirs[lookat] == NULL)
+				return NULL;
+			
+		} else {
+			fclose(handle);
+			break;
+		}
+	}
+
+	char * retChar = (char*)malloc(strlen(filename)+1 * sizeof(char));
+	strcpy(retChar, filename);
+	
+	printf("Found: %s\n", filename);
+
+	return retChar;
 }

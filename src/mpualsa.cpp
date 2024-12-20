@@ -255,6 +255,6 @@ musdevice_t mus_device_alsa = {
     ControllerEvent,
     PitchBendEvent,
 	ProgramEvent,
-	AllNotesOffEvent,
+	AllNotesOffEvent
 };
 #endif
