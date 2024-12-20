@@ -260,7 +260,8 @@ WritePrivateProfileString(
         chsize(fileno(fptr), pos1);
         #endif
         #ifdef __GNUC__
-        int flen = ftruncate(fileno(fptr), pos1);
+        if(ftruncate(fileno(fptr), pos1))
+            EXIT_Error("WritePrivateProfileString: ftruncate Failed.\n");
         #endif
     }
     else if (delta > 0)    // Expand file, starting at the end
