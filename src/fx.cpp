@@ -209,7 +209,10 @@ SND_InitSound(
         fx_channels = 1;
 
     if (fx_card == M_ADLIB || fx_card == M_WAVE || fx_card == M_CANVAS || fx_card == M_GMIDI)
+    {
+        fx_gus = 1;
         GSS_Init(fx_card, 0);
+    }
 
     SDL_PauseAudioDevice(fx_dev, 0);
 
