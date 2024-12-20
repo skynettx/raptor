@@ -179,7 +179,6 @@ GLB_FindFile(
 	* create a file name and attempt to open it local first, then if it
 	* fails use the exe path and try again.
 	*/
-	int lookat = 0;
 	char *name = (char*)malloc((strlen(prefix)+9) * sizeof(char));
 	sprintf(name, "%s%04u.GLB", prefix, filenum);
 	filename = GLB_FindFilePath(name);
@@ -555,7 +554,7 @@ GLB_FetchItem(
  ***************************************************************************/
 char*
 GLB_CacheItem(
-	int handle
+	uint32_t handle
 )
 {
 	return GLB_FetchItem(handle, FI_CACHE);
@@ -566,7 +565,7 @@ GLB_CacheItem(
  ***************************************************************************/
 char*
 GLB_GetItem(
-	int handle               // INPUT : handle of item
+	uint32_t handle               // INPUT : handle of item
 )
 {
 	return GLB_FetchItem(handle, FI_DISCARD);
@@ -577,7 +576,7 @@ GLB_GetItem(
  ***************************************************************************/
 char*
 GLB_LockItem(
-	int handle
+	uint32_t handle
 )
 {
 	return GLB_FetchItem(handle, FI_LOCK);
@@ -588,7 +587,7 @@ GLB_LockItem(
  ***************************************************************************/
 void
 GLB_UnlockItem(
-	int handle
+	uint32_t handle
 )
 {
 	ITEM_H itm;
@@ -628,7 +627,7 @@ GLB_UnlockItem(
  ***************************************************************************/
 int                        // RETURN: TRUE = Label
 GLB_IsLabel(
-	int handle             // INPUT : handle of item
+	uint32_t handle             // INPUT : handle of item
 )
 {
 	ITEM_H itm;
@@ -653,7 +652,7 @@ GLB_IsLabel(
  ***************************************************************************/
 void
 GLB_ReadItem(
-	int handle,                   // INPUT : handle of item
+	uint32_t handle,                   // INPUT : handle of item
 	char* mem                     // INPUT : pointer to memory
 )
 {
@@ -725,7 +724,7 @@ GLB_GetItemID(
  ***************************************************************************/
 char*                           // RETURN: pointer to item
 GLB_GetPtr(
-	int handle                  // INPUT : handle of item
+	uint32_t handle                  // INPUT : handle of item
 )
 {
 	ITEM_H itm;
@@ -751,7 +750,7 @@ GLB_GetPtr(
  ***************************************************************************/
 void
 GLB_FreeItem(
-	int handle               // INPUT : handle of item
+	uint32_t handle               // INPUT : handle of item
 )
 {
 	ITEM_H itm;
@@ -824,7 +823,7 @@ GLB_FreeAll(
  ***************************************************************************/
 int                               // RETURN: sizeof ITEM
 GLB_ItemSize(
-	int handle                    // INPUT : handle of item
+	uint32_t handle                    // INPUT : handle of item
 )
 {
 	ITEM_H itm;
