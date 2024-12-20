@@ -291,9 +291,8 @@ GLB_NumItems(
 	fseek(handle, 0L, SEEK_SET);
 	
 	if (!fread(&key, sizeof(KEYFILE), 1, handle))
-	{
 		EXIT_Error("GLB_NumItems: Read failed!");
-	}
+	
 
 #ifdef _SCOTTGAME
 	GLB_DeCrypt(serial, (uint8_t*)&key, sizeof(KEYFILE));
@@ -314,7 +313,6 @@ GLB_LoadIDT(
 	int j;
 	int k;
 	int n;
-	size_t flen;
 	KEYFILE key[10];
 	ITEMINFO* ii;
 
@@ -330,7 +328,8 @@ GLB_LoadIDT(
 		if (k > (int)ASIZE(key))
 			k = ASIZE(key);
 
-		flen = fread(key, sizeof(KEYFILE), k, handle);
+		if (!fread(key, sizeof(KEYFILE), k, handle))
+			EXIT_Error("GLB_NumItems: Read failed!");
 		
 		for (n = 0; n < k; n++)
 		{
@@ -440,7 +439,6 @@ GLB_Load(
 {
 	FILE *handle;
 	ITEMINFO* ii;
-	size_t flen;
 	ASSERT(filenum >= 0 && filenum < num_glbs);
 
 	handle = filedesc[filenum].handle;
@@ -460,11 +458,13 @@ GLB_Load(
 		else
 		{
 			fseek(handle, ii->offset, SEEK_SET);
-			flen = fread(inmem, ii->size, 1, handle);
+			if(!fread(inmem, ii->size, 1, handle))
+				EXIT_Error("GLB_Load: Failed to read data\n");
+			
 #ifdef _SCOTTGAME
 			if (ii->flags & ITF_ENCODED)
 			{
-				GLB_DeCrypt(serial, inmem, flen);
+				GLB_DeCrypt(serial, inmem, ii->size);
 			}
 #endif
 		}
