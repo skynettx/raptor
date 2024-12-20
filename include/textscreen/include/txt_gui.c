@@ -204,7 +204,6 @@ void TXT_DrawSpecialSeparator(int x, int y, int w, int h, int sepcolor, int cust
     int bx;
     
     int x1;
-    int b;
 
     TXT_SaveColors(&colors);
 
