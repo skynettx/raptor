@@ -11,6 +11,7 @@
 
 #include "musapi.h"
 #include "prefapi.h"
+#include "glbapi.h"
 
 static tsf* g_TinySoundFont;
 
@@ -34,12 +35,18 @@ TSF_Init(
     int option
 )
 {
-    char fn[128];
+    char NameOfFile[127];
 
-    INI_GetPreference("Setup", "SoundFont", fn, 127, "TimGM6mb.sf2");
-    // Load the SoundFont from a file
+    INI_GetPreference("Setup", "SoundFont", NameOfFile, 127, "TimGM6mb.sf2");
 
+    //Get the path to the file.
+    char* fn = GLB_FindFilePath(NameOfFile);
+        
+    //Load the SoundFont from a file 
     g_TinySoundFont = tsf_load_filename(fn);
+
+    if(fn)
+        free(fn);
 
     if (!g_TinySoundFont)
     {
