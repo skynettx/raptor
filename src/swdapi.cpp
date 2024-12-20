@@ -1605,7 +1605,7 @@ SWD_ReformatFieldData(
     SFIELD32* swdfield32 = (SFIELD32*)((char*)header + header->fldofs);
     SFIELD* swdfield = (SFIELD*)((char*)swdNewData + swdNewData->fldofs);
 
-    for (size_t loop = 0; loop < header->numflds; loop++)
+    for (size_t loop = 0; loop < (size_t)header->numflds; loop++)
     {
         swdfield[loop].opt = swdfield32[loop].opt;
         swdfield[loop].id = swdfield32[loop].id;

@@ -639,7 +639,7 @@ GFX_ShadeArea(
 )
 {
     int loop;
-    char *buf, *cur_table;
+    char *buf, *cur_table = ltable;
     
     if (!GFX_ClipLines(NULL, &x, &y, &lx, &ly))
         return;
@@ -682,7 +682,7 @@ GFX_ShadeShape(
     GFX_PIC* h = (GFX_PIC*)inmem;
     GFX_SPRITE* ah;
     char rval;
-    char *cur_table;
+    char *cur_table = ltable;
     char *dest;
     int ox = x;
     int oy = y;
@@ -753,7 +753,7 @@ GFX_VShadeLine(
     int ly                 // INPUT : length of line
 )
 {
-    char *cur_table;
+    char *cur_table = ltable;
     char *outbuf;
     int lx = 1;
     
@@ -798,7 +798,7 @@ GFX_HShadeLine(
     int lx                 // INPUT : length of line
 )
 {
-    char *cur_table;
+    char *cur_table = ltable;
     char *outbuf;
     int ly = 1;
     

@@ -107,7 +107,7 @@ WritePrivateProfileString(
     FILE* fptr;
     short found = 0;
     short len;
-    int pos1, pos2, pos3;
+    int pos1, pos2 = 0, pos3;
     int exist_len, new_len, delta;
     int size;
     int cnt;
@@ -260,7 +260,7 @@ WritePrivateProfileString(
         chsize(fileno(fptr), pos1);
         #endif
         #ifdef __GNUC__
-        ftruncate(fileno(fptr), pos1);
+        int flen = ftruncate(fileno(fptr), pos1);
         #endif
     }
     else if (delta > 0)    // Expand file, starting at the end
