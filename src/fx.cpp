@@ -779,8 +779,7 @@ SFX_PlayPatch(
     int priority
 )
 {
-    int type = *(int16_t*)patch;
-    type = LE_LONG(type);
+    int type = LE_SHORT(*(int16_t*)patch);
     
     switch (type)
     {
