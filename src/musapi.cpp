@@ -5,6 +5,7 @@
 #include "fx.h"
 #include "cards.h"
 #include "gssapi.h"
+#include "entypes.h"
 
 static int musrate = 70;
 static int musfaderate = 50;
@@ -515,15 +516,15 @@ MUS_PlaySong(
         MUS_StopSong(0);
     
     music_ptr = (char*)ptr;
-    music_len = head->len;
-    music_startoffset = head->offset;
+    music_len = LE_USHORT(head->len);
+    music_startoffset = LE_USHORT(head->offset);
     music_cmdptr = 0;
     music_loop = loop;
     music_active = 1;
     music_delay = 0;
     music_vol = 127;
     music_fading = 0;
-    music_channels = head->channels;
+    music_channels = LE_USHORT(head->channels);
     MUS_Reset();
     
     if (fadein)

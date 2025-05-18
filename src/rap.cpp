@@ -32,6 +32,7 @@
 #include "joyapi.h"
 #include "i_lastscr.h"
 #include "fileids.h"
+#include "entypes.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -622,7 +623,7 @@ RAP_DisplayStats(
             {
                 pic = GLB_GetItem(FILE111_WEPDEST_PIC);
                 h = (GFX_PIC*)pic;
-                GFX_PutSprite(pic, (320 - h->width) >> 1, MAP_BOTTOM - 9);
+                GFX_PutSprite(pic, (320 - LE_LONG(h->width)) >> 1, MAP_BOTTOM - 9);
             }
             
             if (startendwave == -1)
@@ -630,7 +631,7 @@ RAP_DisplayStats(
             
             pic = GLB_GetItem(FILE110_SHLDLOW_PIC);
             h = (GFX_PIC*)pic;
-            GFX_PutSprite(pic, (320 - h->width) >> 1, MAP_BOTTOM);
+            GFX_PutSprite(pic, (320 - LE_LONG(h->width)) >> 1, MAP_BOTTOM);
         }
     }
     

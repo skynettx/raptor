@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "common.h"
 #include "gfxapi.h"
+#include "entypes.h"
 
 /*==========================================================================
    GFX_ScaleLine() - Does the scale from scale table ( _stable )
@@ -88,14 +89,14 @@ GFX_ShadeSprite(
     GFX_PIC* h = (GFX_PIC*)inmem;
     GFX_SPRITE* ah = (GFX_SPRITE*)inmem;
 
-    while ((int16_t)ah->offset != -1)
+    while ((int16_t)LE_LONG(ah->offset) != -1)
     {
-        char* d = dest + (uint16_t)ah->offset;
+        char* d = dest + (uint16_t)LE_LONG(ah->offset);
 
-        for (int loop = 0; loop < (uint16_t)h->width; loop++, d++)
+        for (int loop = 0; loop < (uint16_t)LE_LONG(h->width); loop++, d++)
             *d = dtable[(uint8_t)*d];
 
-        h = (GFX_PIC*)((char*)&h->height + (uint16_t)h->width);
+        h = (GFX_PIC*)((char*)&h->height + (uint16_t)LE_LONG(h->width));
         ah = (GFX_SPRITE*)h;
     }
 }
@@ -112,11 +113,11 @@ GFX_DrawSprite(
     GFX_PIC* h = (GFX_PIC*)inmem;
     GFX_SPRITE* ah = (GFX_SPRITE*)inmem;
     
-    while ((int16_t)ah->offset != -1)
+    while ((int16_t)LE_LONG(ah->offset) != -1)
     {
-        memcpy(dest + (uint16_t)ah->offset, (char*)&h->height, (uint16_t)h->width);
+        memcpy(dest + (uint16_t)LE_LONG(ah->offset), (char*)&h->height, (uint16_t)LE_LONG(h->width));
 
-        h = (GFX_PIC*)((char*)&h->height + (uint16_t)h->width);
+        h = (GFX_PIC*)((char*)&h->height + (uint16_t)LE_LONG(h->width));
         ah = (GFX_SPRITE*)h;
     }
 }

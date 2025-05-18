@@ -25,6 +25,7 @@
     <ClInclude Include="..\src\common.h" />
     <ClInclude Include="..\src\demo.h" />
     <ClInclude Include="..\src\dspapi.h" />
+    <ClInclude Include="..\src\entypes.h" />
     <ClInclude Include="..\src\enemy.h" />
     <ClInclude Include="..\src\eshot.h" />
     <ClInclude Include="..\src\fileids.h" />
@@ -83,7 +84,7 @@
     <ClCompile Include="..\src\joyapi.cpp" />
     <ClCompile Include="..\src\kbdapi.cpp" />
     <ClCompile Include="..\src\loadsave.cpp" />
-    <ClCompile Include="..\src\movia_a.cpp" />
+    <ClCompile Include="..\src\movie_a.cpp" />
     <ClCompile Include="..\src\movie.cpp" />
     <ClCompile Include="..\src\mpualsa.cpp" />
     <ClCompile Include="..\src\mpucorea.cpp" />

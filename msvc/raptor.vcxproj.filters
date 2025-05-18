@@ -135,6 +135,9 @@
     <ClInclude Include="..\src\winids.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\entypes.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\anims.cpp">
@@ -200,7 +203,7 @@
     <ClCompile Include="..\src\m_misc.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\movia_a.cpp">
+    <ClCompile Include="..\src\movie_a.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="..\src\movie.cpp">

@@ -13,6 +13,7 @@
 #include "intro.h"
 #include "input.h"
 #include "fileids.h"
+#include "entypes.h"
 
 #ifdef _MSC_VER
 #include <windows.h>
@@ -169,9 +170,9 @@ DEMO_GLBFile(
         
     cur_play = 1;
     
-    max_play = playback[0].playerpic;
-    demo_game = playback[0].px;
-    demo_wave = playback[0].py;
+    max_play = LE_SHORT(playback[0].playerpic);
+    demo_game = LE_SHORT(playback[0].px);
+    demo_wave = LE_SHORT(playback[0].py);
         
     GLB_FreeItem(item);
 }
@@ -191,9 +192,9 @@ DEMO_LoadFile(
     
     cur_play = 1;
     
-    max_play = playback[0].playerpic;
-    demo_game = playback[0].px;
-    demo_wave = playback[0].py;
+    max_play = LE_SHORT(playback[0].playerpic);
+    demo_game = LE_SHORT(playback[0].px);
+    demo_wave = LE_SHORT(playback[0].py);
 }
 
 /***************************************************************************
@@ -207,9 +208,9 @@ DEMO_SaveFile(
     if (cur_play < 2)
         return;
     
-    playback[0].px = cur_game;
-    playback[0].py = game_wave[cur_game];
-    playback[0].playerpic = cur_play;
+    playback[0].px = LE_SHORT(cur_game);
+    playback[0].py = LE_SHORT(game_wave[cur_game]);
+    playback[0].playerpic = LE_SHORT(cur_play);
     
     GLB_SaveFile(demo_name, (char*)playback, cur_play * sizeof(RECORD));
 }
@@ -297,11 +298,11 @@ DEMO_Think(
         buttons[1] = playback[cur_play].b2;
         buttons[2] = playback[cur_play].b3;
         buttons[3] = playback[cur_play].b4;
-        playerx = playback[cur_play].px;
-        playery = playback[cur_play].py;
+        playerx = LE_SHORT(playback[cur_play].px);
+        playery = LE_SHORT(playback[cur_play].py);
         player_cx = playerx + 16;
         player_cy = playery + 16;
-        playerpic = playback[cur_play].playerpic;
+        playerpic = LE_SHORT(playback[cur_play].playerpic);
         cur_play++;
         if (cur_play > max_play)
         {
@@ -315,9 +316,9 @@ DEMO_Think(
         playback[cur_play].b2 = buttons[1];
         playback[cur_play].b3 = buttons[2];
         playback[cur_play].b4 = buttons[3];
-        playback[cur_play].px = playerx;
-        playback[cur_play].py = playery;
-        playback[cur_play].playerpic = playerpic;
+        playback[cur_play].px = LE_SHORT(playerx);
+        playback[cur_play].py = LE_SHORT(playery);
+        playback[cur_play].playerpic = LE_SHORT(playerpic);
         cur_play++;
         if (cur_play == MAX_DEMO)
         {

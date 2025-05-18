@@ -7,6 +7,7 @@
 #include "rap.h"
 #include "tile.h"
 #include "fileids.h"
+#include "entypes.h"
 
 #define MAX_ANIMLIB 25
 #define MAX_ANIMS   100
@@ -128,8 +129,8 @@ ANIMS_Register(
     cur->adir = adir;
     
     h = (GFX_PIC*)GLB_LockItem(item);
-    cur->xoff = h->width >> 1;
-    cur->yoff = h->height >> 1;
+    cur->xoff = LE_LONG(h->width) >> 1;
+    cur->yoff = LE_LONG(h->height) >> 1;
     GLB_FreeItem(item);
     
     return handle;

@@ -4,6 +4,7 @@
 #include "rap.h"
 #include "windows.h"
 #include "glbapi.h"
+#include "entypes.h"
 
 char sdtablemem[516];
 char *sdtable;
@@ -50,8 +51,8 @@ SHADOW_Draw(
     ox = G3D_screenx;
     oy = G3D_screeny;
     
-    G3D_x = ox + h->width - 1;
-    G3D_y = oy + h->height - 1;
+    G3D_x = ox + LE_LONG(h->width) - 1;
+    G3D_y = oy + LE_LONG(h->height) - 1;
     G3D_z = MAXZ;
     GFX_3DPoint();
     lx = G3D_screenx - ox + 1;
@@ -64,14 +65,14 @@ SHADOW_Draw(
     
     ah = (GFX_SPRITE*)pic;
     
-    while (ah->offset != -1)
+    while (LE_LONG(ah->offset) != -1)
     {
         pic += sizeof(GFX_SPRITE);
         
-        ox = ah->x + x;
-        oy = ah->y + y;
+        ox = LE_LONG(ah->x) + x;
+        oy = LE_LONG(ah->y) + y;
         
-        x2 = ox + ah->length - 1;
+        x2 = ox + LE_LONG(ah->length) - 1;
         y2 = oy + 1;
         
         G3D_x = ox;
@@ -92,7 +93,7 @@ SHADOW_Draw(
         
         drawflag = 1;
         
-        if (ah->y != oldy && oldsy == sy)
+        if (LE_LONG(ah->y) != oldy && oldsy == sy)
             drawflag = 0;
         
         if (drawflag)
@@ -102,12 +103,12 @@ SHADOW_Draw(
             if (GFX_ClipLines(0, &sx, &sy, &lx, &ly))
                 GFX_Shade(displaybuffer + sx + ylookup[sy], lx, sdtable);
             
-            oldy = ah->y;
+            oldy = LE_LONG(ah->y);
         }
         
         oldsy = sy;
         
-        pic += ah->length;
+        pic += LE_LONG(ah->length);
         
         ah = (GFX_SPRITE*)pic;
     }

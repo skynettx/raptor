@@ -28,7 +28,7 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/glbapi.cpp
     src/i_video.cpp
     src/musapi.cpp
-    src/movia_a.cpp
+    src/movie_a.cpp
     src/ptrapi_a.cpp
     src/swdapi.cpp
     src/imsapi.cpp

@@ -8,6 +8,7 @@
 #include "loadsave.h"
 #include "fx.h"
 #include "anims.h"
+#include "entypes.h"
 
 #define MAX_STILES ( MAP_ONSCREEN * MAP_COLS )
 #define MAX_TILEDELAY ( ( MAP_ONSCREEN + 1 ) * MAP_COLS )
@@ -262,25 +263,25 @@ TILE_CacheLevel(
     // == CACHE TILES =========================
     for (loop = 0; loop < MAP_SIZE; loop++)
     {
-        game = mapmem->map[loop].fgame;
+        game = LE_SHORT(mapmem->map[loop].fgame);
         lib = flatlib[game];
         
-        money[loop] = lib[mapmem->map[loop].flats].bounty;
+        money[loop] = LE_SHORT(lib[LE_SHORT(mapmem->map[loop].flats)].bounty);
         
         item = startflat[game];
-        item += mapmem->map[loop].flats;
+        item += LE_SHORT(mapmem->map[loop].flats);
         titems[loop] = item;
         GLB_CacheItem(item);
         
         item = startflat[game];
-        item += lib[mapmem->map[loop].flats].linkflat;
+        item += LE_LONG(lib[LE_SHORT(mapmem->map[loop].flats)].linkflat);
         eitems[loop] = item;
         
         if (eitems[loop] != titems[loop])
             GLB_CacheItem(item);
         
         if (eitems[loop] != titems[loop])
-            hits[loop] = lib[mapmem->map[loop].flats].bonus;
+            hits[loop] = LE_SHORT(lib[LE_SHORT(mapmem->map[loop].flats)].bonus);
         else
             hits[loop] = 1;
     }

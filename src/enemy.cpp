@@ -17,6 +17,7 @@
 #include "joyapi.h"
 #include "input.h"
 #include "fileids.h"
+#include "entypes.h" 
 
 #define NORM_SHOOT  -1
 #define START_SHOOT   0
@@ -129,16 +130,16 @@ ENEMY_FreeSprites(
             GLB_FreeItem(spriteitm[loop]);
     }
     
-    for (loop = 0; loop < mapmem->numsprites; loop++)
+    for (loop = 0; loop < LE_LONG(mapmem->numsprites); loop++)
     {
         curfld = &csprite[loop];
-        curlib = &slib[csprite[loop].game][csprite[loop].slib];
+        curlib = &slib[LE_LONG(csprite[loop].game)][LE_LONG(csprite[loop].slib)];
         
         if (cur_diff & curfld->level)
         {
-            for (i = 0; i < curlib->num_frames; i++)
+            for (i = 0; i < LE_LONG(curlib->num_frames); i++)
             {
-                GLB_FreeItem(curlib->item + i);
+                GLB_FreeItem(LE_LONG(curlib->item) + i);
             }
         }
     }
@@ -160,13 +161,13 @@ ENEMY_LoadSprites(
     cur_visable = 0;
     boss_sound = 0;
     
-    for (loop = 0; loop < mapmem->numsprites; loop++)
+    for (loop = 0; loop < LE_LONG(mapmem->numsprites); loop++)
     {
         curfld = &csprite[loop];
-        curlib = &slib[csprite[loop].game][csprite[loop].slib];
-        curlib->item = GLB_GetItemID(curlib->iname);
+        curlib = &slib[LE_LONG(csprite[loop].game)][LE_LONG(csprite[loop].slib)];
+        curlib->item = LE_LONG(GLB_GetItemID(curlib->iname));
         
-        switch (curfld->level)
+        switch (LE_LONG(curfld->level))
         {
         default:
             curfld->level = EB_NOT_USED;
@@ -199,11 +200,11 @@ ENEMY_LoadSprites(
         
         if (cur_diff & curfld->level)
         {
-            if (curlib->item != -1)
+            if (LE_LONG(curlib->item) != -1)
             {
-                for (i = 0; i < curlib->num_frames; i++)
+                for (i = 0; i < LE_LONG(curlib->num_frames); i++)
                 {
-                    item = curlib->item + i;
+                    item = LE_LONG(curlib->item) + i;
                     
                     GLB_CacheItem(item);
                 }
@@ -229,9 +230,9 @@ void ENEMY_LoadLib(
     
     memset(spriteflag, 0, sizeof(spriteflag));
     
-    for (loop = 0; loop < mapmem->numsprites; loop++)
+    for (loop = 0; loop < LE_LONG(mapmem->numsprites); loop++)
     {
-        spriteflag[csprite[loop].game] = 1;
+        spriteflag[LE_LONG(csprite[loop].game)] = 1;
     }
     g_numslibs = 0;
     for (loop = 0; loop < 4; loop++)
@@ -288,9 +289,9 @@ void ENEMY_Clear(
     {
         ships[loop].next = &ships[loop + 1];
     }
-    if (mapmem->numsprites)
+    if (LE_LONG(mapmem->numsprites))
     {
-        end_enemy = csprite + mapmem->numsprites - 1;
+        end_enemy = csprite + LE_LONG(mapmem->numsprites) - 1;
         cur_enemy = csprite;
     }
     else
@@ -338,7 +339,7 @@ SPRITE_SHIP
 {
     SPRITE_SHIP *next;
     
-    if (sh->lib->bossflag)
+    if (LE_LONG(sh->lib->bossflag))
         numboss--;
     
     numships--;
@@ -373,23 +374,23 @@ ENEMY_Add(
     SPRITE_SHIP *newe;
     char *pic;
     GFX_PIC *h;
-    curlib = &slib[sprite->game][sprite->slib];
+    curlib = &slib[LE_LONG(sprite->game)][LE_LONG(sprite->slib)];
     
     newe = ENEMY_Get();
-    pic = GLB_GetItem(curlib->item);
+    pic = GLB_GetItem(LE_LONG(curlib->item));
     h = (GFX_PIC*)pic;
     
-    newe->item = curlib->item;
-    newe->width = h->width;
-    newe->height = h->height;
-    newe->hlx = h->width >> 1;
-    newe->hly = h->height >> 1;
+    newe->item = LE_LONG(curlib->item);
+    newe->width = LE_LONG(h->width);
+    newe->height = LE_LONG(h->height);
+    newe->hlx = LE_LONG(h->width) >> 1;
+    newe->hly = LE_LONG(h->height) >> 1;
     
     newe->kami = KAMI_FLY;
-    newe->hits = curlib->hits;
-    newe->lib = &slib[sprite->game][sprite->slib];
-    newe->y = tileyoff - (tiley - sprite->y) * 32 - 97;
-    newe->x = sprite->x * 32 + MAP_LEFT;
+    newe->hits = LE_LONG(curlib->hits);
+    newe->lib = &slib[LE_LONG(sprite->game)][LE_LONG(sprite->slib)];
+    newe->y = tileyoff - (tiley - LE_LONG(sprite->y)) * 32 - 97;
+    newe->x = LE_LONG(sprite->x) * 32 + MAP_LEFT;
     
     newe->edir = E_FORWARD;
     newe->x += 16;
@@ -400,52 +401,52 @@ ENEMY_Add(
     newe->y2 = newe->y + newe->height;
     newe->move.x = newe->sx = newe->x;
     newe->move.y = newe->sy = newe->y;
-    newe->frame_rate = curlib->frame_rate;
-    newe->speed = curlib->movespeed;
+    newe->frame_rate = LE_LONG(curlib->frame_rate);
+    newe->speed = LE_LONG(curlib->movespeed);
     
-    newe->countdown = curlib->countdown - newe->move.y;
+    newe->countdown = LE_LONG(curlib->countdown) - newe->move.y;
     newe->shoot_disable = 0;
     newe->shoot_on = 0;
     newe->shootagain = NORM_SHOOT;
-    newe->shootcount = curlib->shootcnt;
-    newe->shootflag = curlib->shootstart;
+    newe->shootcount = LE_LONG(curlib->shootcnt);
+    newe->shootflag = LE_LONG(curlib->shootstart);
     
-    if (curlib->bossflag && curplr_diff <= DIFF_1)
+    if (LE_LONG(curlib->bossflag) && curplr_diff <= DIFF_1)
     {
         newe->hits -= newe->hits >> 1;
         newe->shootcount -= newe->shootcount >> 2;
     }
     
-    switch (curlib->animtype)
+    switch (LE_LONG(curlib->animtype))
     {
     default:
         EXIT_Error("ENEMY_Add() - Invalid ANIMTYPE");
         break;
     case GANIM_NORM:
         newe->anim_on = 1;
-        newe->num_frames = curlib->num_frames;
+        newe->num_frames = LE_LONG(curlib->num_frames);
         break;
     
     case GANIM_SHOOT:
         newe->anim_on = 0;
-        newe->num_frames = curlib->num_frames;
+        newe->num_frames = LE_LONG(curlib->num_frames);
         break;
     
     case GANIM_MULTI:
         newe->anim_on = 1;
-        newe->num_frames = curlib->rewind;
+        newe->num_frames = LE_LONG(curlib->rewind);
         break;
     }
     
-    switch (curlib->flighttype)
+    switch (LE_LONG(curlib->flighttype))
     {
     case F_REPEAT:
     case F_LINEAR:
     case F_KAMI:
         newe->groundflag = 0;
         newe->sy = 100 - newe->hly;
-        newe->move.x2 = newe->sx + curlib->flightx[0];
-        newe->move.y2 = newe->sy + curlib->flighty[0];
+        newe->move.x2 = newe->sx + LE_SHORT(curlib->flightx[0]);
+        newe->move.y2 = newe->sy + LE_SHORT(curlib->flighty[0]);
         newe->movepos = 1;
         InitMobj(&newe->move);
         MoveMobj(&newe->move);
@@ -474,9 +475,9 @@ ENEMY_Add(
         break;
     }
     
-    newe->suckagain = curlib->hits >> 4;
+    newe->suckagain = LE_LONG(curlib->hits) >> 4;
     
-    if (curlib->song != -1)
+    if (LE_LONG(curlib->song) != -1)
         boss_sound = 1;
 }
 
@@ -646,7 +647,7 @@ SPRITE_SHIP
         {
             cur->hits--;
             
-            if (cur->lib->suck)
+            if (LE_LONG(cur->lib->suck))
             {
                 if (cur->suckagain > 0)
                 {
@@ -687,7 +688,7 @@ void ENEMY_Think(
     
     tiley = tilepos / MAP_COLS - 3;
     
-    while (!end_waveflag && cur_enemy->y == tiley)
+    while (!end_waveflag && LE_LONG(cur_enemy->y) == tiley)
     {
         do
         {
@@ -703,7 +704,7 @@ void ENEMY_Think(
             }
             
             cur_enemy++;
-        } while (old_enemy->link != -1 && old_enemy->link != 1);
+        } while (LE_LONG(old_enemy->link) != -1 && LE_LONG(old_enemy->link) != 1);
     }
     
     cur_visable = 0;
@@ -712,21 +713,21 @@ void ENEMY_Think(
     {
         curlib = sprite->lib;
         
-        if (curlib->num_frames > 1)
+        if (LE_LONG(curlib->num_frames) > 1)
         {
-            sprite->item = curlib->item + sprite->curframe;
+            sprite->item = LE_LONG(curlib->item) + sprite->curframe;
             
             if (sprite->frame_rate < 1)
             {
-                sprite->frame_rate = curlib->frame_rate;
+                sprite->frame_rate = LE_LONG(curlib->frame_rate);
                 
                 if (sprite->anim_on)
                 {
                     sprite->curframe++;
                     if ((unsigned int)sprite->curframe >= (unsigned int)sprite->num_frames)
                     {
-                        sprite->curframe -= curlib->rewind;
-                        switch (curlib->animtype)
+                        sprite->curframe -= LE_LONG(curlib->rewind);
+                        switch (LE_LONG(curlib->animtype))
                         {
                         default:
                             EXIT_Error("ENEMY_Think() - Invalid ANIMTYPE1");
@@ -742,7 +743,7 @@ void ENEMY_Think(
                             switch (sprite->multi)
                             {
                             case MULTI_START:
-                                sprite->num_frames = curlib->num_frames;
+                                sprite->num_frames = LE_LONG(curlib->num_frames);
                                 sprite->multi = 2;
                                 break;
                             
@@ -760,7 +761,7 @@ void ENEMY_Think(
             
             if (sprite->countdown < 1)
             {
-                switch (curlib->animtype)
+                switch (LE_LONG(curlib->animtype))
                 {
                 default:
                     EXIT_Error("ENEMY_Think() - Invalid ANIMTYPE2");
@@ -779,7 +780,7 @@ void ENEMY_Think(
                 }
             }
             else
-                sprite->countdown -= curlib->movespeed;
+                sprite->countdown -= LE_LONG(curlib->movespeed);
         }
         else
         {
@@ -789,10 +790,10 @@ void ENEMY_Think(
                 sprite->shoot_on = 1;
             }
             else
-                sprite->countdown -= curlib->movespeed;
+                sprite->countdown -= LE_LONG(curlib->movespeed);
         }
         
-        switch (curlib->flighttype)
+        switch (LE_LONG(curlib->flighttype))
         {
         case F_REPEAT:
             sprite->x = sprite->move.x;
@@ -800,7 +801,7 @@ void ENEMY_Think(
             sprite->x2 = sprite->x + sprite->width - 1;
             sprite->y2 = sprite->y + sprite->height - 1;
             
-            speed = curlib->movespeed;
+            speed = LE_LONG(curlib->movespeed);
             
             speed = MoveEobj(&sprite->move, speed);
             
@@ -808,8 +809,8 @@ void ENEMY_Think(
             {
                 sprite->move.x = sprite->move.x2;
                 sprite->move.y = sprite->move.y2;
-                sprite->move.x2 = sprite->sx + curlib->flightx[sprite->movepos];
-                sprite->move.y2 = sprite->sy + curlib->flighty[sprite->movepos];
+                sprite->move.x2 = sprite->sx + LE_SHORT(curlib->flightx[sprite->movepos]);
+                sprite->move.y2 = sprite->sy + LE_SHORT(curlib->flighty[sprite->movepos]);
                 
                 InitMobj(&sprite->move);
                 MoveMobj(&sprite->move);
@@ -819,19 +820,19 @@ void ENEMY_Think(
                 if (!sprite->edir)
                 {
                     sprite->movepos++;
-                    if (sprite->movepos >= curlib->numflight)
+                    if (sprite->movepos >= LE_LONG(curlib->numflight))
                     {
                         sprite->edir = E_BACKWARD;
-                        sprite->movepos = curlib->numflight - 1;
+                        sprite->movepos = LE_LONG(curlib->numflight) - 1;
                     }
                 }
                 else
                 {
                     sprite->movepos--;
-                    if (sprite->movepos <= curlib->repos)
+                    if (sprite->movepos <= LE_LONG(curlib->repos))
                     {
                         sprite->edir = E_FORWARD;
-                        sprite->movepos = curlib->repos;
+                        sprite->movepos = LE_LONG(curlib->repos);
                     }
                 }
             }
@@ -843,7 +844,7 @@ void ENEMY_Think(
             sprite->x2 = sprite->x + sprite->width - 1;
             sprite->y2 = sprite->y + sprite->height - 1;
             
-            speed = curlib->movespeed;
+            speed = LE_LONG(curlib->movespeed);
             speed = MoveEobj(&sprite->move, speed);
             
             if (sprite->kami == KAMI_END)
@@ -876,15 +877,15 @@ void ENEMY_Think(
                 }
                 else
                 {
-                    sprite->move.x2 = sprite->sx + curlib->flightx[sprite->movepos];
-                    sprite->move.y2 = sprite->sy + curlib->flighty[sprite->movepos];
+                    sprite->move.x2 = sprite->sx + LE_SHORT(curlib->flightx[sprite->movepos]);
+                    sprite->move.y2 = sprite->sy + LE_SHORT(curlib->flighty[sprite->movepos]);
                 }
                 
                 InitMobj(&sprite->move);
                 MoveMobj(&sprite->move);
                 speed = MoveEobj(&sprite->move, speed);
                 
-                if (curlib->numflight - 1 > sprite->movepos)
+                if (LE_LONG(curlib->numflight) - 1 > sprite->movepos)
                     sprite->movepos++;
                 else if (sprite->kami == KAMI_FLY)
                     sprite->kami = KAMI_CHASE;
@@ -897,7 +898,7 @@ void ENEMY_Think(
             sprite->x2 = sprite->x + sprite->width - 1;
             sprite->y2 = sprite->y + sprite->height - 1;
             
-            speed = curlib->movespeed;
+            speed = LE_LONG(curlib->movespeed);
             
             speed = MoveEobj(&sprite->move, speed);
             
@@ -905,8 +906,8 @@ void ENEMY_Think(
             {
                 sprite->move.x = sprite->move.x2;
                 sprite->move.y = sprite->move.y2;
-                sprite->move.x2 = sprite->sx + curlib->flightx[sprite->movepos];
-                sprite->move.y2 = sprite->sy + curlib->flighty[sprite->movepos];
+                sprite->move.x2 = sprite->sx + LE_SHORT(curlib->flightx[sprite->movepos]);
+                sprite->move.y2 = sprite->sy + LE_SHORT(curlib->flighty[sprite->movepos]);
                 
                 InitMobj(&sprite->move);
                 MoveMobj(&sprite->move);
@@ -915,7 +916,7 @@ void ENEMY_Think(
                 
                 sprite->movepos++;
                 
-                if (sprite->movepos > curlib->numflight)
+                if (sprite->movepos > LE_LONG(curlib->numflight))
                     sprite->doneflag = 1;
             }
             break;
@@ -934,7 +935,7 @@ void ENEMY_Think(
                 sprite->y++;
             if (sprite->y >= 0)
             {
-                sprite->x += curlib->movespeed;
+                sprite->x += LE_LONG(curlib->movespeed);
                 if (sprite->x > sprite->move.x2)
                     sprite->doneflag = 1;
                 else if (sprite->y > sprite->move.y2)
@@ -949,7 +950,7 @@ void ENEMY_Think(
                 sprite->y++;
             if (sprite->y >= 0)
             {
-                sprite->x -= curlib->movespeed;
+                sprite->x -= LE_LONG(curlib->movespeed);
                 if (sprite->x < sprite->move.x2)
                     sprite->doneflag = 1;
                 else if (sprite->y > sprite->move.y2)
@@ -969,25 +970,25 @@ void ENEMY_Think(
                 
                 if (sprite->shootflag < 0)
                 {
-                    sprite->shootflag = curlib->shootspace;
+                    sprite->shootflag = LE_LONG(curlib->shootspace);
                     
                     if (sprite->shoot_disable == 0)
                     {
-                        for (loop = 0; loop < curlib->numguns; loop++)
+                        for (loop = 0; loop < LE_LONG(curlib->numguns); loop++)
                         {
                             ESHOT_Shoot(sprite, loop);
                         }
                     }
                     sprite->shootcount--;
                     if (sprite->shootcount < 1)
-                        sprite->shootagain = curlib->shootframe;
+                        sprite->shootagain = LE_LONG(curlib->shootframe);
                 }
                 break;
             
             case START_SHOOT:
                 sprite->shootagain = NORM_SHOOT;
-                sprite->shootcount = curlib->shootcnt;
-                sprite->shootflag = curlib->shootspace;
+                sprite->shootcount = LE_LONG(curlib->shootcnt);
+                sprite->shootflag = LE_LONG(curlib->shootspace);
                 break;
             
             default:
@@ -1002,7 +1003,7 @@ void ENEMY_Think(
             continue;
         }
         
-        if (curlib->shadow)
+        if (LE_LONG(curlib->shadow))
         {
             if (sprite->groundflag)
             {
@@ -1014,7 +1015,7 @@ void ENEMY_Think(
             }
         }
         
-        if (curlib->bossflag)
+        if (LE_LONG(curlib->bossflag))
         {
             numboss++;
             if (sprite->hits < 50 && (gl_cnt & 2) != 0)
@@ -1052,11 +1053,11 @@ void ENEMY_Think(
         
         if (sprite->hits <= 0)
         {
-            plr.score += curlib->money;
+            plr.score += LE_LONG(curlib->money);
             
             SND_3DPatch(FX_AIREXPLO, sprite->x + sprite->hlx, sprite->x + sprite->hlx);
             
-            switch (curlib->exptype)
+            switch (LE_LONG(curlib->exptype))
             {
             case EXP_ENERGY:
                 ANIMS_StartAnim(A_ENERGY_AIR_EXPLO, sprite->x + sprite->hlx, sprite->y + sprite->hly);
@@ -1144,8 +1145,8 @@ void ENEMY_Think(
                 break;
             }
             
-            if (curlib->bonus != -1)
-                BONUS_Add(curlib->bonus, sprite->x, sprite->y);
+            if (LE_LONG(curlib->bonus) != -1)
+                BONUS_Add(LE_LONG(curlib->bonus), sprite->x, sprite->y);
             
             sprite = ENEMY_Remove(sprite);
             
@@ -1203,9 +1204,9 @@ ENEMY_DisplaySky(
         
         GFX_PutSprite((char*)GLB_GetItem(spt->item), spt->x, spt->y);
         
-        for (i = 0; i < spt->lib->numengs; i++)
+        for (i = 0; i < LE_LONG(spt->lib->numengs); i++)
         {
-            FLAME_Up(spt->x + spt->lib->engx[i], spt->y + spt->lib->engy[i], spt->lib->englx[i], spt->eframe);
+            FLAME_Up(spt->x + LE_SHORT(spt->lib->engx[i]), spt->y + LE_SHORT(spt->lib->engy[i]), LE_SHORT(spt->lib->englx[i]), spt->eframe);
         }
         
         spt->eframe ^= 1;
@@ -1229,7 +1230,7 @@ ENEMY_GetBaseDamage(
     
     for (spt = first_enemy.next; &last_enemy != spt; spt = spt->next)
     {
-        if (!spt->lib->bossflag)
+        if (!LE_LONG(spt->lib->bossflag))
             continue;
         if (spt->y + spt->hly >= 0)
         {

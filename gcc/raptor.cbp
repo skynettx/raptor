@@ -200,6 +200,7 @@
 		<Unit filename="../src/dspapi.h" />
 		<Unit filename="../src/enemy.cpp" />
 		<Unit filename="../src/enemy.h" />
+		<Unit filename="../src/entypes.h" />
 		<Unit filename="../src/eshot.cpp" />
 		<Unit filename="../src/eshot.h" />
 		<Unit filename="../src/fileids.h" />
@@ -236,9 +237,9 @@
 		<Unit filename="../src/loadsave.h" />
 		<Unit filename="../src/m_misc.cpp" />
 		<Unit filename="../src/m_misc.h" />
-		<Unit filename="../src/movia_a.cpp" />
 		<Unit filename="../src/movie.cpp" />
 		<Unit filename="../src/movie.h" />
+		<Unit filename="../src/movie_a.cpp" />
 		<Unit filename="../src/mpualsa.cpp" />
 		<Unit filename="../src/mpucorea.cpp" />
 		<Unit filename="../src/mpucorem.cpp" />

@@ -12,6 +12,7 @@
 #include "joyapi.h"
 #include "input.h"
 #include "fileids.h"
+#include "entypes.h"
 
 #define MAX_ESHOT 80
 
@@ -158,8 +159,8 @@ ESHOT_Init(
     for (loop = 0; loop < cur->num_frames; loop++)
         cur->pic[loop] = (char*)GLB_LockItem(cur->item + loop);
     h = (GFX_PIC*)cur->pic[0];
-    cur->xoff = h->width >> 1;
-    cur->yoff = h->height >> 1;
+    cur->xoff = LE_LONG(h->width) >> 1;
+    cur->yoff = LE_LONG(h->height) >> 1;
 
     cur = &plib[LIB_ATPLAY];                          
     cur->hits = 1;
@@ -170,8 +171,8 @@ ESHOT_Init(
     for (loop = 0; loop < cur->num_frames; loop++)
         cur->pic[loop] = (char*)GLB_LockItem(cur->item + loop);
     h = (GFX_PIC*)cur->pic[0];
-    cur->xoff = h->width >> 1;
-    cur->yoff = h->height >> 1;
+    cur->xoff = LE_LONG(h->width) >> 1;
+    cur->yoff = LE_LONG(h->height) >> 1;
 
     cur = &plib[LIB_MISSLE];                         
     cur->hits = 4;
@@ -182,8 +183,8 @@ ESHOT_Init(
     for (loop = 0; loop < cur->num_frames; loop++)
         cur->pic[loop] = (char*)GLB_LockItem(cur->item + loop);
     h = (GFX_PIC*) cur->pic[0];
-    cur->xoff = h->width >> 1;
-    cur->yoff = h->height >> 1;
+    cur->xoff = LE_LONG(h->width) >> 1;
+    cur->yoff = LE_LONG(h->height) >> 1;
 
     cur = &plib[LIB_MINES];                        
     cur->hits = 0x10;
@@ -194,8 +195,8 @@ ESHOT_Init(
     for (loop = 0; loop < cur->num_frames; loop++)
         cur->pic[loop] = (char*)GLB_LockItem(cur->item + loop);
     h = (GFX_PIC*)cur->pic[0];
-    cur->xoff = h->width >> 1;
-    cur->yoff = h->height >> 1;
+    cur->xoff = LE_LONG(h->width) >> 1;
+    cur->yoff = LE_LONG(h->height) >> 1;
 
     cur = &plib[LIB_LASER];                        
     cur->hits = 0xc;
@@ -206,8 +207,8 @@ ESHOT_Init(
     for (loop = 0; loop < cur->num_frames; loop++)
         cur->pic[loop] = (char*)GLB_LockItem(cur->item + loop);
     h = (GFX_PIC*)cur->pic[0];
-    cur->xoff = h->width >> 1;
-    cur->yoff = h->height >> 1;
+    cur->xoff = LE_LONG(h->width) >> 1;
+    cur->yoff = LE_LONG(h->height) >> 1;
 
     cur = &plib[LIB_PLASMA];                       
     cur->hits = 0xf;
@@ -218,8 +219,8 @@ ESHOT_Init(
     for (loop = 0; loop < cur->num_frames; loop++)
         cur->pic[loop] = (char*)GLB_LockItem(cur->item + loop);
     h = (GFX_PIC*)cur->pic[0];
-    cur->xoff = h->width >> 1;
-    cur->yoff = h->height >> 1;
+    cur->xoff = LE_LONG(h->width) >> 1;
+    cur->yoff = LE_LONG(h->height) >> 1;
 
     cur = &plib[LIB_COCO];                       
     cur->hits = 1;
@@ -230,8 +231,8 @@ ESHOT_Init(
     for (loop = 0; loop < cur->num_frames; loop++)
         cur->pic[loop] = (char*)GLB_LockItem(cur->item + loop);
     h = (GFX_PIC*)cur->pic[0];
-    cur->xoff = h->width >> 1;
-    cur->yoff = h->height >> 1;
+    cur->xoff = LE_LONG(h->width) >> 1;
+    cur->yoff = LE_LONG(h->height) >> 1;
 }
 
 /***************************************************************************
@@ -248,8 +249,8 @@ ESHOT_Shoot(
     int g_shoot_type;
     ESHOT *cur;
     
-    x = enemy->x + enemy->lib->shootx[gun_num];
-    y = enemy->y + enemy->lib->shooty[gun_num];
+    x = enemy->x + LE_SHORT(enemy->lib->shootx[gun_num]);
+    y = enemy->y + LE_SHORT(enemy->lib->shooty[gun_num]);
     
     if (((x >= 0) && (x < 320)) && ((y >= 0) && (y < 200)))
     {
@@ -262,7 +263,7 @@ ESHOT_Shoot(
         cur->move.y = y;
         cur->en = enemy;
         cur->gun_num = gun_num;
-        g_shoot_type = enemy->lib->shoot_type[gun_num];
+        g_shoot_type = LE_SHORT(enemy->lib->shoot_type[gun_num]);
         
         switch (g_shoot_type)
         {
@@ -407,8 +408,8 @@ ESHOT_Think(
         case ES_LASER:
             if (shot->en && shot->en->lib && shot->curframe < lib->num_frames)
             {
-                shot->x = shot->en->x + shot->en->lib->shootx[shot->gun_num] - 4;
-                shot->y = shot->en->y + shot->en->lib->shooty[shot->gun_num];
+                shot->x = shot->en->x + LE_SHORT(shot->en->lib->shootx[shot->gun_num]) - 4;
+                shot->y = shot->en->y + LE_SHORT(shot->en->lib->shooty[shot->gun_num]);
                 shot->move.y2 = 200;  
                 
                 dx = abs(shot->x - player_cx);
@@ -529,7 +530,7 @@ ESHOT_Display(
             
             if (y > 0 && y < 200)
             {
-                GFX_PutSprite((char*)h, shot->x - (h->width >> 2), y);
+                GFX_PutSprite((char*)h, shot->x - (LE_LONG(h->width) >> 2), y);
             }
         }
         else

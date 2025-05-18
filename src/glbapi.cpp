@@ -8,6 +8,7 @@
 #include "common.h"
 #include "glbapi.h"
 #include "vmemapi.h"
+#include "entypes.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -61,11 +62,19 @@ typedef struct
 	const char *permissions;
 }FILEDESC;
 
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+typedef struct
+{
+	uint16_t filenum;
+	uint16_t itemnum;
+}ITEM_ID;
+#else
 typedef struct
 {
 	uint16_t itemnum;
 	uint16_t filenum;
 }ITEM_ID;
+#endif
 
 typedef union
 {
@@ -289,7 +298,7 @@ GLB_NumItems(
 	GLB_DeCrypt(serial, (uint8_t*)&key, sizeof(KEYFILE));
 #endif
 
-	return ((int)key.offset);
+	return ((int)LE_ULONG(key.offset));
 }
 
 /*--------------------------------------------------------------------------
@@ -326,11 +335,11 @@ GLB_LoadIDT(
 #ifdef _SCOTTGAME
 			GLB_DeCrypt(serial, (void*)&key[n], sizeof(KEYFILE));
 #endif
-			if (key[n].opt == GLB_ENCODED)
+			if (LE_ULONG(key[n].opt) == GLB_ENCODED)
 				ii->flags |= ITF_ENCODED;
 
-			ii->size = key[n].filesize;
-			ii->offset = key[n].offset;
+			ii->size = LE_ULONG(key[n].filesize);
+			ii->offset = LE_ULONG(key[n].offset);
 			memcpy(ii->name, key[n].name, sizeof(ii->name));
 			ii++;
 		}

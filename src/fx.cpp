@@ -13,6 +13,7 @@
 #include "rap.h"
 #include "gssapi.h"
 #include "fileids.h"
+#include "entypes.h"
 
 int music_volume;
 int dig_flag;
@@ -778,7 +779,7 @@ SFX_PlayPatch(
     int priority
 )
 {
-    int type = *(int16_t*)patch;
+    int type = LE_SHORT(*(int16_t*)patch);
     
     switch (type)
     {
