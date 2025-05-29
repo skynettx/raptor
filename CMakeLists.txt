@@ -9,24 +9,24 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 project(raptor)
 
-if (ANDROID)
-include(FetchContent)
-FetchContent_Declare(
-  SDL
-  URL            https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.30.10.zip
-  SOURCE_DIR     ${CMAKE_BINARY_DIR}/include/SDL2
-)
-set(BUILD_SHARED_LIBS ON)
-set(SDL2_DISABLE_UNINSTALL ON CACHE BOOL "" FORCE)
-set(SDL_TEST_ENABLED_BY_DEFAULT OFF)
-set(SDL2_DISABLE_SDL2MAIN ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(SDL)
-set(SDL_ACTIVITY_FOLDER app/src/main/java/org/libsdl/app/)
-file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/android/${SDL_ACTIVITY_FOLDER})
-file(COPY ${CMAKE_BINARY_DIR}/include/SDL2/android-project/${SDL_ACTIVITY_FOLDER} DESTINATION ${CMAKE_SOURCE_DIR}/android/${SDL_ACTIVITY_FOLDER})
+if(ANDROID)
+    include(FetchContent)
+    FetchContent_Declare(
+        SDL
+        URL            https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.30.10.zip
+        SOURCE_DIR     ${CMAKE_BINARY_DIR}/include/SDL2
+        )
+    set(BUILD_SHARED_LIBS ON)
+    set(SDL2_DISABLE_UNINSTALL ON CACHE BOOL "" FORCE)
+    set(SDL_TEST_ENABLED_BY_DEFAULT OFF)
+    set(SDL2_DISABLE_SDL2MAIN ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(SDL)
+    set(SDL_ACTIVITY_FOLDER app/src/main/java/org/libsdl/app/)
+    file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/android/${SDL_ACTIVITY_FOLDER})
+    file(COPY ${CMAKE_BINARY_DIR}/include/SDL2/android-project/${SDL_ACTIVITY_FOLDER} DESTINATION ${CMAKE_SOURCE_DIR}/android/${SDL_ACTIVITY_FOLDER})
 else()
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS})
+    find_package(SDL2 REQUIRED)
+    include_directories(${SDL2_INCLUDE_DIRS})
 endif()
 
 include_directories(./src/)
@@ -81,7 +81,7 @@ set(SOURCE_FILES
     src/mpualsa.cpp
     src/mpucorea.cpp
     src/mpucorem.cpp
-)
+    )
 if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
     add_library( ${PROJECT_NAME} SHARED ${SOURCE_FILES})   
     target_link_libraries(raptor
