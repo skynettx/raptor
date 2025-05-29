@@ -950,7 +950,7 @@ RAP_InitLoadSave(
 #if _WIN32 || __linux__ || __APPLE__
     char* gethome;
 
-    #ifdef __ANDROID__
+    #if __ANDROID__
     gethome = (char*)SDL_AndroidGetExternalStoragePath();
     strcat(gethome, "/");
     #else
@@ -1002,7 +1002,11 @@ RAP_WriteDefaultSetup(
 )
 {
     INI_PutPreferenceLong("Setup", "Detail", 1);
+#if __ANDROID__
+    INI_PutPreferenceLong("Setup", "Control", 1);
+#else
     INI_PutPreferenceLong("Setup", "Control", 0);
+#endif //__ANDROID__
     INI_PutPreferenceLong("Setup", "Haptic", 1);                           
     INI_PutPreferenceLong("Setup", "joy_ipt_MenuNew", 0);         
 
@@ -1051,8 +1055,13 @@ RAP_WriteDefaultSetup(
     INI_PutPreferenceLong("JoyStick", "FireSp", 1);
     INI_PutPreferenceLong("JoyStick", "ChangeSp", 2);
     INI_PutPreferenceLong("JoyStick", "MegaFire", 3);
+#if __ANDROID__
+    INI_PutPreferenceLong("Video", "fullscreen", 1);
+    INI_PutPreferenceLong("Video", "aspect_ratio_correct", 0);
+#else
     INI_PutPreferenceLong("Video", "fullscreen", 0);
     INI_PutPreferenceLong("Video", "aspect_ratio_correct", 1);
+#endif //__ANDROID__
     INI_PutPreferenceLong("Video", "txt_fullscreen", 0);
 }
 
