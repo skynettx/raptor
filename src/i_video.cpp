@@ -411,6 +411,7 @@ void I_GetEvent(void)
     extern void I_HandleKeyboardEvent(SDL_Event *sdlevent);
     extern void I_HandleMouseEvent(SDL_Event *sdlevent);
     extern void I_HandleJoystickEvent(SDL_Event *sdlevent);
+    extern void I_HandleTouchEvent(SDL_Event *sdlevent);
 
     SDL_Event sdlevent;
 
@@ -441,6 +442,10 @@ void I_GetEvent(void)
             case SDL_CONTROLLERBUTTONDOWN:
             case SDL_CONTROLLERAXISMOTION:
                 I_HandleJoystickEvent(&sdlevent);
+                break;
+            case SDL_FINGERDOWN:
+            case SDL_FINGERUP:
+                I_HandleTouchEvent(&sdlevent);
                 break;
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:

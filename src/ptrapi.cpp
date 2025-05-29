@@ -32,6 +32,7 @@ char *displaypic;
 char *cursorstart;
 int mouseb1, mouseb2, mouseb3;
 int mouse_b1_ack, mouse_b2_ack, mouse_b3_ack;
+int touchfire = 0;
 
 int cur_mx, cur_my;
 int old_joy_x, old_joy_y;
@@ -158,6 +159,71 @@ I_HandleMouseEvent(
             break;
         }
         break;
+    }
+}
+
+/*------------------------------------------------------------------------
+   I_HandleTouchEvent() - Get current touch status
+  ------------------------------------------------------------------------*/
+void
+I_HandleTouchEvent(
+        SDL_Event *sdlevent
+)
+{
+    switch (sdlevent->type)
+    {
+        case SDL_FINGERDOWN:
+            if (SDL_GetNumTouchFingers(sdlevent->tfinger.touchId) == 3)
+            {
+                mouseb3 = 4;
+                mouse_b3_ack = 1;
+            }
+            if (SDL_GetNumTouchFingers(sdlevent->tfinger.touchId) == 2)
+            {
+                static int lasttick;
+                int now = SDL_GetTicks();
+                if(now - lasttick < 500)
+                {
+                    mouseb2 = 2;
+                    mouse_b2_ack = 1;
+                }
+
+                lasttick = now;
+            }
+            else if (!g_drawcursor)
+            {
+                static int lasttick;
+                int now = SDL_GetTicks();
+                if(now - lasttick < 500)
+                {
+                    if(!touchfire)
+                        touchfire = 1;
+                    else
+                        touchfire = 0;
+                }
+
+                if (!touchfire)
+                {
+                    mouseb1 = 1;
+                    mouse_b1_ack = 1;
+                }
+                else if(touchfire == 1)
+                {
+                    mouseb1 = 0;
+                }
+
+                lasttick = now;
+            }
+            else
+            {
+                mouseb1 = 1;
+                mouse_b1_ack = 1;
+            }
+            break;
+        case SDL_FINGERUP:
+            mouseb2 = 0;
+            mouseb3 = 0;
+            break;
     }
 }
 
