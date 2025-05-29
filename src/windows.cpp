@@ -797,7 +797,11 @@ WIN_Register(
     
     SWD_SetFieldPtr(window, REG_VIEWID);
     PTR_DrawCursor(1);
-    
+
+#ifdef __ANDROID__
+    SDL_StartTextInput();
+#endif //__ANDROID__
+
     while (1)
     {
         SWD_Dialog(&dlg);
@@ -981,7 +985,11 @@ reg_exit:
     }
     
     diff = 1;
-    
+
+#ifdef __ANDROID__
+    SDL_StopTextInput();
+#endif //__ANDROID__
+
     if (rval)
     {
         diff = WIN_AskDiff();
