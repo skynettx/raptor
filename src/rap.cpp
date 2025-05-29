@@ -1302,17 +1302,17 @@ main(
     
     cur_diff = 0;
 
-    if (!access("FILE0001.GLB", 0) || RAP_CheckFileInPath("FILE0001.GLB"))
-        gameflag[0] = 1;
-    
-    if (!access("FILE0002.GLB", 0) || RAP_CheckFileInPath("FILE0002.GLB"))
-        gameflag[1] = 1;
-    
-    if (!access("FILE0003.GLB", 0) && !access("FILE0004.GLB", 0) || RAP_CheckFileInPath("FILE0003.GLB") && RAP_CheckFileInPath("FILE0004.GLB"))
-    {
-        gameflag[2] = 1;
-        gameflag[3] = 1;
-    }
+	if (!access("FILE0001.GLB", 0) || RAP_CheckFileInPath("FILE0001.GLB"))
+		gameflag[0] = 1;
+
+	if (!access("FILE0002.GLB", 0) || RAP_CheckFileInPath("FILE0002.GLB"))
+		gameflag[1] = 1;
+
+	if ((!access("FILE0003.GLB", 0) && !access("FILE0004.GLB", 0)) || (RAP_CheckFileInPath("FILE0003.GLB") && RAP_CheckFileInPath("FILE0004.GLB")))
+	{
+		gameflag[2] = 1;
+		gameflag[3] = 1;
+	}
 
     if (gameflag[1] + gameflag[2])
         reg_flag = 1;
@@ -1325,7 +1325,7 @@ main(
             numfiles++;
     }
 
-    if (access("FILE0000.GLB", 0) && !RAP_CheckFileInPath("FILE0000.GLB") || !numfiles)
+	if ((access("FILE0000.GLB", 0) && !RAP_CheckFileInPath("FILE0000.GLB")) || !numfiles)
     {
         printf("All game data files NOT FOUND cannot proceed !!\n");
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
