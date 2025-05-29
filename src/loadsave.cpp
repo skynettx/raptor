@@ -949,8 +949,13 @@ RAP_InitLoadSave(
 {
 #if _WIN32 || __linux__ || __APPLE__
     char* gethome;
-    
+
+    #ifdef __ANDROID__
+    gethome = (char*)SDL_AndroidGetExternalStoragePath();
+    strcat(gethome, "/");
+    #else
     gethome = SDL_GetPrefPath("", "Raptor");
+    #endif //__ANDROID__
 
     if (gethome != NULL)
     {
