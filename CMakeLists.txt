@@ -8,14 +8,34 @@ SET(CMAKE_C_STANDARD 11)
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 project(raptor)
+
+if (ANDROID)
+include(FetchContent)
+FetchContent_Declare(
+  SDL
+  URL            https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.30.10.zip
+  SOURCE_DIR     ${CMAKE_BINARY_DIR}/include/SDL2
+)
+set(BUILD_SHARED_LIBS ON)
+set(SDL2_DISABLE_UNINSTALL ON CACHE BOOL "" FORCE)
+set(SDL_TEST_ENABLED_BY_DEFAULT OFF)
+set(SDL2_DISABLE_SDL2MAIN ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(SDL)
+set(SDL_ACTIVITY_FOLDER app/src/main/java/org/libsdl/app/)
+file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/android/${SDL_ACTIVITY_FOLDER})
+file(COPY ${CMAKE_BINARY_DIR}/include/SDL2/android-project/${SDL_ACTIVITY_FOLDER} DESTINATION ${CMAKE_SOURCE_DIR}/android/${SDL_ACTIVITY_FOLDER})
+else()
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
+endif()
+
 include_directories(./src/)
 include_directories(./include/textscreen/include/)
 include_directories(./include/TinySoundFont/)
 
 add_subdirectory(./include/textscreen/include)
-add_executable(${CMAKE_PROJECT_NAME}
+
+set(SOURCE_FILES
     src/tile.cpp
     src/gssapi.cpp
     src/objects.cpp
@@ -62,8 +82,16 @@ add_executable(${CMAKE_PROJECT_NAME}
     src/mpucorea.cpp
     src/mpucorem.cpp
 )
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
+    add_library( ${PROJECT_NAME} SHARED ${SOURCE_FILES})   
+    target_link_libraries(raptor
+        textscreen
+        SDL2::SDL2
+        )
+
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     find_package(ALSA REQUIRED)
+    add_executable( ${PROJECT_NAME} ${SOURCE_FILES} )
     target_link_libraries(raptor
         textscreen
         asound
@@ -76,12 +104,14 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     find_library(AUDIO_UNIT AudioUnit)
     find_library(FOUNDATION_LIBRARY Foundation)
     find_library(COREMIDI_LIB CoreMIDI)
+    add_executable( ${PROJECT_NAME} ${SOURCE_FILES} )
     target_link_libraries(raptor ${AUDIO_TOOLBOX} ${AUDIO_UNIT} ${FOUNDATION_LIBRARY} ${COREMIDI_LIB}
         textscreen
         SDL2::SDL2
         SDL2::SDL2main
         )
 else()
+    add_executable( ${PROJECT_NAME} ${SOURCE_FILES} )
     target_link_libraries(raptor
         textscreen
         SDL2::SDL2
