@@ -253,9 +253,8 @@ GSS_PlayPatch(
     int priority
 )
 {
-    int format = *(int16_t*)gss;
-    format = LE_LONG(format);
-    int handle = (gss_handcnt++) & FXHAND_MASK;
+	int format = LE_SHORT(*(int16_t*)gss);
+	int handle = (gss_handcnt++) & FXHAND_MASK;
     
     if (format != 1 && format != 2)
         return -1;
