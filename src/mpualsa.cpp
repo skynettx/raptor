@@ -1,3 +1,4 @@
+#ifndef __ANDROID__
 #ifdef __linux__
 #include <stdio.h>
 #include <stdlib.h>
@@ -257,4 +258,5 @@ musdevice_t mus_device_alsa = {
 	ProgramEvent,
 	AllNotesOffEvent,
 };
-#endif
+#endif //__linux__
+#endif //__ANDROID__
