@@ -32,7 +32,7 @@ char *displaypic;
 char *cursorstart;
 int mouseb1, mouseb2, mouseb3;
 int mouse_b1_ack, mouse_b2_ack, mouse_b3_ack;
-int touchfire = 0;
+int touchmouseb1off = 0;
 
 int cur_mx, cur_my;
 int old_joy_x, old_joy_y;
@@ -196,18 +196,18 @@ I_HandleTouchEvent(
                 int now = SDL_GetTicks();
                 if(now - lasttick < 500)
                 {
-                    if(!touchfire)
-                        touchfire = 1;
+                    if(!touchmouseb1off)
+                        touchmouseb1off = 1;
                     else
-                        touchfire = 0;
+                        touchmouseb1off = 0;
                 }
 
-                if (!touchfire)
+                if (!touchmouseb1off)
                 {
                     mouseb1 = 1;
                     mouse_b1_ack = 1;
                 }
-                else if(touchfire == 1)
+                else if(touchmouseb1off == 1)
                 {
                     mouseb1 = 0;
                 }
