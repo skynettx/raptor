@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "raptor", "raptor.vcxproj", "{1BD97F3A-736A-4E17-B84D-8CD200ECA0F5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "raptorsetup", "raptorsetup.vcxproj", "{C2855524-EBA4-47F4-8C59-F0A9B732761C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{1BD97F3A-736A-4E17-B84D-8CD200ECA0F5}.Release|x64.Build.0 = Release|x64
 		{1BD97F3A-736A-4E17-B84D-8CD200ECA0F5}.Release|x86.ActiveCfg = Release|Win32
 		{1BD97F3A-736A-4E17-B84D-8CD200ECA0F5}.Release|x86.Build.0 = Release|Win32
+		{C2855524-EBA4-47F4-8C59-F0A9B732761C}.Debug|x64.ActiveCfg = Debug|x64
+		{C2855524-EBA4-47F4-8C59-F0A9B732761C}.Debug|x64.Build.0 = Debug|x64
+		{C2855524-EBA4-47F4-8C59-F0A9B732761C}.Debug|x86.ActiveCfg = Debug|Win32
+		{C2855524-EBA4-47F4-8C59-F0A9B732761C}.Debug|x86.Build.0 = Debug|Win32
+		{C2855524-EBA4-47F4-8C59-F0A9B732761C}.Release|x64.ActiveCfg = Release|x64
+		{C2855524-EBA4-47F4-8C59-F0A9B732761C}.Release|x64.Build.0 = Release|x64
+		{C2855524-EBA4-47F4-8C59-F0A9B732761C}.Release|x86.ActiveCfg = Release|Win32
+		{C2855524-EBA4-47F4-8C59-F0A9B732761C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
