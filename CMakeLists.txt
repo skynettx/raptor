@@ -86,6 +86,18 @@ set(SOURCE_FILES
     src/mpucorea.cpp
     src/mpucorem.cpp
     )
+
+set(SOURCE_SETUP_FILES
+    src/setup/input.cpp
+    src/setup/main.cpp
+    src/setup/music.cpp
+    src/setup/prefapi.cpp
+    src/setup/sound.cpp
+    src/setup/txt_joyinput.cpp
+    src/setup/txt_keyinput.cpp
+    src/setup/txt_mouseinput.cpp
+    )
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
     add_library( ${PROJECT_NAME} SHARED ${SOURCE_FILES})   
     target_link_libraries(raptor
@@ -122,3 +134,13 @@ else()
         SDL2::SDL2main
         )
 endif()
+
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Android")
+    add_executable( raptorsetup ${SOURCE_SETUP_FILES} )
+    target_link_libraries(raptorsetup
+        textscreen
+        SDL2::SDL2
+        SDL2::SDL2main
+        )
+endif()
+   
