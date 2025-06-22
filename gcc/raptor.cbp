@@ -28,7 +28,7 @@
 					<Add directory="../include/textscreen/libwin/x86" />
 				</Linker>
 			</Target>
-			<Target title="Win (32 Bit) Release">
+			<Target title="Win(32 Bit) Release">
 				<Option platforms="Windows;" />
 				<Option output="bin/Release/raptor" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
@@ -50,7 +50,7 @@
 					<Add directory="../include/textscreen/libwin/x86" />
 				</Linker>
 			</Target>
-			<Target title="Linux (32 Bit) Debug">
+			<Target title="Linux(32 Bit) Debug">
 				<Option platforms="Unix;" />
 				<Option output="bin/Debug/raptor" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin/Debug" />
@@ -72,7 +72,7 @@
 					<Add directory="../include/textscreen/liblinux/x86" />
 				</Linker>
 			</Target>
-			<Target title="Linux (32 Bit) Release">
+			<Target title="Linux(32 Bit) Release">
 				<Option platforms="Unix;" />
 				<Option output="bin/Release/raptor" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
@@ -115,7 +115,7 @@
 					<Add directory="../include/textscreen/libwin/x64" />
 				</Linker>
 			</Target>
-			<Target title="Win (64 Bit) Release">
+			<Target title="Win(64 Bit) Release">
 				<Option platforms="Windows;" />
 				<Option output="bin/x64/Release/raptor" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/x64/Release/" />
@@ -137,7 +137,7 @@
 					<Add directory="../include/textscreen/libwin/x64" />
 				</Linker>
 			</Target>
-			<Target title="Linux (64 Bit) Debug">
+			<Target title="Linux(64 Bit) Debug">
 				<Option platforms="Unix;" />
 				<Option output="bin/x64/Debug/raptor" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin/x64/Debug" />
@@ -159,7 +159,7 @@
 					<Add directory="../include/textscreen/liblinux/x64" />
 				</Linker>
 			</Target>
-			<Target title="Linux (64 Bit) Release">
+			<Target title="Linux(64 Bit) Release">
 				<Option platforms="Unix;" />
 				<Option output="bin/x64/Release/raptor" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/x64/Release/" />

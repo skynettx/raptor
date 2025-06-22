@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="raptorsetup" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Win(32 Bit) Debug">
+				<Option platforms="Windows;" />
+				<Option output="bin/Debug/raptorsetup/raptorsetup" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Debug/raptorsetup/" />
+				<Option object_output="obj/Debug/raptorsetup/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-m32" />
+					<Add option="-g" />
+					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/i686-w64-mingw32/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-m32" />
+					<Add option="-lmingw32 -ltextscreen -lSDL2main -lSDL2" />
+					<Add option="-lgdi32" />
+					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/i686-w64-mingw32/lib" />
+					<Add directory="../include/textscreen/libwin/x86" />
+				</Linker>
+			</Target>
+			<Target title="Win(32 Bit) Release">
+				<Option platforms="Windows;" />
+				<Option output="bin/Release/raptorsetup/raptorsetup" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/raptorsetup/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-m32" />
+					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/i686-w64-mingw32/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-m32" />
+					<Add option="-lmingw32 -ltextscreen -lSDL2main -lSDL2" />
+					<Add option="-lgdi32" />
+					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/i686-w64-mingw32/lib" />
+					<Add directory="../include/textscreen/libwin/x86" />
+				</Linker>
+			</Target>
+			<Target title="Linux(32 Bit) Debug">
+				<Option platforms="Unix;" />
+				<Option output="bin/Debug/raptorsetup/raptorsetup" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Debug/raptorsetup/" />
+				<Option object_output="obj/Debug/raptorsetup/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-m32" />
+					<Add option="-g" />
+					<Add directory="/usr/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-m32" />
+					<Add option="-ltextscreen -lSDL2main -lSDL2" />
+					<Add directory="/usr/lib32" />
+					<Add directory="../include/textscreen/liblinux/x86" />
+				</Linker>
+			</Target>
+			<Target title="Linux(32 Bit) Release">
+				<Option platforms="Unix;" />
+				<Option output="bin/Release/raptorsetup/raptorsetup" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/raptorsetup/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-m32" />
+					<Add directory="/usr/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-m32" />
+					<Add option="-lSDL2main -lSDL2 -ltextscreen" />
+					<Add directory="/usr/lib32" />
+					<Add directory="../include/textscreen/liblinux/x86" />
+				</Linker>
+			</Target>
+			<Target title="Linux(64 Bit) Debug">
+				<Option platforms="Unix;" />
+				<Option output="bin/x64/Debug/raptorsetup/raptorsetup" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/x64/Debug/raptorsetup/" />
+				<Option object_output="obj/x64/Debug/raptorsetup/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-m64" />
+					<Add option="-g" />
+					<Add directory="/usr/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-m64" />
+					<Add option="-ltextscreen -lSDL2main -lSDL2" />
+					<Add directory="/usr/lib" />
+					<Add directory="../include/textscreen/liblinux/x64" />
+				</Linker>
+			</Target>
+			<Target title="Linux(64 Bit) Release">
+				<Option platforms="Unix;" />
+				<Option output="bin/x64/Release/raptorsetup/raptorsetup" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/x64/Release/raptorsetup/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-m64" />
+					<Add directory="/usr/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-m64" />
+					<Add option="-lSDL2main -lSDL2 -ltextscreen" />
+					<Add directory="/usr/lib" />
+					<Add directory="../include/textscreen/liblinux/x64" />
+				</Linker>
+			</Target>
+			<Target title="Win(64 Bit) Debug">
+				<Option platforms="Windows;" />
+				<Option output="bin/x64/Debug/raptorsetup/raptorsetup" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/x64/Debug/raptorsetup/" />
+				<Option object_output="obj/x64/Debug/raptorsetup/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-m64" />
+					<Add option="-g" />
+					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/x86_64-w64-mingw32/include/SDL2" />
+					<Add directory="../include/textscreen/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-m64" />
+					<Add option="-lmingw32 -ltextscreen -lSDL2main -lSDL2" />
+					<Add option="-lgdi32" />
+					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/x86_64-w64-mingw32/lib" />
+					<Add directory="../include/textscreen/libwin/x64" />
+				</Linker>
+			</Target>
+			<Target title="Win(64 Bit) Release">
+				<Option platforms="Windows;" />
+				<Option output="bin/x64/Release/raptorsetup/raptorsetup" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/x64/Release/raptorsetup/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-m64" />
+					<Add directory="../include/textscreen/include" />
+					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/x86_64-w64-mingw32/include/SDL2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-m64" />
+					<Add option="-lmingw32 -ltextscreen -lSDL2main -lSDL2" />
+					<Add option="-lgdi32" />
+					<Add directory="../include/SDL2-devel-2.28.2-mingw/SDL2-2.28.2/x86_64-w64-mingw32/lib" />
+					<Add directory="../include/textscreen/libwin/x64" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../rsrc/setup/resource.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="../src/common.h" />
+		<Unit filename="../src/setup/input.cpp" />
+		<Unit filename="../src/setup/input.h" />
+		<Unit filename="../src/setup/main.cpp" />
+		<Unit filename="../src/setup/main.h" />
+		<Unit filename="../src/setup/music.cpp" />
+		<Unit filename="../src/setup/music.h" />
+		<Unit filename="../src/setup/prefapi.cpp" />
+		<Unit filename="../src/setup/prefapi.h" />
+		<Unit filename="../src/setup/sound.cpp" />
+		<Unit filename="../src/setup/sound.h" />
+		<Unit filename="../src/setup/txt_joyinput.cpp" />
+		<Unit filename="../src/setup/txt_joyinput.h" />
+		<Unit filename="../src/setup/txt_keyinput.cpp" />
+		<Unit filename="../src/setup/txt_keyinput.h" />
+		<Unit filename="../src/setup/txt_mouseinput.cpp" />
+		<Unit filename="../src/setup/txt_mouseinput.h" />
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
