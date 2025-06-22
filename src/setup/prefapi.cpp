@@ -1,7 +1,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
-#include "common.h"
+#include "../common.h"
 #include "prefapi.h"
 #include "main.h"
 
