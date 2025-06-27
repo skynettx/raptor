@@ -32,7 +32,7 @@
 				<Option platforms="Windows;" />
 				<Option output="bin/Release/raptor" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
@@ -119,7 +119,7 @@
 				<Option platforms="Windows;" />
 				<Option output="bin/x64/Release/raptor" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/x64/Release/" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
