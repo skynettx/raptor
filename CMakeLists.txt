@@ -122,8 +122,8 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(raptor
         textscreen
         asound
-        SDL2::SDL2
         SDL2::SDL2main
+        SDL2::SDL2
         )
 
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -134,8 +134,8 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     add_executable( ${PROJECT_NAME} ${SOURCE_FILES} )
     target_link_libraries(raptor ${AUDIO_TOOLBOX} ${AUDIO_UNIT} ${FOUNDATION_LIBRARY} ${COREMIDI_LIB}
         textscreen
-        SDL2::SDL2
         SDL2::SDL2main
+        SDL2::SDL2
         )
 
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -160,8 +160,8 @@ else()
     add_executable( ${PROJECT_NAME} ${SOURCE_FILES} )
     target_link_libraries(raptor
         textscreen
-        SDL2::SDL2
         SDL2::SDL2main
+        SDL2::SDL2
         )
 endif()
 
@@ -169,8 +169,8 @@ if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Android")
     add_executable( raptorsetup ${SOURCE_SETUP_FILES} )
     target_link_libraries(raptorsetup
         textscreen
-        SDL2::SDL2
         SDL2::SDL2main
+        SDL2::SDL2
         )
     if(${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo" OR ${CMAKE_BUILD_TYPE} MATCHES "Release")
         if(MSVC)
