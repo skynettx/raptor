@@ -167,6 +167,9 @@ endif()
 
 if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Android")
     add_executable( raptorsetup ${SOURCE_SETUP_FILES} )
+    if(WIN32)
+        target_sources(raptorsetup PRIVATE rsrc/setup/resource.rc)
+    endif()
     target_link_libraries(raptorsetup
         textscreen
         SDL2::SDL2main
