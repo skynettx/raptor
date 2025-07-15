@@ -970,6 +970,34 @@ RAP_InitLoadSave(
         EXIT_Error("Couldn't find home directory");
     }
 
+    #if __ANDROID__
+    for(int i = 0; i < 2; i++)
+    {
+        char src[PATH_MAX];
+        char dst[PATH_MAX];
+        sprintf(src,"FILE%04u.GLB", i);
+        sprintf(dst, "%sFILE%04u.GLB", cdpath, i);
+        if (!RAP_CheckFileInPath(src))
+        {
+            SDL_RWops *readsrc = SDL_RWFromFile(src, "rb");
+            if(readsrc)
+            {
+                Sint64 size = SDL_RWsize(readsrc);
+                char *buffer = (char*)malloc(size);
+                SDL_RWread(readsrc, buffer, sizeof(char), size);
+                SDL_RWops *writedst = SDL_RWFromFile(dst, "wb");
+                if(writedst)
+                {
+                    SDL_RWwrite(writedst, buffer, sizeof(char), size);
+                    SDL_RWclose(writedst);
+                }
+                SDL_RWclose(readsrc);
+                free(buffer);
+            }
+        }
+    }
+    #endif //__ANDROID__
+
     return cdpath;
 #else
     memset(cdpath, 0, sizeof(cdpath));
