@@ -1088,11 +1088,12 @@ RAP_WriteDefaultSetup(
 #if __ANDROID__
     INI_PutPreferenceLong("Video", "fullscreen", 1);
     INI_PutPreferenceLong("Video", "aspect_ratio_correct", 0);
+    INI_PutPreferenceLong("Video", "txt_fullscreen", 1);
 #else
     INI_PutPreferenceLong("Video", "fullscreen", 0);
     INI_PutPreferenceLong("Video", "aspect_ratio_correct", 1);
-#endif //__ANDROID__
     INI_PutPreferenceLong("Video", "txt_fullscreen", 0);
+#endif //__ANDROID__
 }
 
 /***************************************************************************
