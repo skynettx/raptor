@@ -722,8 +722,8 @@ void I_FinishUpdate (void)
 
     if (need_resize)
     {
-        if (SDL_GetTicks() > last_resize_time + RESIZE_DELAY)
-        {
+        //if (SDL_GetTicks() > last_resize_time + RESIZE_DELAY)
+        //{
             int flags;
             // When the window is resized (we're not in fullscreen mode),
             // save the new window size.
@@ -740,11 +740,11 @@ void I_FinishUpdate (void)
             CreateUpscaledTexture(false);
             need_resize = false;
             palette_to_set = true;
-        }
-        else
+        //}
+        /*else
         {
             return;
-        }
+        }*/
     }
 
     UpdateGrab();
