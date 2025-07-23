@@ -870,7 +870,12 @@ Do_Game(
     {
         num_shadows = num_gshadows = 0;
         
+        #ifdef __ANDROID__
+        if (!I_GetNeedResize(true))
+            IPT_MovePlayer();
+        #else
         IPT_MovePlayer();
+        #endif //__ANDROID__
         
         if (KBD_IsKey(SC_F1))                                                                   
         {

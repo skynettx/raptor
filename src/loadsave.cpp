@@ -22,6 +22,7 @@
 #include "fileids.h"
 #include "winids.h"
 #include "prefapi.h"
+#include "i_video.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -785,6 +786,7 @@ RAP_LoadWin(
     while (1)
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
         
         if (joy_ipt_MenuNew)
         {

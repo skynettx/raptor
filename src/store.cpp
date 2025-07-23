@@ -17,6 +17,7 @@
 #include "input.h"
 #include "fileids.h"
 #include "winids.h"
+#include "i_video.h"
 
 #define BUY_MODE  0
 #define SELL_MODE 1
@@ -369,6 +370,7 @@ STORE_Enter(
         }
         
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
         
         if (KBD_Key(SC_X) && KBD_Key(SC_ALT))
             WIN_AskExit();

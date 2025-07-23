@@ -229,6 +229,7 @@ WIN_Opts(
     {
         patchflag = 0;
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
 
         if (joy_ipt_MenuNew)
         {
@@ -590,6 +591,7 @@ WIN_AskBool(
     while (1)
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
         
         if (KBD_IsKey(SC_ESC) || JOY_IsKeyInGameBack(Back))                                                   
         {
@@ -713,6 +715,7 @@ WIN_AskDiff(
     while (1)
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
         
         if (KBD_IsKey(SC_ESC) || Back || BButton)                                                      
         {
@@ -805,6 +808,7 @@ WIN_Register(
     while (1)
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
 
         if (joy_ipt_MenuNew)                                                               
         {
@@ -1153,6 +1157,7 @@ WIN_Hangar(
                 else
                     SWD_SetFieldItem(window, HANG_PIC, -1);
                 
+                I_GetNeedResize(false);
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
             }
@@ -1165,6 +1170,7 @@ WIN_Hangar(
             }
             
             SWD_Dialog(&dlg);
+            I_GetNeedResize(false);
 
             if (joy_ipt_MenuNew)
             {
@@ -1518,6 +1524,7 @@ WIN_ShipComp(
     while (1)
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
 
         if (joy_ipt_MenuNew)
         {
@@ -2103,6 +2110,7 @@ WIN_MainMenu(
     do
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
         
         if (dlg.keypress == SC_D || YButton)                                    
         {

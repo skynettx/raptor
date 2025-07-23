@@ -771,6 +771,7 @@ INTRO_Taiwan(
         while (GFX_GetFrameCount() - local_cnt < 4)
         {
         }
+        I_GetNeedResize(false);
     }
     
     GFX_FadeOut(0, 0, 0, 63);
@@ -817,18 +818,21 @@ INTRO_Credits(
         while (GFX_GetFrameCount() - local_cnt < 4)
         {
         }
+        I_GetNeedResize(false);
     }
     
     if (bday_num != -1 && dig_flag)
     {
         while (SND_IsPatchPlaying(FX_THEME)) {
             I_GetEvent();
+            I_GetNeedResize(false);
         }
     }
     else
     {
         while (SND_IsSongPlaying() && !IMS_IsAck()) {
             I_GetEvent();
+            I_GetNeedResize(false);
         }
     }
     
@@ -869,6 +873,7 @@ INTRO_Credits(
         while (GFX_GetFrameCount() - local_cnt < 3)
         {
         }
+        I_GetNeedResize(false);
     }
     
     GFX_FadeOut(0, 0, 0, 63);

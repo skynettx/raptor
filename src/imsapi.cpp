@@ -98,6 +98,7 @@ IMS_WaitTimed(
             hold = GFX_GetFrameCount();
             while (GFX_GetFrameCount() == hold)
             {
+                I_GetNeedResize(false);
             }
             
             if (IMS_CheckAck())
@@ -106,6 +107,7 @@ IMS_WaitTimed(
                 goto end_func;
             }
         }
+        I_GetNeedResize(false);
         secs--;
     }
 

@@ -86,6 +86,7 @@ HELP_Win(
         }
         
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
         
         switch (dlg.keypress)
         {
