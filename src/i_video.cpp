@@ -184,6 +184,7 @@ static bool window_focused = true;
 // Window resize state.
 
 static bool need_resize = false;
+static bool need_resize_ext = false;
 static unsigned int last_resize_time;
 #define RESIZE_DELAY 500
 
@@ -322,6 +323,7 @@ static void HandleWindowEvent(SDL_WindowEvent *event)
 
         case SDL_WINDOWEVENT_RESIZED:
             need_resize = true;
+            need_resize_ext = true;
             last_resize_time = SDL_GetTicks();
             break;
 
@@ -334,6 +336,7 @@ static void HandleWindowEvent(SDL_WindowEvent *event)
         case SDL_WINDOWEVENT_MAXIMIZED:
         case SDL_WINDOWEVENT_RESTORED:
             screenvisible = true;
+            need_resize_ext = true;
             break;
 
         // Update the value of window_focused when we get a focus event
