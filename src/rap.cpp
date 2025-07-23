@@ -1174,6 +1174,12 @@ Do_Game(
             if (!demo_mode)
             {
                 SWD_SetClearFlag(0);
+
+                #ifdef __ANDROID__
+                int old_mx = cur_mx;
+                int old_my = cur_my;
+                #endif //__ANDROID__
+
                 IPT_End();
                 RAP_ClearSides();
                 if (WIN_AskBool("Abort Mission ?"))
@@ -1182,6 +1188,11 @@ Do_Game(
                     rval = 1;
                     break;
                 }
+                
+                #ifdef __ANDROID__
+                PTR_SetPos(old_mx, old_my);
+                #endif //__ANDROID__
+
                 IPT_Start();
                 g_oldsuper = -1;
                 g_oldshield = -1;
