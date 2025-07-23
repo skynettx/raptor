@@ -185,6 +185,8 @@ static bool window_focused = true;
 
 static bool need_resize = false;
 static bool need_resize_ext = false;
+static bool setpos = false;
+static int old_mx, old_my;
 static unsigned int last_resize_time;
 #define RESIZE_DELAY 500
 
@@ -1575,4 +1577,39 @@ void I_SetMousePos(int x, int y)
 void closewindow(void)
 {
     SDL_DestroyWindow(screen);
+}
+
+bool I_GetNeedResize(bool setonlypos)
+{
+    if (!need_resize_ext)
+    {
+        old_mx = cur_mx;
+        old_my = cur_my;
+
+        if (g_drawcursor)
+            setpos = true;
+
+        return false;
+    }
+    else
+    {
+        if (setonlypos)
+            PTR_SetPos(old_mx, old_my);
+        else if (setpos)
+        {
+            PTR_SetPos(old_mx, old_my);
+            GFX_DisplayUpdate();
+            I_FinishUpdate();
+        }
+        else
+        {
+            GFX_DisplayUpdate();
+            I_FinishUpdate();
+        }
+
+        need_resize_ext = false;
+        setpos = false;
+
+        return true;
+    }
 }
