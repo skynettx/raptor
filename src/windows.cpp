@@ -802,7 +802,8 @@ WIN_Register(
     PTR_DrawCursor(1);
 
 #ifdef __ANDROID__
-    SDL_StartTextInput();
+    if((control == 1) || (control == 2 && !joy_ipt_MenuNew))
+       SDL_StartTextInput();
 #endif //__ANDROID__
 
     while (1)
@@ -991,7 +992,8 @@ reg_exit:
     diff = 1;
 
 #ifdef __ANDROID__
-    SDL_StopTextInput();
+    if ((control == 1) || (control == 2 && !joy_ipt_MenuNew))
+        SDL_StopTextInput();
 #endif //__ANDROID__
 
     if (rval)
