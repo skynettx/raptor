@@ -1597,7 +1597,9 @@ bool I_GetNeedResize(bool setonlypos)
             PTR_SetPos(old_mx, old_my);
         else if (setpos)
         {
+            #ifdef __ANDROID__
             PTR_SetPos(old_mx, old_my);
+            #endif //__ANDROID__
             GFX_DisplayUpdate();
             I_FinishUpdate();
         }
