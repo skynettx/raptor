@@ -665,3 +665,14 @@ PTR_End(
     // if (ptr_tsm != -1)
     //     TSM_DelService(ptr_tsm);
 }
+
+/***************************************************************************
+ PTR_Settouchmouseb1off() - Set mouseb1off on/off for touch input
+ ***************************************************************************/
+void
+PTR_Settouchmouseb1off(
+    int flag                // INPUT : TRUE / FALSE
+)
+{
+    touchmouseb1off = flag;
+}

@@ -30,3 +30,4 @@ void PTR_Save(void);
 void PTR_ClipSave(void);
 void PTR_Draw(void);
 void PTR_UpdateCursor(void);
+void PTR_Settouchmouseb1off(int flag);

@@ -824,6 +824,7 @@ Do_Game(
     end_fadeflag = 0;
     KBD_Clear();
     IMS_StartAck();
+    PTR_Settouchmouseb1off(0);
     BUT_1 = 0;
     BUT_2 = 0;
     BUT_3 = 0;
