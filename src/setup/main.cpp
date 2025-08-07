@@ -185,6 +185,7 @@ const char* RAP_DataPath(void)
 {
 #if _WIN32 || __linux__ || __APPLE__
 	char* gethome;
+	char g_setup_pathlc[PATH_MAX];
 
 	gethome = SDL_GetPrefPath("", "Raptor");
 
@@ -192,7 +193,13 @@ const char* RAP_DataPath(void)
 	{
 		strcpy(g_data_path, gethome);
 		strcpy(g_setup_path, gethome);
-		sprintf(g_setup_path, "%s%s", g_setup_path, "SETUP.INI");
+		strcpy(g_setup_pathlc, gethome);
+		sprintf(g_setup_pathlc, "%s%s", g_setup_pathlc, "setup.ini");
+		if (!access(g_setup_pathlc, 0))
+			strcpy(g_setup_path, g_setup_pathlc);
+		else
+			sprintf(g_setup_path, "%s%s", g_setup_path, "SETUP.INI");
+		
 		hasdatapath = 1;
 		SDL_free(gethome);
 	}
@@ -207,7 +214,10 @@ const char* RAP_DataPath(void)
 
 	hasdatapath = 0;
 
-	strcpy(g_setup_path, "SETUP.INI");
+	if (!access("setup.ini", 0))
+		strcpy(g_setup_path, "setup.ini");
+	else
+		strcpy(g_setup_path, "SETUP.INI");
 
 	return g_data_path;
 #endif // _WIN32 || __linux__ || __APPLE__

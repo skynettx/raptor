@@ -164,6 +164,7 @@ GLB_FindFile(
 {
 	const char* routine = "GLB_FindFile";
 	char filename[PATH_MAX];
+	char filenamelc[PATH_MAX];
 	FILE *handle;
 	FILEDESC* fd;
 	
@@ -182,10 +183,19 @@ GLB_FindFile(
 	* create a file name and attempt to open it local first, then if it
 	* fails use the exe path and try again.
 	*/
-	sprintf(filename, "%s%04u.GLB", prefix, filenum);
+	sprintf(filenamelc, "%s%04u.glb", "file", filenum);
+	if (!access(filenamelc, 0))
+		strcpy(filename, filenamelc);
+	else
+		sprintf(filename, "%s%04u.GLB", prefix, filenum);
+	
 	if ((handle = fopen(filename, permissions)) == NULL)
 	{
-		sprintf(filename, "%s%s%04u.GLB", exePath, prefix, filenum);
+		sprintf(filenamelc, "%s%s%04u.glb", exePath, "file", filenum);
+		if (!access(filenamelc, 0))
+			strcpy(filename, filenamelc);
+		else
+			sprintf(filename, "%s%s%04u.GLB", exePath, prefix, filenum);
 		
 		if ((handle = fopen(filename, permissions)) == NULL)
 		{

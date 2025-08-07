@@ -963,7 +963,12 @@ RAP_InitLoadSave(
     {
         strcpy(cdpath, gethome);
         strcpy(g_setup_ini, gethome);
-        sprintf(g_setup_ini, "%s%s", g_setup_ini, "SETUP.INI");
+        
+        if(RAP_CheckFileInPath("setup.ini"))
+            sprintf(g_setup_ini, "%s%s", g_setup_ini, "setup.ini");
+        else
+            sprintf(g_setup_ini, "%s%s", g_setup_ini, "SETUP.INI");
+        
         cdflag = 1;
         SDL_free(gethome);
     }
@@ -976,10 +981,12 @@ RAP_InitLoadSave(
     for(int i = 0; i < 2; i++)
     {
         char src[PATH_MAX];
+        char srclc[PATH_MAX];
         char dst[PATH_MAX];
         sprintf(src,"FILE%04u.GLB", i);
+        sprintf(srclc, "file%04u.glb", i);
         sprintf(dst, "%sFILE%04u.GLB", cdpath, i);
-        if (!RAP_CheckFileInPath(src))
+        if (!RAP_CheckFileInPath(src) && !RAP_CheckFileInPath(srclc))
         {
             SDL_RWops *readsrc = SDL_RWFromFile(src, "rb");
             if(readsrc)
@@ -1006,7 +1013,10 @@ RAP_InitLoadSave(
 
     cdflag = 0;
 
-    strcpy(g_setup_ini, "SETUP.INI");
+    if(!access("setup.ini", 0))
+        strcpy(g_setup_ini, "setup.ini");
+    else
+        strcpy(g_setup_ini, "SETUP.INI");
 
     return cdpath;
 #endif // _WIN32 || __linux__ || __APPLE__
