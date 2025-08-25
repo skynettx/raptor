@@ -824,6 +824,7 @@ Do_Game(
     end_fadeflag = 0;
     KBD_Clear();
     IMS_StartAck();
+    PTR_SetGameFlag(1);
     PTR_Settouchmouseb1off(0);
     BUT_1 = 0;
     BUT_2 = 0;
@@ -1222,6 +1223,7 @@ Do_Game(
     
     RAP_FreeMap();
     end_wave = 0;
+    PTR_SetGameFlag(0);
     
     memset(displaybuffer, 0, 64000);
     GFX_MarkUpdate(0, 0, 320, 200);

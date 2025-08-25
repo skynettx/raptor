@@ -33,6 +33,7 @@ char *cursorstart;
 int mouseb1, mouseb2, mouseb3;
 int mouse_b1_ack, mouse_b2_ack, mouse_b3_ack;
 int touchmouseb1off = 0;
+int do_game = 0;
 
 int cur_mx, cur_my;
 int old_joy_x, old_joy_y;
@@ -190,7 +191,7 @@ I_HandleTouchEvent(
 
                 lasttick = now;
             }
-            else if (!g_drawcursor)
+            else if (!g_drawcursor && do_game)
             {
                 static int lasttick;
                 int now = SDL_GetTicks();
@@ -675,4 +676,15 @@ PTR_Settouchmouseb1off(
 )
 {
     touchmouseb1off = flag;
+}
+
+/***************************************************************************
+ PTR_SetGameFlag() - Set do_game on/off for touch input
+ ***************************************************************************/
+void
+PTR_SetGameFlag(
+    int flag         // INPUT : TRUE / FALSE
+)
+{
+    do_game = flag;
 }
