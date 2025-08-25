@@ -52,3 +52,4 @@ void I_SetGrabMouseCallback(grabmouse_callback_t func);
 void VIDEO_LoadPrefs(void);
 void closewindow(void);
 bool I_GetNeedResize(bool setonlypos);
+void I_Settextmode(bool flag);
