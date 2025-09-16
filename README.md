@@ -121,6 +121,10 @@ make
 Make sure CMake is installed in your Android Studio environment.
 If this is the case, open the `android\` project folder in Android Studio and build the APK.
 
+## License
+Raptor is licensed under the [GPLv2](https://github.com/skynettx/raptor/blob/master/LICENSE) or later.  
+Raptor for Android is licensed under the [GPLv3](https://github.com/skynettx/raptor/blob/master/pkg/android/license/LICENSE) to be compatible with Apache 2.0 licensed libraries.
+
 ## FAQ
 1. No audio under Linux:  
 Make sure you get all the necessary ALSA and or PulseAudio dependencies from the packagemanager of your distro. 
