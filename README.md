@@ -12,13 +12,13 @@ Original Raptor Call Of The Shadows author Scott Host is working on a new modern
 Release builds are available for Windows, macOS and Android.
 To download the latest release build for your platform, click [Download](https://github.com/skynettx/raptor/releases/latest).
 Then install the downloaded release build on your system by following the instructions of the installer.
-You then need to obtain the assets (GLB files) of the shareware or full version yourself and copy them into the installation directory or the external system specific directory.
+You then need to obtain the assets (GLB files) of the shareware or full version 1.2 or higher yourself and copy them into the installation directory or the external system specific directory.
 That's it now Raptor is ready to play.
 For those who want to build themselves or who want more configuration information, continue below otherwise you're done here.
 
 ## Installing
-You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or full version.
-Important only the DOS version v1.2 is compatible! You have to take care of these files yourself.  
+You need the original assets (GLB files) from Raptor Call Of The Shadows shareware or full version 1.2 or higher.
+Important: No older versions before 1.2 are compatible! You have to take care of these files yourself.  
 The assets can be loaded from the current working directory (Raptor directory) or from the external system specific directory.
 **Please note that the release build version 0.8.0 does not support the external system specific directory and manages all assets, config and save files in the current working directory.**
 The external system specific directories are the following:
