@@ -63,7 +63,8 @@ static txt_input_mode_t input_mode = TXT_INPUT_NORMAL;
 // is the value that was passed to SDL_CreateWindow().
 static int screen_image_w, screen_image_h;
 
-static int fullscreenflag;
+static int fullscreenflag = 0;
+static int retinaflag = 0;
 
 static TxtSDLEventCallbackFunc event_callback;
 static void *event_callback_data;
@@ -255,7 +256,7 @@ int TXT_Init(void)
         flags |= SDL_WINDOW_ALLOW_HIGHDPI;
     }
 
-    //If fullscreenflag is true set SDL to fullscreenmode 
+    // If fullscreenflag is true, set window to full screen mode. 
     if (fullscreenflag)
     {
         flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -275,6 +276,19 @@ int TXT_Init(void)
 
     if (renderer == NULL)
         return 0;
+
+    // Check for retina display. When returning values width or hight from
+    // window size and drawable size are different, we have a retina display.
+    int w;
+    int h;
+    int w1;
+    int h1;
+
+    SDL_GetWindowSize(TXT_SDLWindow, &w, &h);
+    SDL_GL_GetDrawableSize(TXT_SDLWindow, &w1, &h1);
+
+    if ((w != w1) || (h != h1))
+        retinaflag = 1;
 
     // Special handling for OS X retina display. If we successfully set the
     // highdpi flag, check the output size for the screen renderer. If we get
@@ -489,32 +503,17 @@ void TXT_GetMousePosition(int *x, int *y)
     // origin position since we center the image within the window.
     SDL_GetWindowSize(TXT_SDLWindow, &window_w, &window_h);
     
-    if (fullscreenflag)
-    {
-        if ((strcmp(font->name, "large") == 0))
-        {
-            origin_x = (window_w - (screen_image_w * 2)) / 2;
-            origin_y = (window_h - (screen_image_h * 2)) / 2;
-            *x = ((*x - origin_x) * TXT_SCREEN_W) / (screen_image_w * 2);
-            *y = ((*y - origin_y) * TXT_SCREEN_H) / (screen_image_h * 2);
-        }
+    int multiplier = 1;
 
-        else
-        {
-            origin_x = (window_w - screen_image_w) / 2;
-            origin_y = (window_h - screen_image_h) / 2;
-            *x = ((*x - origin_x) * TXT_SCREEN_W) / screen_image_w;
-            *y = ((*y - origin_y) * TXT_SCREEN_H) / screen_image_h;
-        }
-    }
-    
-    else
+    if (fullscreenflag && (strcmp(font->name, "large") == 0) && !retinaflag)
     {
-        origin_x = (window_w - screen_image_w) / 2;
-        origin_y = (window_h - screen_image_h) / 2;
-        *x = ((*x - origin_x) * TXT_SCREEN_W) / screen_image_w;
-        *y = ((*y - origin_y) * TXT_SCREEN_H) / screen_image_h;
+        multiplier = 2;
     }
+
+    origin_x = (window_w - (screen_image_w * multiplier)) / 2;
+    origin_y = (window_h - (screen_image_h * multiplier)) / 2;
+    *x = ((*x - origin_x) * TXT_SCREEN_W) / (screen_image_w * multiplier);
+    *y = ((*y - origin_y) * TXT_SCREEN_H) / (screen_image_h * multiplier);
 
     if (*x < 0)
     {
