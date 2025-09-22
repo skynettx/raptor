@@ -31,7 +31,7 @@ The external system specific directories are the following:
 The config file `SETUP.INI` and the save files are also loaded and saved in these folders.
 On other systems that are not officially supported, the Raptor directory is used for loading and saving the config file and the save files.  
 Copy the `raptor.exe` (Windows) or `raptor` (Linux or macOS) from build directory to Raptor directory. 
-For MIDI support over TinySoundFont copy the soundfont `TimGM6mb.sf2` from `include\TimGM6mb\` to Raptor directory.
+For MIDI support over TinySoundFont (currently not supported on Android) copy the soundfont `TimGM6mb.sf2` from `include\TimGM6mb\` to Raptor directory.
 Under Windows copy the file `SDL.dll` from `include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x86\` for 32 bit installation or for 64 bit installation from 
 `include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x64\` to Raptor directory.
 Under Linux install lib-sdl2 from the packagemanager of your respective distro. When you use macOS install lib-sdl2 from dmg or from a packagemanager like brew etc. 
