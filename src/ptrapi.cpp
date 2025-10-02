@@ -32,6 +32,8 @@ char *displaypic;
 char *cursorstart;
 int mouseb1, mouseb2, mouseb3;
 int mouse_b1_ack, mouse_b2_ack, mouse_b3_ack;
+int touchmouseb1off = 0;
+int do_game = 0;
 
 int cur_mx, cur_my;
 int old_joy_x, old_joy_y;
@@ -158,6 +160,71 @@ I_HandleMouseEvent(
             break;
         }
         break;
+    }
+}
+
+/*------------------------------------------------------------------------
+   I_HandleTouchEvent() - Get current touch status
+  ------------------------------------------------------------------------*/
+void
+I_HandleTouchEvent(
+        SDL_Event *sdlevent
+)
+{
+    switch (sdlevent->type)
+    {
+        case SDL_FINGERDOWN:
+            if (SDL_GetNumTouchFingers(sdlevent->tfinger.touchId) == 3)
+            {
+                mouseb3 = 4;
+                mouse_b3_ack = 1;
+            }
+            if (SDL_GetNumTouchFingers(sdlevent->tfinger.touchId) == 2)
+            {
+                static int lasttick;
+                int now = SDL_GetTicks();
+                if(now - lasttick < 500)
+                {
+                    mouseb2 = 2;
+                    mouse_b2_ack = 1;
+                }
+
+                lasttick = now;
+            }
+            else if (!g_drawcursor && do_game)
+            {
+                static int lasttick;
+                int now = SDL_GetTicks();
+                if(now - lasttick < 500)
+                {
+                    if(!touchmouseb1off)
+                        touchmouseb1off = 1;
+                    else
+                        touchmouseb1off = 0;
+                }
+
+                if (!touchmouseb1off)
+                {
+                    mouseb1 = 1;
+                    mouse_b1_ack = 1;
+                }
+                else if(touchmouseb1off == 1)
+                {
+                    mouseb1 = 0;
+                }
+
+                lasttick = now;
+            }
+            else
+            {
+                mouseb1 = 1;
+                mouse_b1_ack = 1;
+            }
+            break;
+        case SDL_FINGERUP:
+            mouseb2 = 0;
+            mouseb3 = 0;
+            break;
     }
 }
 
@@ -598,4 +665,26 @@ PTR_End(
 {
     // if (ptr_tsm != -1)
     //     TSM_DelService(ptr_tsm);
+}
+
+/***************************************************************************
+ PTR_Settouchmouseb1off() - Set mouseb1off on/off for touch input
+ ***************************************************************************/
+void
+PTR_Settouchmouseb1off(
+    int flag                // INPUT : TRUE / FALSE
+)
+{
+    touchmouseb1off = flag;
+}
+
+/***************************************************************************
+ PTR_SetGameFlag() - Set do_game on/off for touch input
+ ***************************************************************************/
+void
+PTR_SetGameFlag(
+    int flag         // INPUT : TRUE / FALSE
+)
+{
+    do_game = flag;
 }

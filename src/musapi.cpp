@@ -435,10 +435,12 @@ MUS_Init(
             #ifdef _WIN32
             music_device = &mus_device_winmm;
             #endif // _WIN32
-            
+
+            #ifndef __ANDROID__
             #ifdef __linux__
             music_device = &mus_device_alsa;
             #endif // __linux__
+            #endif //__ANDROID__
             
             #ifdef __APPLE__
             if (core_dls_synth)

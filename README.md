@@ -9,17 +9,16 @@ Click on the thumbnail to watch some videos showing the project in action
 Original Raptor Call Of The Shadows author Scott Host is working on a new modernized version of the classic called Raptor Remixed. If you are a Raptor fan it would be cool if you would support the project on Kickstarter. For more information visit [www.mking.com](https://www.mking.com)
 
 ## Quick start
-Release builds are available for Windows and macOS.
-All release builds contain only the assets (GLB files) of the shareware version 1.2.
-If you want to play the full version you have to get the assets (GLB files) of the full version 1.2 yourself and copy them to the installation directory.
+Release builds are available for Windows, macOS and Android.
 To download the latest release build for your platform, click [Download](https://github.com/skynettx/raptor/releases/latest).
 Then install the downloaded release build on your system by following the instructions of the installer.
+You then need to obtain the assets (GLB files) of the shareware or full version 1.2 or higher yourself and copy them into the installation directory or the external system specific directory.
 That's it now Raptor is ready to play.
 For those who want to build themselves or who want more configuration information, continue below otherwise you're done here.
 
 ## Installing
-You need the original assets (GLB files) from Raptor Call Of The Shadows v1.2 shareware or full version.
-Important only the DOS version v1.2 is compatible! You have to take care of these files yourself.  
+You need the original assets (GLB files) from Raptor Call Of The Shadows shareware or full version 1.2 or higher.
+Important: No older versions before 1.2 are compatible! You have to take care of these files yourself.  
 The assets can be loaded from the current working directory (Raptor directory) or from the external system specific directory.
 **Please note that the release build version 0.8.0 does not support the external system specific directory and manages all assets, config and save files in the current working directory.**
 The external system specific directories are the following:
@@ -27,14 +26,16 @@ The external system specific directories are the following:
  Windows: Users\Username\AppData\Roaming\Raptor\  
  Linux: ~/.local/share/Raptor/
  macOS: ~/Library/Application Support/Raptor/
+ Android: storage/emulated/0/Android/data/com.raptor.skynettx/files/
 ```
 The config file `SETUP.INI` and the save files are also loaded and saved in these folders.
 On other systems that are not officially supported, the Raptor directory is used for loading and saving the config file and the save files.  
 Copy the `raptor.exe` (Windows) or `raptor` (Linux or macOS) from build directory to Raptor directory. 
-For MIDI support over TinySoundFont copy the soundfont `TimGM6mb.sf2` from `include\TimGM6mb\` to Raptor directory.
+For MIDI support over TinySoundFont (currently not supported on Android) copy the soundfont `TimGM6mb.sf2` from `include\TimGM6mb\` to Raptor directory.
 Under Windows copy the file `SDL.dll` from `include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x86\` for 32 bit installation or for 64 bit installation from 
 `include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x64\` to Raptor directory.
 Under Linux install lib-sdl2 from the packagemanager of your respective distro. When you use macOS install lib-sdl2 from dmg or from a packagemanager like brew etc. 
+On an Android device, the APK can be installed via your preferred file manager.
 ### Shareware
 Copy the following files to Raptor or external system specific directory:  
 ```
@@ -51,9 +52,9 @@ FILE0003.GLB
 FILE0004.GLB  
 ```
 ### Configuration
-You can build or download [Raptor Setup](https://github.com/skynettx/raptorsetup.git) to create and edit the
-`SETUP.INI`, or edit it manually as follows.
-Copy the `SETUP(ADLIB).INI` or the `SETUP(MIDI).INI` file from build directory to external system specific directory (Windows, Linux and macOS) or Raptor directory (only systems that are not officially supported) and rename it to `SETUP.INI`.  
+If no `SETUP.INI` file exists in the target directory, a default file will be created automatically on Windows, Linux, macOS and Android.
+Furthermore, Raptor Setup can be used to create or edit the `SETUP.INI` (not available on Android), or edit it manually as follows.
+Copy the `SETUP(ADLIB).INI` or the `SETUP(MIDI).INI` (MIDI is currently not supported on Android) file from build directory to external system specific directory (Windows, Linux, macOS and Android) or Raptor directory (only systems that are not officially supported) and rename it to `SETUP.INI`.  
 If you want MIDI over the TinySoundFont lib rename the `TimGM6mb.sf2` to `SoundFont.sf2` or specify the filename in the `SETUP.INI` file:  
 `SoundFont=SoundFont.sf2`  
 You can use any other GM compatible soundfont in sf2 format. For a better MIDI sound quality I recommend the FluidR3_GM.sf2.
@@ -98,7 +99,7 @@ You can use the projectfile for Visual Studio 2022 under `msvc\` or the projectf
 ### Linux
 Please remember to install the required dependencies lib-sdl2. In some distros there is an extra libsdl2-dev package like Debian or Ubuntu.  
 You can use the projectfile for CodeBlocks under `gcc\`.
-Otherwise you can use cmake. To use cmake type in the root of the repository:   
+Otherwise you can use CMake. To use CMake type in the root of the repository:   
 ```
 mkdir build  
 cd build  
@@ -107,13 +108,21 @@ make
 ```
 
 ### macOS
-Install the required dependencies lib-sdl2. To build use cmake, type in the root of the repository:
+Install the required dependencies lib-sdl2. To build use CMake, type in the root of the repository:
 ```
 mkdir build  
 cd build  
 cmake ..  
 make  
 ```
+
+### Android
+Make sure CMake is installed in your Android Studio environment.
+If this is the case, open the `android\` project folder in Android Studio and build the APK.
+
+## License
+Raptor is licensed under the [GPLv2](https://github.com/skynettx/raptor/blob/master/LICENSE) or later.  
+Raptor for Android is licensed under the [GPLv3](https://github.com/skynettx/raptor/blob/master/pkg/android/license/LICENSE) to be compatible with Apache 2.0 licensed libraries.
 
 ## FAQ
 1. No audio under Linux:  

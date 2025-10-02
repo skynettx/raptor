@@ -229,6 +229,7 @@ WIN_Opts(
     {
         patchflag = 0;
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
 
         if (joy_ipt_MenuNew)
         {
@@ -590,6 +591,7 @@ WIN_AskBool(
     while (1)
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
         
         if (KBD_IsKey(SC_ESC) || JOY_IsKeyInGameBack(Back))                                                   
         {
@@ -713,6 +715,7 @@ WIN_AskDiff(
     while (1)
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
         
         if (KBD_IsKey(SC_ESC) || Back || BButton)                                                      
         {
@@ -797,10 +800,16 @@ WIN_Register(
     
     SWD_SetFieldPtr(window, REG_VIEWID);
     PTR_DrawCursor(1);
-    
+
+#ifdef __ANDROID__
+    if((control == 1) || (control == 2 && !joy_ipt_MenuNew))
+       SDL_StartTextInput();
+#endif //__ANDROID__
+
     while (1)
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
 
         if (joy_ipt_MenuNew)                                                               
         {
@@ -981,7 +990,12 @@ reg_exit:
     }
     
     diff = 1;
-    
+
+#ifdef __ANDROID__
+    if ((control == 1) || (control == 2 && !joy_ipt_MenuNew))
+        SDL_StopTextInput();
+#endif //__ANDROID__
+
     if (rval)
     {
         diff = WIN_AskDiff();
@@ -1145,6 +1159,7 @@ WIN_Hangar(
                 else
                     SWD_SetFieldItem(window, HANG_PIC, -1);
                 
+                I_GetNeedResize(false);
                 SWD_ShowAllWindows();
                 GFX_DisplayUpdate();
             }
@@ -1157,6 +1172,7 @@ WIN_Hangar(
             }
             
             SWD_Dialog(&dlg);
+            I_GetNeedResize(false);
 
             if (joy_ipt_MenuNew)
             {
@@ -1510,6 +1526,7 @@ WIN_ShipComp(
     while (1)
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
 
         if (joy_ipt_MenuNew)
         {
@@ -2095,6 +2112,7 @@ WIN_MainMenu(
     do
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
         
         if (dlg.keypress == SC_D || YButton)                                    
         {

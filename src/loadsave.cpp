@@ -22,6 +22,7 @@
 #include "fileids.h"
 #include "winids.h"
 #include "prefapi.h"
+#include "i_video.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -785,6 +786,7 @@ RAP_LoadWin(
     while (1)
     {
         SWD_Dialog(&dlg);
+        I_GetNeedResize(false);
         
         if (joy_ipt_MenuNew)
         {
@@ -949,14 +951,24 @@ RAP_InitLoadSave(
 {
 #if _WIN32 || __linux__ || __APPLE__
     char* gethome;
-    
+
+    #if __ANDROID__
+    gethome = (char*)SDL_AndroidGetExternalStoragePath();
+    strcat(gethome, "/");
+    #else
     gethome = SDL_GetPrefPath("", "Raptor");
+    #endif //__ANDROID__
 
     if (gethome != NULL)
     {
         strcpy(cdpath, gethome);
         strcpy(g_setup_ini, gethome);
-        sprintf(g_setup_ini, "%s%s", g_setup_ini, "SETUP.INI");
+        
+        if(RAP_CheckFileInPath("setup.ini"))
+            sprintf(g_setup_ini, "%s%s", g_setup_ini, "setup.ini");
+        else
+            sprintf(g_setup_ini, "%s%s", g_setup_ini, "SETUP.INI");
+        
         cdflag = 1;
         SDL_free(gethome);
     }
@@ -965,13 +977,46 @@ RAP_InitLoadSave(
         EXIT_Error("Couldn't find home directory");
     }
 
+    #if __ANDROID__
+    for(int i = 0; i < 2; i++)
+    {
+        char src[PATH_MAX];
+        char srclc[PATH_MAX];
+        char dst[PATH_MAX];
+        sprintf(src,"FILE%04u.GLB", i);
+        sprintf(srclc, "file%04u.glb", i);
+        sprintf(dst, "%sFILE%04u.GLB", cdpath, i);
+        if (!RAP_CheckFileInPath(src) && !RAP_CheckFileInPath(srclc))
+        {
+            SDL_RWops *readsrc = SDL_RWFromFile(src, "rb");
+            if(readsrc)
+            {
+                Sint64 size = SDL_RWsize(readsrc);
+                char *buffer = (char*)malloc(size);
+                SDL_RWread(readsrc, buffer, sizeof(char), size);
+                SDL_RWops *writedst = SDL_RWFromFile(dst, "wb");
+                if(writedst)
+                {
+                    SDL_RWwrite(writedst, buffer, sizeof(char), size);
+                    SDL_RWclose(writedst);
+                }
+                SDL_RWclose(readsrc);
+                free(buffer);
+            }
+        }
+    }
+    #endif //__ANDROID__
+
     return cdpath;
 #else
     memset(cdpath, 0, sizeof(cdpath));
 
     cdflag = 0;
 
-    strcpy(g_setup_ini, "SETUP.INI");
+    if(!access("setup.ini", 0))
+        strcpy(g_setup_ini, "setup.ini");
+    else
+        strcpy(g_setup_ini, "SETUP.INI");
 
     return cdpath;
 #endif // _WIN32 || __linux__ || __APPLE__
@@ -997,7 +1042,11 @@ RAP_WriteDefaultSetup(
 )
 {
     INI_PutPreferenceLong("Setup", "Detail", 1);
+#if __ANDROID__
+    INI_PutPreferenceLong("Setup", "Control", 1);
+#else
     INI_PutPreferenceLong("Setup", "Control", 0);
+#endif //__ANDROID__
     INI_PutPreferenceLong("Setup", "Haptic", 1);                           
     INI_PutPreferenceLong("Setup", "joy_ipt_MenuNew", 0);         
 
@@ -1046,9 +1095,15 @@ RAP_WriteDefaultSetup(
     INI_PutPreferenceLong("JoyStick", "FireSp", 1);
     INI_PutPreferenceLong("JoyStick", "ChangeSp", 2);
     INI_PutPreferenceLong("JoyStick", "MegaFire", 3);
+#if __ANDROID__
+    INI_PutPreferenceLong("Video", "fullscreen", 1);
+    INI_PutPreferenceLong("Video", "aspect_ratio_correct", 0);
+    INI_PutPreferenceLong("Video", "txt_fullscreen", 1);
+#else
     INI_PutPreferenceLong("Video", "fullscreen", 0);
     INI_PutPreferenceLong("Video", "aspect_ratio_correct", 1);
     INI_PutPreferenceLong("Video", "txt_fullscreen", 0);
+#endif //__ANDROID__
 }
 
 /***************************************************************************

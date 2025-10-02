@@ -67,6 +67,7 @@ void I_LASTSCR(char* mem)
     // Wait for a keypress
 
     IMS_StartAck();
+    I_Settextmode(true);
 
     while (true)
     {

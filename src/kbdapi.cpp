@@ -174,7 +174,13 @@ I_HandleKeyboardEvent(
     case SDL_SCANCODE_RALT:
         key = 0x38;
         break;
-    
+
+#ifdef __ANDROID__
+    case SDL_SCANCODE_AC_BACK:
+        key = 0x01;
+        break;
+#endif //__ANDROID__
+
     default:
         if (sdlevent->key.keysym.scancode >= 0 && sdlevent->key.keysym.scancode < 100)
             key = ScanCodeMap[sdlevent->key.keysym.scancode];

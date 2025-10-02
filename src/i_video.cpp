@@ -184,6 +184,9 @@ static bool window_focused = true;
 // Window resize state.
 
 static bool need_resize = false;
+static bool need_resize_ext = false;
+static bool setpos = false;
+static int old_mx, old_my;
 static unsigned int last_resize_time;
 #define RESIZE_DELAY 500
 
@@ -196,6 +199,9 @@ unsigned int joywait = 0;
 
 // Set to true if screen coordinates are in points rather than pixels
 int screencoordpoint = 0;
+
+// When textmode is true not update pointer cursor
+static bool textmode = false;
 
 void VIDEO_LoadPrefs(void)
 {
@@ -322,6 +328,7 @@ static void HandleWindowEvent(SDL_WindowEvent *event)
 
         case SDL_WINDOWEVENT_RESIZED:
             need_resize = true;
+            need_resize_ext = true;
             last_resize_time = SDL_GetTicks();
             break;
 
@@ -334,6 +341,7 @@ static void HandleWindowEvent(SDL_WindowEvent *event)
         case SDL_WINDOWEVENT_MAXIMIZED:
         case SDL_WINDOWEVENT_RESTORED:
             screenvisible = true;
+            need_resize_ext = true;
             break;
 
         // Update the value of window_focused when we get a focus event
@@ -411,6 +419,7 @@ void I_GetEvent(void)
     extern void I_HandleKeyboardEvent(SDL_Event *sdlevent);
     extern void I_HandleMouseEvent(SDL_Event *sdlevent);
     extern void I_HandleJoystickEvent(SDL_Event *sdlevent);
+    extern void I_HandleTouchEvent(SDL_Event *sdlevent);
 
     SDL_Event sdlevent;
 
@@ -441,6 +450,10 @@ void I_GetEvent(void)
             case SDL_CONTROLLERBUTTONDOWN:
             case SDL_CONTROLLERAXISMOTION:
                 I_HandleJoystickEvent(&sdlevent);
+                break;
+            case SDL_FINGERDOWN:
+            case SDL_FINGERUP:
+                I_HandleTouchEvent(&sdlevent);
                 break;
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
@@ -481,10 +494,14 @@ void I_GetEvent(void)
     }
 
     if ((control == 2) && (!joy_ipt_MenuNew))
-         PTR_JoyHandler();
+        PTR_JoyHandler();
+    
     if ((control != 2) || (control == 2 && joy_ipt_MenuNew))
-         PTR_MouseHandler();
-    PTR_UpdateCursor();
+        PTR_MouseHandler();
+    
+    if (!textmode)
+        PTR_UpdateCursor();
+    
     IPT_GetButtons();
 
     MUS_Poll();
@@ -717,8 +734,8 @@ void I_FinishUpdate (void)
 
     if (need_resize)
     {
-        if (SDL_GetTicks() > last_resize_time + RESIZE_DELAY)
-        {
+        //if (SDL_GetTicks() > last_resize_time + RESIZE_DELAY)
+        //{
             int flags;
             // When the window is resized (we're not in fullscreen mode),
             // save the new window size.
@@ -735,11 +752,11 @@ void I_FinishUpdate (void)
             CreateUpscaledTexture(false);
             need_resize = false;
             palette_to_set = true;
-        }
-        else
+        //}
+        /*else
         {
             return;
-        }
+        }*/
     }
 
     UpdateGrab();
@@ -1532,11 +1549,13 @@ void I_GetMousePos(int *x, int *y)
     SDL_RenderGetViewport(renderer, &viewport);
     SDL_RenderGetScale(renderer, &sx, &sy);
 
+#ifndef __ANDROID__
     if (screencoordpoint)
     {
         sx /= 2;
         sy /= 2;
     }
+#endif //__ANDROID__
 
     *x = (int)(*x / sx) - viewport.x;
     *y = (int)(((*y / sy - viewport.y) * (float)SCREENHEIGHT) / actualheight);
@@ -1549,11 +1568,13 @@ void I_SetMousePos(int x, int y)
     SDL_RenderGetViewport(renderer, &viewport);
     SDL_RenderGetScale(renderer, &sx, &sy);
 
+#ifndef __ANDROID__
     if (screencoordpoint)
     {
         sx /= 2;
         sy /= 2;
     }
+#endif //__ANDROID__
 
     x = (int)((x + viewport.x) * sx);
     y = (int)(((y * actualheight) / (float)SCREENHEIGHT + viewport.y) * sy);
@@ -1563,4 +1584,46 @@ void I_SetMousePos(int x, int y)
 void closewindow(void)
 {
     SDL_DestroyWindow(screen);
+}
+
+bool I_GetNeedResize(bool setonlypos)
+{
+    if (!need_resize_ext)
+    {
+        old_mx = cur_mx;
+        old_my = cur_my;
+
+        if (g_drawcursor)
+            setpos = true;
+
+        return false;
+    }
+    else
+    {
+        if (setonlypos)
+            PTR_SetPos(old_mx, old_my);
+        else if (setpos)
+        {
+            #ifdef __ANDROID__
+            PTR_SetPos(old_mx, old_my);
+            #endif //__ANDROID__
+            GFX_DisplayUpdate();
+            I_FinishUpdate();
+        }
+        else
+        {
+            GFX_DisplayUpdate();
+            I_FinishUpdate();
+        }
+
+        need_resize_ext = false;
+        setpos = false;
+
+        return true;
+    }
+}
+
+void I_Settextmode(bool flag)
+{
+    textmode = flag;
 }

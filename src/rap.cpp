@@ -824,6 +824,8 @@ Do_Game(
     end_fadeflag = 0;
     KBD_Clear();
     IMS_StartAck();
+    PTR_SetGameFlag(1);
+    PTR_Settouchmouseb1off(0);
     BUT_1 = 0;
     BUT_2 = 0;
     BUT_3 = 0;
@@ -870,7 +872,12 @@ Do_Game(
     {
         num_shadows = num_gshadows = 0;
         
+        #ifdef __ANDROID__
+        if (!I_GetNeedResize(true))
+            IPT_MovePlayer();
+        #else
         IPT_MovePlayer();
+        #endif //__ANDROID__
         
         if (KBD_IsKey(SC_F1))                                                                   
         {
@@ -1169,6 +1176,12 @@ Do_Game(
             if (!demo_mode)
             {
                 SWD_SetClearFlag(0);
+
+                #ifdef __ANDROID__
+                int old_mx = cur_mx;
+                int old_my = cur_my;
+                #endif //__ANDROID__
+
                 IPT_End();
                 RAP_ClearSides();
                 if (WIN_AskBool("Abort Mission ?"))
@@ -1177,6 +1190,11 @@ Do_Game(
                     rval = 1;
                     break;
                 }
+                
+                #ifdef __ANDROID__
+                PTR_SetPos(old_mx, old_my);
+                #endif //__ANDROID__
+
                 IPT_Start();
                 g_oldsuper = -1;
                 g_oldshield = -1;
@@ -1205,6 +1223,7 @@ Do_Game(
     
     RAP_FreeMap();
     end_wave = 0;
+    PTR_SetGameFlag(0);
     
     memset(displaybuffer, 0, 64000);
     GFX_MarkUpdate(0, 0, 320, 200);
@@ -1302,16 +1321,29 @@ main(
     
     cur_diff = 0;
 
-    if (!access("FILE0001.GLB", 0) || RAP_CheckFileInPath("FILE0001.GLB"))
-	gameflag[0] = 1;
+    if (!access("FILE0001.GLB", 0) ||
+        !access("file0001.glb", 0) ||
+        RAP_CheckFileInPath("FILE0001.GLB") ||
+        RAP_CheckFileInPath("file0001.glb"))
+        gameflag[0] = 1;
 
-    if (!access("FILE0002.GLB", 0) || RAP_CheckFileInPath("FILE0002.GLB"))
-	gameflag[1] = 1;
+    if (!access("FILE0002.GLB", 0) ||
+        !access("file0002.glb", 0) ||
+        RAP_CheckFileInPath("FILE0002.GLB") ||
+        RAP_CheckFileInPath("file0002.glb"))
+        gameflag[1] = 1;
 
-    if ((!access("FILE0003.GLB", 0) && !access("FILE0004.GLB", 0)) || (RAP_CheckFileInPath("FILE0003.GLB") && RAP_CheckFileInPath("FILE0004.GLB")))
+    if ((!access("FILE0003.GLB", 0) && !access("FILE0004.GLB", 0)) || 
+        (!access("file0003.glb", 0) && !access("file0004.glb", 0)) ||
+        (!access("FILE0003.GLB", 0) && !access("file0004.glb", 0)) ||
+        (!access("file0003.glb", 0) && !access("FILE0004.GLB", 0)) ||
+        (RAP_CheckFileInPath("FILE0003.GLB") && RAP_CheckFileInPath("FILE0004.GLB")) ||
+        (RAP_CheckFileInPath("file0003.glb") && RAP_CheckFileInPath("file0004.glb")) ||
+        (RAP_CheckFileInPath("FILE0003.GLB") && RAP_CheckFileInPath("file0004.glb")) ||
+        (RAP_CheckFileInPath("file0003.glb") && RAP_CheckFileInPath("FILE0004.GLB")))
     {
-	gameflag[2] = 1;
-	gameflag[3] = 1;
+        gameflag[2] = 1;
+        gameflag[3] = 1;
     }
 
     if (gameflag[1] + gameflag[2])
@@ -1325,7 +1357,9 @@ main(
             numfiles++;
     }
 
-    if ((access("FILE0000.GLB", 0) && !RAP_CheckFileInPath("FILE0000.GLB")) || !numfiles)
+    if ((access("FILE0000.GLB", 0) && !RAP_CheckFileInPath("FILE0000.GLB")) &&
+        (access("file0000.glb", 0) && !RAP_CheckFileInPath("file0000.glb")) ||
+        !numfiles)
     {
         printf("All game data files NOT FOUND cannot proceed !!\n");
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
