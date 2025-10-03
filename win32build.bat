@@ -309,11 +309,11 @@ xcopy "%assetspath%\*.GLB" pkg\win32\%buildfoldername%
   echo.
   echo Function un.onUninstSuccess
   echo   HideWindow
-  echo   MessageBox MB_ICONINFORMATION^|MB_OK "Raptor wurde erfolgreich deinstalliert."
+  echo   MessageBox MB_ICONINFORMATION^|MB_OK "Raptor was successfully uninstalled."
   echo FunctionEnd
   echo.
   echo Function un.onInit
-  echo   MessageBox MB_ICONQUESTION^|MB_YESNO^|MB_DEFBUTTON2 "Möchten Sie Raptor und alle seinen Komponenten deinstallieren?" IDYES +2
+  echo   MessageBox MB_ICONQUESTION^|MB_YESNO^|MB_DEFBUTTON2 "Do you want to uninstall Raptor and all its components?" IDYES +2
   echo   Abort
   echo FunctionEnd
   echo.
