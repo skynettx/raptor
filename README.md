@@ -31,7 +31,6 @@ The external system specific directories are the following:
 The config file `SETUP.INI` and the save files are also loaded and saved in these folders.
 On other systems that are not officially supported, the Raptor directory is used for loading and saving the config file and the save files.  
 Copy the `raptor.exe` (Windows) or `raptor` (Linux or macOS) from build directory to Raptor directory. 
-For MIDI support over TinySoundFont (currently not supported on Android) copy the soundfont `TimGM6mb.sf2` from `include\TimGM6mb\` to Raptor directory.
 Under Windows copy the file `SDL.dll` from `include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x86\` for 32 bit installation or for 64 bit installation from 
 `include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x64\` to Raptor directory.
 Under Linux install lib-sdl2 from the packagemanager of your respective distro. When you use macOS install lib-sdl2 from dmg or from a packagemanager like brew etc. 
@@ -55,10 +54,9 @@ FILE0004.GLB
 If no `SETUP.INI` file exists in the target directory, a default file will be created automatically on Windows, Linux, macOS and Android.
 Furthermore, Raptor Setup can be used to create or edit the `SETUP.INI` (not available on Android), or edit it manually as follows.
 Copy the `SETUP(ADLIB).INI` or the `SETUP(MIDI).INI` (MIDI is currently not supported on Android) file from build directory to external system specific directory (Windows, Linux, macOS and Android) or Raptor directory (only systems that are not officially supported) and rename it to `SETUP.INI`.  
-If you want MIDI over the TinySoundFont lib rename the `TimGM6mb.sf2` to `SoundFont.sf2` or specify the filename in the `SETUP.INI` file:  
+For MIDI support via TinySoundFont, you need a GM-compatible soundfont in SF2 format, e.g., FluidR3GM.sf2.
+You can specify the path to the soundfont in the `SETUP.INI` file:  
 `SoundFont=SoundFont.sf2`  
-You can use any other GM compatible soundfont in sf2 format. For a better MIDI sound quality I recommend the FluidR3_GM.sf2.
-This font is 140 MB in size, so it is not in the repository.  
 To play with one of the following input devices set `Control=0` under the [Setup] section in the `SETUP.INI` file to:  
 `Control=0` Keyboard  
 `Control=1` Mouse  
@@ -135,8 +133,7 @@ to `fullscreen=1`. Or aspect ratio mode off `aspect_ratio_correct=1` to `aspect_
 Special thanks to [nukeykt](https://github.com/nukeykt) and [wel97459](https://github.com/wel97459) for their great work on the reconstructed source code.
 Big thanks to [Scott Host](https://www.mking.com) for his great support.
 Also many thanks to [schellingb](https://github.com/schellingb) for the great TinySoundFont library and to all contributors from the
-[chocolate-doom project](https://github.com/chocolate-doom) for the awesome libtextscreen. Furthermore, many thanks to Tim Brechbill for the TimGM6mb
-soundfont.
+[chocolate-doom project](https://github.com/chocolate-doom) for the awesome libtextscreen.
 
 
  
