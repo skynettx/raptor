@@ -156,7 +156,6 @@ xcopy %msvcfolder%\raptorsetup\raptorsetup.exe pkg\win32\%buildfoldername%
 xcopy include\TinySoundFont\LICENSE pkg\win32\%buildfoldername%
 ren pkg\win32\%buildfoldername%\LICENSE LICENSETSF
 xcopy LICENSE pkg\win32\%buildfoldername%
-xcopy include\TimGM6mb\TimGM6mb.sf2 pkg\win32\%buildfoldername%
 xcopy %sdlfolder% pkg\win32\%buildfoldername%
 
 if exist pkg\win32\%buildfoldername%\raptor.exe (
@@ -181,12 +180,6 @@ if exist pkg\win32\%buildfoldername%\LICENSE (
   echo LICENSE PASS
 ) else (
   echo LICENSE FAILED
-  goto:eof
-)
-if exist pkg\win32\%buildfoldername%\TimGM6mb.sf2 (
-  echo TimGM6mb.sf2 PASS
-) else (
-  echo TimGM6mb.sf2 FAILED
   goto:eof
 )
 if exist pkg\win32\%buildfoldername%\SDL2.dll (
@@ -289,7 +282,6 @@ xcopy "%assetspath%\*.GLB" pkg\win32\%buildfoldername%
   echo   CreateShortCut "$SMPROGRAMS\Raptor\Raptor Setup.lnk" "$INSTDIR\raptorsetup.exe"
   echo   CreateShortCut "$DESKTOP\Raptor Setup.lnk" "$INSTDIR\raptorsetup.exe"
   echo   File "%buildfoldername%\SDL2.dll"
-  echo   File "%buildfoldername%\TimGM6mb.sf2"
   echo SectionEnd
   echo.
   echo Section -AdditionalIcons
@@ -319,7 +311,6 @@ xcopy "%assetspath%\*.GLB" pkg\win32\%buildfoldername%
   echo.
   echo Section Uninstall
   echo   Delete "$INSTDIR\uninst.exe"
-  echo   Delete "$INSTDIR\TimGM6mb.sf2"
   echo   Delete "$INSTDIR\SDL2.dll"
   echo   Delete "$INSTDIR\raptorsetup.exe"
   echo   Delete "$INSTDIR\raptor.exe"
