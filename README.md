@@ -54,7 +54,7 @@ FILE0004.GLB
 If no `SETUP.INI` file exists in the target directory, a default file will be created automatically on Windows, Linux, macOS and Android.
 Furthermore, Raptor Setup can be used to create or edit the `SETUP.INI` (not available on Android), or edit it manually as follows.
 Copy the `SETUP(ADLIB).INI` or the `SETUP(MIDI).INI` (MIDI is currently not supported on Android) file from build directory to external system specific directory (Windows, Linux, macOS and Android) or Raptor directory (only systems that are not officially supported) and rename it to `SETUP.INI`.  
-For MIDI support via TinySoundFont, you need a GM-compatible soundfont in SF2 format, e.g., FluidR3GM.sf2.
+For MIDI support via TinySoundFont (currently not supported on Android), you need a GM-compatible soundfont in SF2 format, e.g., FluidR3_GM.sf2.
 You can specify the path to the soundfont in the `SETUP.INI` file:  
 `SoundFont=SoundFont.sf2`  
 To play with one of the following input devices set `Control=0` under the [Setup] section in the `SETUP.INI` file to:  
