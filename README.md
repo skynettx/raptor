@@ -1,3 +1,34 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=skynettx&project=raptor&lang=id">Bahasa Indonesia</a>
+      </div>
+    </div>
+  </details>
+</div>
+
 # Raptor
 Based on the reverse-engineered codebase from Raptor Call Of The Shadows by nukeykt
 
