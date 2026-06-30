@@ -1,6 +1,7 @@
 #include "SDL.h"
 #include "i_video.h"
 #include "joyapi.h"
+#include "ptrapi.h"
 
 int joy_ack;
 
@@ -83,6 +84,31 @@ IPT_CloJoy(
 }
 
 /***************************************************************************
+IPT_ConvertAxisValue() - Convert raw values from axis to usable input values
+ ***************************************************************************/
+static int
+IPT_ConvertAxisValue(
+	int AxisValue,        //Raw value from axis
+	int RangeDivison      //Defines axis value range division
+)
+{
+	int deadzone = 8000;
+	int result;
+
+	if (AxisValue == 0 ||
+		(AxisValue > 0 && AxisValue < deadzone) ||
+		(AxisValue < 0 && AxisValue > -deadzone))
+		return 0;
+
+	if (AxisValue > 0)
+		result = (AxisValue - deadzone) * RangeDivison / (32767 - deadzone);
+	else
+		result = (AxisValue + deadzone) * RangeDivison / (32768 - deadzone);
+
+	return result;
+}
+
+/***************************************************************************
 I_HandleJoystickEvent() - Get current button or axis status
  ***************************************************************************/
 void 
@@ -109,10 +135,19 @@ I_HandleJoystickEvent(
 			XButton = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_X);
 			YButton = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_Y);
 
-			StickX = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX) / 8000;
-			StickY = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY) / 8000;
-			TriggerLeft = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERLEFT) / 8000;
-			TriggerRight = SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERRIGHT) / 8000;
+			if (!g_drawcursor)
+			{
+				StickX = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 10);
+				StickY = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 8);
+			}
+			else
+			{
+				StickX = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 4);
+				StickY = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 4);
+			}
+			
+			TriggerLeft = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERLEFT), 4);
+			TriggerRight = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERRIGHT), 4);
 		}
 		
 		if (sdlevent->type == SDL_CONTROLLERBUTTONUP) 
