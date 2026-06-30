@@ -207,12 +207,8 @@ IPT_GetJoyStick(
 
     if (StickX != 0)
     {
-        if (StickX > 0)
-            StickX *= 2;
         if (StickX > MAX_ADDX)
             StickX = MAX_ADDX;
-        if (StickX < 0)
-            StickX *= 2;
         if (StickX < -MAX_ADDX)
             StickX = -MAX_ADDX;
         g_addx = StickX;
@@ -220,12 +216,8 @@ IPT_GetJoyStick(
     
     if (StickY != 0)
     {
-        if (StickY > 0)
-            StickY *= 2;
         if (StickY > MAX_ADDY)
             StickY = MAX_ADDY;
-        if (StickY < 0)
-            StickY *= 2;
         if (StickY < -MAX_ADDY)
             StickY = -MAX_ADDY;
         g_addy = StickY;
