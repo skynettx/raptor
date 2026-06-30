@@ -695,6 +695,8 @@ SWD_FieldInput(
     FONT *fld_font;
     char *wrkbuf;
     int flag;
+    int joyinput;
+    joyinput = 0;
     flag = 0;
     fld_font = (FONT*)GLB_GetItem(curfld->fontid);
     wrkbuf = (char*)curfld + LE_LONG(curfld->txtoff);
@@ -710,6 +712,8 @@ SWD_FieldInput(
         
         if (StickY || Down || Up || AButton || YButton || Start)            
         {
+            joyinput = 1;
+
             if (curpos > 17)
             {
                 curpos--;
@@ -732,6 +736,8 @@ SWD_FieldInput(
         {
             if (JOY_IsScroll(0) == 1)
             {
+                flag = 1;
+
                 if (fi_joy_count > 0)
                 {
                     curpos--;
@@ -761,6 +767,8 @@ SWD_FieldInput(
         {
             if (JOY_IsScroll(0) == 1)
             {
+                flag = 1;
+
                 if (fi_joy_count > 0)
                 {
                     curpos--;
@@ -801,6 +809,7 @@ SWD_FieldInput(
         if (AButton)                                                  
         {
             JOY_IsKey(AButton);
+            flag = 1;
             curpos++;
             fi_joy_count = 0;
         }
@@ -824,6 +833,7 @@ SWD_FieldInput(
         if (YButton)                                                  
         {
             JOY_IsKey(YButton);
+            flag = 1;
             wrkbuf[curpos + 1] = 0;
             g_joy_ascii = 0x20;
             wrkbuf[curpos] = g_joy_ascii;
@@ -837,6 +847,15 @@ SWD_FieldInput(
             JOY_IsKey(Start);
             g_key = SC_ENTER;
             fi_joy_count = 0;
+        }
+
+        if (joyinput)
+        {
+            if (GFX_StrPixelLen(fld_font, wrkbuf, curpos + 1) >= LE_LONG(curfld->lx))
+                curpos--;
+
+            wrkbuf[curpos + 1] = 0;
+            joyinput = 0;
         }
     }
     

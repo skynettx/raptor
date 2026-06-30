@@ -931,6 +931,7 @@ WIN_Register(
             {
             case REG_NAME:
                 SWD_GetFieldText(window, REG_NAME, tp.name);
+                fi_sec_field = false;
                 if (strlen(tp.name) != 0 && dlg.keypress == SC_ENTER)
                 {
                     fi_sec_field = true;
@@ -943,6 +944,7 @@ WIN_Register(
             case REG_CALLSIGN:
                 SWD_GetFieldText(window, REG_CALLSIGN, tp.callsign);
                 SWD_GetFieldText(window, REG_CALLSIGN, tp.name);
+                fi_sec_field = true;
                 if (!strlen(tp.name))
                 {
                     fi_sec_field = false;
