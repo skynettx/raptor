@@ -15,7 +15,6 @@
 
 int g_joy_ascii;
 unsigned int fi_joy_count;
-bool fi_sec_field;
 
 int kbactive;
 int g_button_flag = 1;
@@ -696,10 +695,12 @@ SWD_FieldInput(
     char *wrkbuf;
     int flag;
     int joyinput;
+    int fieldmaxchars;
     joyinput = 0;
     flag = 0;
     fld_font = (FONT*)GLB_GetItem(curfld->fontid);
     wrkbuf = (char*)curfld + LE_LONG(curfld->txtoff);
+    fieldmaxchars = LE_LONG(curfld->maxchars);
     
     curpos = strlen(wrkbuf);
     
@@ -714,19 +715,10 @@ SWD_FieldInput(
         {
             joyinput = 1;
 
-            if (curpos > 17)
+            if (curpos + 1 >= fieldmaxchars)
             {
                 curpos--;
                 wrkbuf[curpos] = 0;
-            }
-            
-            if (fi_sec_field)
-            {
-                if (curpos > 10)
-                {
-                    curpos--;
-                    wrkbuf[curpos] = 0;
-                }
             }
         }
         
@@ -878,11 +870,6 @@ SWD_FieldInput(
             else
                 cur_cmd = F_NEXT;
         }
-        
-        if (fi_sec_field == false)
-            fi_sec_field = true;
-        else
-            fi_sec_field = false;
         break;
     
     case SC_ENTER:
@@ -1696,6 +1683,7 @@ SWD_InitWindow(
     old_field = -1;
     kbactive = 0;
     highlight_flag = 0;
+    fi_joy_count = 0;
     
     if (lastfld)
     {
