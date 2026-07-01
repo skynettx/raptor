@@ -728,8 +728,6 @@ SWD_FieldInput(
         {
             if (JOY_IsScroll(0) == 1)
             {
-                flag = 1;
-
                 if (fi_joy_count > 0)
                 {
                     curpos--;
@@ -759,8 +757,6 @@ SWD_FieldInput(
         {
             if (JOY_IsScroll(0) == 1)
             {
-                flag = 1;
-
                 if (fi_joy_count > 0)
                 {
                     curpos--;
@@ -801,7 +797,6 @@ SWD_FieldInput(
         if (AButton)                                                  
         {
             JOY_IsKey(AButton);
-            flag = 1;
             curpos++;
             fi_joy_count = 0;
         }
@@ -825,7 +820,6 @@ SWD_FieldInput(
         if (YButton)                                                  
         {
             JOY_IsKey(YButton);
-            flag = 1;
             wrkbuf[curpos + 1] = 0;
             g_joy_ascii = 0x20;
             wrkbuf[curpos] = g_joy_ascii;
@@ -848,6 +842,11 @@ SWD_FieldInput(
 
             wrkbuf[curpos + 1] = 0;
             joyinput = 0;
+
+            if (g_key == SC_ENTER)
+                flag = 0;
+            else
+                flag = 1;
         }
     }
     
