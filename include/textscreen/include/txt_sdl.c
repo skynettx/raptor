@@ -513,6 +513,7 @@ void TXT_GetMousePosition(int *x, int *y)
 {
     int window_w, window_h;
     int origin_x, origin_y;
+    float sx, sy;
 
     SDL_GetMouseState(x, y);
 
@@ -521,18 +522,27 @@ void TXT_GetMousePosition(int *x, int *y)
     // what SDL_GetWindowSize() returns; we must calculate and subtract the
     // origin position since we center the image within the window.
     SDL_GetWindowSize(TXT_SDLWindow, &window_w, &window_h);
-    
-    int multiplier = 1;
 
-    if (fullscreenflag && (strcmp(font->name, "large") == 0) && !retinaflag)
+    if (aspect_ratio_correctflag)
+        SDL_RenderGetScale(renderer, &sx, &sy);
+    else
     {
-        multiplier = 2;
+        sx = (float)window_w / screen_image_w;
+        sy = (float)window_h / screen_image_h;
     }
-
-    origin_x = (window_w - (screen_image_w * multiplier)) / 2;
-    origin_y = (window_h - (screen_image_h * multiplier)) / 2;
-    *x = ((*x - origin_x) * TXT_SCREEN_W) / (screen_image_w * multiplier);
-    *y = ((*y - origin_y) * TXT_SCREEN_H) / (screen_image_h * multiplier);
+    
+    if (screen_image_w != screenbuffer->w &&
+        screen_image_h != screenbuffer->h &&
+        aspect_ratio_correctflag)
+    {
+        sx *= (screenbuffer->w / screen_image_w);
+        sy *= (screenbuffer->h / screen_image_h);
+    }
+    
+    origin_x = (window_w - (screen_image_w * sx)) / 2;
+    origin_y = (window_h - (screen_image_h * sy)) / 2;
+    *x = ((*x - origin_x) * TXT_SCREEN_W) / (screen_image_w * sx);
+    *y = ((*y - origin_y) * TXT_SCREEN_H) / (screen_image_h * sy);
 
     if (*x < 0)
     {
