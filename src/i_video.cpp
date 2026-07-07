@@ -1545,9 +1545,18 @@ void I_GetMousePos(int *x, int *y)
 {
     SDL_Rect viewport;
     float sx, sy;
+    int rw, rh;
     SDL_GetMouseState(x, y);
     SDL_RenderGetViewport(renderer, &viewport);
-    SDL_RenderGetScale(renderer, &sx, &sy);
+    
+    if (aspect_ratio_correct)
+        SDL_RenderGetScale(renderer, &sx, &sy);
+    else
+    {
+        SDL_GetRendererOutputSize(renderer, &rw, &rh);
+        sx = (float)rw / SCREENWIDTH;
+        sy = (float)rh / actualheight;
+    }
 
 #ifndef __ANDROID__
     if (screencoordpoint)
@@ -1565,8 +1574,17 @@ void I_SetMousePos(int x, int y)
 {
     SDL_Rect viewport;
     float sx, sy;
+    int rw, rh;
     SDL_RenderGetViewport(renderer, &viewport);
-    SDL_RenderGetScale(renderer, &sx, &sy);
+    
+    if (aspect_ratio_correct)
+        SDL_RenderGetScale(renderer, &sx, &sy);
+    else
+    {
+        SDL_GetRendererOutputSize(renderer, &rw, &rh);
+        sx = (float)rw / SCREENWIDTH;
+        sy = (float)rh / actualheight;
+    }
 
 #ifndef __ANDROID__
     if (screencoordpoint)
