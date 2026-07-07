@@ -64,6 +64,8 @@ static txt_input_mode_t input_mode = TXT_INPUT_NORMAL;
 static int screen_image_w, screen_image_h;
 
 static int fullscreenflag = 0;
+static int resizableflag = 0;
+static int aspect_ratio_correctflag = 0;
 static int retinaflag = 0;
 
 static TxtSDLEventCallbackFunc event_callback;
@@ -236,7 +238,7 @@ void TXT_Fullscreen(int fullscreen)
 // Returns 1 if successful, 0 if an error occurred
 //
 
-int TXT_Init(void)
+int TXT_Init(int fullscreen, int resizable, int aspect_ratio_correct)
 {
     int flags = 0;
 
@@ -256,10 +258,16 @@ int TXT_Init(void)
         flags |= SDL_WINDOW_ALLOW_HIGHDPI;
     }
 
-    // If fullscreenflag is true, set window to full screen mode. 
-    if (fullscreenflag)
+    if (fullscreen)
     {
+        fullscreenflag = 1;
         flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
+
+    if (resizable)
+    {
+        resizableflag = 1;
+        flags |= SDL_WINDOW_RESIZABLE;
     }
 
     TXT_SDLWindow =
@@ -323,6 +331,12 @@ int TXT_Init(void)
                                         TXT_SCREEN_W * font->w,
                                         TXT_SCREEN_H * font->h,
                                         8, 0, 0, 0, 0);
+
+    if (aspect_ratio_correct)
+    {
+        aspect_ratio_correctflag = 1;
+        SDL_RenderSetLogicalSize(renderer, screenbuffer->w, screenbuffer->h);
+    }
 
     SDL_LockSurface(screenbuffer);
     SDL_SetPaletteColors(screenbuffer->format->palette, ega_colors, 0, 16);
