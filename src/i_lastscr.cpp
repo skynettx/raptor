@@ -45,7 +45,7 @@ void I_LASTSCR(char* mem)
     
     // Set up text mode screen
 
-    TXT_Init();
+    TXT_Init(txt_fullscreen, 0, 0);
 
     TXT_SetWindowTitle("Raptor");
     // SDL2-TODO I_InitWindowTitle();

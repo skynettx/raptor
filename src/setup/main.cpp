@@ -1704,7 +1704,7 @@ int main(int argc, char* argv[])
 
 	TXT_Fullscreen(txt_fullscreen);
 
-	if (!TXT_Init())
+	if (!TXT_Init(txt_fullscreen, 1, 0))
 	{
 		fprintf(stderr, "Failed to initialise GUI\n");
 		exit(-1);
