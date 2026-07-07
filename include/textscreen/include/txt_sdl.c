@@ -225,13 +225,6 @@ static void ChooseFont(void)
     }
 }
 
-//Set fullscreenmode
-
-void TXT_Fullscreen(int fullscreen)
-{
-    fullscreenflag = fullscreen;
-}
-
 //
 // Initialize text mode screen
 //

@@ -40,8 +40,6 @@ void I_LASTSCR(char* mem)
     unsigned char* screendata;
     int y;
     int indent;
-
-    TXT_Fullscreen(txt_fullscreen);
     
     // Set up text mode screen
 
