@@ -63,6 +63,9 @@ static txt_input_mode_t input_mode = TXT_INPUT_NORMAL;
 // is the value that was passed to SDL_CreateWindow().
 static int screen_image_w, screen_image_h;
 
+static int window_width;
+static int window_height;
+
 static int fullscreenflag = 0;
 static int resizableflag = 0;
 static int aspect_ratio_correctflag = 0;
@@ -244,6 +247,8 @@ int TXT_Init(int fullscreen, int resizable, int aspect_ratio_correct)
 
     screen_image_w = TXT_SCREEN_W * font->w;
     screen_image_h = TXT_SCREEN_H * font->h;
+    window_width = screen_image_w;
+    window_height = screen_image_h;
 
     // If highdpi_font is selected, try to initialize high dpi rendering.
     if (font == &highdpi_font)
@@ -662,6 +667,54 @@ static int MouseHasMoved(void)
     }
 }
 
+static int ToggleFullScreenKeyShortcut(SDL_Keysym* sym)
+{
+    Uint16 flags = (KMOD_LALT | KMOD_RALT);
+#if defined(__MACOSX__)
+    flags |= (KMOD_LGUI | KMOD_RGUI);
+#endif
+    return (sym->scancode == SDL_SCANCODE_RETURN ||
+        sym->scancode == SDL_SCANCODE_KP_ENTER) && (sym->mod & flags) != 0;
+}
+
+static void ToggleFullScreen(void)
+{
+    unsigned int flags = 0;
+
+    fullscreenflag = !fullscreenflag;
+
+    if (fullscreenflag)
+    {
+        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
+
+    SDL_SetWindowFullscreen(TXT_SDLWindow, flags);
+
+    if (!fullscreenflag)
+    {
+        SDL_SetWindowSize(TXT_SDLWindow, window_width, window_height);
+    }
+}
+
+static void HandleWindowEvent(SDL_WindowEvent* event)
+{
+    switch (event->event)
+    {
+    case SDL_WINDOWEVENT_RESIZED:
+        int flags;
+        // When the window is resized (we're not in fullscreen mode),
+        // save the new window size.
+        flags = SDL_GetWindowFlags(TXT_SDLWindow);
+        if ((flags & SDL_WINDOW_FULLSCREEN_DESKTOP) == 0)
+        {
+            SDL_GetWindowSize(TXT_SDLWindow, &window_width, &window_height);
+            SDL_SetWindowSize(TXT_SDLWindow, window_width, window_height);
+        }
+        TXT_UpdateScreen();
+        break;
+    }
+}
+
 signed int TXT_GetChar(void)
 {
     SDL_Event ev;
@@ -683,6 +736,13 @@ signed int TXT_GetChar(void)
 
         switch (ev.type)
         {
+            case SDL_WINDOWEVENT:
+            if (ev.window.windowID == SDL_GetWindowID(TXT_SDLWindow))
+            {
+                HandleWindowEvent(&ev.window);
+            }
+            break;
+
             case SDL_MOUSEBUTTONDOWN:
                 if (ev.button.button < TXT_MAX_MOUSE_BUTTONS)
                 {
@@ -694,6 +754,11 @@ signed int TXT_GetChar(void)
                 return SDLWheelToTXTButton(&ev.wheel);
 
             case SDL_KEYDOWN:
+                if (ToggleFullScreenKeyShortcut(&ev.key.keysym))
+                {
+                    ToggleFullScreen();
+                    break;
+                }
                 switch (input_mode)
                 {
                     case TXT_INPUT_RAW:
