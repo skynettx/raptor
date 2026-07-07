@@ -454,8 +454,8 @@ static void GetDestRect(SDL_Rect *rect)
     int w, h;
 
     SDL_GetRendererOutputSize(renderer, &w, &h);
-    rect->x = (w - screenbuffer->w) / 2;
-    rect->y = (h - screenbuffer->h) / 2;
+    rect->x = 0;
+    rect->y = 0;
     rect->w = screenbuffer->w;
     rect->h = screenbuffer->h;
 }
@@ -493,7 +493,12 @@ void TXT_UpdateScreenArea(int x, int y, int w, int h)
 
     SDL_RenderClear(renderer);
     GetDestRect(&rect);
-    SDL_RenderCopy(renderer, screentx, NULL, &rect);
+    
+    if (aspect_ratio_correctflag)
+        SDL_RenderCopy(renderer, screentx, NULL, &rect);
+    else
+        SDL_RenderCopy(renderer, screentx, NULL, NULL);
+    
     SDL_RenderPresent(renderer);
 
     SDL_DestroyTexture(screentx);
