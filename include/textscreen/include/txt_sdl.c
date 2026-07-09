@@ -700,18 +700,18 @@ static void HandleWindowEvent(SDL_WindowEvent* event)
 {
     switch (event->event)
     {
-    case SDL_WINDOWEVENT_RESIZED:
-        int flags;
-        // When the window is resized (we're not in fullscreen mode),
-        // save the new window size.
-        flags = SDL_GetWindowFlags(TXT_SDLWindow);
-        if ((flags & SDL_WINDOW_FULLSCREEN_DESKTOP) == 0)
-        {
-            SDL_GetWindowSize(TXT_SDLWindow, &window_width, &window_height);
-            SDL_SetWindowSize(TXT_SDLWindow, window_width, window_height);
-        }
-        TXT_UpdateScreen();
-        break;
+        case SDL_WINDOWEVENT_RESIZED:
+            int flags;
+            // When the window is resized (we're not in fullscreen mode),
+            // save the new window size.
+            flags = SDL_GetWindowFlags(TXT_SDLWindow);
+            if ((flags & SDL_WINDOW_FULLSCREEN_DESKTOP) == 0)
+            {
+                SDL_GetWindowSize(TXT_SDLWindow, &window_width, &window_height);
+                SDL_SetWindowSize(TXT_SDLWindow, window_width, window_height);
+            }
+            TXT_UpdateScreen();
+            break;
     }
 }
 
@@ -737,11 +737,11 @@ signed int TXT_GetChar(void)
         switch (ev.type)
         {
             case SDL_WINDOWEVENT:
-            if (ev.window.windowID == SDL_GetWindowID(TXT_SDLWindow))
-            {
-                HandleWindowEvent(&ev.window);
-            }
-            break;
+                if (ev.window.windowID == SDL_GetWindowID(TXT_SDLWindow))
+                {
+                    HandleWindowEvent(&ev.window);
+                }
+                break;
 
             case SDL_MOUSEBUTTONDOWN:
                 if (ev.button.button < TXT_MAX_MOUSE_BUTTONS)
