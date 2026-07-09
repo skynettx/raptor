@@ -197,8 +197,8 @@ int usegamma = 0;
 // Joystick/gamepad hysteresis
 unsigned int joywait = 0;
 
-// Set to true if screen coordinates are in points rather than pixels
-int screencoordpoint = 0;
+// Becomes true when high-DPI display detected
+static bool highdpi = false;
 
 // When textmode is true not update pointer cursor
 static bool textmode = false;
@@ -1413,6 +1413,7 @@ void I_InitGraphics(uint8_t *pal)
 {
     SDL_Event dummy;
     char *env;
+    int ww = 0, wh = 0;
     int rw = 0, rh = 0;
 
     // Pass through the XSCREENSAVER_WINDOW environment variable to
@@ -1507,11 +1508,15 @@ void I_InitGraphics(uint8_t *pal)
 
     // I_AtExit(I_ShutdownGraphics, true);
 
+    // If the window size differs from renderer output size,
+    // it is a high-DPI display.
+
+    SDL_GetWindowSize(screen, &ww, &wh);
     SDL_GetRendererOutputSize(renderer, &rw, &rh);
 
-    if (rw != window_width)
+    if (rw != ww)
     {
-        screencoordpoint = 1;
+        highdpi = true;
     }
 }
 
@@ -1559,7 +1564,7 @@ void I_GetMousePos(int *x, int *y)
     }
 
 #ifndef __ANDROID__
-    if (screencoordpoint)
+    if (highdpi)
     {
         sx /= 2;
         sy /= 2;
@@ -1587,7 +1592,7 @@ void I_SetMousePos(int x, int y)
     }
 
 #ifndef __ANDROID__
-    if (screencoordpoint)
+    if (highdpi)
     {
         sx /= 2;
         sy /= 2;
