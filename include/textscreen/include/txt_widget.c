@@ -24,6 +24,9 @@
 #define strdup _strdup
 #endif
 
+static int focused_fgcolor = TXT_COLOR_BLACK;
+static int focused_bgcolor = TXT_COLOR_GREY;
+
 typedef struct
 {
     char *signal_name;
@@ -323,6 +326,12 @@ void TXT_SetHelpLabel(TXT_UNCAST_ARG(widget), const char* helplabel)
     widget->is_helplabel_set = 1;
 }
 
+void TXT_SetWidgetFocusedColor(int fgcolor, int bgcolor)
+{
+    focused_fgcolor = fgcolor;
+    focused_bgcolor = bgcolor;
+}
+
 void TXT_SetWidgetBG(TXT_UNCAST_ARG(widget))
 {
     TXT_CAST_ARG(txt_widget_t, widget);
@@ -351,8 +360,8 @@ void TXT_SetWidgetBG(TXT_UNCAST_ARG(widget))
     
     if (widget->focused)
     {
-        TXT_FGColor(TXT_COLOR_BLACK);
-        TXT_BGColor(TXT_COLOR_GREY, 0);
+        TXT_FGColor(focused_fgcolor);
+        TXT_BGColor(focused_bgcolor, 0);
         
         // Set helplabel when widget focused
 
