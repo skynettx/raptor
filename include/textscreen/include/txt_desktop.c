@@ -149,7 +149,7 @@ int TXT_LowerWindow(txt_window_t *window)
     return 0;
 }
 
-static void DrawDesktopBackground(const char *title, const char* title_help)
+static void DrawDesktopBackground(const char *title)
 {
     int i;
     unsigned char *screendata;
@@ -193,15 +193,6 @@ static void DrawDesktopBackground(const char *title, const char* title_help)
 
     TXT_PutChar(' ');
     TXT_Puts(title);
-
-    // Help Text on bottom banner
-    
-    TXT_GotoXY(0, 24);
-    TXT_FGColor(TXT_COLOR_DARK_GREY);
-    TXT_BGColor(TXT_COLOR_GREY, 0);
-
-    TXT_DrawString(" ");
-    TXT_DrawString(title_help);
 }
 
 static void DrawHelpIndicator(void)
@@ -235,6 +226,16 @@ static void DrawHelpIndicator(void)
     TXT_DrawString("=Help ");
 }
 
+static void DrawHelpLabel(const char* title)
+{
+    TXT_GotoXY(0, 24);
+    TXT_FGColor(TXT_COLOR_DARK_GREY);
+    TXT_BGColor(TXT_COLOR_GREY, 0);
+
+    TXT_DrawString(" ");
+    TXT_DrawString(title);
+}
+
 void TXT_DrawHelpLabel(const char* title)
 {
     free(help_label);
@@ -261,13 +262,8 @@ void TXT_DrawDesktop(void)
         title = "";
     else
         title = desktop_title;
-
-    if (help_label == NULL)
-        title_help = "";
-    else
-        title_help = help_label;
-
-    DrawDesktopBackground(title, title_help);
+    
+    DrawDesktopBackground(title);
 
     active_window = TXT_GetActiveWindow();
     if (active_window != NULL && active_window->help_url != NULL)
@@ -279,6 +275,14 @@ void TXT_DrawDesktop(void)
     {
         TXT_DrawWindow(all_windows[i]);
     }
+
+    // Draw help label on bottom banner.
+    if (help_label == NULL)
+        title_help = "";
+    else
+        title_help = help_label;
+
+    DrawHelpLabel(title_help);
 
     TXT_UpdateScreen();
 }
