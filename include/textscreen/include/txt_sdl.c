@@ -667,6 +667,23 @@ static int MouseHasMoved(void)
     }
 }
 
+static void AdjustWindowSize(void)
+{
+    if (aspect_ratio_correctflag)
+    {
+        if (window_width * screen_image_h <= window_height * screen_image_w)
+        {
+            // We round up window_height if the ratio is not exact; this leaves
+            // the result stable.
+            window_height = (window_width * screen_image_h + screen_image_w - 1) / screen_image_w;
+        }
+        else
+        {
+            window_width = window_height * screen_image_w / screen_image_h;
+        }
+    }
+}
+
 static int ToggleFullScreenKeyShortcut(SDL_Keysym* sym)
 {
     Uint16 flags = (KMOD_LALT | KMOD_RALT);
@@ -692,6 +709,7 @@ static void ToggleFullScreen(void)
 
     if (!fullscreenflag)
     {
+        AdjustWindowSize();
         SDL_SetWindowSize(TXT_SDLWindow, window_width, window_height);
     }
 }
@@ -708,6 +726,7 @@ static void HandleWindowEvent(SDL_WindowEvent* event)
             if ((flags & SDL_WINDOW_FULLSCREEN_DESKTOP) == 0)
             {
                 SDL_GetWindowSize(TXT_SDLWindow, &window_width, &window_height);
+                AdjustWindowSize();
                 SDL_SetWindowSize(TXT_SDLWindow, window_width, window_height);
             }
             TXT_UpdateScreen();
