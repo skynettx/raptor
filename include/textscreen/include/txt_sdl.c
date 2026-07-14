@@ -275,6 +275,8 @@ int TXT_Init(int fullscreen, int resizable, int aspect_ratio_correct)
     if (TXT_SDLWindow == NULL)
         return 0;
 
+    SDL_SetWindowMinimumSize(TXT_SDLWindow, screen_image_w, screen_image_h);
+
     renderer = SDL_CreateRenderer(TXT_SDLWindow, -1, SDL_RENDERER_PRESENTVSYNC);
 
     if (renderer == NULL)
