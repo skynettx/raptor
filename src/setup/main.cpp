@@ -64,6 +64,12 @@ void ClosePwnBox(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(window))
 
 	TXT_CloseWindow(window);
 }
+
+void ResetWidgetFocusedColor(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(window))
+{
+	TXT_CAST_ARG(txt_window_t, window);
+	TXT_SetWidgetFocusedColor(TXT_COLOR_BLACK, TXT_COLOR_GREY);
+}
 ///////////////////////////////////////////////////Check Settings from Setup.ini///////////////////////////////////////////////////////////////
 void CheckSetupSettings(void)
 {

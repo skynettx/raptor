@@ -261,6 +261,8 @@ void GetControlKeyboard(TXT_UNCAST_ARG(widget), void* user_data)
     getcontrolkeyboardwindow = TXT_NewWindow("Keyboard Configuration           ");
     TXT_SetWindowPosition(getcontrolkeyboardwindow, TXT_HORIZ_CENTER, TXT_VERT_TOP, 39, 3);
     
+    TXT_SetWidgetFocusedColor(TXT_COLOR_BLUE, TXT_COLOR_GREY);
+
     TXT_AddWidget(getcontrolkeyboardwindow, TXT_TABLE_EMPTY);
     
     TXT_SetTableColumns(getcontrolkeyboardwindow, 2);
@@ -289,10 +291,12 @@ void GetControlKeyboard(TXT_UNCAST_ARG(widget), void* user_data)
     TXT_SetHelpLabel(select_button, " Press ENTER to Select");
 
     TXT_SignalConnect(close_button, "pressed", ClosePwnBox, getcontrolkeyboardwindow);
+    TXT_SignalConnect(close_button, "pressed", ResetWidgetFocusedColor, getcontrolkeyboardwindow);
     
     TXT_SignalConnect(select_button, "pressed", WindowSelect, getcontrolkeyboardwindow);
 
     TXT_SignalConnect(accept_button, "pressed", ClosePwnBox, getcontrolkeyboardwindow);
+    TXT_SignalConnect(accept_button, "pressed", ResetWidgetFocusedColor, getcontrolkeyboardwindow);
     TXT_SignalConnect(accept_button, "pressed", ConvertKey, NULL);
     
     TXT_SetWindowAction(getcontrolkeyboardwindow, TXT_HORIZ_LEFT, close_button);
@@ -375,6 +379,8 @@ void GetControlMouse(TXT_UNCAST_ARG(widget), void* user_data)
     getcontrolmousewindow = TXT_NewWindow("Mouse Configuration              ");
     TXT_SetWindowPosition(getcontrolmousewindow, TXT_HORIZ_CENTER, TXT_VERT_TOP, 40, 5);
 
+    TXT_SetWidgetFocusedColor(TXT_COLOR_BLUE, TXT_COLOR_GREY);
+
     TXT_AddWidget(getcontrolmousewindow, TXT_NewStrut(0, 1));
     
     TXT_SetTableColumns(getcontrolmousewindow, 2);
@@ -394,10 +400,12 @@ void GetControlMouse(TXT_UNCAST_ARG(widget), void* user_data)
     TXT_SetHelpLabel(select_button, " Press ENTER to Select");
     
     TXT_SignalConnect(close_button, "pressed", ClosePwnBox, getcontrolmousewindow);
+    TXT_SignalConnect(close_button, "pressed", ResetWidgetFocusedColor, getcontrolmousewindow);
     
     TXT_SignalConnect(select_button, "pressed", WindowSelect, getcontrolmousewindow);
 
     TXT_SignalConnect(accept_button, "pressed", ClosePwnBox, getcontrolmousewindow);
+    TXT_SignalConnect(accept_button, "pressed", ResetWidgetFocusedColor, getcontrolmousewindow);
     TXT_SignalConnect(accept_button, "pressed", SaveMouseConfig, NULL);
 
     TXT_SetWindowAction(getcontrolmousewindow, TXT_HORIZ_LEFT, close_button);
@@ -468,6 +476,8 @@ void GetControlJoystick(TXT_UNCAST_ARG(widget), void* user_data)
     getcontroljoystickwindow = TXT_NewWindow("Joystick/Gamepad Config          ");
     TXT_SetWindowPosition(getcontroljoystickwindow, TXT_HORIZ_CENTER, TXT_VERT_TOP, 39, 7);
 
+    TXT_SetWidgetFocusedColor(TXT_COLOR_BLUE, TXT_COLOR_GREY);
+
     TXT_AddWidget(getcontroljoystickwindow, TXT_NewStrut(0, 1));
     
     TXT_SetTableColumns(getcontroljoystickwindow, 2);
@@ -487,10 +497,12 @@ void GetControlJoystick(TXT_UNCAST_ARG(widget), void* user_data)
     TXT_SetHelpLabel(select_button, " Press ENTER to Select");
 
     TXT_SignalConnect(close_button, "pressed", ClosePwnBox, getcontroljoystickwindow);
+    TXT_SignalConnect(close_button, "pressed", ResetWidgetFocusedColor, getcontroljoystickwindow);
     
     TXT_SignalConnect(select_button, "pressed", WindowSelect, getcontroljoystickwindow);
     
     TXT_SignalConnect(accept_button, "pressed", ClosePwnBox, getcontroljoystickwindow);
+    TXT_SignalConnect(accept_button, "pressed", ResetWidgetFocusedColor, getcontroljoystickwindow);
     TXT_SignalConnect(accept_button, "pressed", SaveJoyConfig, NULL);
 
     TXT_SetWindowAction(getcontroljoystickwindow, TXT_HORIZ_LEFT, close_button);
