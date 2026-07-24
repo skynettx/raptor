@@ -211,6 +211,39 @@ static void TXT_EvJoyButton(SDL_Event* sdlevent)
     }
 }
 
+static int TXT_ConvJoyAxisValue(int AxisValue, int RangeDivison)
+{
+    int deadzone = 8000;
+    int result;
+
+    if (AxisValue == 0 ||
+        (AxisValue > 0 && AxisValue < deadzone) ||
+        (AxisValue < 0 && AxisValue > -deadzone))
+        return 0;
+
+    if (AxisValue > 0)
+        result = (AxisValue - deadzone) * RangeDivison / (32767 - deadzone);
+    else
+        result = (AxisValue + deadzone) * RangeDivison / (32768 - deadzone);
+
+    return result;
+}
+
+static void TXT_EvJoyAxis(SDL_Event* sdlevent)
+{
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
+    {
+        if (TXT_ControllerHandles[ControllerIndex] != 0 && SDL_GameControllerGetAttached(TXT_ControllerHandles[ControllerIndex]))
+        {
+            if (!joyinputlock[TXT_JOY_STICKX])
+                joy[ControllerIndex][TXT_JOY_STICKX] = TXT_ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 6);
+            
+            if (!joyinputlock[TXT_JOY_STICKY])
+                joy[ControllerIndex][TXT_JOY_STICKY] = TXT_ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 6);
+        }
+    }
+}
+
 // Examine system DPI settings to determine whether to use the large font.
 
 static int Win32_UseLargeFont(void)
@@ -871,6 +904,10 @@ signed int TXT_GetChar(void)
             case SDL_CONTROLLERBUTTONUP:
             case SDL_CONTROLLERBUTTONDOWN:
                 TXT_EvJoyButton(&ev);
+                break;
+
+            case SDL_CONTROLLERAXISMOTION:
+                TXT_EvJoyAxis(&ev);
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
