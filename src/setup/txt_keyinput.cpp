@@ -35,6 +35,7 @@ static int KeyPressCallback(txt_window_t* window, int key,
     TXT_UNCAST_ARG(key_input))
 {
     TXT_CAST_ARG(txt_key_input_t, key_input);
+    TXT_LockJoyInputAll(0);
 
     if (key != KEY_ESCAPE)
     {
@@ -70,6 +71,10 @@ static void OpenPromptWindow(txt_key_input_t* key_input)
 {
     txt_window_t* window;
     txt_window_action_t* close_button;
+
+    TXT_LockJoyInputAll(1);
+    TXT_LockJoyInput(TXT_JOY_BACK, 0);
+    TXT_LockJoyInput(TXT_JOY_B, 0);
     
     // Silently update when the shift button is held down.
 
