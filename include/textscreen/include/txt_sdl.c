@@ -422,6 +422,7 @@ void TXT_Shutdown(void)
     SDL_FreeSurface(screenbuffer);
     screenbuffer = NULL;
     CloJoy(1);
+    SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
