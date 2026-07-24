@@ -198,7 +198,7 @@ static void PromptWindowClosed(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(joystick))
     SDL_JoystickClose(joystick);
     TXT_SDL_SetEventCallback(NULL, NULL);
     //SDL_JoystickEventState(SDL_DISABLE);
-    //SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+    SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
     
     TXT_LockJoyInputAll(0);
 }
