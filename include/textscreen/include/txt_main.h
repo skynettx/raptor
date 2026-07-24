@@ -213,5 +213,11 @@ int TXT_vsnprintf(char *buf, size_t buf_len, const char *s, va_list args);
 // Safe version of snprintf().
 int TXT_snprintf(char *buf, size_t buf_len, const char *s, ...) PRINTF_ATTR(3, 4);
 
+// Lock/Unlock complete input from joystick.
+void TXT_LockJoyInputAll(int flag);
+
+// Lock/Unlock specific input from joystick.
+void TXT_LockJoyInput(int buttonaxis, int flag);
+
 #endif /* #ifndef TXT_MAIN_H */
 

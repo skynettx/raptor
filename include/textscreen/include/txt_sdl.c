@@ -800,6 +800,21 @@ static void HandleWindowEvent(SDL_WindowEvent* event)
     }
 }
 
+void TXT_LockJoyInputAll(int flag)
+{
+    ResetJoy();
+    
+    for (int i = 0; i < 11; i++)
+        joyinputlock[i] = flag;
+}
+
+void TXT_LockJoyInput(int buttonaxis, int flag)
+{
+    ResetJoy();
+
+    joyinputlock[buttonaxis] = flag;
+}
+
 static void EvJoyButton(SDL_Event* sdlevent)
 {
     for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
