@@ -131,7 +131,7 @@ static int updateascii = 0;
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-static void TXT_ResetJoy(void)
+static void ResetJoy(void)
 {
     for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
     {
@@ -140,7 +140,7 @@ static void TXT_ResetJoy(void)
     }
 }
 
-static void TXT_CalJoy(void)
+static void CalJoy(void)
 {
     if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0)
     {
@@ -166,9 +166,10 @@ static void TXT_CalJoy(void)
     }
 }
 
-static void TXT_CloJoy(void)
+static void CloJoy(void)
 {
-    TXT_ResetJoy();
+    ResetJoy();
+    
     for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
     {
         if (TXT_ControllerHandles[ControllerIndex])
@@ -303,7 +304,7 @@ int TXT_Init(int fullscreen, int resizable, int aspect_ratio_correct)
         return 0;
     }
 
-    TXT_CalJoy();
+    CalJoy();
 
     ChooseFont();
 
@@ -416,7 +417,7 @@ void TXT_Shutdown(void)
     screendata = NULL;
     SDL_FreeSurface(screenbuffer);
     screenbuffer = NULL;
-    TXT_CloJoy();
+    CloJoy();
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
@@ -799,7 +800,7 @@ static void HandleWindowEvent(SDL_WindowEvent* event)
     }
 }
 
-static void TXT_EvJoyButton(SDL_Event* sdlevent)
+static void EvJoyButton(SDL_Event* sdlevent)
 {
     for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
     {
@@ -835,7 +836,7 @@ static void TXT_EvJoyButton(SDL_Event* sdlevent)
     }
 }
 
-static int TXT_ConvJoyAxisValue(int AxisValue, int RangeDivison)
+static int ConvJoyAxisValue(int AxisValue, int RangeDivison)
 {
     int deadzone = 8000;
     int result;
@@ -853,22 +854,22 @@ static int TXT_ConvJoyAxisValue(int AxisValue, int RangeDivison)
     return result;
 }
 
-static void TXT_EvJoyAxis(SDL_Event* sdlevent)
+static void EvJoyAxis(SDL_Event* sdlevent)
 {
     for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
     {
         if (TXT_ControllerHandles[ControllerIndex] != 0 && SDL_GameControllerGetAttached(TXT_ControllerHandles[ControllerIndex]))
         {
             if (!joyinputlock[TXT_JOY_STICKX])
-                joy[ControllerIndex][TXT_JOY_STICKX] = TXT_ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 6);
+                joy[ControllerIndex][TXT_JOY_STICKX] = ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 6);
 
             if (!joyinputlock[TXT_JOY_STICKY])
-                joy[ControllerIndex][TXT_JOY_STICKY] = TXT_ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 6);
+                joy[ControllerIndex][TXT_JOY_STICKY] = ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 6);
         }
     }
 }
 
-static int TXT_MapJoyText(int index)
+static int MapJoyText(int index)
 {
     if (joy[index][TXT_JOY_A])
     {
@@ -934,7 +935,7 @@ static int TXT_MapJoyText(int index)
     return 0;
 }
 
-static int TXT_MapJoyKey(void)
+static int MapJoyKey(void)
 {
     for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ControllerIndex++)
     {
@@ -954,7 +955,7 @@ static int TXT_MapJoyKey(void)
                 lastTime = currentTime;
 
                 if (input_mode == TXT_INPUT_TEXT)
-                    return TXT_MapJoyText(ControllerIndex);
+                    return MapJoyText(ControllerIndex);
 
                 if (joy[ControllerIndex][TXT_JOY_STICKX] > 0 || joy[ControllerIndex][TXT_JOY_RIGHT])
                     return KEY_RIGHTARROW;
@@ -1019,20 +1020,20 @@ signed int TXT_GetChar(void)
                 break;
 
             case SDL_CONTROLLERDEVICEADDED:
-                TXT_CalJoy();
+                CalJoy();
                 break;
             
             case SDL_CONTROLLERDEVICEREMOVED:
-                TXT_CloJoy();
+                CloJoy();
                 break;
 
             case SDL_CONTROLLERBUTTONUP:
             case SDL_CONTROLLERBUTTONDOWN:
-                TXT_EvJoyButton(&ev);
+                EvJoyButton(&ev);
                 break;
 
             case SDL_CONTROLLERAXISMOTION:
-                TXT_EvJoyAxis(&ev);
+                EvJoyAxis(&ev);
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
@@ -1097,7 +1098,7 @@ signed int TXT_GetChar(void)
         }
     }
 
-    int joykey = TXT_MapJoyKey();
+    int joykey = MapJoyKey();
     
     if (joykey)
         return joykey;
