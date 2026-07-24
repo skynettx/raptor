@@ -197,14 +197,18 @@ static void PromptWindowClosed(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(joystick))
 
     SDL_JoystickClose(joystick);
     TXT_SDL_SetEventCallback(NULL, NULL);
-    SDL_JoystickEventState(SDL_DISABLE);
-    SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+    //SDL_JoystickEventState(SDL_DISABLE);
+    //SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+    
+    TXT_LockJoyInputAll(0);
 }
 
 static void OpenErrorWindow(void)
 {
     txt_window_t* window;
     txt_window_action_t* close_button;
+
+    TXT_LockJoyInputAll(0);
 
     window = TXT_CustomMessageBox(NULL, "Please connect a controller first!", TXT_COLOR_BRIGHT_WHITE, TXT_COLOR_RED, TXT_COLOR_RED, TXT_COLOR_BRIGHT_WHITE, TXT_COLOR_BRIGHT_WHITE, TXT_COLOR_BRIGHT_WHITE, TXT_COLOR_BRIGHT_WHITE);
     
@@ -224,6 +228,8 @@ static void OpenPromptWindow(txt_joystick_input_t* joystick_input)
     txt_window_t* window;
     txt_window_action_t* close_button;
     SDL_Joystick* joystick;
+
+    TXT_LockJoyInputAll(1);
 
     // Silently update when the shift button is held down.
 
