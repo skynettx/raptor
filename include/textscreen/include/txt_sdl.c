@@ -122,6 +122,9 @@ static int joy[MAX_CONTROLLERS][11];
 static int joyinputlock[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 static int joyactive = 0;
 static unsigned int lastTime = 0;
+static int asciitable = 0;
+static int spaceflag = 0;
+static int updateascii = 0;
 
 #ifdef _WIN32
 
@@ -865,6 +868,128 @@ static void HandleWindowEvent(SDL_WindowEvent* event)
     }
 }
 
+static int TXT_MapJoyText(int index)
+{
+    if (joy[index][TXT_JOY_A])
+    {
+        spaceflag = 1;
+        asciitable = 0;
+        return 0x20;
+    }
+    
+    if (joy[index][TXT_JOY_X])
+    {
+        asciitable = 0;
+        return KEY_BACKSPACE;
+    }
+    
+    if (joy[index][TXT_JOY_B] || joy[index][TXT_JOY_BACK])
+    {
+        asciitable = 0;
+        return KEY_ESCAPE;
+    }
+    
+    if (joy[index][TXT_JOY_START])
+    {
+        asciitable = 0;
+        return KEY_ENTER;
+    }
+    
+    if (joy[index][TXT_JOY_STICKY] < 0 || joy[index][TXT_JOY_UP])
+    {
+        if (spaceflag)
+        {
+            spaceflag = 0;
+            asciitable = 0x40;
+        }
+        if (asciitable)
+            asciitable++;
+        else if (!asciitable)
+            asciitable = 0x41;
+        if (asciitable > 0x7e)
+            asciitable = 0x41;
+
+        updateascii = 1;
+        return KEY_BACKSPACE;
+    }
+
+    if (joy[index][TXT_JOY_STICKY] > 0 || joy[index][TXT_JOY_DOWN])
+    {
+        if (spaceflag)
+        {
+            spaceflag = 0;
+            asciitable = 0x42;
+        }
+        if (asciitable)
+            asciitable--;
+        else if (!asciitable)
+            asciitable = 0x41;
+        if (asciitable < 0x21)
+            asciitable = 0x41;
+
+        updateascii = 1;
+        return KEY_BACKSPACE;
+    }
+
+    return 0;
+}
+
+static int TXT_MapJoyKey(void)
+{
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ControllerIndex++)
+    {
+        if (joy[ControllerIndex][TXT_JOY_STICKX] || joy[ControllerIndex][TXT_JOY_STICKY] ||
+            joy[ControllerIndex][TXT_JOY_UP] || joy[ControllerIndex][TXT_JOY_DOWN] ||
+            joy[ControllerIndex][TXT_JOY_LEFT] || joy[ControllerIndex][TXT_JOY_RIGHT] ||
+            joy[ControllerIndex][TXT_JOY_START] || joy[ControllerIndex][TXT_JOY_BACK] ||
+            joy[ControllerIndex][TXT_JOY_A] || joy[ControllerIndex][TXT_JOY_B] ||
+            joy[ControllerIndex][TXT_JOY_X])
+        {
+            unsigned int currentTime;
+            currentTime = SDL_GetTicks();
+            joyactive = 1;
+            
+            if (currentTime > lastTime + 200)
+            {
+                lastTime = currentTime;
+
+                if (input_mode == TXT_INPUT_TEXT)
+                    return TXT_MapJoyText(ControllerIndex);
+
+                if (joy[ControllerIndex][TXT_JOY_STICKX] > 0 || joy[ControllerIndex][TXT_JOY_RIGHT])
+                    return KEY_RIGHTARROW;
+                
+                if (joy[ControllerIndex][TXT_JOY_STICKX] < 0 || joy[ControllerIndex][TXT_JOY_LEFT])
+                    return KEY_LEFTARROW;
+                
+                if (joy[ControllerIndex][TXT_JOY_STICKY] > 0 || joy[ControllerIndex][TXT_JOY_DOWN])
+                    return KEY_DOWNARROW;
+                
+                if (joy[ControllerIndex][TXT_JOY_STICKY] < 0 || joy[ControllerIndex][TXT_JOY_UP])
+                    return KEY_UPARROW;
+                
+                if (joy[ControllerIndex][TXT_JOY_START])
+                    return KEY_ENTER;
+                
+                if (joy[ControllerIndex][TXT_JOY_BACK])
+                    return KEY_ESCAPE;
+                
+                if (joy[ControllerIndex][TXT_JOY_A])
+                    return KEY_ENTER;
+                
+                if (joy[ControllerIndex][TXT_JOY_B])
+                    return KEY_ESCAPE;
+                
+                if (joy[ControllerIndex][TXT_JOY_X])
+                    return KEY_F10;
+            }
+            return 0;
+        }
+    }
+    joyactive = 0;
+    return 0;
+}
+
 signed int TXT_GetChar(void)
 {
     SDL_Event ev;
@@ -970,6 +1095,17 @@ signed int TXT_GetChar(void)
             default:
                 break;
         }
+    }
+
+    int joykey = TXT_MapJoyKey();
+    
+    if (joykey)
+        return joykey;
+
+    if (updateascii)
+    {
+        updateascii = 0;
+        return TXT_UNICODE_TO_KEY(asciitable);
     }
 
     return -1;
