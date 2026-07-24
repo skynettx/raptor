@@ -119,6 +119,7 @@ static int MaxJoysticks;
 static int ControllerIndex;
 static int JoystickIndex;
 static int joy[MAX_CONTROLLERS][11];
+static int joyinputlock[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 static int joyactive = 0;
 static unsigned int lastTime = 0;
 
@@ -170,6 +171,42 @@ static void TXT_CloJoy(void)
         if (TXT_ControllerHandles[ControllerIndex])
         {
             SDL_GameControllerClose(TXT_ControllerHandles[ControllerIndex]);
+        }
+    }
+}
+
+static void TXT_EvJoyButton(SDL_Event* sdlevent)
+{
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
+    {
+        if (TXT_ControllerHandles[ControllerIndex] != 0 && SDL_GameControllerGetAttached(TXT_ControllerHandles[ControllerIndex]))
+        {
+            if (!joyinputlock[TXT_JOY_UP])
+                joy[ControllerIndex][TXT_JOY_UP] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_UP);
+            
+            if (!joyinputlock[TXT_JOY_DOWN])
+                joy[ControllerIndex][TXT_JOY_DOWN] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+            
+            if (!joyinputlock[TXT_JOY_LEFT])
+                joy[ControllerIndex][TXT_JOY_LEFT] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+            
+            if (!joyinputlock[TXT_JOY_RIGHT])
+                joy[ControllerIndex][TXT_JOY_RIGHT] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+            
+            if (!joyinputlock[TXT_JOY_START])
+                joy[ControllerIndex][TXT_JOY_START] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_START);
+            
+            if (!joyinputlock[TXT_JOY_BACK])
+                joy[ControllerIndex][TXT_JOY_BACK] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_BACK);
+            
+            if (!joyinputlock[TXT_JOY_A])
+                joy[ControllerIndex][TXT_JOY_A] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_A);
+            
+            if (!joyinputlock[TXT_JOY_B])
+                joy[ControllerIndex][TXT_JOY_B] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_B);
+            
+            if (!joyinputlock[TXT_JOY_X])
+                joy[ControllerIndex][TXT_JOY_X] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_X);
         }
     }
 }
@@ -829,6 +866,11 @@ signed int TXT_GetChar(void)
             
             case SDL_CONTROLLERDEVICEREMOVED:
                 TXT_CloJoy();
+                break;
+
+            case SDL_CONTROLLERBUTTONUP:
+            case SDL_CONTROLLERBUTTONDOWN:
+                TXT_EvJoyButton(&ev);
                 break;
 
             case SDL_MOUSEBUTTONDOWN:

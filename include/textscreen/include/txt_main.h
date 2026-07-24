@@ -122,6 +122,22 @@ typedef enum
     TXT_INPUT_TEXT,
 } txt_input_mode_t;
 
+// Gamecontroller axis and buttons.
+
+typedef enum
+{
+    TXT_JOY_STICKX,
+    TXT_JOY_STICKY,
+    TXT_JOY_UP,
+    TXT_JOY_DOWN,
+    TXT_JOY_LEFT,
+    TXT_JOY_RIGHT,
+    TXT_JOY_START,
+    TXT_JOY_BACK,
+    TXT_JOY_A,
+    TXT_JOY_B,
+    TXT_JOY_X
+} txt_joy_buttons;
 
 #ifdef __GNUC__
 
