@@ -166,13 +166,17 @@ static void CalJoy(void)
     }
 }
 
-static void CloJoy(void)
+static void CloJoy(int all)
 {
     ResetJoy();
     
     for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
     {
-        if (TXT_ControllerHandles[ControllerIndex])
+        if (TXT_ControllerHandles[ControllerIndex] && !SDL_GameControllerGetAttached(TXT_ControllerHandles[ControllerIndex]) && !all)
+        {
+            SDL_GameControllerClose(TXT_ControllerHandles[ControllerIndex]);
+        }
+        else if (TXT_ControllerHandles[ControllerIndex] && all)
         {
             SDL_GameControllerClose(TXT_ControllerHandles[ControllerIndex]);
         }
@@ -417,7 +421,7 @@ void TXT_Shutdown(void)
     screendata = NULL;
     SDL_FreeSurface(screenbuffer);
     screenbuffer = NULL;
-    CloJoy();
+    CloJoy(1);
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
@@ -1039,7 +1043,7 @@ signed int TXT_GetChar(void)
                 break;
             
             case SDL_CONTROLLERDEVICEREMOVED:
-                CloJoy();
+                CloJoy(0);
                 break;
 
             case SDL_CONTROLLERBUTTONUP:
