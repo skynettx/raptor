@@ -178,75 +178,6 @@ static void TXT_CloJoy(void)
     }
 }
 
-static void TXT_EvJoyButton(SDL_Event* sdlevent)
-{
-    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
-    {
-        if (TXT_ControllerHandles[ControllerIndex] != 0 && SDL_GameControllerGetAttached(TXT_ControllerHandles[ControllerIndex]))
-        {
-            if (!joyinputlock[TXT_JOY_UP])
-                joy[ControllerIndex][TXT_JOY_UP] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_UP);
-            
-            if (!joyinputlock[TXT_JOY_DOWN])
-                joy[ControllerIndex][TXT_JOY_DOWN] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-            
-            if (!joyinputlock[TXT_JOY_LEFT])
-                joy[ControllerIndex][TXT_JOY_LEFT] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_LEFT);
-            
-            if (!joyinputlock[TXT_JOY_RIGHT])
-                joy[ControllerIndex][TXT_JOY_RIGHT] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-            
-            if (!joyinputlock[TXT_JOY_START])
-                joy[ControllerIndex][TXT_JOY_START] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_START);
-            
-            if (!joyinputlock[TXT_JOY_BACK])
-                joy[ControllerIndex][TXT_JOY_BACK] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_BACK);
-            
-            if (!joyinputlock[TXT_JOY_A])
-                joy[ControllerIndex][TXT_JOY_A] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_A);
-            
-            if (!joyinputlock[TXT_JOY_B])
-                joy[ControllerIndex][TXT_JOY_B] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_B);
-            
-            if (!joyinputlock[TXT_JOY_X])
-                joy[ControllerIndex][TXT_JOY_X] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_X);
-        }
-    }
-}
-
-static int TXT_ConvJoyAxisValue(int AxisValue, int RangeDivison)
-{
-    int deadzone = 8000;
-    int result;
-
-    if (AxisValue == 0 ||
-        (AxisValue > 0 && AxisValue < deadzone) ||
-        (AxisValue < 0 && AxisValue > -deadzone))
-        return 0;
-
-    if (AxisValue > 0)
-        result = (AxisValue - deadzone) * RangeDivison / (32767 - deadzone);
-    else
-        result = (AxisValue + deadzone) * RangeDivison / (32768 - deadzone);
-
-    return result;
-}
-
-static void TXT_EvJoyAxis(SDL_Event* sdlevent)
-{
-    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
-    {
-        if (TXT_ControllerHandles[ControllerIndex] != 0 && SDL_GameControllerGetAttached(TXT_ControllerHandles[ControllerIndex]))
-        {
-            if (!joyinputlock[TXT_JOY_STICKX])
-                joy[ControllerIndex][TXT_JOY_STICKX] = TXT_ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 6);
-            
-            if (!joyinputlock[TXT_JOY_STICKY])
-                joy[ControllerIndex][TXT_JOY_STICKY] = TXT_ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 6);
-        }
-    }
-}
-
 // Examine system DPI settings to determine whether to use the large font.
 
 static int Win32_UseLargeFont(void)
@@ -865,6 +796,75 @@ static void HandleWindowEvent(SDL_WindowEvent* event)
             }
             TXT_UpdateScreen();
             break;
+    }
+}
+
+static void TXT_EvJoyButton(SDL_Event* sdlevent)
+{
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
+    {
+        if (TXT_ControllerHandles[ControllerIndex] != 0 && SDL_GameControllerGetAttached(TXT_ControllerHandles[ControllerIndex]))
+        {
+            if (!joyinputlock[TXT_JOY_UP])
+                joy[ControllerIndex][TXT_JOY_UP] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_UP);
+
+            if (!joyinputlock[TXT_JOY_DOWN])
+                joy[ControllerIndex][TXT_JOY_DOWN] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+
+            if (!joyinputlock[TXT_JOY_LEFT])
+                joy[ControllerIndex][TXT_JOY_LEFT] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+
+            if (!joyinputlock[TXT_JOY_RIGHT])
+                joy[ControllerIndex][TXT_JOY_RIGHT] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+
+            if (!joyinputlock[TXT_JOY_START])
+                joy[ControllerIndex][TXT_JOY_START] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_START);
+
+            if (!joyinputlock[TXT_JOY_BACK])
+                joy[ControllerIndex][TXT_JOY_BACK] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_BACK);
+
+            if (!joyinputlock[TXT_JOY_A])
+                joy[ControllerIndex][TXT_JOY_A] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_A);
+
+            if (!joyinputlock[TXT_JOY_B])
+                joy[ControllerIndex][TXT_JOY_B] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_B);
+
+            if (!joyinputlock[TXT_JOY_X])
+                joy[ControllerIndex][TXT_JOY_X] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_X);
+        }
+    }
+}
+
+static int TXT_ConvJoyAxisValue(int AxisValue, int RangeDivison)
+{
+    int deadzone = 8000;
+    int result;
+
+    if (AxisValue == 0 ||
+        (AxisValue > 0 && AxisValue < deadzone) ||
+        (AxisValue < 0 && AxisValue > -deadzone))
+        return 0;
+
+    if (AxisValue > 0)
+        result = (AxisValue - deadzone) * RangeDivison / (32767 - deadzone);
+    else
+        result = (AxisValue + deadzone) * RangeDivison / (32768 - deadzone);
+
+    return result;
+}
+
+static void TXT_EvJoyAxis(SDL_Event* sdlevent)
+{
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
+    {
+        if (TXT_ControllerHandles[ControllerIndex] != 0 && SDL_GameControllerGetAttached(TXT_ControllerHandles[ControllerIndex]))
+        {
+            if (!joyinputlock[TXT_JOY_STICKX])
+                joy[ControllerIndex][TXT_JOY_STICKX] = TXT_ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 6);
+
+            if (!joyinputlock[TXT_JOY_STICKY])
+                joy[ControllerIndex][TXT_JOY_STICKY] = TXT_ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 6);
+        }
     }
 }
 
