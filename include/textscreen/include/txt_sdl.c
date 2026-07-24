@@ -113,10 +113,66 @@ static const SDL_Color ega_colors[] =
     {0xfe, 0xfe, 0xfe, 0xff},          // 15: Bright white
 };
 
+#define MAX_CONTROLLERS 4
+SDL_GameController* TXT_ControllerHandles[MAX_CONTROLLERS];
+static int MaxJoysticks;
+static int ControllerIndex;
+static int JoystickIndex;
+static int joy[MAX_CONTROLLERS][11];
+static int joyactive = 0;
+static unsigned int lastTime = 0;
+
 #ifdef _WIN32
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
+static void TXT_ResetJoy(void)
+{
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
+    {
+        for (int i = 0; i < 11; i++)
+            joy[ControllerIndex][i] = 0;
+    }
+}
+
+static void TXT_CalJoy(void)
+{
+    if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0)
+    {
+        return;
+    }
+
+    MaxJoysticks = SDL_NumJoysticks();
+    ControllerIndex = 0;
+
+    for (JoystickIndex = 0; JoystickIndex < MaxJoysticks; ++JoystickIndex)
+    {
+        if (!SDL_IsGameController(JoystickIndex))
+        {
+            continue;
+        }
+        if (ControllerIndex >= MAX_CONTROLLERS)
+        {
+            break;
+        }
+
+        TXT_ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(JoystickIndex);
+        ControllerIndex++;
+    }
+}
+
+static void TXT_CloJoy(void)
+{
+    TXT_ResetJoy();
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
+    {
+        if (TXT_ControllerHandles[ControllerIndex])
+        {
+            SDL_GameControllerClose(TXT_ControllerHandles[ControllerIndex]);
+        }
+    }
+}
 
 // Examine system DPI settings to determine whether to use the large font.
 
@@ -243,6 +299,8 @@ int TXT_Init(int fullscreen, int resizable, int aspect_ratio_correct)
         return 0;
     }
 
+    TXT_CalJoy();
+
     ChooseFont();
 
     screen_image_w = TXT_SCREEN_W * font->w;
@@ -354,6 +412,7 @@ void TXT_Shutdown(void)
     screendata = NULL;
     SDL_FreeSurface(screenbuffer);
     screenbuffer = NULL;
+    TXT_CloJoy();
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
@@ -764,6 +823,14 @@ signed int TXT_GetChar(void)
                 }
                 break;
 
+            case SDL_CONTROLLERDEVICEADDED:
+                TXT_CalJoy();
+                break;
+            
+            case SDL_CONTROLLERDEVICEREMOVED:
+                TXT_CloJoy();
+                break;
+
             case SDL_MOUSEBUTTONDOWN:
                 if (ev.button.button < TXT_MAX_MOUSE_BUTTONS)
                 {
@@ -1011,7 +1078,8 @@ void TXT_Sleep(int timeout)
     {
         // We can just wait forever until an event occurs
 
-        SDL_WaitEvent(NULL);
+        if (!joyactive)
+            SDL_WaitEvent(NULL);
     }
     else
     {
