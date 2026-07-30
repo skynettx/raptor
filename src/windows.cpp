@@ -1139,6 +1139,10 @@ WIN_Hangar(
                 kflag = 1;
                 KBD_Wait(SC_UP);
                 KBD_Wait(SC_LEFT);
+                JOY_IsKey(JOYUP);
+                JOY_IsKey(JOYLEFT);
+                JOY_IsKey(JOYSTICKX);
+                JOY_IsKey(JOYSTICKY);
                 pos++;
                 pos %= 4;
                 break;
@@ -1148,6 +1152,10 @@ WIN_Hangar(
                 kflag = 1;
                 KBD_Wait(SC_DOWN);
                 KBD_Wait(SC_RIGHT);
+                JOY_IsKey(JOYDOWN);
+                JOY_IsKey(JOYRIGHT);
+                JOY_IsKey(JOYSTICKX);
+                JOY_IsKey(JOYSTICKY);
                 pos--;
                 if (pos < 0)
                     pos = 3;
@@ -1157,6 +1165,8 @@ WIN_Hangar(
             case SC_SPACE:
                 KBD_Wait(SC_ENTER);
                 KBD_Wait(SC_SPACE);
+                JOY_IsKey(JOYA);
+                JOY_IsKey(JOYSTART);
                 opt = poslookup[pos];
                 goto keyboard_part;
             }
