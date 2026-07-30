@@ -458,3 +458,39 @@ JOY_GetConvertButton(
 	}
 	return -1;
 }
+
+/***************************************************************************
+JOY_GetButton() - Get button status from joystick
+ ***************************************************************************/
+int
+JOY_GetButton(
+	int button
+)
+{
+	for (ControllerIndex = 0;
+		ControllerIndex < MAX_CONTROLLERS;
+		++ControllerIndex)
+	{
+		if (joyinput[ControllerIndex][button])
+			return 1;
+	}
+	return 0;
+}
+
+/***************************************************************************
+JOY_GetAxis() - Get axis status from joystick
+ ***************************************************************************/
+int
+JOY_GetAxis(
+	int axis
+)
+{
+	for (ControllerIndex = 0;
+		ControllerIndex < MAX_CONTROLLERS;
+		++ControllerIndex)
+	{
+		if (joyinput[ControllerIndex][axis])
+			return joyinput[ControllerIndex][axis];
+	}
+	return 0;
+}
