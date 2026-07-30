@@ -15,7 +15,6 @@ int MaxJoysticks;
 int ControllerIndex;
 int JoystickIndex;
 
-int AButtonconvert, BButtonconvert, XButtonconvert, YButtonconvert;
 static unsigned int lastTime = 0;
 
 /***************************************************************************
@@ -30,11 +29,7 @@ IPT_CalJoy(
 
 	MaxJoysticks = SDL_NumJoysticks();
 	ControllerIndex = 0;
-	AButtonconvert = 0;
-	BButtonconvert = 0;
-	XButtonconvert = 0;
-	YButtonconvert = 0;
-
+	
 	for (JoystickIndex = 0; JoystickIndex < MaxJoysticks; ++JoystickIndex)
 	{
 		if (!SDL_IsGameController(JoystickIndex))
@@ -173,11 +168,6 @@ GetJoyButtonMapping(
 		case SDL_CONTROLLER_TYPE_PS3:
 		case SDL_CONTROLLER_TYPE_PS4:
 		case SDL_CONTROLLER_TYPE_PS5:
-			AButtonconvert = 0;
-			BButtonconvert = 1;
-			XButtonconvert = 3;
-			YButtonconvert = 2;
-
 			joyconvert[ControllerIndex][JOYCONVERTA] = 0;
 			joyconvert[ControllerIndex][JOYCONVERTB] = 1;
 			joyconvert[ControllerIndex][JOYCONVERTX] = 3;
@@ -187,11 +177,6 @@ GetJoyButtonMapping(
 		case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO:
 		case SDL_CONTROLLER_TYPE_XBOX360:
 		case SDL_CONTROLLER_TYPE_XBOXONE:
-			AButtonconvert = 0;
-			BButtonconvert = 1;
-			XButtonconvert = 2;
-			YButtonconvert = 3;
-
 			joyconvert[ControllerIndex][JOYCONVERTA] = 0;
 			joyconvert[ControllerIndex][JOYCONVERTB] = 1;
 			joyconvert[ControllerIndex][JOYCONVERTX] = 2;
@@ -199,14 +184,6 @@ GetJoyButtonMapping(
 			break;
 		
 		default:
-			if ((AButtonconvert == 0) && (BButtonconvert == 0) && (XButtonconvert == 0) && (YButtonconvert == 0))
-			{
-				AButtonconvert = 0;
-				BButtonconvert = 1;
-				XButtonconvert = 2;
-				YButtonconvert = 3;
-			}
-
 			if (joyconvert[ControllerIndex][JOYCONVERTA] == 0 &&
 				joyconvert[ControllerIndex][JOYCONVERTB] == 0 &&
 				joyconvert[ControllerIndex][JOYCONVERTX] == 0 &&

@@ -33,8 +33,6 @@ extern SDL_GameController* ControllerHandles[MAX_CONTROLLERS];
 
 extern int joy_ack;
 
-extern int AButtonconvert, BButtonconvert, XButtonconvert, YButtonconvert;
-
 void IPT_CalJoy(void);
 void IPT_CloJoy(int closeall);
 void IPT_CalJoyRumbleLow(void);

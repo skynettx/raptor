@@ -99,54 +99,59 @@ IPT_GetJoyStick(
 )
 {
     int getstickx, getsticky;
+    int getbutton;
 
     //Get Button
     
     if (JOY_GetButton(JOYA))
     {
-        if (AButtonconvert == j_lookup[0])                        //Fire
+        getbutton = JOY_GetConvertButton(JOYA, JOYCONVERTA);
+        if (getbutton == j_lookup[0])                             //Fire
             buttons[0] = 1;
-        if (AButtonconvert == j_lookup[1])                        //Fire Special
+        if (getbutton == j_lookup[1])                             //Fire Special
             buttons[1] = 1;
-        if (AButtonconvert == j_lookup[2])                        //Change Special
+        if (getbutton == j_lookup[2])                             //Change Special
             buttons[2] = 1;
-        if (AButtonconvert == j_lookup[3])                        //Mega
+        if (getbutton == j_lookup[3])                             //Mega
             buttons[3] = 1;
     }
     
     if (JOY_GetButton(JOYB))
     {
-        if (BButtonconvert == j_lookup[0])                        //Fire
+        getbutton = JOY_GetConvertButton(JOYB, JOYCONVERTB);
+        if (getbutton == j_lookup[0])                            //Fire
             buttons[0] = 1;
-        if (BButtonconvert == j_lookup[1])                        //Fire Special
+        if (getbutton == j_lookup[1])                            //Fire Special
             buttons[1] = 1;
-        if (BButtonconvert == j_lookup[2])                        //Change Special
+        if (getbutton == j_lookup[2])                            //Change Special
             buttons[2] = 1;
-        if (BButtonconvert == j_lookup[3])                        //Mega
+        if (getbutton == j_lookup[3])                            //Mega
             buttons[3] = 1;
     }
     
     if (JOY_GetButton(JOYX))
     {
-        if (XButtonconvert == j_lookup[0])                        //Fire
+        getbutton = JOY_GetConvertButton(JOYX, JOYCONVERTX);
+        if (getbutton == j_lookup[0])                            //Fire
             buttons[0] = 1;
-        if (XButtonconvert == j_lookup[1])                        //Fire Special
+        if (getbutton == j_lookup[1])                            //Fire Special
             buttons[1] = 1;
-        if (XButtonconvert == j_lookup[2])                        //Change Special
+        if (getbutton == j_lookup[2])                            //Change Special
             buttons[2] = 1;
-        if (XButtonconvert == j_lookup[3])                        //Mega
+        if (getbutton == j_lookup[3])                            //Mega
             buttons[3] = 1;
     }
     
     if (JOY_GetButton(JOYY))
     {
-        if (YButtonconvert == j_lookup[0])                        //Fire
+        getbutton = JOY_GetConvertButton(JOYY, JOYCONVERTY);
+        if (getbutton == j_lookup[0])                             //Fire
             buttons[0] = 1;
-        if (YButtonconvert == j_lookup[1])                        //Fire Special
+        if (getbutton == j_lookup[1])                             //Fire Special
             buttons[1] = 1;
-        if (YButtonconvert == j_lookup[2])                        //Change Special
+        if (getbutton == j_lookup[2])                             //Change Special
             buttons[2] = 1;
-        if (YButtonconvert == j_lookup[3])                        //Mega
+        if (getbutton == j_lookup[3])                             //Mega
             buttons[3] = 1;
     }
     
