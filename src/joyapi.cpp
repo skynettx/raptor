@@ -311,27 +311,6 @@ JOY_IsKey(
 }
 
 /***************************************************************************
-JOY_IsScroll() - Scroll cursor in menu
- ***************************************************************************/
-int 
-JOY_IsScroll(
-	int scrollflag
-)
-{
-	unsigned int currentTime;
-	currentTime = SDL_GetTicks();
-	
-	if (currentTime > lastTime + 200)
-	{
-		lastTime = currentTime;
-		
-		return 1;
-	}
-	
-	return 0;
-}
-
-/***************************************************************************
 JOY_MapsInput() - Maps input to key
  ***************************************************************************/
 int
