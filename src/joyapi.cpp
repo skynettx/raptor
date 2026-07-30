@@ -437,3 +437,24 @@ JOY_GetInput(
 	}
 	return 0;
 }
+
+/***************************************************************************
+JOY_GetConvertButton() - Get converted button from joystick
+ ***************************************************************************/
+int
+JOY_GetConvertButton(
+	int button,
+	int convertbutton
+)
+{
+	for (ControllerIndex = 0;
+		ControllerIndex < MAX_CONTROLLERS;
+		++ControllerIndex)
+	{
+		if (joyinput[ControllerIndex][button])
+		{
+			return joyconvert[ControllerIndex][convertbutton];
+		}
+	}
+	return -1;
+}

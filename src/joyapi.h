@@ -57,3 +57,4 @@ void GetJoyButtonMapping(void);
 int JOY_IsScroll(int scrollflag);
 int JOY_MapsInput(void);
 int JOY_GetInput(void);
+int JOY_GetConvertButton(int button, int convertbutton);
