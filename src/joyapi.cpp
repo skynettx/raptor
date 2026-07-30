@@ -412,3 +412,28 @@ JOY_MapsInput(
 	}
 	return 0;
 }
+
+/***************************************************************************
+JOY_GetInput() - Get input from joystick
+ ***************************************************************************/
+int
+JOY_GetInput(
+	void
+)
+{
+	for (ControllerIndex = 0;
+		ControllerIndex < MAX_CONTROLLERS;
+		++ControllerIndex)
+	{
+		if (joyinput[ControllerIndex][JOYUP] || joyinput[ControllerIndex][JOYDOWN] ||
+			joyinput[ControllerIndex][JOYLEFT] || joyinput[ControllerIndex][JOYRIGHT] ||
+			joyinput[ControllerIndex][JOYSTART] || joyinput[ControllerIndex][JOYBACK] ||
+			joyinput[ControllerIndex][JOYA] || joyinput[ControllerIndex][JOYB] ||
+			joyinput[ControllerIndex][JOYX] || joyinput[ControllerIndex][JOYY] ||
+			joyinput[ControllerIndex][JOYRIGHTSHOULDER] || joyinput[ControllerIndex][JOYLEFTSHOULDER])
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
