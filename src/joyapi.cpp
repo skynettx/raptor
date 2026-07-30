@@ -55,8 +55,9 @@ IPT_CalJoy(
 		ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(JoystickIndex);
 		
 		ControllerIndex++;
-		GetJoyButtonMapping();
 	}
+	
+	GetJoyButtonMapping();
 }
 
 /***************************************************************************
