@@ -1472,7 +1472,7 @@ SWD_IsButtonDown(
     if (KBD_Key(SC_ENTER))
         return 1;
     
-    if ((mouseb1) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
+    if ((mouseb1) || JOY_GetButton(JOYA) || JOY_GetButton(JOYSTART))
         return 1;
     
     return 0;
