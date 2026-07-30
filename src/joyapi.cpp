@@ -128,19 +128,41 @@ I_HandleJoystickEvent(
 			XButton = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_X);
 			YButton = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_Y);
 
+			joyinput[ControllerIndex][JOYUP] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_UP);
+			joyinput[ControllerIndex][JOYDOWN] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+			joyinput[ControllerIndex][JOYLEFT] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+			joyinput[ControllerIndex][JOYRIGHT] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+			joyinput[ControllerIndex][JOYSTART] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_START);
+			joyinput[ControllerIndex][JOYBACK] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_BACK);
+			joyinput[ControllerIndex][JOYLEFTSHOULDER] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+			joyinput[ControllerIndex][JOYRIGHTSHOULDER] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+			joyinput[ControllerIndex][JOYA] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_A);
+			joyinput[ControllerIndex][JOYB] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_B);
+			joyinput[ControllerIndex][JOYX] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_X);
+			joyinput[ControllerIndex][JOYY] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_Y);
+
 			if (!g_drawcursor)
 			{
 				StickX = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 10);
 				StickY = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 8);
+
+				joyinput[ControllerIndex][JOYSTICKX] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 10);
+				joyinput[ControllerIndex][JOYSTICKY] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 8);
 			}
 			else
 			{
 				StickX = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 4);
 				StickY = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 4);
+
+				joyinput[ControllerIndex][JOYSTICKX] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 4);
+				joyinput[ControllerIndex][JOYSTICKY] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 4);
 			}
 			
 			TriggerLeft = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERLEFT), 4);
 			TriggerRight = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERRIGHT), 4);
+
+			joyinput[ControllerIndex][JOYTRIGGERLEFT] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERLEFT), 4);
+			joyinput[ControllerIndex][JOYTRIGGERRIGHT] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERRIGHT), 4);
 		}
 		
 		if (sdlevent->type == SDL_CONTROLLERBUTTONUP) 
