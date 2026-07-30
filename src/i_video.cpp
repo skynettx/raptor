@@ -444,7 +444,7 @@ void I_GetEvent(void)
                 IPT_CalJoy();
                 break;
             case SDL_CONTROLLERDEVICEREMOVED:          
-                IPT_CloJoy();
+                IPT_CloJoy(0);
                 break;
             case SDL_CONTROLLERBUTTONUP:
             case SDL_CONTROLLERBUTTONDOWN:

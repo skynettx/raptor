@@ -68,7 +68,7 @@ IPT_CloJoy() - Close Gamecontroller
  ***************************************************************************/
 void  
 IPT_CloJoy(
-	void
+	int closeall
 )
 {
 	for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
@@ -76,7 +76,11 @@ IPT_CloJoy(
 		for (int i = 0; i < 16; i++)
 			joyinput[ControllerIndex][i] = 0;
 
-		if (ControllerHandles[ControllerIndex])
+		if (ControllerHandles[ControllerIndex] && !SDL_GameControllerGetAttached(ControllerHandles[ControllerIndex]) && !closeall)
+		{
+			SDL_GameControllerClose(ControllerHandles[ControllerIndex]);
+		}
+		else if (ControllerHandles[ControllerIndex] && closeall)
 		{
 			SDL_GameControllerClose(ControllerHandles[ControllerIndex]);
 		}

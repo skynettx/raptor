@@ -228,7 +228,7 @@ ShutDown(
     closewindow();                                   //Close Main Window
     I_LASTSCR(mem);                                  //Call to display ANSI Screen 
     GLB_FreeAll();
-    IPT_CloJoy();                                    //Close Joystick
+    IPT_CloJoy(1);                                   //Close Joystick
     SWD_End();
     SDL_Quit();
     
