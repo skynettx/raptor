@@ -507,6 +507,8 @@ STORE_Enter(
         
         case SC_ENTER:
             KBD_Wait(dlg.keypress);
+            JOY_IsKey(JOYA);
+            JOY_IsKey(JOYSTART);
             dlg.cur_act = S_FLD_COMMAND;
             dlg.cur_cmd = F_SELECT;
             dlg.field = STOR_BUYIT;
@@ -516,6 +518,10 @@ STORE_Enter(
         case SC_PAGEUP:
         case SC_RIGHT:
             KBD_Wait(dlg.keypress);
+            JOY_IsKey(JOYUP);
+            JOY_IsKey(JOYRIGHT);
+            JOY_IsKey(JOYSTICKX);
+            JOY_IsKey(JOYSTICKY);
             dlg.cur_act = S_FLD_COMMAND;
             dlg.cur_cmd = F_SELECT;
             dlg.field = STOR_NEXT;
@@ -525,6 +531,10 @@ STORE_Enter(
         case SC_DOWN:
         case SC_PAGEDN:
             KBD_Wait(dlg.keypress);
+            JOY_IsKey(JOYLEFT);
+            JOY_IsKey(JOYDOWN);
+            JOY_IsKey(JOYSTICKX);
+            JOY_IsKey(JOYSTICKY);
             dlg.cur_act = S_FLD_COMMAND;
             dlg.cur_cmd = F_SELECT;
             dlg.field = STOR_PREV;
