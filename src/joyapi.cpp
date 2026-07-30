@@ -194,6 +194,11 @@ GetJoyButtonMapping(
 			BButtonconvert = 1;
 			XButtonconvert = 3;
 			YButtonconvert = 2;
+
+			joyconvert[ControllerIndex][JOYCONVERTA] = 0;
+			joyconvert[ControllerIndex][JOYCONVERTB] = 1;
+			joyconvert[ControllerIndex][JOYCONVERTX] = 3;
+			joyconvert[ControllerIndex][JOYCONVERTY] = 2;
 			break;
 		
 		case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO:
@@ -203,6 +208,11 @@ GetJoyButtonMapping(
 			BButtonconvert = 1;
 			XButtonconvert = 2;
 			YButtonconvert = 3;
+
+			joyconvert[ControllerIndex][JOYCONVERTA] = 0;
+			joyconvert[ControllerIndex][JOYCONVERTB] = 1;
+			joyconvert[ControllerIndex][JOYCONVERTX] = 2;
+			joyconvert[ControllerIndex][JOYCONVERTY] = 3;
 			break;
 		
 		default:
@@ -212,6 +222,17 @@ GetJoyButtonMapping(
 				BButtonconvert = 1;
 				XButtonconvert = 2;
 				YButtonconvert = 3;
+			}
+
+			if (joyconvert[ControllerIndex][JOYCONVERTA] == 0 &&
+				joyconvert[ControllerIndex][JOYCONVERTB] == 0 &&
+				joyconvert[ControllerIndex][JOYCONVERTX] == 0 &&
+				joyconvert[ControllerIndex][JOYCONVERTY] == 0)
+			{
+				joyconvert[ControllerIndex][JOYCONVERTA] = 0;
+				joyconvert[ControllerIndex][JOYCONVERTB] = 1;
+				joyconvert[ControllerIndex][JOYCONVERTX] = 2;
+				joyconvert[ControllerIndex][JOYCONVERTY] = 3;
 			}
 			break;
 		}
