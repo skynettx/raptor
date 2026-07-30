@@ -750,6 +750,7 @@ SWD_FieldInput(
         if (JOY_GetButton(JOYA))
         {
             JOY_IsKey(JOYA);
+            g_key = SC_NONE;
             curpos++;
             fi_joy_count = 0;
         }
