@@ -52,6 +52,9 @@ IPT_CalJoy(
 			break;
 		}
 		
+		for (int i = 0; i < 4; i++)
+			joyconvert[ControllerIndex][i] = 0;
+
 		ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(JoystickIndex);
 		
 		ControllerIndex++;
