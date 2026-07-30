@@ -1,6 +1,34 @@
 #include "SDL.h"
 #define MAX_CONTROLLERS 4
 
+typedef enum
+{
+	JOYSTICKX,
+	JOYSTICKY,
+	JOYTRIGGERLEFT,
+	JOYTRIGGERRIGHT,
+	JOYUP,
+	JOYDOWN,
+	JOYLEFT,
+	JOYRIGHT,
+	JOYSTART,
+	JOYBACK,
+	JOYLEFTSHOULDER,
+	JOYRIGHTSHOULDER,
+	JOYA,
+	JOYB,
+	JOYX,
+	JOYY
+} joy_buttons_axis;
+
+typedef enum
+{
+	JOYCONVERTA,
+	JOYCONVERTB,
+	JOYCONVERTX,
+	JOYCONVERTY
+} joy_buttons_convert;
+
 extern SDL_GameController* ControllerHandles[MAX_CONTROLLERS];
 
 extern int joy_ack;

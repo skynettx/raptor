@@ -11,6 +11,9 @@ bool AButton, BButton, XButton, YButton;
 
 int16_t StickX, StickY, TriggerLeft, TriggerRight;
 
+int joyinput[MAX_CONTROLLERS][16];
+int joyconvert[MAX_CONTROLLERS][4];
+
 SDL_GameController* ControllerHandles[MAX_CONTROLLERS];
 
 int MaxJoysticks;
