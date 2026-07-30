@@ -126,11 +126,6 @@ static int asciitable = 0;
 static int spaceflag = 0;
 static int updateascii = 0;
 
-#ifdef _WIN32
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 static void ResetJoy(void)
 {
     for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
@@ -182,6 +177,11 @@ static void CloJoy(int all)
         }
     }
 }
+
+#ifdef _WIN32
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
 // Examine system DPI settings to determine whether to use the large font.
 
