@@ -73,6 +73,9 @@ IPT_CloJoy(
 {
 	for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
 	{
+		for (int i = 0; i < 16; i++)
+			joyinput[ControllerIndex][i] = 0;
+
 		if (ControllerHandles[ControllerIndex])
 		{
 			SDL_GameControllerClose(ControllerHandles[ControllerIndex]);
