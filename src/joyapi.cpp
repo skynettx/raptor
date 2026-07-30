@@ -12,7 +12,6 @@ bool AButton, BButton, XButton, YButton;
 int16_t StickX, StickY, TriggerLeft, TriggerRight;
 
 SDL_GameController* ControllerHandles[MAX_CONTROLLERS];
-SDL_Haptic* RumbleHandles[MAX_CONTROLLERS] ;
 
 int MaxJoysticks;
 int ControllerIndex;
@@ -29,7 +28,7 @@ IPT_CalJoy(
 	void
 )
 {
-	SDL_Init(SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC);
+	SDL_Init(SDL_INIT_GAMECONTROLLER);
 
 	MaxJoysticks = SDL_NumJoysticks();
 	ControllerIndex = 0;
@@ -50,14 +49,7 @@ IPT_CalJoy(
 		}
 		
 		ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(JoystickIndex);
-		RumbleHandles[ControllerIndex] = SDL_HapticOpen(JoystickIndex);
 		
-		if (SDL_HapticRumbleInit(RumbleHandles[ControllerIndex]) != 0)
-		{
-			SDL_HapticClose(RumbleHandles[ControllerIndex]);
-			RumbleHandles[ControllerIndex] = 0;
-		}
-	    
 		ControllerIndex++;
 		GetJoyButtonMapping();
 	}
@@ -75,9 +67,6 @@ IPT_CloJoy(
 	{
 		if (ControllerHandles[ControllerIndex])
 		{
-			if (RumbleHandles[ControllerIndex])
-				SDL_HapticClose(RumbleHandles[ControllerIndex]);
-			
 			SDL_GameControllerClose(ControllerHandles[ControllerIndex]);
 		}
 	}

@@ -1519,8 +1519,8 @@ SWD_IsButtonDown(
     if (KBD_Key(SC_ENTER))
         return 1;
     
-    if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                       
-         return 1;
+    if ((mouseb1) || (AButton && !joy_ipt_MenuNew))
+        return 1;
     
     return 0;
 }
