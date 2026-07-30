@@ -55,3 +55,4 @@ int JOY_IsKeyMenu(int button);
 
 void GetJoyButtonMapping(void);
 int JOY_IsScroll(int scrollflag);
+int JOY_MapsInput(void);

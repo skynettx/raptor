@@ -2,6 +2,7 @@
 #include "i_video.h"
 #include "joyapi.h"
 #include "ptrapi.h"
+#include "kbdapi.h"
 
 int joy_ack;
 
@@ -351,5 +352,63 @@ JOY_IsScroll(
 		return 1;
 	}
 	
+	return 0;
+}
+
+/***************************************************************************
+JOY_MapsInput() - Maps input to key
+ ***************************************************************************/
+int
+JOY_MapsInput(
+	void
+)
+{
+	for (ControllerIndex = 0;
+		ControllerIndex < MAX_CONTROLLERS;
+		++ControllerIndex)
+	{
+		if (joyinput[ControllerIndex][JOYSTICKX] || joyinput[ControllerIndex][JOYSTICKY] ||
+			joyinput[ControllerIndex][JOYUP] || joyinput[ControllerIndex][JOYDOWN] ||
+			joyinput[ControllerIndex][JOYLEFT] || joyinput[ControllerIndex][JOYRIGHT] ||
+			joyinput[ControllerIndex][JOYSTART] || joyinput[ControllerIndex][JOYBACK] ||
+			joyinput[ControllerIndex][JOYA] || joyinput[ControllerIndex][JOYB] ||
+			joyinput[ControllerIndex][JOYX] || joyinput[ControllerIndex][JOYY] ||
+			joyinput[ControllerIndex][JOYRIGHTSHOULDER] || joyinput[ControllerIndex][JOYLEFTSHOULDER])
+		{
+			unsigned int currentTime;
+			currentTime = SDL_GetTicks();
+
+			if (currentTime > lastTime + 200)
+			{
+				lastTime = currentTime;
+
+				if (joyinput[ControllerIndex][JOYSTICKX] > 0 ||
+					joyinput[ControllerIndex][JOYRIGHT])
+					return SC_RIGHT;
+				if (joyinput[ControllerIndex][JOYSTICKX] < 0 ||
+					joyinput[ControllerIndex][JOYLEFT])
+					return SC_LEFT;
+				if (joyinput[ControllerIndex][JOYSTICKY] > 0 ||
+					joyinput[ControllerIndex][JOYDOWN])
+					return SC_DOWN;
+				if (joyinput[ControllerIndex][JOYSTICKY] < 0 ||
+					joyinput[ControllerIndex][JOYUP])
+					return SC_UP;
+				if (joyinput[ControllerIndex][JOYA] ||
+					joyinput[ControllerIndex][JOYSTART])
+					return SC_ENTER;
+				if (joyinput[ControllerIndex][JOYB] ||
+					joyinput[ControllerIndex][JOYBACK])
+					return SC_ESC;
+				if (joyinput[ControllerIndex][JOYX])
+					return SC_DELETE;
+				if (joyinput[ControllerIndex][JOYLEFTSHOULDER])
+					return SC_CTRL;
+				if (joyinput[ControllerIndex][JOYRIGHTSHOULDER])
+					return SC_F1;
+			}
+			return 0;
+		}
+	}
 	return 0;
 }
