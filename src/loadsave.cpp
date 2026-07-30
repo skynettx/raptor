@@ -788,16 +788,7 @@ RAP_LoadWin(
         SWD_Dialog(&dlg);
         I_GetNeedResize(false);
         
-        if (joy_ipt_MenuNew)
-        {
-            if (XButton)                                                                                                                        
-            {
-                JOY_IsKey(XButton);
-                dlg.keypress = SC_DELETE;
-            }
-        }
-        
-        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))                                      
+        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKey(JOYBACK) && joy_ipt_MenuNew) || (JOY_IsKey(JOYB) && joy_ipt_MenuNew))
         {
             rval = 0;
             goto load_exit;

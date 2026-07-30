@@ -120,7 +120,7 @@ HELP_Win(
             break;
         }
         
-        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))
+        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKey(JOYBACK) && joy_ipt_MenuNew) || (JOY_IsKey(JOYB) && joy_ipt_MenuNew))
             break;
         
         if (KBD_Key(SC_X) && KBD_Key(SC_ALT))

@@ -900,7 +900,7 @@ Do_Game(
             b3_flag = 0;
         }
         
-        if (KBD_IsKey(SC_P) || JOY_IsKeyInGameStart(Start))                                                                  
+        if (KBD_IsKey(SC_P) || JOY_IsKey(JOYSTART))
         {
             while (IMS_IsAck())
             {
@@ -1168,7 +1168,7 @@ Do_Game(
             b3_flag = 0;
         }
         
-        if (KBD_IsKey(SC_ESC) || JOY_IsKeyInGameBack(Back))                                                                       
+        if (KBD_IsKey(SC_ESC) || JOY_IsKey(JOYBACK))
         {
             if (godmode)
                 end_wave = 1;

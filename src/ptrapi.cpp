@@ -54,8 +54,8 @@ PTR_JoyHandler(
     
     lasttick += 1000 / 60;
 
-    cur_mx = StickX + old_joy_x;
-    cur_my = StickY + old_joy_y;
+    cur_mx = JOY_GetAxis(JOYSTICKX) + old_joy_x;
+    cur_my = JOY_GetAxis(JOYSTICKY) + old_joy_y;
     
     if (cur_mx < 0)
         cur_mx = 0;

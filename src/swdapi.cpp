@@ -583,41 +583,6 @@ SWD_DoButton(
     SFIELD *curfld         // INPUT : pointer to current field
 )
 {
-    // == CONTROLLER INPUT ==============================
-    
-    if (joy_ipt_MenuNew)                                                 
-    {
-        if (StickY > 0 || Down)                                                   
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_DOWN;
-        }
-        
-        if (StickY < 0 || Up)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_UP;
-        }
-        
-        if (StickX > 0 || Right)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_RIGHT;
-        }
-        
-        if (StickX < 0 || Left)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_LEFT;
-        }
-        
-        if (AButton)
-        {
-            JOY_IsKey(AButton);
-            g_key = SC_ENTER;
-        }
-    }
-    
     if (!g_button_flag)
         return;
     
@@ -711,7 +676,7 @@ SWD_FieldInput(
         
         // == INPUT CONTROLLER MAX FIELDINPUT ==============================
         
-        if (StickY || Down || Up || AButton || YButton || Start)            
+        if (JOY_GetAxis(JOYSTICKY) || JOY_GetButton(JOYDOWN) || JOY_GetButton(JOYUP) || JOY_GetButton(JOYA) || JOY_GetButton(JOYY) || JOY_GetButton(JOYSTART))
         {
             joyinput = 1;
 
@@ -724,9 +689,9 @@ SWD_FieldInput(
         
         // == INPUT CONTROLLER ASCII TABLE DOWN ==============================
 
-        if (StickY > 0 || Down)                                                    
+        if (JOY_GetAxis(JOYSTICKY) > 0 || JOY_GetButton(JOYDOWN))
         {
-            if (JOY_IsScroll(0) == 1)
+            if (g_key == SC_DOWN)
             {
                 if (fi_joy_count > 0)
                 {
@@ -753,9 +718,9 @@ SWD_FieldInput(
         
         // == INPUT CONTROLLER ASCII TABLE UP ==============================
 
-        if (StickY < 0 || Up)                                                    
+        if (JOY_GetAxis(JOYSTICKY) < 0 || JOY_GetButton(JOYUP))
         {
-            if (JOY_IsScroll(0) == 1)
+            if (g_key == SC_UP)
             {
                 if (fi_joy_count > 0)
                 {
@@ -780,32 +745,20 @@ SWD_FieldInput(
             }
         }
         
-        if (StickX > 0 || Right)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_RIGHT;
-        }
-        
-        if (StickX < 0 || Left)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_LEFT;
-        }
-        
         // == INPUT CONTROLLER NEXT INPUT ==============================
 
-        if (AButton)                                                  
+        if (JOY_GetButton(JOYA))
         {
-            JOY_IsKey(AButton);
+            JOY_IsKey(JOYA);
             curpos++;
             fi_joy_count = 0;
         }
         
         // == INPUT CONTROLLER DELETE ==============================
 
-        if (XButton)                                                  
+        if (JOY_GetButton(JOYX))
         {
-            JOY_IsKey(XButton);
+            JOY_IsKey(JOYX);
             flag = 1;
             
             if (curpos > 0)
@@ -817,9 +770,9 @@ SWD_FieldInput(
         
         // == INPUT CONTROLLER SPACE ==============================
         
-        if (YButton)                                                  
+        if (JOY_GetButton(JOYY))
         {
-            JOY_IsKey(YButton);
+            JOY_IsKey(JOYY);
             wrkbuf[curpos + 1] = 0;
             g_joy_ascii = 0x20;
             wrkbuf[curpos] = g_joy_ascii;
@@ -828,9 +781,9 @@ SWD_FieldInput(
         
         // == INPUT CONTROLLER CONFIRM ==============================
 
-        if (Start)                                                   
+        if (JOY_GetButton(JOYSTART))
         {
-            JOY_IsKey(Start);
+            JOY_IsKey(JOYSTART);
             g_key = SC_ENTER;
             fi_joy_count = 0;
         }
@@ -1519,7 +1472,7 @@ SWD_IsButtonDown(
     if (KBD_Key(SC_ENTER))
         return 1;
     
-    if ((mouseb1) || (AButton && !joy_ipt_MenuNew))
+    if ((mouseb1) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
         return 1;
     
     return 0;
@@ -2341,7 +2294,7 @@ SWD_Dialog(
     if (active_field == -1)
         return;
 
-    if ((mouseb1 && !cur_act) || (AButton && !joy_ipt_MenuNew && !cur_act))                            
+    if ((mouseb1 && !cur_act) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew && !cur_act))
     {
         old_field = active_field;
         

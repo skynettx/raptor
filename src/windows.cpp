@@ -230,51 +230,6 @@ WIN_Opts(
         patchflag = 0;
         SWD_Dialog(&dlg);
         I_GetNeedResize(false);
-
-        if (joy_ipt_MenuNew)
-        {
-            if (StickY > 0 || Down)                                                   
-            {
-                if (JOY_IsScroll(0) == 1)
-                    dlg.keypress = SC_DOWN;
-            }
-            
-            if (StickY < 0 || Up)
-            {
-                if (JOY_IsScroll(0) == 1)
-                    dlg.keypress = SC_UP;
-            }
-            
-            if (StickX > 0 || Right)
-            {
-                if (JOY_IsScroll(0) == 1)
-                    dlg.keypress = SC_RIGHT;
-            }
-            
-            if (StickX < 0 || Left)
-            {
-                if (JOY_IsScroll(0) == 1)
-                    dlg.keypress = SC_LEFT;
-            }
-            
-            if (Back)
-            {
-                dlg.keypress = SC_ESC;
-                JOY_IsKey(Back);
-            }
-            
-            if (BButton)
-            {
-                dlg.keypress = SC_ESC;
-                JOY_IsKey(BButton);
-            }
-            
-            if (AButton)
-            {
-                dlg.keypress = SC_ENTER;
-                JOY_IsKey(AButton);
-            }
-        }
         
         switch (dlg.keypress)
         {
@@ -351,7 +306,7 @@ WIN_Opts(
             switch (dlg.sfield)
             {
             case OPTS_VMUSIC:
-                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                  
+                if ((mouseb1) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
                 {
                     while (!IMS_IsAck())
                     {
@@ -369,7 +324,7 @@ WIN_Opts(
                 break;
             
             case OPTS_VFX:
-                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                 
+                if ((mouseb1) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
                 {
                     while (!IMS_IsAck())
                     {
@@ -469,7 +424,8 @@ WIN_Pause(
     SWD_DestroyWindow(window);
     GFX_DisplayUpdate();
     
-    JOY_Wait(0);
+    JOY_IsKey(JOYSTART);
+    JOY_IsKey(JOYBACK);
     KBD_Clear();
     IMS_StartAck();
 }
@@ -593,7 +549,7 @@ WIN_AskBool(
         SWD_Dialog(&dlg);
         I_GetNeedResize(false);
         
-        if (KBD_IsKey(SC_ESC) || JOY_IsKeyInGameBack(Back))                                                   
+        if (KBD_IsKey(SC_ESC) || JOY_IsKey(JOYBACK))
         {
             dlg.cur_act = S_FLD_COMMAND;
             dlg.cur_cmd = F_SELECT;
@@ -717,7 +673,7 @@ WIN_AskDiff(
         SWD_Dialog(&dlg);
         I_GetNeedResize(false);
         
-        if (KBD_IsKey(SC_ESC) || Back || BButton)                                                      
+        if (KBD_IsKey(SC_ESC) || JOY_GetButton(JOYBACK) || JOY_GetButton(JOYB))
         {
             rval = -1;
             goto askdiff_exit;
@@ -810,23 +766,8 @@ WIN_Register(
     {
         SWD_Dialog(&dlg);
         I_GetNeedResize(false);
-
-        if (joy_ipt_MenuNew)                                                               
-        {
-            if (LeftShoulder)                                           
-            {
-                JOY_IsKey(LeftShoulder);
-                dlg.keypress = SC_CTRL;
-            }
-            
-            if (RightShoulder)
-            {
-                JOY_IsKey(RightShoulder);
-                dlg.keypress = SC_F1;
-            }
-        }
         
-        if (KBD_Key(SC_ESC) || Back || BButton)
+        if (KBD_Key(SC_ESC) || JOY_GetButton(JOYBACK) || JOY_GetButton(JOYB))
         {
             rval = 0;
             goto reg_exit;
@@ -858,7 +799,7 @@ WIN_Register(
             {
             case REG_VIEWEXIT:
                 opt = dlg.sfield;
-                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                       
+                if ((mouseb1) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
                 {
                     while (IMS_IsAck())
                     {
@@ -882,7 +823,7 @@ WIN_Register(
             
             case REG_VIEWID:
                 opt = dlg.sfield;
-                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                     
+                if ((mouseb1) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
                 {
                     while (IMS_IsAck())
                     {
@@ -1168,47 +1109,8 @@ WIN_Hangar(
             
             SWD_Dialog(&dlg);
             I_GetNeedResize(false);
-
-            if (joy_ipt_MenuNew)
-            {
-                if (StickY > 0 || Down)                                                   
-                {
-                    JOY_IsKey(StickY);
-                    dlg.keypress = SC_DOWN;
-                }
-                
-                if (StickY < 0 || Up)
-                {
-                    JOY_IsKey(StickY);
-                    dlg.keypress = SC_UP;
-                }
-                
-                if (StickX > 0 || Right)
-                {
-                    JOY_IsKey(StickX);
-                    dlg.keypress = SC_RIGHT;
-                }
-                
-                if (StickX < 0 || Left)
-                {
-                    JOY_IsKey(StickX);
-                    dlg.keypress = SC_LEFT;
-                }
-                
-                if (AButton)
-                {
-                    JOY_IsKey(AButton);
-                    dlg.keypress = SC_ENTER;
-                }
-                
-                if (RightShoulder)
-                {
-                    JOY_IsKey(RightShoulder);
-                    dlg.keypress = SC_F1;
-                }
-            }
             
-            if (KBD_Key(SC_ESC) || Back || BButton)
+            if (KBD_Key(SC_ESC) || JOY_GetButton(JOYBACK) || JOY_GetButton(JOYB))
             {
                 opt = -99;
                 goto hangar_exit;
@@ -1295,7 +1197,7 @@ keyboard_part:
                 case HANG_MISSION:
                     pos = 0;
                     opt = dlg.sfield;
-                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (AButton && !joy_ipt_MenuNew))                
+                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
                     {
                         SND_Patch(FX_DOOR, 60);
                         while (IMS_IsAck())
@@ -1315,7 +1217,7 @@ keyboard_part:
                 case HANG_SUPPLIES:
                     pos = 1;
                     opt = dlg.sfield;
-                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (AButton && !joy_ipt_MenuNew))               
+                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
                     {
                         SND_Patch(FX_DOOR, 127);
                         while (IMS_IsAck())
@@ -1335,7 +1237,7 @@ keyboard_part:
                 case HANG_MAIN_MENU:
                     pos = 2;
                     opt = dlg.sfield;
-                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (AButton && !joy_ipt_MenuNew))             
+                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
                     {
                         opt = -99;
                         SND_Patch(FX_DOOR, 200);
@@ -1356,7 +1258,7 @@ keyboard_part:
                 case HANG_QSAVE:
                     pos = 3;
                     opt = dlg.sfield;
-                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (AButton && !joy_ipt_MenuNew))            
+                    if ((mouseb1) || (dlg.keypress == SC_ENTER) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
                     {
                         while (IMS_IsAck())
                         {
@@ -1522,27 +1424,6 @@ WIN_ShipComp(
     {
         SWD_Dialog(&dlg);
         I_GetNeedResize(false);
-
-        if (joy_ipt_MenuNew)
-        {
-            if (Back)                                                         
-            {
-                JOY_IsKey(Back);
-                dlg.keypress = SC_ESC;
-            }
-            
-            if (BButton)
-            {
-                JOY_IsKey(BButton);
-                dlg.keypress = SC_ESC;
-            }
-            
-            if (RightShoulder)
-            {
-                JOY_IsKey(RightShoulder);
-                dlg.keypress = SC_F1;
-            }
-        }
         
         if (KBD_Key(SC_X) && KBD_Key(SC_ALT))
             WIN_AskExit();
@@ -2109,7 +1990,7 @@ WIN_MainMenu(
         SWD_Dialog(&dlg);
         I_GetNeedResize(false);
         
-        if (dlg.keypress == SC_D || YButton)                                    
+        if (dlg.keypress == SC_D || JOY_GetButton(JOYY))
         {
             cur_opt = DEM_DEMO1G1;
             d_count = DEMO_DELAY + 2;
@@ -2143,13 +2024,13 @@ WIN_MainMenu(
         if (KBD_Key(SC_X) && KBD_Key(SC_ALT))
             WIN_AskExit();
         
-        if ((KBD_Key(SC_ESC) && ingameflag) || (Back && ingameflag) || (BButton && ingameflag))                                   
+        if ((KBD_Key(SC_ESC) && ingameflag) || (JOY_GetButton(JOYBACK) && ingameflag) || (JOY_GetButton(JOYB) && ingameflag))
             goto menu_exit;
         
-        if ((dlg.keypress == SC_F1) || (JOY_IsKeyMenu(RightShoulder)))                                                         
+        if ((dlg.keypress == SC_F1) || (JOY_IsKey(JOYRIGHTSHOULDER)))
             HELP_Win("HELP1_TXT");
         
-        if (mouseb1 || mouseb2 || dlg.keypress || (AButton && !joy_ipt_MenuNew))                                              
+        if (mouseb1 || mouseb2 || dlg.keypress || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
             WIN_DemoDelay(1);
         
         if (dlg.cur_act == S_FLD_COMMAND && dlg.cur_cmd == F_SELECT)

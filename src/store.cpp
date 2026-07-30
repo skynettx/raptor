@@ -381,7 +381,7 @@ STORE_Enter(
             {
             case STOR_VEXIT:
                 opt = dlg.sfield;
-                if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                                  
+                if ((mouseb1) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew))
                     goto store_exit;
                 if (opt != oldopt)
                 {
@@ -474,75 +474,12 @@ STORE_Enter(
             }
         }
         
-        if (joy_ipt_MenuNew)
+        if (JOY_GetButton(JOYLEFTSHOULDER))
         {
-            if (StickY > 0)                                                   
-            {
-                JOY_IsKey(StickY);
-                dlg.keypress = SC_DOWN;
-            }
-            if (StickY < 0)
-            {
-                JOY_IsKey(StickY);
-                dlg.keypress = SC_UP;
-            }
-            if (StickX > 0)
-            {
-                JOY_IsKey(StickX);
-                dlg.keypress = SC_RIGHT;
-            }
-            if (StickX < 0)
-            {
-                JOY_IsKey(StickX);
-                dlg.keypress = SC_LEFT;
-            }
-            if (Down)
-            {
-                JOY_IsKey(Down);
-                dlg.keypress = SC_DOWN;
-            }
-            if (Up)
-            {
-                JOY_IsKey(Up);
-                dlg.keypress = SC_UP;
-            }
-            if (Left)
-            {
-                JOY_IsKey(Left);
-                dlg.keypress = SC_LEFT;
-            }
-            if (Right)
-            {
-                JOY_IsKey(Right);
-                dlg.keypress = SC_RIGHT;
-            }
-            if (AButton)
-            {
-                JOY_IsKey(AButton);
-                dlg.keypress = SC_ENTER;
-            }
-            if (Back)
-            {
-                JOY_IsKey(Back);
-                dlg.keypress = SC_ESC;
-            }
-            if (BButton)
-            {
-                JOY_IsKey(BButton);
-                dlg.keypress = SC_ESC;
-            }
-            if (LeftShoulder)
-            {
-                JOY_IsKey(LeftShoulder);
-                dlg.keypress = SC_SPACE;
-            }
-            if (RightShoulder)
-            {
-                JOY_IsKey(RightShoulder);
-                dlg.keypress = SC_F1;
-            }
+            JOY_IsKey(JOYLEFTSHOULDER);
+            dlg.keypress = SC_SPACE;
         }
-        
+
         switch (dlg.keypress)
         {
         case SC_ESC:

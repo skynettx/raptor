@@ -6,12 +6,6 @@
 
 int joy_ack;
 
-bool Up, Down, Left, Right;
-bool Start, Back, LeftShoulder, RightShoulder;
-bool AButton, BButton, XButton, YButton;
-
-int16_t StickX, StickY, TriggerLeft, TriggerRight;
-
 int joyinput[MAX_CONTROLLERS][16];
 int joyconvert[MAX_CONTROLLERS][4];
 
@@ -126,19 +120,6 @@ I_HandleJoystickEvent(
 	{
 		if (ControllerHandles[ControllerIndex] != 0 && SDL_GameControllerGetAttached(ControllerHandles[ControllerIndex]))
 		{
-			Up = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_UP);
-			Down = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-			Left = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_LEFT);
-			Right = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-			Start = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_START);
-			Back = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_BACK);
-			LeftShoulder = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
-			RightShoulder = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
-			AButton = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_A);
-			BButton = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_B);
-			XButton = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_X);
-			YButton = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_Y);
-
 			joyinput[ControllerIndex][JOYUP] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_UP);
 			joyinput[ControllerIndex][JOYDOWN] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_DOWN);
 			joyinput[ControllerIndex][JOYLEFT] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_LEFT);
@@ -154,24 +135,15 @@ I_HandleJoystickEvent(
 
 			if (!g_drawcursor)
 			{
-				StickX = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 10);
-				StickY = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 8);
-
 				joyinput[ControllerIndex][JOYSTICKX] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 10);
 				joyinput[ControllerIndex][JOYSTICKY] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 8);
 			}
 			else
 			{
-				StickX = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 4);
-				StickY = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 4);
-
 				joyinput[ControllerIndex][JOYSTICKX] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 4);
 				joyinput[ControllerIndex][JOYSTICKY] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 4);
 			}
 			
-			TriggerLeft = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERLEFT), 4);
-			TriggerRight = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERRIGHT), 4);
-
 			joyinput[ControllerIndex][JOYTRIGGERLEFT] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERLEFT), 4);
 			joyinput[ControllerIndex][JOYTRIGGERRIGHT] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_TRIGGERRIGHT), 4);
 		}
@@ -306,10 +278,11 @@ JOY_Wait() - Waits for button to be released
  ***************************************************************************/
 void 
 JOY_Wait(
+	int index,
 	int button
 )
 {
-	while (StickX || StickY || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
+	while (joyinput[index][button])
 	{
 		I_GetEvent();
 	}
@@ -323,66 +296,15 @@ JOY_IsKey(
 	int button
 )
 {
-	if (StickX || StickY || Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
+	for (ControllerIndex = 0;
+		ControllerIndex < MAX_CONTROLLERS;
+		++ControllerIndex)
 	{
-		JOY_Wait(button);
-		
-		return 1;
-	}
-    
-	return 0;
-}
-
-/***************************************************************************
-JOY_IsKeyInGameStart() - Tests to see if button is down if so waits for release
- ***************************************************************************/
-int 
-JOY_IsKeyInGameStart(
-	int button
-)
-{
-	if (Start)
-	{
-		JOY_Wait(button);
-		
-		return 1;
-	}
-	
-	return 0;
-}
-
-/***************************************************************************
-JOY_IsKeyInGameBack() - Tests to see if button is down if so waits for release
- ***************************************************************************/
-int 
-JOY_IsKeyInGameBack(
-	int button
-)
-{
-
-	if (Back)
-	{
-		JOY_Wait(button);
-		
-		return 1;
-	}
-	
-	return 0;
-}
-
-/***************************************************************************
-JOY_IsKeyMenu() - Tests to see if button is down if so waits for release
- ***************************************************************************/
-int 
-JOY_IsKeyMenu(
-	int button
-)
-{
-	if (RightShoulder || Back || BButton)
-	{
-		JOY_Wait(button);
-		
-		return 1;
+		if (joyinput[ControllerIndex][button])
+		{
+			JOY_Wait(ControllerIndex, button);
+			return 1;
+		}
 	}
 	
 	return 0;

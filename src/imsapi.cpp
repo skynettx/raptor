@@ -60,7 +60,7 @@ IMS_IsAck(
 {
     I_GetEvent();
     
-    if (Up || Down || Left || Right || Start || Back || LeftShoulder || RightShoulder || AButton || BButton || XButton || YButton)
+    if (JOY_GetInput())
     {
         return 1;
     }
