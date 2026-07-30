@@ -2227,12 +2227,21 @@ SWD_Dialog(
 )
 {
     int update, loop, sy, sx;
+    int joyinput;
     SWIN *curwin;
     SFIELD *firstfld, *curfld;
     
     //__disable();
     I_GetEvent();
     g_key = lastscan;
+    
+    if (joy_ipt_MenuNew)
+    {
+        joyinput = JOY_MapsInput();
+        if (!lastscan && joyinput)
+            g_key = joyinput;
+    }
+    
     lastscan = SC_NONE;
     g_ascii = lastascii;
     lastascii = SC_NONE;
