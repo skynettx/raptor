@@ -234,6 +234,8 @@ WIN_Opts(
         switch (dlg.keypress)
         {
         case SC_ESC:
+            JOY_IsKey(JOYB);
+            JOY_IsKey(JOYBACK);
             dlg.cur_act = S_FLD_COMMAND;
             dlg.cur_cmd = F_SELECT;
             dlg.field = OPTS_EXIT;
