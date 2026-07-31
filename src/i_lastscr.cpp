@@ -63,18 +63,16 @@ void I_LASTSCR(char* mem)
     }
 
     // Wait for a keypress
-
-    IMS_StartAck();
-    I_Settextmode(true);
-
+    
     while (true)
     {
         TXT_UpdateScreen();
-        I_GetEvent();
-
-        if (joy_ack || kbd_ack || mouse_b1_ack || mouse_b2_ack || mouse_b3_ack)
+        
+        if (TXT_GetChar() > 0)
+        {
             break;
-
+        }
+        
         TXT_Sleep(0);
     }
 
