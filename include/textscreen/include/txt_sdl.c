@@ -412,6 +412,8 @@ int TXT_Init(int fullscreen, int resizable, int aspect_ratio_correct)
     screendata = malloc(TXT_SCREEN_W * TXT_SCREEN_H * 2);
     memset(screendata, 0, TXT_SCREEN_W * TXT_SCREEN_H * 2);
 
+    TXT_SetInputMode(TXT_INPUT_NORMAL);
+
     return 1;
 }
 
