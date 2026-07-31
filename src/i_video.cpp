@@ -200,9 +200,6 @@ unsigned int joywait = 0;
 // Becomes true when high-DPI display detected
 static bool highdpi = false;
 
-// When textmode is true not update pointer cursor
-static bool textmode = false;
-
 void VIDEO_LoadPrefs(void)
 {
     fullscreen = INI_GetPreferenceLong("Video", "fullscreen", 0);
@@ -499,9 +496,7 @@ void I_GetEvent(void)
     if ((control != 2) || (control == 2 && joy_ipt_MenuNew))
         PTR_MouseHandler();
     
-    if (!textmode)
-        PTR_UpdateCursor();
-    
+    PTR_UpdateCursor();
     IPT_GetButtons();
 
     MUS_Poll();
@@ -1644,9 +1639,4 @@ bool I_GetNeedResize(bool setonlypos)
 
         return true;
     }
-}
-
-void I_Settextmode(bool flag)
-{
-    textmode = flag;
 }
