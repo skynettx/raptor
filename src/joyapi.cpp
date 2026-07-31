@@ -25,7 +25,8 @@ IPT_CalJoy(
 	void
 )
 {
-	SDL_Init(SDL_INIT_GAMECONTROLLER);
+	if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0)
+		return;
 
 	MaxJoysticks = SDL_NumJoysticks();
 	ControllerIndex = 0;
