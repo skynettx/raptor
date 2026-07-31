@@ -19,14 +19,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "rap.h"
-#include "i_lastscr.h"
 #include "textscreen.h"
 #include "i_video.h"
-#include "joyapi.h"
-#include "kbdapi.h"
-#include "ptrapi.h"
-#include "imsapi.h"
 
 #define LASTSCR_W 80
 #define LASTSCR_H 25
