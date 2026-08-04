@@ -1088,7 +1088,8 @@ signed int TXT_GetChar(void)
                         // few special cases needed during text input:
                         if (ev.key.keysym.sym == SDLK_ESCAPE
                          || ev.key.keysym.sym == SDLK_BACKSPACE
-                         || ev.key.keysym.sym == SDLK_RETURN)
+                         || ev.key.keysym.sym == SDLK_RETURN
+                         || ev.key.keysym.sym == SDLK_AC_BACK)
                         {
                             return TranslateKeysym(&ev.key.keysym);
                         }
