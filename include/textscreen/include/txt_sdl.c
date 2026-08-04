@@ -658,6 +658,9 @@ static int TranslateScancode(SDL_Scancode scancode)
         case SDL_SCANCODE_RALT:
             return KEY_RALT;
 
+        case SDL_SCANCODE_AC_BACK:
+            return KEY_ESCAPE;
+
         default:
             if (scancode < arrlen(scancode_translate_table))
             {
