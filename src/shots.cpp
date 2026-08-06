@@ -49,16 +49,11 @@ SHOTS_Clear(
     
     memset(shots, 0, sizeof(shots));
 
-    for (loop = 0; loop < MAX_SHOTS; loop++)
-    {
-        if (loop == 69) // FIXME
-        {
-            shots[loop].next = &first_shots;
-            continue;
-        }
-        
+    // Stop one short so the last next stays NULL from the memset() above,
+    // which is what SHOTS_Get() tests to detect an exhausted pool. Same as
+    // ESHOT_Clear() in eshot.cpp.
+    for (loop = 0; loop < MAX_SHOTS - 1; loop++)
         shots[loop].next = &shots[loop + 1];
-    }
 }
 
 /*-------------------------------------------------------------------------*
