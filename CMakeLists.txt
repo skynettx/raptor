@@ -6,7 +6,10 @@ SET(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_FLAGS "-O3")
 SET(CMAKE_C_STANDARD 11)
 
-if(NOT DEFINED CMAKE_BUILD_TYPE)
+# Test the value, not just definedness: project() below creates an empty
+# CMAKE_BUILD_TYPE cache entry, so on any re-configure the variable is already
+# defined but empty and the default would never be applied.
+if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
@@ -147,7 +150,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         SDL2::SDL2main
         SDL2::SDL2
         )
-    if(${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo" OR ${CMAKE_BUILD_TYPE} MATCHES "Release")
+    if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo" OR CMAKE_BUILD_TYPE MATCHES "Release")
         if(MSVC)
             target_link_options(raptor PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
         else()
@@ -175,7 +178,7 @@ if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Android")
         SDL2::SDL2main
         SDL2::SDL2
         )
-    if(${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo" OR ${CMAKE_BUILD_TYPE} MATCHES "Release")
+    if(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo" OR CMAKE_BUILD_TYPE MATCHES "Release")
         if(MSVC)
             target_link_options(raptorsetup PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
         elseif(WIN32)
