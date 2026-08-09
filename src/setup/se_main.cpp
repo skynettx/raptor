@@ -19,6 +19,11 @@
 #include "se_input.h"
 #include "startscreen.h"
 
+extern "C" {
+#include "txt_io.h"
+#include "txt_gui.h"
+}
+
 #ifdef _MSC_VER
 #define PATH_MAX        4096
 #define access _access
@@ -34,6 +39,7 @@ char g_setup_path[PATH_MAX];
 int controltype;
 int musiccard;
 int soundfxcard;
+static int startscreenupdate = 1;
 static int fullscreen, aspect_ratio, txt_fullscreen, haptic, joy_ipt_MenuNew, sys_midi, winmm_mpu_device, core_dls_synth, core_midi_port, alsaclient, alsaport, setup;
 int keymoveup, keymovedown, keymoveleft, keymoveright, keyfire, keyspecial, keymega;
 static char soundfont[128];
@@ -1704,6 +1710,36 @@ void MainMenu(TXT_UNCAST_ARG(widget), void* user_data)
 	TXT_SetWindowAction(mainwindow, TXT_HORIZ_RIGHT, accept_button);
 
 	setupflag = 0;
+}
+
+void Setup(void)
+{
+	if (access(RAP_GetSetupPath(), 0))                     //Check setup.ini is in folder
+	{
+		setupflag = 1;
+		writesetupflag = 1;
+	}
+
+	SE_INI_InitPreference(RAP_GetSetupPath());
+	GetSetupSettings();
+
+	if (!setupflag)
+	{
+		InfoWindow(0, 0);
+		MainMenu(0, 0);
+	}
+
+	if (setupflag)
+	{
+		InfoWindow(0, 0);
+		Control(0, 0);
+	}
+
+	TXT_GUIMainLoop();
+	mainwindow = NULL;
+	TXT_BGColor(TXT_COLOR_BLACK, 0);
+	TXT_ClearScreen();
+	startscreenupdate = 1;
 }
 
 void DrawStartScreen(void)
