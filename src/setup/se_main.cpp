@@ -157,34 +157,34 @@ void CheckSetupSettings(void)
 /////////////////////////////////////////////Get Settings from Setup.ini//////////////////////////////////////////////////////
 void GetSetupSettings(void)
 {
-	controltype = INI_GetPreferenceLong("Setup", "Control", 3);
-	musiccard = INI_GetPreferenceLong("Music", "CardType", 0);
-	soundfxcard = INI_GetPreferenceLong("SoundFX", "CardType", 0);
-	keymoveup = INI_GetPreferenceLong("Keyboard", "MoveUp", 72);
-	keymovedown = INI_GetPreferenceLong("Keyboard", "MoveDn", 80);
-	keymoveleft = INI_GetPreferenceLong("Keyboard", "MoveLeft", 75);
-	keymoveright = INI_GetPreferenceLong("Keyboard", "MoveRight", 77);
-	keyfire = INI_GetPreferenceLong("Keyboard", "Fire", 29);
-	keyspecial = INI_GetPreferenceLong("Keyboard", "FireSp", 56);
-	keymega = INI_GetPreferenceLong("Keyboard", "ChangeSp", 57);
-	mousebfire = INI_GetPreferenceLong("Mouse", "Fire", 0);
-	mousebchweapon = INI_GetPreferenceLong("Mouse", "FireSp", 1);
-	mousebmega = INI_GetPreferenceLong("Mouse", "ChangeSp", 2);
-	joybfire = INI_GetPreferenceLong("JoyStick", "Fire", 0);
-	joybchweapon = INI_GetPreferenceLong("JoyStick", "FireSp", 1);
-	joybmega = INI_GetPreferenceLong("JoyStick", "ChangeSp", 2);
-	fullscreen = INI_GetPreferenceLong("Video", "fullscreen", 0);
-	aspect_ratio = INI_GetPreferenceLong("Video", "aspect_ratio_correct", 1);
-	txt_fullscreen = INI_GetPreferenceLong("Video", "txt_fullscreen", 0);
-	haptic = INI_GetPreferenceLong("Setup", "Haptic", 1);
-	joy_ipt_MenuNew = INI_GetPreferenceLong("Setup", "joy_ipt_MenuNew", 0);
-	sys_midi = INI_GetPreferenceLong("Setup", "sys_midi", 0);
-	winmm_mpu_device = INI_GetPreferenceLong("Setup", "winmm_mpu_device", 0);
-	core_dls_synth = INI_GetPreferenceLong("Setup", "core_dls_synth", 1);
-	core_midi_port = INI_GetPreferenceLong("Setup", "core_midi_port", 0);
-	alsaclient = INI_GetPreferenceLong("Setup", "alsa_output_client", 128);
-	alsaport = INI_GetPreferenceLong("Setup", "alsa_output_port", 0);
-	sf = (char*)INI_GetPreference("Setup", "SoundFont", soundfont, 127, "SoundFont.sf2");
+	controltype = SE_INI_GetPreferenceLong("Setup", "Control", 3);
+	musiccard = SE_INI_GetPreferenceLong("Music", "CardType", 0);
+	soundfxcard = SE_INI_GetPreferenceLong("SoundFX", "CardType", 0);
+	keymoveup = SE_INI_GetPreferenceLong("Keyboard", "MoveUp", 72);
+	keymovedown = SE_INI_GetPreferenceLong("Keyboard", "MoveDn", 80);
+	keymoveleft = SE_INI_GetPreferenceLong("Keyboard", "MoveLeft", 75);
+	keymoveright = SE_INI_GetPreferenceLong("Keyboard", "MoveRight", 77);
+	keyfire = SE_INI_GetPreferenceLong("Keyboard", "Fire", 29);
+	keyspecial = SE_INI_GetPreferenceLong("Keyboard", "FireSp", 56);
+	keymega = SE_INI_GetPreferenceLong("Keyboard", "ChangeSp", 57);
+	mousebfire = SE_INI_GetPreferenceLong("Mouse", "Fire", 0);
+	mousebchweapon = SE_INI_GetPreferenceLong("Mouse", "FireSp", 1);
+	mousebmega = SE_INI_GetPreferenceLong("Mouse", "ChangeSp", 2);
+	joybfire = SE_INI_GetPreferenceLong("JoyStick", "Fire", 0);
+	joybchweapon = SE_INI_GetPreferenceLong("JoyStick", "FireSp", 1);
+	joybmega = SE_INI_GetPreferenceLong("JoyStick", "ChangeSp", 2);
+	fullscreen = SE_INI_GetPreferenceLong("Video", "fullscreen", 0);
+	aspect_ratio = SE_INI_GetPreferenceLong("Video", "aspect_ratio_correct", 1);
+	txt_fullscreen = SE_INI_GetPreferenceLong("Video", "txt_fullscreen", 0);
+	haptic = SE_INI_GetPreferenceLong("Setup", "Haptic", 1);
+	joy_ipt_MenuNew = SE_INI_GetPreferenceLong("Setup", "joy_ipt_MenuNew", 0);
+	sys_midi = SE_INI_GetPreferenceLong("Setup", "sys_midi", 0);
+	winmm_mpu_device = SE_INI_GetPreferenceLong("Setup", "winmm_mpu_device", 0);
+	core_dls_synth = SE_INI_GetPreferenceLong("Setup", "core_dls_synth", 1);
+	core_midi_port = SE_INI_GetPreferenceLong("Setup", "core_midi_port", 0);
+	alsaclient = SE_INI_GetPreferenceLong("Setup", "alsa_output_client", 128);
+	alsaport = SE_INI_GetPreferenceLong("Setup", "alsa_output_port", 0);
+	sf = (char*)SE_INI_GetPreference("Setup", "SoundFont", soundfont, 127, "SoundFont.sf2");
 }
 /////////////////////////////////////////////Get Setup.ini/////////////////////////////////////////////////////////////////////
 const char* RAP_DataPath(void)
@@ -236,191 +236,191 @@ const char* RAP_GetSetupPath(void)
 ////////////////////////////////////////////////Save Settings to SETUP.INI/////////////////////////////////////////////////////
 void SaveSettings(TXT_UNCAST_ARG(widget), void* user_data)
 {
-	INI_PutPreferenceLong("Setup", "Detail", 1);
+	SE_INI_PutPreferenceLong("Setup", "Detail", 1);
 
 	if (ControllerType)                                                         //Save Controller Type to SETUP.INI
 	{
-		INI_PutPreferenceLong("Setup", "Control", ControllerType);
+		SE_INI_PutPreferenceLong("Setup", "Control", ControllerType);
 	}
 	if (ControllerType == 1000)
 	{
-		INI_PutPreferenceLong("Setup", "Control", 0);
+		SE_INI_PutPreferenceLong("Setup", "Control", 0);
 	}
 
-	INI_PutPreferenceLong("Setup", "Haptic", haptic);                           //Save Additional Feature Haptic to SETUP.INI
-	INI_PutPreferenceLong("Setup", "joy_ipt_MenuNew", joy_ipt_MenuNew);         //Save Additional Feature joy_ipt_MenuNew to SETUP.INI
-	INI_PutPreferenceLong("Setup", "sys_midi", sys_midi);                       //Save Additional Feature sys_midi to SETUP.INI
-	INI_PutPreferenceLong("Setup", "winmm_mpu_device", winmm_mpu_device);       //Save Additional Feature winmm_mpu_device to SETUP.INI
-	INI_PutPreferenceLong("Setup", "core_dls_synth", core_dls_synth);           //Save Additional Feature core_dls_synth to SETUP.INI
-	INI_PutPreferenceLong("Setup", "core_midi_port", core_midi_port);           //Save Additional Feature core_dls_synth to SETUP.INI
-	INI_PutPreferenceLong("Setup", "alsa_output_client", alsaclient);           //Save Additional Feature alsa_output_client to SETUP.INI
-	INI_PutPreferenceLong("Setup", "alsa_output_port", alsaport);               //Save Additional Feature alsa_output_port to SETUP.INI
-	INI_PutPreference("Setup", "SoundFont", sf);                                //Save Additional Feature soundfont to SETUP.INI
+	SE_INI_PutPreferenceLong("Setup", "Haptic", haptic);                           //Save Additional Feature Haptic to SETUP.INI
+	SE_INI_PutPreferenceLong("Setup", "joy_ipt_MenuNew", joy_ipt_MenuNew);         //Save Additional Feature joy_ipt_MenuNew to SETUP.INI
+	SE_INI_PutPreferenceLong("Setup", "sys_midi", sys_midi);                       //Save Additional Feature sys_midi to SETUP.INI
+	SE_INI_PutPreferenceLong("Setup", "winmm_mpu_device", winmm_mpu_device);       //Save Additional Feature winmm_mpu_device to SETUP.INI
+	SE_INI_PutPreferenceLong("Setup", "core_dls_synth", core_dls_synth);           //Save Additional Feature core_dls_synth to SETUP.INI
+	SE_INI_PutPreferenceLong("Setup", "core_midi_port", core_midi_port);           //Save Additional Feature core_dls_synth to SETUP.INI
+	SE_INI_PutPreferenceLong("Setup", "alsa_output_client", alsaclient);           //Save Additional Feature alsa_output_client to SETUP.INI
+	SE_INI_PutPreferenceLong("Setup", "alsa_output_port", alsaport);               //Save Additional Feature alsa_output_port to SETUP.INI
+	SE_INI_PutPreference("Setup", "SoundFont", sf);                                //Save Additional Feature soundfont to SETUP.INI
 
 	if (CardType)                                                               //Save Music Card to SETUP.INI
 	{
-		INI_PutPreferenceLong("Music", "Volume", 85);
-		INI_PutPreferenceLong("Music", "CardType", CardType);
+		SE_INI_PutPreferenceLong("Music", "Volume", 85);
+		SE_INI_PutPreferenceLong("Music", "CardType", CardType);
 	}
 	if (CardType == 4 || CardType == 3)
 	{
-		INI_DeletePreference("Music", "MidiPort");
-		INI_PutPreferenceLong("Music", "BasePort", 220);
-		INI_PutPreferenceLong("Music", "Irq", 7);
-		INI_PutPreferenceLong("Music", "Dma", 1);
+		SE_INI_DeletePreference("Music", "MidiPort");
+		SE_INI_PutPreferenceLong("Music", "BasePort", 220);
+		SE_INI_PutPreferenceLong("Music", "Irq", 7);
+		SE_INI_PutPreferenceLong("Music", "Dma", 1);
 	}
 	if (CardType == 2)
 	{
-		INI_DeletePreference("Music", "MidiPort");
-		INI_DeletePreference("Music", "BasePort");
-		INI_DeletePreference("Music", "Irq");
-		INI_DeletePreference("Music", "Dma");
+		SE_INI_DeletePreference("Music", "MidiPort");
+		SE_INI_DeletePreference("Music", "BasePort");
+		SE_INI_DeletePreference("Music", "Irq");
+		SE_INI_DeletePreference("Music", "Dma");
 	}
 	if (CardType == 1000)
 	{
-		INI_DeletePreference("Music", "MidiPort");
-		INI_DeletePreference("Music", "BasePort");
-		INI_DeletePreference("Music", "Irq");
-		INI_DeletePreference("Music", "Dma");
-		INI_PutPreferenceLong("Music", "Volume", 85);
-		INI_PutPreferenceLong("Music", "CardType", 0);
+		SE_INI_DeletePreference("Music", "MidiPort");
+		SE_INI_DeletePreference("Music", "BasePort");
+		SE_INI_DeletePreference("Music", "Irq");
+		SE_INI_DeletePreference("Music", "Dma");
+		SE_INI_PutPreferenceLong("Music", "Volume", 85);
+		SE_INI_PutPreferenceLong("Music", "CardType", 0);
 	}
 	if (BasePort)
 	{
-		INI_DeletePreference("Music", "MidiPort");
-		INI_PutPreferenceLong("Music", "BasePort", BasePort);
-		INI_PutPreferenceLong("Music", "Irq", 7);
-		INI_PutPreferenceLong("Music", "Dma", 1);
+		SE_INI_DeletePreference("Music", "MidiPort");
+		SE_INI_PutPreferenceLong("Music", "BasePort", BasePort);
+		SE_INI_PutPreferenceLong("Music", "Irq", 7);
+		SE_INI_PutPreferenceLong("Music", "Dma", 1);
 	}
 	if (MidiPort)
 	{
-		INI_DeletePreference("Music", "BasePort");
-		INI_DeletePreference("Music", "Irq");
-		INI_DeletePreference("Music", "Dma");
-		INI_PutPreferenceLong("Music", "MidiPort", MidiPort);
+		SE_INI_DeletePreference("Music", "BasePort");
+		SE_INI_DeletePreference("Music", "Irq");
+		SE_INI_DeletePreference("Music", "Dma");
+		SE_INI_PutPreferenceLong("Music", "MidiPort", MidiPort);
 	}
 
 	if (SoundCardType)                                                              //Save Sound Card to SETUP.INI
 	{
-		INI_PutPreferenceLong("SoundFX", "Volume", 85);
-		INI_PutPreferenceLong("SoundFX", "CardType", SoundCardType);
+		SE_INI_PutPreferenceLong("SoundFX", "Volume", 85);
+		SE_INI_PutPreferenceLong("SoundFX", "CardType", SoundCardType);
 	}
 	if (SoundCardType == 8 || SoundCardType == 7)
 	{
-		INI_DeletePreference("SoundFX", "BasePort");
-		INI_DeletePreference("SoundFX", "Irq");
-		INI_DeletePreference("SoundFX", "Dma");
-		INI_PutPreferenceLong("SoundFX", "Channels", 6);
-		INI_PutPreferenceLong("SoundFX", "MidiPort", SoundMidiPort);
+		SE_INI_DeletePreference("SoundFX", "BasePort");
+		SE_INI_DeletePreference("SoundFX", "Irq");
+		SE_INI_DeletePreference("SoundFX", "Dma");
+		SE_INI_PutPreferenceLong("SoundFX", "Channels", 6);
+		SE_INI_PutPreferenceLong("SoundFX", "MidiPort", SoundMidiPort);
 	}
 	if (SoundCardType == 5)
 	{
-		INI_DeletePreference("SoundFX", "MidiPort");
-		INI_PutPreferenceLong("SoundFX", "Channels", SoundChannels);
-		INI_PutPreferenceLong("SoundFX", "BasePort", SoundBasePort);
-		INI_PutPreferenceLong("SoundFX", "Irq", SoundIrq);
+		SE_INI_DeletePreference("SoundFX", "MidiPort");
+		SE_INI_PutPreferenceLong("SoundFX", "Channels", SoundChannels);
+		SE_INI_PutPreferenceLong("SoundFX", "BasePort", SoundBasePort);
+		SE_INI_PutPreferenceLong("SoundFX", "Irq", SoundIrq);
 		if (SoundDma == 1000)
 			SoundDma = 0;
-		INI_PutPreferenceLong("SoundFX", "Dma", SoundDma);
+		SE_INI_PutPreferenceLong("SoundFX", "Dma", SoundDma);
 	}
 	if (SoundCardType == 4)
 	{
-		INI_DeletePreference("SoundFX", "BasePort");
-		INI_DeletePreference("SoundFX", "MidiPort");
-		INI_DeletePreference("SoundFX", "Irq");
-		INI_DeletePreference("SoundFX", "Dma");
-		INI_PutPreferenceLong("SoundFX", "Channels", SoundChannels);
+		SE_INI_DeletePreference("SoundFX", "BasePort");
+		SE_INI_DeletePreference("SoundFX", "MidiPort");
+		SE_INI_DeletePreference("SoundFX", "Irq");
+		SE_INI_DeletePreference("SoundFX", "Dma");
+		SE_INI_PutPreferenceLong("SoundFX", "Channels", SoundChannels);
 	}
 	if (SoundCardType == 3)
 	{
-		INI_DeletePreference("SoundFX", "MidiPort");
-		INI_PutPreferenceLong("SoundFX", "Channels", SoundChannels);
-		INI_PutPreferenceLong("SoundFX", "BasePort", 220);
-		INI_PutPreferenceLong("SoundFX", "Irq", 7);
-		INI_PutPreferenceLong("SoundFX", "Dma", 1);
+		SE_INI_DeletePreference("SoundFX", "MidiPort");
+		SE_INI_PutPreferenceLong("SoundFX", "Channels", SoundChannels);
+		SE_INI_PutPreferenceLong("SoundFX", "BasePort", 220);
+		SE_INI_PutPreferenceLong("SoundFX", "Irq", 7);
+		SE_INI_PutPreferenceLong("SoundFX", "Dma", 1);
 	}
 	if (SoundCardType == 2)
 	{
-		INI_DeletePreference("SoundFX", "BasePort");
-		INI_DeletePreference("SoundFX", "MidiPort");
-		INI_DeletePreference("SoundFX", "Irq");
-		INI_DeletePreference("SoundFX", "Dma");
-		INI_PutPreferenceLong("SoundFX", "Channels", 3);
+		SE_INI_DeletePreference("SoundFX", "BasePort");
+		SE_INI_DeletePreference("SoundFX", "MidiPort");
+		SE_INI_DeletePreference("SoundFX", "Irq");
+		SE_INI_DeletePreference("SoundFX", "Dma");
+		SE_INI_PutPreferenceLong("SoundFX", "Channels", 3);
 	}
 	if (SoundCardType == 1)
 	{
-		INI_DeletePreference("SoundFX", "BasePort");
-		INI_DeletePreference("SoundFX", "MidiPort");
-		INI_DeletePreference("SoundFX", "Irq");
-		INI_DeletePreference("SoundFX", "Dma");
-		INI_PutPreferenceLong("SoundFX", "Channels", 4);
+		SE_INI_DeletePreference("SoundFX", "BasePort");
+		SE_INI_DeletePreference("SoundFX", "MidiPort");
+		SE_INI_DeletePreference("SoundFX", "Irq");
+		SE_INI_DeletePreference("SoundFX", "Dma");
+		SE_INI_PutPreferenceLong("SoundFX", "Channels", 4);
 	}
 	if (SoundCardType == 1000)
 	{
-		INI_DeletePreference("SoundFX", "BasePort");
-		INI_DeletePreference("SoundFX", "MidiPort");
-		INI_DeletePreference("SoundFX", "Irq");
-		INI_DeletePreference("SoundFX", "Dma");
-		INI_PutPreferenceLong("SoundFX", "Volume", 85);
-		INI_PutPreferenceLong("SoundFX", "CardType", 0);
-		INI_PutPreferenceLong("SoundFX", "Channels", 4);
+		SE_INI_DeletePreference("SoundFX", "BasePort");
+		SE_INI_DeletePreference("SoundFX", "MidiPort");
+		SE_INI_DeletePreference("SoundFX", "Irq");
+		SE_INI_DeletePreference("SoundFX", "Dma");
+		SE_INI_PutPreferenceLong("SoundFX", "Volume", 85);
+		SE_INI_PutPreferenceLong("SoundFX", "CardType", 0);
+		SE_INI_PutPreferenceLong("SoundFX", "Channels", 4);
 	}
 	if (writesetupflag && !writeflagkey)                                     //Save Defaultkeyboardlayout when SETUP.INI not in folder and layout not set
 	{
-		INI_PutPreferenceLong("Keyboard", "MoveUp", 72);
-		INI_PutPreferenceLong("Keyboard", "MoveDn", 80);
-		INI_PutPreferenceLong("Keyboard", "MoveLeft", 75);
-		INI_PutPreferenceLong("Keyboard", "MoveRight", 77);
-		INI_PutPreferenceLong("Keyboard", "Fire", 29);
-		INI_PutPreferenceLong("Keyboard", "FireSp", 56);
-		INI_PutPreferenceLong("Keyboard", "ChangeSp", 57);
-		INI_PutPreferenceLong("Keyboard", "MegaFire", 54);
+		SE_INI_PutPreferenceLong("Keyboard", "MoveUp", 72);
+		SE_INI_PutPreferenceLong("Keyboard", "MoveDn", 80);
+		SE_INI_PutPreferenceLong("Keyboard", "MoveLeft", 75);
+		SE_INI_PutPreferenceLong("Keyboard", "MoveRight", 77);
+		SE_INI_PutPreferenceLong("Keyboard", "Fire", 29);
+		SE_INI_PutPreferenceLong("Keyboard", "FireSp", 56);
+		SE_INI_PutPreferenceLong("Keyboard", "ChangeSp", 57);
+		SE_INI_PutPreferenceLong("Keyboard", "MegaFire", 54);
 	}
 	if (writeflagkey)                                                        //Save Keyboardlayout to SETUP.INI
 	{
-		INI_PutPreferenceLong("Keyboard", "MoveUp", key_up_convert);
-		INI_PutPreferenceLong("Keyboard", "MoveDn", key_down_convert);
-		INI_PutPreferenceLong("Keyboard", "MoveLeft", key_left_convert);
-		INI_PutPreferenceLong("Keyboard", "MoveRight", key_right_convert);
-		INI_PutPreferenceLong("Keyboard", "Fire", key_fire_convert);
-		INI_PutPreferenceLong("Keyboard", "FireSp", key_special_convert);
-		INI_PutPreferenceLong("Keyboard", "ChangeSp", key_mega_convert);
-		INI_PutPreferenceLong("Keyboard", "MegaFire", 54);
+		SE_INI_PutPreferenceLong("Keyboard", "MoveUp", key_up_convert);
+		SE_INI_PutPreferenceLong("Keyboard", "MoveDn", key_down_convert);
+		SE_INI_PutPreferenceLong("Keyboard", "MoveLeft", key_left_convert);
+		SE_INI_PutPreferenceLong("Keyboard", "MoveRight", key_right_convert);
+		SE_INI_PutPreferenceLong("Keyboard", "Fire", key_fire_convert);
+		SE_INI_PutPreferenceLong("Keyboard", "FireSp", key_special_convert);
+		SE_INI_PutPreferenceLong("Keyboard", "ChangeSp", key_mega_convert);
+		SE_INI_PutPreferenceLong("Keyboard", "MegaFire", 54);
 	}
 	if (writesetupflag && !writeflagmouse)                                  //Save Defaultmouselayout when SETUP.INI not in folder and layout not set
 	{
-		INI_PutPreferenceLong("Mouse", "Fire", 0);
-		INI_PutPreferenceLong("Mouse", "FireSp", 1);
-		INI_PutPreferenceLong("Mouse", "ChangeSp", 2);
+		SE_INI_PutPreferenceLong("Mouse", "Fire", 0);
+		SE_INI_PutPreferenceLong("Mouse", "FireSp", 1);
+		SE_INI_PutPreferenceLong("Mouse", "ChangeSp", 2);
 	}
 	if (writeflagmouse)                                                    //Save Mouselayout to SETUP.INI
 	{
-		INI_PutPreferenceLong("Mouse", "Fire", mousebfire);
-		INI_PutPreferenceLong("Mouse", "FireSp", mousebchweapon);
-		INI_PutPreferenceLong("Mouse", "ChangeSp", mousebmega);
+		SE_INI_PutPreferenceLong("Mouse", "Fire", mousebfire);
+		SE_INI_PutPreferenceLong("Mouse", "FireSp", mousebchweapon);
+		SE_INI_PutPreferenceLong("Mouse", "ChangeSp", mousebmega);
 	}
 	if (writesetupflag && !writeflagjoy)                                  //Save Defaultjoysticklayout when SETUP.INI not in folder and layout not set
 	{
-		INI_PutPreferenceLong("JoyStick", "Fire", 0);
-		INI_PutPreferenceLong("JoyStick", "FireSp", 1);
-		INI_PutPreferenceLong("JoyStick", "ChangeSp", 2);
-		INI_PutPreferenceLong("JoyStick", "MegaFire", 3);
+		SE_INI_PutPreferenceLong("JoyStick", "Fire", 0);
+		SE_INI_PutPreferenceLong("JoyStick", "FireSp", 1);
+		SE_INI_PutPreferenceLong("JoyStick", "ChangeSp", 2);
+		SE_INI_PutPreferenceLong("JoyStick", "MegaFire", 3);
 	}
 	if (writeflagjoy)                                                     //Save joysticklayout to SETUP.INI
 	{
 		if (writeflagjoybfire || writesetupflag)
-			INI_PutPreferenceLong("JoyStick", "Fire", joybfireout);
+			SE_INI_PutPreferenceLong("JoyStick", "Fire", joybfireout);
 		if (writeflagjoybchweapon || writesetupflag)
-			INI_PutPreferenceLong("JoyStick", "FireSp", joybchweaponout);
+			SE_INI_PutPreferenceLong("JoyStick", "FireSp", joybchweaponout);
 		if (writeflagjoybmega || writesetupflag)
-			INI_PutPreferenceLong("JoyStick", "ChangeSp", joybmegaout);
+			SE_INI_PutPreferenceLong("JoyStick", "ChangeSp", joybmegaout);
 
-		INI_PutPreferenceLong("JoyStick", "MegaFire", 3);
+		SE_INI_PutPreferenceLong("JoyStick", "MegaFire", 3);
 	}
 
-	INI_PutPreferenceLong("Video", "fullscreen", fullscreen);                          //Save Additional Feature fullscreen to SETUP.INI
-	INI_PutPreferenceLong("Video", "aspect_ratio_correct", aspect_ratio);              //Save Additional Feature aspect_ratio_correct to SETUP.INI
-	INI_PutPreferenceLong("Video", "txt_fullscreen", txt_fullscreen);                  //Save Additional Feature txt_fullscreen to SETUP.INI
+	SE_INI_PutPreferenceLong("Video", "fullscreen", fullscreen);                          //Save Additional Feature fullscreen to SETUP.INI
+	SE_INI_PutPreferenceLong("Video", "aspect_ratio_correct", aspect_ratio);              //Save Additional Feature aspect_ratio_correct to SETUP.INI
+	SE_INI_PutPreferenceLong("Video", "txt_fullscreen", txt_fullscreen);                  //Save Additional Feature txt_fullscreen to SETUP.INI
 }
 /////////////////////////////////////////////////////////Info Window/////////////////////////////////////////////////////////
 void InfoWindow(TXT_UNCAST_ARG(widget), void* user_data)
@@ -1705,7 +1705,7 @@ int main(int argc, char* argv[])
 		writesetupflag = 1;
 	}
 
-	INI_InitPreference(RAP_GetSetupPath());
+	SE_INI_InitPreference(RAP_GetSetupPath());
 	GetSetupSettings();
 
 	if (!TXT_Init(txt_fullscreen, 1, 0))

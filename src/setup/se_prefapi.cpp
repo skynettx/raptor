@@ -276,28 +276,28 @@ static int INI_SaveFile(const char *section, const char *key, const char *value,
 
 static char preference[PATH_MAX];
 
-int INI_InitPreference(const char *section)
+int SE_INI_InitPreference(const char *section)
 {
     if (section)
         strcpy(preference, section);
     return !access(preference, 4);
 }
 
-int INI_GetPreferenceLong(const char *section, const char *key, int defValue)
+int SE_INI_GetPreferenceLong(const char *section, const char *key, int defValue)
 {
     char s1[20], s2[20];
     ltoa(defValue, s1, 10);
-    INI_GetPreference(section, key, s2, 20, s1);
+    SE_INI_GetPreference(section, key, s2, 20, s1);
     return atol(s2);
 }
 
-int INI_GetPreferenceHex(const char* section, const char* key, int defValue)
+int SE_INI_GetPreferenceHex(const char* section, const char* key, int defValue)
 {
     char s1[32], s2[32];
     unsigned int t;
 
     ltoa(defValue, s1, 10);
-    INI_GetPreference(section, key, s2, 32, s1);
+    SE_INI_GetPreference(section, key, s2, 32, s1);
     sscanf(s2, "%x", &t);
 
     return t & 0xFF;
@@ -311,13 +311,13 @@ int INI_GetPreferenceHex(const char* section, const char* key, int defValue)
     return t;
 }*/
 
-int INI_GetPreferenceBool(const char *section, const char *key, short defValue)
+int SE_INI_GetPreferenceBool(const char *section, const char *key, short defValue)
 {
     char s2[10];
     if (defValue)
-        INI_GetPreference(section, key, s2, 10, "TRUE");
+        SE_INI_GetPreference(section, key, s2, 10, "TRUE");
     else
-        INI_GetPreference(section, key, s2, 10, "FALSE");
+        SE_INI_GetPreference(section, key, s2, 10, "FALSE");
     if (s2[0] == '1' || !strcmp(s2, "TRUE"))
         return 1;
     if (s2[0] == '0' || !strcmp(s2, "FALSE"))
@@ -325,7 +325,7 @@ int INI_GetPreferenceBool(const char *section, const char *key, short defValue)
     return atoi(s2);
 }
 
-char *INI_GetPreference(const char *section, const char *key, char *retValue, int length, const char *defValue)
+char *SE_INI_GetPreference(const char *section, const char *key, char *retValue, int length, const char *defValue)
 {
     if (!section || !key || !retValue)
     {
@@ -337,45 +337,45 @@ char *INI_GetPreference(const char *section, const char *key, char *retValue, in
     return retValue;
 }
 
-int INI_PutPreferenceLong(const char *section, const char *key, int value)
+int SE_INI_PutPreferenceLong(const char *section, const char *key, int value)
 {
     char s1[32];
     if (value == -1)
     {
-        INI_DeletePreference(section, key);
+        SE_INI_DeletePreference(section, key);
         return 0;
     }
     ltoa(value, s1, 10);
-    return INI_PutPreference(section, key, s1);
+    return SE_INI_PutPreference(section, key, s1);
 }
 
-int INI_PutPreferenceHex(const char *section, const char *key, int value)
+int SE_INI_PutPreferenceHex(const char *section, const char *key, int value)
 {
     char s1[36];
     if (value == -1)
     {
-        INI_DeletePreference(section, key);
+        SE_INI_DeletePreference(section, key);
         return 0;
     }
     sprintf(s1, "%x", value);
-    return INI_PutPreference(section, key, s1);
+    return SE_INI_PutPreference(section, key, s1);
 }
 
-int INI_PutPreferenceBool(const char *section, const char *key, short value)
+int SE_INI_PutPreferenceBool(const char *section, const char *key, short value)
 {
     if (value)
-        return INI_PutPreference(section, key, "TRUE");
-    return INI_PutPreference(section, key, "FALSE");
+        return SE_INI_PutPreference(section, key, "TRUE");
+    return SE_INI_PutPreference(section, key, "FALSE");
 }
 
-int INI_PutPreference(const char *section, const char *key, const char *value)
+int SE_INI_PutPreference(const char *section, const char *key, const char *value)
 {
     if (!section || !key || !value)
         return 0;
     return INI_SaveFile(section, key, value, preference);
 }
 
-int INI_DeletePreference(const char *section, const char *key)
+int SE_INI_DeletePreference(const char *section, const char *key)
 {
     if (!section)
         return 0;
