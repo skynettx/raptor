@@ -86,6 +86,9 @@ You can set the CoreMIDI port under the [Setup] section in the `SETUP.INI` file 
 To display the text mode ending screen after the game quits in fullscreen mode set under the [Video] section in the `SETUP.INI` file:  
 `txt_fullscreen=0`  
 `txt_fullscreen=1`  
+To disable or enable the display of the setup at startup set under the [Setup] section in the `SETUP.INI` file:  
+`setup_menu=0`  
+`setup_menu=1`  
 
 ## Build
 The project supports the compilers msvc, gcc and clang.  
