@@ -1905,7 +1905,10 @@ int StartScreen(void)
 		{
 			if ((x >= 35 && x < 46) &&
 				y == 16)
+			{
+				TXT_Shutdown();
 				break;
+			}
 			if ((x >= 35 && x < 46) &&
 				y == 18)
 			{
@@ -1922,7 +1925,10 @@ int StartScreen(void)
 		if (keyvalue == KEY_ENTER || keyvalue == KEY_ESCAPE)
 		{
 			if (curpos == 0 && keyvalue == KEY_ENTER)
+			{
+				TXT_Shutdown();
 				break;
+			}
 			if (curpos == 1 && keyvalue == KEY_ENTER)
 			{
 				Setup();
