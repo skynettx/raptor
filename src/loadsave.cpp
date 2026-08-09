@@ -1056,6 +1056,7 @@ RAP_WriteDefaultSetup(
     INI_PutPreferenceLong("Setup", "alsa_output_client", 128);           
     INI_PutPreferenceLong("Setup", "alsa_output_port", 0);               
     INI_PutPreference("Setup", "SoundFont", "SoundFont.sf2");
+    INI_PutPreferenceLong("Setup", "setup_menu", 1);
     INI_PutPreferenceLong("Music", "Volume", 85);
 
 #if _WIN32 || __APPLE__

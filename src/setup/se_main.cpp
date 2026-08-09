@@ -33,7 +33,7 @@ char g_setup_path[PATH_MAX];
 int controltype;
 int musiccard;
 int soundfxcard;
-static int fullscreen, aspect_ratio, txt_fullscreen, haptic, joy_ipt_MenuNew, sys_midi, winmm_mpu_device, core_dls_synth, core_midi_port, alsaclient, alsaport;
+static int fullscreen, aspect_ratio, txt_fullscreen, haptic, joy_ipt_MenuNew, sys_midi, winmm_mpu_device, core_dls_synth, core_midi_port, alsaclient, alsaport, setup;
 int keymoveup, keymovedown, keymoveleft, keymoveright, keyfire, keyspecial, keymega;
 static char soundfont[128];
 static char* sf;
@@ -185,6 +185,7 @@ void GetSetupSettings(void)
 	alsaclient = SE_INI_GetPreferenceLong("Setup", "alsa_output_client", 128);
 	alsaport = SE_INI_GetPreferenceLong("Setup", "alsa_output_port", 0);
 	sf = (char*)SE_INI_GetPreference("Setup", "SoundFont", soundfont, 127, "SoundFont.sf2");
+	setup = SE_INI_GetPreferenceLong("Setup", "setup_menu", 1);
 }
 /////////////////////////////////////////////Get Setup.ini/////////////////////////////////////////////////////////////////////
 const char* RAP_DataPath(void)
@@ -264,6 +265,7 @@ void SaveSettings(TXT_UNCAST_ARG(widget), void* user_data)
 	SE_INI_PutPreferenceLong("Setup", "alsa_output_client", alsaclient);           //Save Additional Feature alsa_output_client to SETUP.INI
 	SE_INI_PutPreferenceLong("Setup", "alsa_output_port", alsaport);               //Save Additional Feature alsa_output_port to SETUP.INI
 	SE_INI_PutPreference("Setup", "SoundFont", sf);                                //Save Additional Feature soundfont to SETUP.INI
+	SE_INI_PutPreferenceLong("Setup", "setup_menu", setup);                        //Save Additional Feature setup_menu to SETUP.INI
 
 	if (CardType)                                                               //Save Music Card to SETUP.INI
 	{
@@ -1715,6 +1717,9 @@ int Setup(void)
 
 	SE_INI_InitPreference(RAP_GetSetupPath());
 	GetSetupSettings();
+
+	if (!setup)
+		return 0;
 
 	if (!TXT_Init(txt_fullscreen, 1, 0))
 	{
