@@ -1705,7 +1705,7 @@ void MainMenu(TXT_UNCAST_ARG(widget), void* user_data)
 	setupflag = 0;
 }
 
-int Setup(void)
+int StartScreen(void)
 {
 	RAP_DataPath();
 

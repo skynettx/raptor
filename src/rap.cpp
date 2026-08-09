@@ -1269,7 +1269,7 @@ main(
     char *var1, *tptr, *pal;
     int loop, numfiles, ptrflag, item;
 
-    Setup();
+    StartScreen();
 
     var1 = getenv("S_HOST");
 
