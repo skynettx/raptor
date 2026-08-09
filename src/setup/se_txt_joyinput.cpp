@@ -20,7 +20,7 @@
 
 #include "doomkeys.h"
 #include "se_input.h"
-#include "se_prefapi.h"
+#include "../m_misc.h"
 #include "se_main.h"
 
 extern "C" {

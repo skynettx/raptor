@@ -10,7 +10,3 @@ int SE_INI_PutPreferenceHex(const char* section, const char* key, int value);
 int SE_INI_PutPreferenceBool(const char* section, const char* key, short value);
 int SE_INI_PutPreference(const char* section, const char* key, const char* value);
 int SE_INI_DeletePreference(const char* section, const char* key);
-int M_snprintf(char* buf, size_t buf_len, const char* s, ...);
-int M_StringCopy(char* dest, const char* src, size_t dest_size);
-
-
