@@ -1269,6 +1269,8 @@ main(
     char *var1, *tptr, *pal;
     int loop, numfiles, ptrflag, item;
 
+    Setup();
+
     var1 = getenv("S_HOST");
 
     InitScreen();
