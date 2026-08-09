@@ -1762,6 +1762,10 @@ void DrawStartScreen(void)
 
 int StartScreen(void)
 {
+	int curpos = 0;
+	int keyvalue;
+	int x, y;
+
 	RAP_DataPath();
 
 	if (access(RAP_GetSetupPath(), 0))                     //Check setup.ini is in folder
@@ -1787,6 +1791,152 @@ int StartScreen(void)
 	TXT_SetDesktopTitle("Raptor Setup ver 1.2                              (c) Cygnus Studios Inc. 1994");
 	TXT_SetWindowTitle("Raptor Setup");
 	
+	while (true)
+	{
+		TXT_InitClipArea();
+		
+		if (startscreenupdate)
+		{
+			DrawStartScreen();
+
+
+			TXT_BGColor(TXT_COLOR_BLACK, 0);
+			TXT_FGColor(TXT_COLOR_DARK_GREY);
+			TXT_GotoXY(45, 24);
+			TXT_DrawString("Raptor ver 0.8.2 (c) skynettx 2026");
+			startscreenupdate = 0;
+		}
+		keyvalue = TXT_GetChar();
+		if (keyvalue == KEY_DOWNARROW)
+		{
+			curpos++;
+			if (curpos > 2)
+				curpos = 2;
+		}
+		if (keyvalue == KEY_UPARROW)
+		{
+			curpos--;
+			if (curpos < 0)
+				curpos = 0;
+		}
+
+		if (curpos == 0)
+		{
+			TXT_GotoXY(35, 16);
+			TXT_BGColor(TXT_COLOR_GREY, 0);
+			TXT_FGColor(TXT_COLOR_BLACK);
+			TXT_DrawString("Run Raptor");
+			TXT_GotoXY(35, 18);
+			TXT_BGColor(TXT_COLOR_BLACK, 0);
+			TXT_FGColor(TXT_COLOR_GREY);
+			TXT_DrawString("Run Setup ");
+			TXT_GotoXY(35, 20);
+			TXT_BGColor(TXT_COLOR_BLACK, 0);
+			TXT_FGColor(TXT_COLOR_GREY);
+			TXT_DrawString("Exit      ");
+		}
+		if (curpos == 1)
+		{
+			TXT_GotoXY(35, 16);
+			TXT_BGColor(TXT_COLOR_BLACK, 0);
+			TXT_FGColor(TXT_COLOR_GREY);
+			TXT_DrawString("Run Raptor");
+			TXT_GotoXY(35, 18);
+			TXT_BGColor(TXT_COLOR_GREY, 0);
+			TXT_FGColor(TXT_COLOR_BLACK);
+			TXT_DrawString("Run Setup ");
+			TXT_GotoXY(35, 20);
+			TXT_BGColor(TXT_COLOR_BLACK, 0);
+			TXT_FGColor(TXT_COLOR_GREY);
+			TXT_DrawString("Exit      ");
+		}
+		if (curpos == 2)
+		{
+			TXT_GotoXY(35, 16);
+			TXT_BGColor(TXT_COLOR_BLACK, 0);
+			TXT_FGColor(TXT_COLOR_GREY);
+			TXT_DrawString("Run Raptor");
+			TXT_GotoXY(35, 18);
+			TXT_BGColor(TXT_COLOR_BLACK, 0);
+			TXT_FGColor(TXT_COLOR_GREY);
+			TXT_DrawString("Run Setup ");
+			TXT_GotoXY(35, 20);
+			TXT_BGColor(TXT_COLOR_GREY, 0);
+			TXT_FGColor(TXT_COLOR_BLACK);
+			TXT_DrawString("Exit      ");
+		}
+
+		TXT_GetMousePosition(&x, &y);
+
+		if ((x >= 35 && x < 46) &&
+			y == 16 && curpos != 0)
+		{
+			if (keyvalue == TXT_MOUSE_SCROLLUP ||
+				keyvalue == TXT_MOUSE_SCROLLDOWN)
+				curpos = 0;
+			TXT_GotoXY(35, 16);
+			TXT_BGColor(TXT_HOVER_BACKGROUND, 0);
+			TXT_FGColor(TXT_COLOR_BLACK);
+			TXT_DrawString("Run Raptor");
+		}
+		if ((x >= 35 && x < 46) &&
+			y == 18 && curpos != 1)
+		{
+			if (keyvalue == TXT_MOUSE_SCROLLUP ||
+				keyvalue == TXT_MOUSE_SCROLLDOWN)
+				curpos = 1;
+			TXT_GotoXY(35, 18);
+			TXT_BGColor(TXT_HOVER_BACKGROUND, 0);
+			TXT_FGColor(TXT_COLOR_BLACK);
+			TXT_DrawString("Run Setup ");
+		}
+		if ((x >= 35 && x < 46) &&
+			y == 20 && curpos != 2)
+		{
+			if (keyvalue == TXT_MOUSE_SCROLLUP ||
+				keyvalue == TXT_MOUSE_SCROLLDOWN)
+				curpos = 2;
+			TXT_GotoXY(35, 20);
+			TXT_BGColor(TXT_HOVER_BACKGROUND, 0);
+			TXT_FGColor(TXT_COLOR_BLACK);
+			TXT_DrawString("Exit      ");
+		}
+		if (keyvalue == TXT_MOUSE_LEFT)
+		{
+			if ((x >= 35 && x < 46) &&
+				y == 16)
+				break;
+			if ((x >= 35 && x < 46) &&
+				y == 18)
+			{
+				Setup();
+			}
+			if ((x >= 35 && x < 46) &&
+				y == 20)
+			{
+				TXT_Shutdown();
+				exit(0);
+			}
+		}
+
+		if (keyvalue == KEY_ENTER || keyvalue == KEY_ESCAPE)
+		{
+			if (curpos == 0 && keyvalue == KEY_ENTER)
+				break;
+			if (curpos == 1 && keyvalue == KEY_ENTER)
+			{
+				Setup();
+			}
+			if (curpos == 2 || keyvalue == KEY_ESCAPE)
+			{
+				TXT_Shutdown();
+				exit(0);
+			}
+		}
+		TXT_UpdateScreen();
+		TXT_Sleep(0);
+	}
+
 	return 0;
 }
 
