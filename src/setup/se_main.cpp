@@ -1786,23 +1786,7 @@ int StartScreen(void)
 
 	TXT_SetDesktopTitle("Raptor Setup ver 1.2                              (c) Cygnus Studios Inc. 1994");
 	TXT_SetWindowTitle("Raptor Setup");
-
-	if (!setupflag)
-	{
-		InfoWindow(0, 0);
-		MainMenu(0, 0);
-	}
-
-	if (setupflag)
-	{
-		InfoWindow(0, 0);
-		Control(0, 0);
-	}
-
-	TXT_GUIMainLoop();
-
-	TXT_Shutdown();
-
+	
 	return 0;
 }
 
