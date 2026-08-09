@@ -18,3 +18,4 @@ void SaveSettings(TXT_UNCAST_ARG(widget), void* user_data);
 void WindowSelect(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(window));
 void ClosePwnBox(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(window));
 void ResetWidgetFocusedColor(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(window));
+int Setup(void);

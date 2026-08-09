@@ -33,6 +33,7 @@
 #include "i_lastscr.h"
 #include "fileids.h"
 #include "entypes.h"
+#include "setup/se_main.h"
 
 #ifdef _WIN32
 #include <io.h>

@@ -1695,7 +1695,7 @@ void MainMenu(TXT_UNCAST_ARG(widget), void* user_data)
 	setupflag = 0;
 }
 
-int main(int argc, char* argv[])
+int Setup(void)
 {
 	RAP_DataPath();
 
