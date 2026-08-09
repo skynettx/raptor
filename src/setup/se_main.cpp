@@ -212,7 +212,10 @@ const char* RAP_DataPath(void)
 			sprintf(g_setup_path, "%s%s", g_setup_path, "SETUP.INI");
 		
 		hasdatapath = 1;
+
+#ifndef __ANDROID__
 		SDL_free(gethome);
+#endif //__ANDROID__
 	}
 	else
 	{

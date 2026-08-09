@@ -961,7 +961,10 @@ RAP_InitLoadSave(
             sprintf(g_setup_ini, "%s%s", g_setup_ini, "SETUP.INI");
         
         cdflag = 1;
+        
+        #ifndef __ANDROID__
         SDL_free(gethome);
+        #endif //__ANDROID__
     }
     else
     {
