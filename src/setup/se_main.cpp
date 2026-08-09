@@ -193,7 +193,12 @@ const char* RAP_DataPath(void)
 	char* gethome;
 	char g_setup_pathlc[PATH_MAX];
 
+#if __ANDROID__
+	gethome = (char*)SDL_AndroidGetExternalStoragePath();
+	strcat(gethome, "/");
+#else
 	gethome = SDL_GetPrefPath("", "Raptor");
+#endif //__ANDROID__
 
 	if (gethome != NULL)
 	{
