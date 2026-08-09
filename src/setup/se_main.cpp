@@ -17,6 +17,7 @@
 #include "se_music.h"
 #include "se_sound.h"
 #include "se_input.h"
+#include "startscreen.h"
 
 #ifdef _MSC_VER
 #define PATH_MAX        4096
@@ -1703,6 +1704,24 @@ void MainMenu(TXT_UNCAST_ARG(widget), void* user_data)
 	TXT_SetWindowAction(mainwindow, TXT_HORIZ_RIGHT, accept_button);
 
 	setupflag = 0;
+}
+
+void DrawStartScreen(void)
+{
+	unsigned char* screendata;
+	int y;
+	int indent;
+
+	screendata = TXT_GetScreenData();
+
+	indent = (80 - TXT_SCREEN_W) / 2;
+
+	for (y = 0; y < TXT_SCREEN_H; ++y)
+	{
+		memcpy(screendata + (y * TXT_SCREEN_W * 2),
+			startscreen + (y * 80 + indent) * 2,
+			TXT_SCREEN_W * 2);
+	}
 }
 
 int StartScreen(void)
