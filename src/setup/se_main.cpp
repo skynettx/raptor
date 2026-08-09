@@ -33,7 +33,7 @@ char g_setup_path[PATH_MAX];
 int controltype;
 int musiccard;
 int soundfxcard;
-int fullscreen, aspect_ratio, txt_fullscreen, haptic, joy_ipt_MenuNew, sys_midi, winmm_mpu_device, core_dls_synth, core_midi_port, alsaclient, alsaport;
+static int fullscreen, aspect_ratio, txt_fullscreen, haptic, joy_ipt_MenuNew, sys_midi, winmm_mpu_device, core_dls_synth, core_midi_port, alsaclient, alsaport;
 int keymoveup, keymovedown, keymoveleft, keymoveright, keyfire, keyspecial, keymega;
 static char soundfont[128];
 static char* sf;
