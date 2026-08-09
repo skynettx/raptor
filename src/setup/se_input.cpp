@@ -3,13 +3,13 @@
 #include <string.h>
 
 #include "textscreen.h"
-#include "main.h"
-#include "input.h"
+#include "se_main.h"
+#include "se_input.h"
 
 extern "C" {
-#include "txt_keyinput.h"
-#include "txt_mouseinput.h"
-#include "txt_joyinput.h"
+#include "se_txt_keyinput.h"
+#include "se_txt_mouseinput.h"
+#include "se_txt_joyinput.h"
 }
 
 int ControllerType;

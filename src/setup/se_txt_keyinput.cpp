@@ -16,12 +16,12 @@
 #include <string.h>
 
 #include "doomkeys.h"
-#include "prefapi.h"
-#include "input.h"
-#include "main.h"
+#include "se_prefapi.h"
+#include "se_input.h"
+#include "se_main.h"
 
 extern "C" {
-#include "txt_keyinput.h"
+#include "se_txt_keyinput.h"
 #include "txt_gui.h"
 #include "txt_io.h"
 #include "txt_label.h"

@@ -19,12 +19,12 @@
 #include "SDL_joystick.h"
 
 #include "doomkeys.h"
-#include "input.h"
-#include "prefapi.h"
-#include "main.h"
+#include "se_input.h"
+#include "se_prefapi.h"
+#include "se_main.h"
 
 extern "C" {
-#include "txt_joyinput.h"
+#include "se_txt_joyinput.h"
 #include "txt_gui.h"
 #include "txt_io.h"
 #include "txt_label.h"

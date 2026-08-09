@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "textscreen.h"
-#include "main.h"
+#include "se_main.h"
 
 int SoundCardType;
 int SoundMidiPort;

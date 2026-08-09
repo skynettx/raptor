@@ -12,11 +12,11 @@
 
 #include "SDL_filesystem.h"
 #include "textscreen.h"
-#include "prefapi.h"
-#include "main.h"
-#include "music.h"
-#include "sound.h"
-#include "input.h"
+#include "se_prefapi.h"
+#include "se_main.h"
+#include "se_music.h"
+#include "se_sound.h"
+#include "se_input.h"
 
 #ifdef _MSC_VER
 #define PATH_MAX        4096

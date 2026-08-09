@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "../common.h"
-#include "prefapi.h"
-#include "main.h"
+#include "se_prefapi.h"
+#include "se_main.h"
 
 #ifdef _WIN32
 #include <io.h>
