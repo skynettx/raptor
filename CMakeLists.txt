@@ -96,17 +96,14 @@ set(SOURCE_FILES
     src/mpualsa.cpp
     src/mpucorea.cpp
     src/mpucorem.cpp
-    )
-
-set(SOURCE_SETUP_FILES
-    src/setup/input.cpp
-    src/setup/main.cpp
-    src/setup/music.cpp
-    src/setup/prefapi.cpp
-    src/setup/sound.cpp
-    src/setup/txt_joyinput.cpp
-    src/setup/txt_keyinput.cpp
-    src/setup/txt_mouseinput.cpp
+    src/setup/se_input.cpp
+    src/setup/se_main.cpp
+    src/setup/se_music.cpp
+    src/setup/se_prefapi.cpp
+    src/setup/se_sound.cpp
+    src/setup/se_txt_joyinput.cpp
+    src/setup/se_txt_keyinput.cpp
+    src/setup/se_txt_mouseinput.cpp
     )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
@@ -164,25 +161,3 @@ else()
         SDL2::SDL2
         )
 endif()
-
-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Android")
-    add_executable( raptorsetup ${SOURCE_SETUP_FILES} )
-    if(WIN32)
-        target_sources(raptorsetup PRIVATE rsrc/setup/resource.rc)
-    endif()
-    target_link_libraries(raptorsetup
-        textscreen
-        SDL2::SDL2main
-        SDL2::SDL2
-        )
-    if(${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo" OR ${CMAKE_BUILD_TYPE} MATCHES "Release")
-        if(MSVC)
-            target_link_options(raptorsetup PRIVATE /subsystem:windows /ENTRY:mainCRTStartup)
-        elseif(WIN32)
-            target_link_options(raptorsetup PRIVATE -mwindows)
-        endif()
-    elseif(WIN32 AND NOT MSVC)
-        target_link_options(raptorsetup PRIVATE -mconsole)
-    endif()
-endif()
-   
