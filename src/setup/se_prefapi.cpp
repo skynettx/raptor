@@ -10,7 +10,7 @@
 #endif // _WIN32
 #ifdef __GNUC__
 #include <unistd.h>
-char* ltoa(long i, char* s, int dummy_radix) {
+static char* ltoa(long i, char* s, int dummy_radix) {
     sprintf(s, "%ld", i);
     return s;
 }
