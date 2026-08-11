@@ -107,42 +107,6 @@ echo         VALUE "Translation", 0x409, 1252
 echo     END
 echo END
 ) > rsrc\resource.rc
-(
-echo #define APSTUDIO_READONLY_SYMBOLS
-echo #include "winres.h"
-echo #undef APSTUDIO_READONLY_SYMBOLS
-echo.
-echo MAINICON ICON "raptorsetup.ico"
-echo.
-echo VS_VERSION_INFO VERSIONINFO
-echo     FILEVERSION %version:~0,-4%,%version:~2,-2%,%version:~4%,0
-echo     PRODUCTVERSION %version:~0,-4%,%version:~2,-2%,%version:~4%,0
-echo     FILEFLAGSMASK 0x3FL
-echo     FILEFLAGS 0x0L
-echo     FILEOS 0x4L
-echo     FILETYPE 0x1L
-echo     FILESUBTYPE 0x0L
-echo BEGIN
-echo     BLOCK "StringFileInfo"
-echo     BEGIN
-echo         BLOCK "040904E4"
-echo         BEGIN
-echo             VALUE "CompanyName", "skynettx"
-echo             VALUE "FileDescription", "Raptor %version% Setup"
-echo             VALUE "FileVersion", "%version%"
-echo             VALUE "InternalName", "raptorsetup"
-echo             VALUE "LegalCopyright", "GNU General Public License"
-echo             VALUE "OriginalFilename", "raptorsetup"
-echo             VALUE "ProductName", "Raptor Setup"
-echo             VALUE "ProductVersion", "%version%"
-echo         END
-echo     END
-echo     BLOCK "VarFileInfo"
-echo     BEGIN
-echo         VALUE "Translation", 0x409, 1252
-echo     END
-echo END
-) > rsrc\setup\resource.rc
 
 :build
 devenv msvc\raptor.sln /Build %arch%
@@ -152,7 +116,6 @@ goto:buildfolder
 @RD /S /Q pkg\win32\%buildfoldername%
 mkdir pkg\win32\%buildfoldername%
 xcopy %msvcfolder%\raptor.exe pkg\win32\%buildfoldername%
-xcopy %msvcfolder%\raptorsetup\raptorsetup.exe pkg\win32\%buildfoldername%
 xcopy include\TinySoundFont\LICENSE pkg\win32\%buildfoldername%
 ren pkg\win32\%buildfoldername%\LICENSE LICENSETSF
 xcopy LICENSE pkg\win32\%buildfoldername%
@@ -162,12 +125,6 @@ if exist pkg\win32\%buildfoldername%\raptor.exe (
   echo raptor.exe PASS
 ) else (
   echo raptor.exe FAILED
-  goto:eof
-)
-if exist pkg\win32\%buildfoldername%\raptorsetup.exe (
-  echo raptorsetup.exe PASS
-) else (
-  echo raptorsetup.exe FAILED
   goto:eof
 )
 if exist pkg\win32\%buildfoldername%\LICENSETSF (
@@ -278,9 +235,6 @@ xcopy "%assetspath%\*.GLB" pkg\win32\%buildfoldername%
   echo   CreateDirectory "$SMPROGRAMS\Raptor"
   echo   CreateShortCut "$SMPROGRAMS\Raptor\Raptor.lnk" "$INSTDIR\raptor.exe"
   echo   CreateShortCut "$DESKTOP\Raptor.lnk" "$INSTDIR\raptor.exe"
-  echo   File "%buildfoldername%\raptorsetup.exe"
-  echo   CreateShortCut "$SMPROGRAMS\Raptor\Raptor Setup.lnk" "$INSTDIR\raptorsetup.exe"
-  echo   CreateShortCut "$DESKTOP\Raptor Setup.lnk" "$INSTDIR\raptorsetup.exe"
   echo   File "%buildfoldername%\SDL2.dll"
   echo SectionEnd
   echo.
@@ -312,7 +266,6 @@ xcopy "%assetspath%\*.GLB" pkg\win32\%buildfoldername%
   echo Section Uninstall
   echo   Delete "$INSTDIR\uninst.exe"
   echo   Delete "$INSTDIR\SDL2.dll"
-  echo   Delete "$INSTDIR\raptorsetup.exe"
   echo   Delete "$INSTDIR\raptor.exe"
   echo   Delete "$INSTDIR\LICENSETSF"
   echo   Delete "$INSTDIR\LICENSE"
@@ -322,8 +275,6 @@ xcopy "%assetspath%\*.GLB" pkg\win32\%buildfoldername%
   )
   echo.
   echo   Delete "$SMPROGRAMS\Raptor\Uninstall.lnk"
-  echo   Delete "$DESKTOP\Raptor Setup.lnk"
-  echo   Delete "$SMPROGRAMS\Raptor\Raptor Setup.lnk"
   echo   Delete "$DESKTOP\Raptor.lnk"
   echo   Delete "$SMPROGRAMS\Raptor\Raptor.lnk"
   echo.
