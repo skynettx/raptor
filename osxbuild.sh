@@ -45,6 +45,7 @@ esac
 read -p "Enter version number: " version
 volumename="Raptor ${version} ${archname}"
 filename="raptor-${version}-${archname}.dmg"
+year="`date +%Y`"
 
 if [ -f $filename ]; then
     rm $filename
@@ -53,40 +54,68 @@ rm -rf pkg/osx/build
 rm -rf pkg/osx/DerivedData
 
 cd pkg/osx/
-xcodebuild -project raptorlauncher.xcodeproj ARCHS=$arch ONLY_ACTIVE_ARCH=No -configuration Release
+mkdir build
+mkdir build/Release
+mkdir build/Release/Raptor.app
+mkdir build/Release/Raptor.app/Contents
+mkdir build/Release/Raptor.app/Contents/MacOS
+mkdir build/Release/Raptor.app/Contents/Resources
+
+cat > build/Release/Raptor.app/Contents/Info.plist <<EOL
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>CFBundleIdentifier</key>
+        <string>com.skynettx.raptor</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleDisplayName</key>
+	<string>Raptor</string>
+	<key>CFBundleExecutable</key>
+	<string>raptor.sh</string>
+	<key>CFBundleGetInfoString</key>
+	<string>Raptor ${version}</string>
+	<key>CFBundleIconFile</key>
+	<string>raptor.icns</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Raptor</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${version}</string>
+	<key>CFBundleVersion</key>
+	<string>${version}</string>
+	<key>NSHighResolutionCapable</key>
+	<string>true</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright (C) ${year} skynettx</string>
+</dict>
+</plist>
+EOL
+
 cd ../../
 mkdir build
 cd build
 cmake -DCMAKE_OSX_ARCHITECTURES=$arch -DCMAKE_BUILD_TYPE=Release ..
 make -j `sysctl -n hw.ncpu`
 cd ..
-cp -r build/bin/. pkg/osx/build/Release/raptorlauncher.app/Contents/MacOS
-cp -R /Library/Frameworks/SDL2.framework pkg/osx/build/Release/raptorlauncher.app/Contents/MacOS
-printf '#!/bin/sh\ncd "${0%%/*}"\n./raptor' >> pkg/osx/build/Release/raptorlauncher.app/Contents/MacOS/raptor.sh
-printf '#!/bin/sh\ncd "${0%%/*}"\n./raptorsetup' >> pkg/osx/build/Release/raptorlauncher.app/Contents/MacOS/raptorsetup.sh
-chmod 755 pkg/osx/build/Release/raptorlauncher.app/Contents/MacOS/raptor.sh
-chmod 755 pkg/osx/build/Release/raptorlauncher.app/Contents/MacOS/raptorsetup.sh
-install_name_tool -add_rpath @executable_path pkg/osx/build/Release/raptorlauncher.app/Contents/MacOS/raptor
-install_name_tool -add_rpath @executable_path pkg/osx/build/Release/raptorlauncher.app/Contents/MacOS/raptorsetup
-mv pkg/osx/build/Release/raptorlauncher.app pkg/osx/build/Release/Raptor.app
+cp -r build/bin/. pkg/osx/build/Release/Raptor.app/Contents/MacOS
+cp -R /Library/Frameworks/SDL2.framework pkg/osx/build/Release/Raptor.app/Contents/MacOS
+cp -r rsrc/raptor.icns pkg/osx/build/Release/Raptor.app/Contents/Resources
+printf '#!/bin/sh\ncd "${0%%/*}"\n./raptor' >> pkg/osx/build/Release/Raptor.app/Contents/MacOS/raptor.sh
+chmod 755 pkg/osx/build/Release/Raptor.app/Contents/MacOS/raptor.sh
+install_name_tool -add_rpath @executable_path pkg/osx/build/Release/Raptor.app/Contents/MacOS/raptor
 
 echo "Check Raptor.app contains all files"
-if [ -f pkg/osx/build/Release/Raptor.app/Contents/MacOS/raptorlauncher ]; then
-    echo -e "raptorlauncher \033[0;32mPASS\033[0m"
-else
-    echo -e "raptorlauncher \033[0;31mFAILED\033[0m"
-    exit 1
-fi
 if [ -f pkg/osx/build/Release/Raptor.app/Contents/MacOS/raptor ]; then
     echo -e "raptor \033[0;32mPASS\033[0m"
 else
     echo -e "raptor \033[0;31mFAILED\033[0m"
-    exit 1
-fi
-if [ -f pkg/osx/build/Release/Raptor.app/Contents/MacOS/raptorsetup ]; then
-    echo -e "raptorsetup \033[0;32mPASS\033[0m"
-else
-    echo -e "raptorsetup \033[0;31mFAILED\033[0m"
     exit 1
 fi
 if [ -f pkg/osx/build/Release/Raptor.app/Contents/MacOS/raptor.sh ]; then
@@ -95,16 +124,22 @@ else
     echo -e "raptor.sh \033[0;31mFAILED\033[0m"
     exit 1
 fi
-if [ -f pkg/osx/build/Release/Raptor.app/Contents/MacOS/raptorsetup.sh ]; then
-    echo -e "raptorsetup.sh \033[0;32mPASS\033[0m"
-else
-    echo -e "raptorsetup.sh \033[0;31mFAILED\033[0m"
-    exit 1
-fi
 if [ -d pkg/osx/build/Release/Raptor.app/Contents/MacOS/SDL2.framework ]; then
     echo -e "SDL2.framework \033[0;32mPASS\033[0m"
 else
     echo -e "SDL2.framework \033[0;31mFAILED\033[0m"
+    exit 1
+fi
+if [ -f pkg/osx/build/Release/Raptor.app/Contents/Info.plist ]; then
+    echo -e "Info.plist \033[0;32mPASS\033[0m"
+else
+    echo -e "Info.plist \033[0;31mFAILED\033[0m"
+    exit 1
+fi
+if [ -f pkg/osx/build/Release/Raptor.app/Contents/Resources/raptor.icns ]; then
+    echo -e "raptor.icns \033[0;32mPASS\033[0m"
+else
+    echo -e "raptor.icns \033[0;31mFAILED\033[0m"
     exit 1
 fi
 
