@@ -1269,6 +1269,10 @@ main(
     char *var1, *tptr, *pal;
     int loop, numfiles, ptrflag, item;
 
+#ifdef __ANDROID__
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+#endif //__ANDROID__
+
     StartScreen();
 
     var1 = getenv("S_HOST");
