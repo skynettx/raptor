@@ -792,10 +792,11 @@ static void ToggleFullScreen(void)
 
 static void HandleWindowEvent(SDL_WindowEvent* event)
 {
+    int flags;
+
     switch (event->event)
     {
         case SDL_WINDOWEVENT_RESIZED:
-            int flags;
             // When the window is resized (we're not in fullscreen mode),
             // save the new window size.
             flags = SDL_GetWindowFlags(TXT_SDLWindow);
