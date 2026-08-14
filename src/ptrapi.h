@@ -14,6 +14,7 @@ extern int cur_mx, cur_my;
 extern int ptractive;
 extern int mouse_b1_ack, mouse_b2_ack, mouse_b3_ack;
 extern int g_drawcursor;
+extern int touchmode;
 
 void PTR_JoyHandler(void);
 void PTR_MouseHandler(void);

@@ -338,15 +338,30 @@ IPT_GetMouse(
     
     g_addx = xm;
     g_addy = ym;
-    
+
     if (mouseb1)
-        buttons[m_lookup[0]] = 1;
-    
+    {
+        if (touchmode)
+            buttons[0] = 1;
+        else
+            buttons[m_lookup[0]] = 1;
+    }
+
     if (mouseb2)
-        buttons[m_lookup[1]] = 1;
-    
+    {
+        if (touchmode)
+            buttons[1] = 1;
+        else
+            buttons[m_lookup[1]] = 1;
+    }
+
     if (mouseb3)
-        buttons[m_lookup[2]] = 1;
+    {
+        if (touchmode)
+            buttons[2] = 1;
+        else
+            buttons[m_lookup[2]] = 1;
+    }
 }
 
 /*------------------------------------------------------------------------
