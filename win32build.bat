@@ -25,18 +25,18 @@ echo Incorrect entry
 goto:eof
 
 :win32:
-set arch="Release|x86"
+set cmakesettings=-G "Visual Studio 17" -DCMAKE_BUILD_TYPE=Release -A Win32
+set arch="Release|Win32"
 set archname=win32
 set buildfoldername=raptorx86
-set msvcfolder=msvc\Release
 set sdlfolder=include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x86\SDL2.dll
 goto:buildres
 
 :win64:
+set cmakesettings=-G "Visual Studio 17" -DCMAKE_BUILD_TYPE=Release -A x64
 set arch="Release|x64"
 set archname=win64
 set buildfoldername=raptorx64
-set msvcfolder=msvc\x64\Release
 set sdlfolder=include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x64\SDL2.dll
 goto:buildres
 
@@ -114,13 +114,18 @@ echo END
 ) > rsrc\resource.rc
 
 :build
-devenv msvc\raptor.sln /Build %arch%
+@RD /S /Q build
+mkdir build
+cd build
+cmake %cmakesettings% ..
+cd ..
+devenv build\raptor.sln /Build %arch%
 goto:buildfolder
 
 :buildfolder
 @RD /S /Q pkg\win32\%buildfoldername%
 mkdir pkg\win32\%buildfoldername%
-xcopy %msvcfolder%\raptor.exe pkg\win32\%buildfoldername%
+xcopy build\bin\Release\raptor.exe pkg\win32\%buildfoldername%
 xcopy include\TinySoundFont\LICENSE pkg\win32\%buildfoldername%
 ren pkg\win32\%buildfoldername%\LICENSE LICENSETSF
 xcopy LICENSE pkg\win32\%buildfoldername%
@@ -297,9 +302,7 @@ del pkg\win32\raptor-%version%-%archname%.exe
 goto:eof
 
 :clean:
-@RD /S /Q msvc\.vs
-@RD /S /Q msvc\Release
-@RD /S /Q msvc\x64
+@RD /S /Q build
 @RD /S /Q pkg\win32
 del *.exe
 echo All cleaned
