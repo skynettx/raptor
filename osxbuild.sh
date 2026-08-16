@@ -53,6 +53,12 @@ fi
 rm -rf pkg/osx/build
 rm -rf pkg/osx/DerivedData
 
+cat > src/rapver.h <<EOL
+const char raptorwindowtitle[] = "Raptor ${version}";
+const char setuptitle[] = "Raptor Setup ver ${version}                                       (c) skynettx ${year}";
+const char startver[] = "Raptor ver ${version} (c) skynettx ${year}";
+EOL
+
 cd pkg/osx/
 mkdir build
 mkdir build/Release
