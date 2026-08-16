@@ -1558,13 +1558,11 @@ void I_GetMousePos(int *x, int *y)
         sy = (float)rh / actualheight;
     }
 
-#ifndef __ANDROID__
     if (highdpi)
     {
         sx /= 2;
         sy /= 2;
     }
-#endif //__ANDROID__
 
     *x = (int)(*x / sx) - viewport.x;
     *y = (int)(((*y / sy - viewport.y) * (float)SCREENHEIGHT) / actualheight);
@@ -1586,13 +1584,11 @@ void I_SetMousePos(int x, int y)
         sy = (float)rh / actualheight;
     }
 
-#ifndef __ANDROID__
     if (highdpi)
     {
         sx /= 2;
         sy /= 2;
     }
-#endif //__ANDROID__
 
     x = (int)((x + viewport.x) * sx);
     y = (int)(((y * actualheight) / (float)SCREENHEIGHT + viewport.y) * sy);
