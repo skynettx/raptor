@@ -21,6 +21,7 @@
 
 #include "textscreen.h"
 #include "i_video.h"
+#include "rapver.h"
 
 #define LASTSCR_W 80
 #define LASTSCR_H 25
@@ -39,7 +40,7 @@ void I_LASTSCR(char* mem)
 
     TXT_Init(txt_fullscreen, 0, 0);
 
-    TXT_SetWindowTitle("Raptor");
+    TXT_SetWindowTitle(raptorwindowtitle);
     // SDL2-TODO I_InitWindowTitle();
     // SDL2-TODO I_InitWindowIcon();
 

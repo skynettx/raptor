@@ -38,6 +38,7 @@
 #include "musapi.h"
 #include "prefapi.h"
 #include "joyapi.h"
+#include "rapver.h"
 
 // These are (1) the window (or the full screen) that our game is rendered to
 // and (2) the renderer that scales the texture (see below) into this window.
@@ -921,7 +922,7 @@ void I_SetWindowTitle(const char *title)
 
 void I_InitWindowTitle(void)
 {
-    SDL_SetWindowTitle(screen, "Raptor");
+    SDL_SetWindowTitle(screen, raptorwindowtitle);
 #if 0
     char *buf;
 

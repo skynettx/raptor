@@ -18,6 +18,7 @@
 #include "se_sound.h"
 #include "se_input.h"
 #include "startscreen.h"
+#include "../rapver.h"
 
 extern "C" {
 #include "txt_io.h"
@@ -1788,8 +1789,8 @@ int StartScreen(void)
 
 	TXT_SetColor(TXT_COLOR_BLUE, 0x04, 0x14, 0x40);
 
-	TXT_SetDesktopTitle("Raptor Setup ver 1.2                              (c) Cygnus Studios Inc. 1994");
-	TXT_SetWindowTitle("Raptor Setup");
+	TXT_SetDesktopTitle(setuptitle);
+	TXT_SetWindowTitle(raptorwindowtitle);
 	
 	while (true)
 	{
@@ -1803,7 +1804,7 @@ int StartScreen(void)
 			TXT_BGColor(TXT_COLOR_BLACK, 0);
 			TXT_FGColor(TXT_COLOR_DARK_GREY);
 			TXT_GotoXY(45, 24);
-			TXT_DrawString("Raptor ver 0.8.2 (c) skynettx 2026");
+			TXT_DrawString(startver);
 			startscreenupdate = 0;
 		}
 		keyvalue = TXT_GetChar();
