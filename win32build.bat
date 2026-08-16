@@ -72,6 +72,11 @@ if not "%version:~3,-1%" == "." (
   goto:buildres
 )
 (
+echo const char raptorwindowtitle[] = "Raptor %version%";
+echo const char setuptitle[] = "Raptor Setup ver %version%                                       (c) skynettx %date:~-4%";
+echo const char startver[] = "Raptor ver %version% (c) skynettx %date:~-4%";
+) > src/rapver.h
+(
 echo #define APSTUDIO_READONLY_SYMBOLS
 echo #include "winres.h"
 echo #undef APSTUDIO_READONLY_SYMBOLS
