@@ -94,28 +94,56 @@ To disable or enable the display of the setup at startup set under the [Setup] s
 ## Build
 The project supports the compilers msvc, gcc and clang.  
 When you have installed git on your system you can clone the repository by type in `git clone https://github.com/skynettx/raptor.git`.
+The following steps apply to Windows, Linux, and macOS. For Android, please continue reading in the Android section.
+CMake is required to generate project files or makefiles.
+In the root of the repository type:
+```
+mkdir build
+cd build
+```
+Subsequently, a project file of your choice or a makefile can be generated using CMake.
+`-DCMAKE_BUILD_TYPE=Release` can be replaced with `-DCMAKE_BUILD_TYPE=Debug` for Debug or Release configuration.
 
 ### Windows
-You can use the projectfile for Visual Studio 2022 under `msvc\` or the projectfile for CodeBlocks under `gcc\`.
+A project file for Visual Studio 2022 is created as follows:
+```
+# 32 bit
+cmake -G "Visual Studio 17" -DCMAKE_BUILD_TYPE=Release -A Win32 ..
+# or 64 bit
+cmake -G "Visual Studio 17" -DCMAKE_BUILD_TYPE=Release -A x64 ..
+```
+A project file for CodeBlocks:
+```
+cmake -G "CodeBlocks - Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+```
+Or a makefile:
+```
+cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+```
+The project can then be built using your preferred IDE or Make.
+If you build using Make, type:
+```
+make
+```
 
 ### Linux
 Please remember to install the required dependencies lib-sdl2. In some distros there is an extra libsdl2-dev package like Debian or Ubuntu.  
-You can use the projectfile for CodeBlocks under `gcc\`.
-Otherwise you can use CMake. To use CMake type in the root of the repository:   
+Type the following:   
 ```
-mkdir build  
-cd build  
 cmake ..  
 make  
 ```
 
 ### macOS
-Install the required dependencies lib-sdl2. To build use CMake, type in the root of the repository:
+Install the required dependencies lib-sdl2. Replace `-DCMAKE_OSX_ARCHITECTURES=x86_64` with `-DCMAKE_OSX_ARCHITECTURES=arm64` to define the target architecture.
+Type in:
 ```
-mkdir build  
-cd build  
-cmake ..  
-make  
+cmake -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_BUILD_TYPE=Release ..
+make 
+```
+Alternatively, an Xcode project file can also be created:
+```
+cmake -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_BUILD_TYPE=Release ..
 ```
 
 ### Android
