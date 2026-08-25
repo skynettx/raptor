@@ -10,10 +10,12 @@
 #endif // _WIN32
 #ifdef __GNUC__
 #include <unistd.h>
+#ifndef _WIN32
 static char* ltoa(long i, char* s, int dummy_radix) {
     sprintf(s, "%ld", i);
     return s;
 }
+#endif // _WIN32
 #endif // __GNUC__
 #ifdef _MSC_VER
 #include <windows.h>
