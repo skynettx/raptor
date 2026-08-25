@@ -130,7 +130,7 @@ make
 Please remember to install the required dependencies lib-sdl2. In some distros there is an extra libsdl2-dev package like Debian or Ubuntu.  
 Type the following:   
 ```
-cmake ..  
+cmake -DCMAKE_BUILD_TYPE=Release ..  
 make  
 ```
 
