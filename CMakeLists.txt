@@ -51,59 +51,65 @@ include_directories(./include/TinySoundFont/)
 add_subdirectory(./include/textscreen/include)
 
 set(SOURCE_FILES
-    src/tile.cpp
-    src/gssapi.cpp
-    src/objects.cpp
+    src/tile.cpp                             src/tile.h
+    src/gssapi.cpp                           src/gssapi.h
+    src/objects.cpp                          src/objects.h
     src/tile_a.cpp
-    src/windows.cpp
-    src/flame.cpp
-    src/i_lastscr.cpp
-    src/joyapi.cpp
-    src/kbdapi.cpp
-    src/glbapi.cpp
-    src/i_video.cpp
-    src/musapi.cpp
+    src/windows.cpp                          src/windows.h
+    src/flame.cpp                            src/flame.h
+    src/i_lastscr.cpp                        src/i_lastscr.h
+    src/joyapi.cpp                           src/joyapi.h
+    src/kbdapi.cpp                           src/kbdapi.h
+    src/glbapi.cpp                           src/glbapi.h
+    src/i_video.cpp                          src/i_video.h
+    src/musapi.cpp                           src/musapi.h
     src/movie_a.cpp
     src/ptrapi_a.cpp
-    src/swdapi.cpp
-    src/imsapi.cpp
-    src/store.cpp
-    src/i_oplmusic.cpp
-    src/bonus.cpp
-    src/anims.cpp
-    src/shadow.cpp
-    src/movie.cpp
-    src/m_misc.cpp
-    src/shots.cpp
-    src/opl3.cpp
-    src/eshot.cpp
+    src/swdapi.cpp                           src/swdapi.h
+    src/imsapi.cpp                           src/imsapi.h
+    src/store.cpp                            src/store.h
+    src/i_oplmusic.cpp                       src/i_oplmusic.h
+    src/bonus.cpp                            src/bonus.h
+    src/anims.cpp                            src/anims.h
+    src/shadow.cpp                           src/shadow.h
+    src/movie.cpp                            src/movie.h
+    src/m_misc.cpp                           src/m_misc.h
+    src/shots.cpp                            src/shots.h
+    src/opl3.cpp                             src/opl3.h
+    src/eshot.cpp                            src/eshot.h
     src/gfxapi_a.cpp
-    src/dspapi.cpp
-    src/vmemapi.cpp
-    src/rap.cpp
-    src/demo.cpp
-    src/prefapi.cpp
-    src/gfxapi.cpp
-    src/intro.cpp
-    src/help.cpp
-    src/input.cpp
-    src/fx.cpp
-    src/ptrapi.cpp
-    src/loadsave.cpp
-    src/enemy.cpp
+    src/dspapi.cpp                           src/dspapi.h
+    src/vmemapi.cpp                          src/vmemapi.h
+    src/rap.cpp                              src/rap.h
+    src/demo.cpp                             src/demo.h
+    src/prefapi.cpp                          src/prefapi.h
+    src/gfxapi.cpp                           src/gfxapi.h
+    src/intro.cpp                            src/intro.h
+    src/help.cpp                             src/help.h
+    src/input.cpp                            src/input.h
+    src/fx.cpp                               src/fx.h
+    src/ptrapi.cpp                           src/ptrapi.h
+    src/loadsave.cpp                         src/loadsave.h
+    src/enemy.cpp                            src/enemy.h
     src/mpuwinmm.cpp
     src/mputsf.cpp
     src/mpualsa.cpp
     src/mpucorea.cpp
     src/mpucorem.cpp
-    src/setup/se_input.cpp
-    src/setup/se_main.cpp
-    src/setup/se_music.cpp
-    src/setup/se_prefapi.cpp
-    src/setup/se_sound.cpp
-    src/setup/se_txt_joyinput.cpp
-    src/setup/se_txt_keyinput.cpp
-    src/setup/se_txt_mouseinput.cpp
+                                             src/cards.h
+                                             src/common.h
+                                             src/entypes.h
+                                             src/fileids.h
+                                             src/rapver.h
+                                             src/winids.h
+    src/setup/se_input.cpp                   src/setup/se_input.h
+    src/setup/se_main.cpp                    src/setup/se_main.h
+    src/setup/se_music.cpp                   src/setup/se_music.h
+    src/setup/se_prefapi.cpp                 src/setup/se_prefapi.h
+    src/setup/se_sound.cpp                   src/setup/se_sound.h
+    src/setup/se_txt_joyinput.cpp            src/setup/se_txt_joyinput.h
+    src/setup/se_txt_keyinput.cpp            src/setup/se_txt_keyinput.h
+    src/setup/se_txt_mouseinput.cpp          src/setup/se_txt_mouseinput.h
     )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
