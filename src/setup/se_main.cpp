@@ -40,7 +40,7 @@ char g_setup_path[PATH_MAX];
 int controltype;
 int musiccard;
 int soundfxcard;
-static int startscreenupdate = 1;
+static int startscreenupdate;
 static int fullscreen, aspect_ratio, txt_fullscreen, haptic, joy_ipt_MenuNew, sys_midi, winmm_mpu_device, core_dls_synth, core_midi_port, alsaclient, alsaport, setup;
 int keymoveup, keymovedown, keymoveleft, keymoveright, keyfire, keyspecial, keymega;
 static char soundfont[128];
@@ -1791,6 +1791,8 @@ int StartScreen(void)
 
 	TXT_SetDesktopTitle(setuptitle);
 	TXT_SetWindowTitle(raptorwindowtitle);
+
+	startscreenupdate = 1;
 	
 	while (true)
 	{
