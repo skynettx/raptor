@@ -1764,6 +1764,7 @@ void DrawStartScreen(void)
 int StartScreen(void)
 {
 	int curpos = 0;
+	int sleepoff = 0;
 	int keyvalue;
 	int x, y;
 
@@ -1916,6 +1917,7 @@ int StartScreen(void)
 				y == 18)
 			{
 				Setup();
+				sleepoff = 1;
 			}
 			if ((x >= 35 && x < 46) &&
 				y == 20)
@@ -1935,6 +1937,7 @@ int StartScreen(void)
 			if (curpos == 1 && keyvalue == KEY_ENTER)
 			{
 				Setup();
+				sleepoff = 1;
 			}
 			if (curpos == 2 || keyvalue == KEY_ESCAPE)
 			{
@@ -1943,7 +1946,11 @@ int StartScreen(void)
 			}
 		}
 		TXT_UpdateScreen();
-		TXT_Sleep(0);
+		
+		if (!sleepoff)
+			TXT_Sleep(0);
+		else
+			sleepoff = 0;
 	}
 
 	return 0;
