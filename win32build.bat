@@ -146,7 +146,7 @@ if "%compiler%" == "msvc" (
   cd ..
   devenv build\raptor.sln /Build %arch%
 ) else (
-  make
+  make -j%NUMBER_OF_PROCESSORS%
   cd ..
 )
 goto:buildfolder
