@@ -164,6 +164,7 @@ GetJoyButtonMapping(
 		ControllerIndex < MAX_CONTROLLERS;
 		++ControllerIndex)
 	{
+#if SDL_VERSION_ATLEAST(2, 0, 12)
 		switch (SDL_GameControllerTypeForIndex(ControllerIndex))
 		{
 		case SDL_CONTROLLER_TYPE_PS3:
@@ -197,6 +198,18 @@ GetJoyButtonMapping(
 			}
 			break;
 		}
+#else
+		if (joyconvert[ControllerIndex][JOYCONVERTA] == 0 &&
+			joyconvert[ControllerIndex][JOYCONVERTB] == 0 &&
+			joyconvert[ControllerIndex][JOYCONVERTX] == 0 &&
+			joyconvert[ControllerIndex][JOYCONVERTY] == 0)
+		{
+			joyconvert[ControllerIndex][JOYCONVERTA] = 0;
+			joyconvert[ControllerIndex][JOYCONVERTB] = 1;
+			joyconvert[ControllerIndex][JOYCONVERTX] = 2;
+			joyconvert[ControllerIndex][JOYCONVERTY] = 3;
+		}
+#endif
 	}
 }
 
