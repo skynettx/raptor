@@ -128,10 +128,17 @@ make
 
 ### Linux
 Please remember to install the required dependencies lib-sdl2. In some distros there is an extra libsdl2-dev package like Debian or Ubuntu.  
-Type the following:   
+To build for the native system architecture, type the following:
 ```
-cmake -DCMAKE_BUILD_TYPE=Release ..  
-make  
+cmake -DCMAKE_BUILD_TYPE=Release ..
+```
+Or, to force a 32-bit build on a 64-bit multilib system, type:
+```
+cmake -DCMAKE_CXX_FLAGS=-m32 -DCMAKE_C_FLAGS=-m32 -DCMAKE_BUILD_TYPE=Release ..
+```
+Then type in the following:
+```
+make
 ```
 
 ### macOS
