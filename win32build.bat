@@ -9,22 +9,27 @@ echo *********************************************************************
 echo.
 echo Select build:
 echo.
-echo   1. Release build win32
-echo   2. Release build win64
-echo   3. Clean all
+echo   1. Release build MSVC win32
+echo   2. Release build MSVC win64
+echo   3. Release build Mingw win32
+echo   4. Release build Mingw win64
+echo   5. Clean all
 echo   0. Exit
 echo.
 
-set /P select=Select 0-3: 
+set /P select=Select 0-5: 
 
-if /i "%select%"== "1" goto:win32
-if /i "%select%"== "2" goto:win64
-if /i "%select%"== "3" goto:clean
+if /i "%select%"== "1" goto:msvcwin32
+if /i "%select%"== "2" goto:msvcwin64
+if /i "%select%"== "3" goto:mingwwin32
+if /i "%select%"== "4" goto:mingwwin64
+if /i "%select%"== "5" goto:clean
 if /i "%select%"== "0" goto:eof
 echo Incorrect entry
 goto:eof
 
-:win32:
+:msvcwin32:
+set compiler=msvc
 set cmakesettings=-G "Visual Studio 17" -DCMAKE_BUILD_TYPE=Release -A Win32
 set arch="Release|Win32"
 set archname=win32
@@ -32,12 +37,31 @@ set buildfoldername=raptorx86
 set sdlfolder=include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x86\SDL2.dll
 goto:buildres
 
-:win64:
+:msvcwin64:
+set compiler=msvc
 set cmakesettings=-G "Visual Studio 17" -DCMAKE_BUILD_TYPE=Release -A x64
 set arch="Release|x64"
 set archname=win64
 set buildfoldername=raptorx64
 set sdlfolder=include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x64\SDL2.dll
+goto:buildres
+
+:mingwwin32:
+set compiler=mingw
+set cmakesettings=-G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+set arch="Release|Win32"
+set archname=win32
+set buildfoldername=raptorx86
+set sdlfolder=include\SDL2-devel-2.28.2-mingw\SDL2-2.28.2\i686-w64-mingw32\bin\SDL2.dll
+goto:buildres
+
+:mingwwin64:
+set compiler=mingw
+set cmakesettings=-G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+set arch="Release|x64"
+set archname=win64
+set buildfoldername=raptorx64
+set sdlfolder=include\SDL2-devel-2.28.2-mingw\SDL2-2.28.2\x86_64-w64-mingw32\bin\SDL2.dll
 goto:buildres
 
 :buildres
@@ -118,14 +142,23 @@ echo END
 mkdir build
 cd build
 cmake %cmakesettings% ..
-cd ..
-devenv build\raptor.sln /Build %arch%
+if "%compiler%" == "msvc" (
+  cd ..
+  devenv build\raptor.sln /Build %arch%
+) else (
+  make
+  cd ..
+)
 goto:buildfolder
 
 :buildfolder
 @RD /S /Q pkg\win32\%buildfoldername%
 mkdir pkg\win32\%buildfoldername%
-xcopy build\bin\Release\raptor.exe pkg\win32\%buildfoldername%
+if "%compiler%" == "msvc" (
+  xcopy build\bin\Release\raptor.exe pkg\win32\%buildfoldername%
+) else (
+  xcopy build\bin\raptor.exe pkg\win32\%buildfoldername%
+)
 xcopy include\TinySoundFont\LICENSE pkg\win32\%buildfoldername%
 ren pkg\win32\%buildfoldername%\LICENSE LICENSETSF
 xcopy LICENSE pkg\win32\%buildfoldername%
