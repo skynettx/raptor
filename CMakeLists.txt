@@ -1,16 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
+project(raptor)
 
 set(EXECUTABLE_OUTPUT_PATH "bin")
-set(CMAKE_CXX_FLAGS "-O3")
 SET(CMAKE_CXX_STANDARD 11)
-set(CMAKE_C_FLAGS "-O3")
 SET(CMAKE_C_STANDARD 11)
+
+if(NOT MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
+endif()
 
 if(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
-
-project(raptor)
 
 if(ANDROID)
     include(FetchContent)
@@ -34,6 +36,7 @@ if(ANDROID)
 elseif(WIN32)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
     if(MSVC)
+        add_compile_options(/wd4996)
         set(SDL2_DIR "include/SDL2-devel-2.28.2-VC/SDL2-2.28.2/cmake")
     else()
         set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ -static")
