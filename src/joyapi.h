@@ -23,11 +23,11 @@ typedef enum
 
 typedef enum
 {
-	JOYCONVERTA,
-	JOYCONVERTB,
-	JOYCONVERTX,
-	JOYCONVERTY
-} joy_buttons_convert;
+	FIRE,
+	CHWEAPON,
+	MEGABOMB,
+	MEGAFIRE
+} joy_buttons_map;
 
 extern int joy_ack;
 
@@ -40,9 +40,8 @@ void IPT_CalJoyRumbleHigh(void);
 int JOY_IsKey(int button);
 void JOY_Wait(int index, int button);
 
-void GetJoyButtonMapping(void);
 int JOY_MapsInput(void);
 int JOY_GetInput(void);
-int JOY_GetConvertButton(int button, int convertbutton);
+int JOY_GetMappedButton(int button);
 int JOY_GetButton(int button);
 int JOY_GetAxis(int axis);

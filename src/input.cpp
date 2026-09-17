@@ -99,61 +99,20 @@ IPT_GetJoyStick(
 )
 {
     int getstickx, getsticky;
-    int getbutton;
 
     //Get Button
-    
-    if (JOY_GetButton(JOYA))
-    {
-        getbutton = JOY_GetConvertButton(JOYA, JOYCONVERTA);
-        if (getbutton == j_lookup[0])                             //Fire
-            buttons[0] = 1;
-        if (getbutton == j_lookup[1])                             //Fire Special
-            buttons[1] = 1;
-        if (getbutton == j_lookup[2])                             //Change Special
-            buttons[2] = 1;
-        if (getbutton == j_lookup[3])                             //Mega
-            buttons[3] = 1;
-    }
-    
-    if (JOY_GetButton(JOYB))
-    {
-        getbutton = JOY_GetConvertButton(JOYB, JOYCONVERTB);
-        if (getbutton == j_lookup[0])                            //Fire
-            buttons[0] = 1;
-        if (getbutton == j_lookup[1])                            //Fire Special
-            buttons[1] = 1;
-        if (getbutton == j_lookup[2])                            //Change Special
-            buttons[2] = 1;
-        if (getbutton == j_lookup[3])                            //Mega
-            buttons[3] = 1;
-    }
-    
-    if (JOY_GetButton(JOYX))
-    {
-        getbutton = JOY_GetConvertButton(JOYX, JOYCONVERTX);
-        if (getbutton == j_lookup[0])                            //Fire
-            buttons[0] = 1;
-        if (getbutton == j_lookup[1])                            //Fire Special
-            buttons[1] = 1;
-        if (getbutton == j_lookup[2])                            //Change Special
-            buttons[2] = 1;
-        if (getbutton == j_lookup[3])                            //Mega
-            buttons[3] = 1;
-    }
-    
-    if (JOY_GetButton(JOYY))
-    {
-        getbutton = JOY_GetConvertButton(JOYY, JOYCONVERTY);
-        if (getbutton == j_lookup[0])                             //Fire
-            buttons[0] = 1;
-        if (getbutton == j_lookup[1])                             //Fire Special
-            buttons[1] = 1;
-        if (getbutton == j_lookup[2])                             //Change Special
-            buttons[2] = 1;
-        if (getbutton == j_lookup[3])                             //Mega
-            buttons[3] = 1;
-    }
+
+    if (JOY_GetMappedButton(FIRE))
+        buttons[0] = 1;
+
+    if (JOY_GetMappedButton(CHWEAPON))
+        buttons[1] = 1;
+
+    if (JOY_GetMappedButton(MEGABOMB))
+        buttons[2] = 1;
+
+    if (JOY_GetMappedButton(MEGAFIRE))
+        buttons[3] = 1;
     
     if (JOY_GetAxis(JOYTRIGGERRIGHT) > 0)                         //Fire
         buttons[0] = 1;

@@ -3,11 +3,12 @@
 #include "joyapi.h"
 #include "ptrapi.h"
 #include "kbdapi.h"
+#include "input.h"
 
 int joy_ack;
 
 int joyinput[MAX_CONTROLLERS][16];
-int joyconvert[MAX_CONTROLLERS][4];
+int joyinputmap[MAX_CONTROLLERS][4];
 
 SDL_GameController* ControllerHandles[MAX_CONTROLLERS];
 
@@ -42,15 +43,10 @@ IPT_CalJoy(
 			break;
 		}
 		
-		for (int i = 0; i < 4; i++)
-			joyconvert[ControllerIndex][i] = 0;
-
 		ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(JoystickIndex);
 		
 		ControllerIndex++;
 	}
-	
-	GetJoyButtonMapping();
 }
 
 /***************************************************************************
@@ -65,6 +61,9 @@ IPT_CloJoy(
 	{
 		for (int i = 0; i < 16; i++)
 			joyinput[ControllerIndex][i] = 0;
+
+		for (int i = 0; i < 4; i++)
+			joyinputmap[ControllerIndex][i] = 0;
 
 		if (ControllerHandles[ControllerIndex] && !SDL_GameControllerGetAttached(ControllerHandles[ControllerIndex]) && !closeall)
 		{
@@ -129,6 +128,11 @@ I_HandleJoystickEvent(
 			joyinput[ControllerIndex][JOYX] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_X);
 			joyinput[ControllerIndex][JOYY] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_Y);
 
+			joyinputmap[ControllerIndex][FIRE] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], (SDL_GameControllerButton)j_lookup[0]);
+			joyinputmap[ControllerIndex][CHWEAPON] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], (SDL_GameControllerButton)j_lookup[1]);
+			joyinputmap[ControllerIndex][MEGABOMB] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], (SDL_GameControllerButton)j_lookup[2]);
+			joyinputmap[ControllerIndex][MEGAFIRE] = SDL_GameControllerGetButton(ControllerHandles[ControllerIndex], (SDL_GameControllerButton)j_lookup[3]);
+
 			if (!g_drawcursor)
 			{
 				joyinput[ControllerIndex][JOYSTICKX] = IPT_ConvertAxisValue(SDL_GameControllerGetAxis(ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 10);
@@ -149,67 +153,6 @@ I_HandleJoystickEvent(
 		
 		if (sdlevent->type == SDL_CONTROLLERBUTTONDOWN) 
 			joy_ack = 1;
-	}
-}
-
-/***************************************************************************
-GetJoyButtonMapping() - Detect connected Gamecontroller and map buttons for it
- ***************************************************************************/
-void 
-GetJoyButtonMapping(
-	void
-)
-{
-	for (ControllerIndex = 0;
-		ControllerIndex < MAX_CONTROLLERS;
-		++ControllerIndex)
-	{
-#if SDL_VERSION_ATLEAST(2, 0, 12)
-		switch (SDL_GameControllerTypeForIndex(ControllerIndex))
-		{
-		case SDL_CONTROLLER_TYPE_PS3:
-		case SDL_CONTROLLER_TYPE_PS4:
-		case SDL_CONTROLLER_TYPE_PS5:
-			joyconvert[ControllerIndex][JOYCONVERTA] = 0;
-			joyconvert[ControllerIndex][JOYCONVERTB] = 1;
-			joyconvert[ControllerIndex][JOYCONVERTX] = 3;
-			joyconvert[ControllerIndex][JOYCONVERTY] = 2;
-			break;
-		
-		case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_PRO:
-		case SDL_CONTROLLER_TYPE_XBOX360:
-		case SDL_CONTROLLER_TYPE_XBOXONE:
-			joyconvert[ControllerIndex][JOYCONVERTA] = 0;
-			joyconvert[ControllerIndex][JOYCONVERTB] = 1;
-			joyconvert[ControllerIndex][JOYCONVERTX] = 2;
-			joyconvert[ControllerIndex][JOYCONVERTY] = 3;
-			break;
-		
-		default:
-			if (joyconvert[ControllerIndex][JOYCONVERTA] == 0 &&
-				joyconvert[ControllerIndex][JOYCONVERTB] == 0 &&
-				joyconvert[ControllerIndex][JOYCONVERTX] == 0 &&
-				joyconvert[ControllerIndex][JOYCONVERTY] == 0)
-			{
-				joyconvert[ControllerIndex][JOYCONVERTA] = 0;
-				joyconvert[ControllerIndex][JOYCONVERTB] = 1;
-				joyconvert[ControllerIndex][JOYCONVERTX] = 2;
-				joyconvert[ControllerIndex][JOYCONVERTY] = 3;
-			}
-			break;
-		}
-#else
-		if (joyconvert[ControllerIndex][JOYCONVERTA] == 0 &&
-			joyconvert[ControllerIndex][JOYCONVERTB] == 0 &&
-			joyconvert[ControllerIndex][JOYCONVERTX] == 0 &&
-			joyconvert[ControllerIndex][JOYCONVERTY] == 0)
-		{
-			joyconvert[ControllerIndex][JOYCONVERTA] = 0;
-			joyconvert[ControllerIndex][JOYCONVERTB] = 1;
-			joyconvert[ControllerIndex][JOYCONVERTX] = 2;
-			joyconvert[ControllerIndex][JOYCONVERTY] = 3;
-		}
-#endif
 	}
 }
 
@@ -385,24 +328,21 @@ JOY_GetInput(
 }
 
 /***************************************************************************
-JOY_GetConvertButton() - Get converted button from joystick
+JOY_GetMappedButton() - Get mapped button status from joystick
  ***************************************************************************/
 int
-JOY_GetConvertButton(
-	int button,
-	int convertbutton
+JOY_GetMappedButton(
+	int button
 )
 {
 	for (ControllerIndex = 0;
 		ControllerIndex < MAX_CONTROLLERS;
 		++ControllerIndex)
 	{
-		if (joyinput[ControllerIndex][button])
-		{
-			return joyconvert[ControllerIndex][convertbutton];
-		}
+		if (joyinputmap[ControllerIndex][button])
+			return 1;
 	}
-	return -1;
+	return 0;
 }
 
 /***************************************************************************
