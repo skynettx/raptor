@@ -33,7 +33,10 @@
 #include "i_lastscr.h"
 #include "fileids.h"
 #include "entypes.h"
+
+#ifdef BUILD_WITH_SETUP
 #include "setup/se_main.h"
+#endif // BUILD_WITH_SETUP
 
 #ifdef _WIN32
 #include <io.h>
@@ -1273,7 +1276,9 @@ main(
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 #endif //__ANDROID__
 
+#ifdef BUILD_WITH_SETUP
     StartScreen();
+#endif // BUILD_WITH_SETUP
 
     var1 = getenv("S_HOST");
 
