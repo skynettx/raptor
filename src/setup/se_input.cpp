@@ -153,56 +153,38 @@ void ConvertKey(TXT_UNCAST_ARG(widget), void* user_data)
     {
         if (scantokey[s] == key_up)
         {
+            keymoveup = s;
             key_up_convert = s;
-            break;
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_down)
         {
+            keymovedown = s;
             key_down_convert = s;
-            break;
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_left)
         {
+            keymoveleft = s;
             key_left_convert = s;
-            break;
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_right)
         {
+            keymoveright = s;
             key_right_convert = s;
-            break;
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_fire)
         {
+            keyfire = s;
             key_fire_convert = s;
-            break;
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_special)
         {
+            keyspecial = s;
             key_special_convert = s;
-            break;
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_mega)
         {
+            keymega = s;
             key_mega_convert = s;
-            break;
         }
     }
 }
