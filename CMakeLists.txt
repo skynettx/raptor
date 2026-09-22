@@ -14,6 +14,8 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
+option(BUILD_WITH_SETUP "Build project with setup" ON)
+
 if(ANDROID)
     include(FetchContent)
     FetchContent_Declare(
@@ -106,15 +108,21 @@ set(SOURCE_FILES
                                              src/fileids.h
                                              src/rapver.h
                                              src/winids.h
-    src/setup/se_input.cpp                   src/setup/se_input.h
-    src/setup/se_main.cpp                    src/setup/se_main.h
-    src/setup/se_music.cpp                   src/setup/se_music.h
-    src/setup/se_prefapi.cpp                 src/setup/se_prefapi.h
-    src/setup/se_sound.cpp                   src/setup/se_sound.h
-    src/setup/se_txt_joyinput.cpp            src/setup/se_txt_joyinput.h
-    src/setup/se_txt_keyinput.cpp            src/setup/se_txt_keyinput.h
-    src/setup/se_txt_mouseinput.cpp          src/setup/se_txt_mouseinput.h
     )
+
+if(BUILD_WITH_SETUP)
+    list(APPEND SOURCE_FILES 
+         src/setup/se_input.cpp                   src/setup/se_input.h
+         src/setup/se_main.cpp                    src/setup/se_main.h
+         src/setup/se_music.cpp                   src/setup/se_music.h
+         src/setup/se_prefapi.cpp                 src/setup/se_prefapi.h
+         src/setup/se_sound.cpp                   src/setup/se_sound.h
+         src/setup/se_txt_joyinput.cpp            src/setup/se_txt_joyinput.h
+         src/setup/se_txt_keyinput.cpp            src/setup/se_txt_keyinput.h
+         src/setup/se_txt_mouseinput.cpp          src/setup/se_txt_mouseinput.h
+         )
+    add_compile_definitions(BUILD_WITH_SETUP=1)
+endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
     add_library( ${PROJECT_NAME} SHARED ${SOURCE_FILES})   
