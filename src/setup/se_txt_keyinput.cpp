@@ -126,7 +126,7 @@ static void TXT_KeyInputDrawer(TXT_UNCAST_ARG(key_input))
 
     if (*key_input->variable == 0)
     {
-        M_StringCopy(buf, "(none)", sizeof(buf));
+        M_StringCopy(buf, "", sizeof(buf));
     }
     else
     {

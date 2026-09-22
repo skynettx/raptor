@@ -114,7 +114,7 @@ static void TXT_MouseInputDrawer(TXT_UNCAST_ARG(mouse_input))
 
     if (*mouse_input->variable < 0)
     {
-        M_StringCopy(buf, "(none)", sizeof(buf));
+        M_StringCopy(buf, "", sizeof(buf));
     }
     else
     {

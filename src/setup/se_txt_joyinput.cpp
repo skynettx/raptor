@@ -296,7 +296,7 @@ static void TXT_JoystickInputDrawer(TXT_UNCAST_ARG(joystick_input))
 
     if (*joystick_input->variable < 0)
     {
-        M_StringCopy(buf, "(none)", sizeof(buf));
+        M_StringCopy(buf, "", sizeof(buf));
     }
     else
     {
