@@ -21,8 +21,9 @@ int key_right = KEY_RIGHTARROW;
 int key_fire = KEY_RCTRL;
 int key_special = KEY_LALT;
 int key_mega = ' ';
-int convertflagkey;
+int initflagkey = 1;
 int writeflagkey;
+int restoreflagkey;
 int key_up_convert, key_down_convert, key_left_convert, key_right_convert, key_fire_convert, key_special_convert, key_mega_convert;
 static int* controls[] = { &key_up, &key_down, &key_left, &key_right, &key_fire, &key_special, &key_mega, NULL };
 
@@ -148,6 +149,7 @@ void ConvertKey(TXT_UNCAST_ARG(widget), void* user_data)
     int s;
 
     writeflagkey = 1;
+    restoreflagkey = 0;
 
     for (s = 0; s < 128; ++s)
     {
@@ -228,7 +230,7 @@ void GetControlKeyboard(TXT_UNCAST_ARG(widget), void* user_data)
     txt_window_action_t* accept_button;
     txt_window_action_t* select_button;
 
-    if (!convertflagkey)
+    if (restoreflagkey || initflagkey)
     {
         key_up = scantokey[keymoveup];
         key_down = scantokey[keymovedown];
@@ -237,8 +239,9 @@ void GetControlKeyboard(TXT_UNCAST_ARG(widget), void* user_data)
         key_fire = scantokey[keyfire];
         key_special = scantokey[keyspecial];
         key_mega = scantokey[keymega];
-        convertflagkey = 1;
     }
+    restoreflagkey = 1;
+    initflagkey = 0;
 
     getcontrolkeyboardwindow = TXT_NewWindow("Keyboard Configuration           ");
     TXT_SetWindowPosition(getcontrolkeyboardwindow, TXT_HORIZ_CENTER, TXT_VERT_TOP, 39, 3);

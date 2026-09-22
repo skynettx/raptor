@@ -194,6 +194,8 @@ void GetSetupSettings(void)
 	alsaport = SE_INI_GetPreferenceLong("Setup", "alsa_output_port", 0);
 	sf = (char*)SE_INI_GetPreference("Setup", "SoundFont", soundfont, 127, "SoundFont.sf2");
 	setup = SE_INI_GetPreferenceLong("Setup", "setup_menu", 1);
+
+	initflagkey = 1;
 }
 /////////////////////////////////////////////Get Setup.ini/////////////////////////////////////////////////////////////////////
 const char* RAP_DataPath(void)
