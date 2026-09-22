@@ -168,17 +168,34 @@ static int EventCallback(SDL_Event* event, TXT_UNCAST_ARG(joystick_input))
         if (vbutton == 0)
         {
             joybfireout = physbutton;
-            writeflagjoybfire = 1;
+            
+            if (joybchweaponout == physbutton)
+                joybchweaponout = -1;
+            
+            if (joybmegaout == physbutton)
+                joybmegaout = -1;
         }
+        
         if (vbutton == 1)
         {
             joybchweaponout = physbutton;
-            writeflagjoybchweapon = 1;
+            
+            if (joybfireout == physbutton)
+                joybfireout = -1;
+            
+            if (joybmegaout == physbutton)
+                joybmegaout = -1;
         }
+        
         if (vbutton == 2)
         {
             joybmegaout = physbutton;
-            writeflagjoybmega = 1;
+            
+            if (joybchweaponout == physbutton)
+                joybchweaponout = -1;
+            
+            if (joybfireout == physbutton)
+                joybfireout = -1;
         }
 
         TXT_CloseWindow(joystick_input->prompt_window);
@@ -363,6 +380,14 @@ txt_widget_class_t txt_joystick_input_class =
     TXT_JoystickInputMousePress,
     NULL,
 };
+
+void TXT_ResetJoystickPhysicalButtons(int num_buttons)
+{
+    for (int i = 0; i < num_buttons; i++)
+    {
+        joystick_physical_buttons[i] = i;
+    }
+}
 
 txt_joystick_input_t* TXT_NewJoystickInput(int* variable)
 {

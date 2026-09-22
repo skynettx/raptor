@@ -18,7 +18,9 @@ extern int writeflagmouse;
 
 extern int joybfire, joybchweapon, joybmega, joybspeed;
 extern int joybfireout, joybchweaponout, joybmegaout;
-extern int writeflagjoy, writeflagjoybfire, writeflagjoybchweapon, writeflagjoybmega;
+extern int savejoybfire, savejoybchweapon, savejoybmega;
+extern int writeflagjoy;
+extern int initflagjoyb;
 
 void GetControl(TXT_UNCAST_ARG(widget), void* user_data);
 void GetControlKeyboard(TXT_UNCAST_ARG(widget), void* user_data);

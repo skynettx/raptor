@@ -60,7 +60,10 @@ static int* all_mouse_buttons[] = {
 
 int joybfire, joybchweapon, joybmega, joybspeed;
 int joybfireout, joybchweaponout, joybmegaout;
-int writeflagjoy, writeflagjoybfire, writeflagjoybchweapon, writeflagjoybmega;
+int savejoybfire, savejoybchweapon, savejoybmega;
+int initflagjoyb = 1;
+int writeflagjoy;
+int restoreflagjoyb;
 
 txt_window_t* getcontrolkeyboardwindow;
 txt_window_t* getcontrolmousewindow;
@@ -453,11 +456,17 @@ void SaveJoyConfig(TXT_UNCAST_ARG(widget), void* user_data)
         TXT_SetWindowAction(window, TXT_HORIZ_CENTER, close_button);
         
         writeflagjoy = 0;
+        restoreflagjoyb = 1;
 
         return;
     }
 
     writeflagjoy = 1;
+    restoreflagjoyb = 0;
+
+    savejoybfire = joybfireout;
+    savejoybchweapon = joybchweaponout;
+    savejoybmega = joybmegaout;
 }
 
 void GetControlJoystick(TXT_UNCAST_ARG(widget), void* user_data)
@@ -466,12 +475,21 @@ void GetControlJoystick(TXT_UNCAST_ARG(widget), void* user_data)
     txt_window_action_t* accept_button;
     txt_window_action_t* select_button;
 
-    if (!joybfireout)
-    joybfireout = joybfire;
-    if (!joybchweaponout)
-    joybchweaponout = joybchweapon;
-    if (!joybmegaout)
-    joybmegaout = joybmega;
+    if (restoreflagjoyb || initflagjoyb)
+    {
+        joybfire = savejoybfire;
+        joybfireout = joybfire;
+
+        joybchweapon = savejoybchweapon;
+        joybchweaponout = joybchweapon;
+
+        joybmega = savejoybmega;
+        joybmegaout = joybmega;
+
+        TXT_ResetJoystickPhysicalButtons(NUM_VIRTUAL_BUTTONS);
+    }
+    restoreflagjoyb = 1;
+    initflagjoyb = 0;
 
     getcontroljoystickwindow = TXT_NewWindow("Joystick/Gamepad Config          ");
     TXT_SetWindowPosition(getcontroljoystickwindow, TXT_HORIZ_CENTER, TXT_VERT_TOP, 39, 7);

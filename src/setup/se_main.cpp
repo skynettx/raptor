@@ -198,7 +198,13 @@ void GetSetupSettings(void)
 	savemousebfire = mousebfire;
 	savemousebchweapon = mousebchweapon;
 	savemousebmega = mousebmega;
+
+	savejoybfire = joybfire;
+	savejoybchweapon = joybchweapon;
+	savejoybmega = joybmega;
+
 	initflagkey = 1;
+	initflagjoyb = 1;
 }
 /////////////////////////////////////////////Get Setup.ini/////////////////////////////////////////////////////////////////////
 const char* RAP_DataPath(void)
@@ -431,13 +437,9 @@ void SaveSettings(TXT_UNCAST_ARG(widget), void* user_data)
 	}
 	if (writeflagjoy)                                                     //Save joysticklayout to SETUP.INI
 	{
-		if (writeflagjoybfire || writesetupflag)
-			SE_INI_PutPreferenceLong("JoyStick", "Fire", joybfireout);
-		if (writeflagjoybchweapon || writesetupflag)
-			SE_INI_PutPreferenceLong("JoyStick", "FireSp", joybchweaponout);
-		if (writeflagjoybmega || writesetupflag)
-			SE_INI_PutPreferenceLong("JoyStick", "ChangeSp", joybmegaout);
-
+		SE_INI_PutPreferenceLong("JoyStick", "Fire", joybfireout);
+		SE_INI_PutPreferenceLong("JoyStick", "FireSp", joybchweaponout);
+		SE_INI_PutPreferenceLong("JoyStick", "ChangeSp", joybmegaout);
 		SE_INI_PutPreferenceLong("JoyStick", "MegaFire", 3);
 	}
 
