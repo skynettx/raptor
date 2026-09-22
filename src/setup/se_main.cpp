@@ -195,6 +195,9 @@ void GetSetupSettings(void)
 	sf = (char*)SE_INI_GetPreference("Setup", "SoundFont", soundfont, 127, "SoundFont.sf2");
 	setup = SE_INI_GetPreferenceLong("Setup", "setup_menu", 1);
 
+	savemousebfire = mousebfire;
+	savemousebchweapon = mousebchweapon;
+	savemousebmega = mousebmega;
 	initflagkey = 1;
 }
 /////////////////////////////////////////////Get Setup.ini/////////////////////////////////////////////////////////////////////

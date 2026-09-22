@@ -13,7 +13,7 @@ extern int writeflagkey;
 extern int initflagkey;
 
 extern int mousebfire, mousebchweapon, mousebmega;
-extern int mousebfireout, mousebchweaponout, mousebmegaout;
+extern int savemousebfire, savemousebchweapon, savemousebmega;
 extern int writeflagmouse;
 
 extern int joybfire, joybchweapon, joybmega, joybspeed;

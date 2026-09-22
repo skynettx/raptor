@@ -48,8 +48,9 @@ static const int scantokey[128] =
 };
 
 int mousebfire, mousebchweapon, mousebmega;
-int mousebfireout, mousebchweaponout, mousebmegaout;
+int savemousebfire, savemousebchweapon, savemousebmega;
 int writeflagmouse;
+int restoreflagmouseb;
 
 static int* all_mouse_buttons[] = {
     &mousebfire,
@@ -348,11 +349,17 @@ void SaveMouseConfig(TXT_UNCAST_ARG(widget), void* user_data)
         TXT_SetWindowAction(window, TXT_HORIZ_CENTER, close_button);
        
         writeflagmouse = 0;
+        restoreflagmouseb = 1;
 
         return;
     }
     
     writeflagmouse = 1;
+    restoreflagmouseb = 0;
+
+    savemousebfire = mousebfire;
+    savemousebchweapon = mousebchweapon;
+    savemousebmega = mousebmega;
 }
 
 void GetControlMouse(TXT_UNCAST_ARG(widget), void* user_data)
@@ -360,6 +367,14 @@ void GetControlMouse(TXT_UNCAST_ARG(widget), void* user_data)
     txt_window_action_t* close_button;
     txt_window_action_t* accept_button;
     txt_window_action_t* select_button;
+
+    if (restoreflagmouseb)
+    {
+        mousebfire = savemousebfire;
+        mousebchweapon = savemousebchweapon;
+        mousebmega = savemousebmega;
+    }
+    restoreflagmouseb = 1;
 
     getcontrolmousewindow = TXT_NewWindow("Mouse Configuration              ");
     TXT_SetWindowPosition(getcontrolmousewindow, TXT_HORIZ_CENTER, TXT_VERT_TOP, 40, 5);
