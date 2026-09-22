@@ -33,7 +33,7 @@ extern "C" {
 #include "txt_window.h"
 }
 
-#define JOYSTICK_INPUT_WIDTH 10
+#define JOYSTICK_INPUT_WIDTH 9
 
 int joystick_index;
 int joystick_physical_buttons[NUM_VIRTUAL_BUTTONS] = {

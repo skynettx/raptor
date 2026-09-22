@@ -31,7 +31,7 @@ extern "C" {
 }
 
 // eg. "BUTTON #10"
-#define MOUSE_INPUT_WIDTH 10
+#define MOUSE_INPUT_WIDTH 14
 
 static int MousePressCallback(txt_window_t* window,
     int x, int y, int b,
