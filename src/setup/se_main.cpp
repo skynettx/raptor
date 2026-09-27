@@ -181,9 +181,14 @@ void GetSetupSettings(void)
 	joybfire = SE_INI_GetPreferenceLong("JoyStick", "Fire", 0);
 	joybchweapon = SE_INI_GetPreferenceLong("JoyStick", "FireSp", 1);
 	joybmega = SE_INI_GetPreferenceLong("JoyStick", "ChangeSp", 2);
-	fullscreen = SE_INI_GetPreferenceLong("Video", "fullscreen", 0);
+	fullscreen = SE_INI_GetPreferenceLong("Video", "fullscreen", 1);
+#if __ANDROID__
+	aspect_ratio = SE_INI_GetPreferenceLong("Video", "aspect_ratio_correct", 0);
+	txt_fullscreen = SE_INI_GetPreferenceLong("Video", "txt_fullscreen", 1);
+#else
 	aspect_ratio = SE_INI_GetPreferenceLong("Video", "aspect_ratio_correct", 1);
 	txt_fullscreen = SE_INI_GetPreferenceLong("Video", "txt_fullscreen", 0);
+#endif //__ANDROID__
 	haptic = SE_INI_GetPreferenceLong("Setup", "Haptic", 1);
 	joy_ipt_MenuNew = SE_INI_GetPreferenceLong("Setup", "joy_ipt_MenuNew", 0);
 	sys_midi = SE_INI_GetPreferenceLong("Setup", "sys_midi", 0);

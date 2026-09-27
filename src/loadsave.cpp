@@ -1090,12 +1090,11 @@ RAP_WriteDefaultSetup(
     INI_PutPreferenceLong("JoyStick", "FireSp", 1);
     INI_PutPreferenceLong("JoyStick", "ChangeSp", 2);
     INI_PutPreferenceLong("JoyStick", "MegaFire", 3);
-#if __ANDROID__
     INI_PutPreferenceLong("Video", "fullscreen", 1);
+#if __ANDROID__
     INI_PutPreferenceLong("Video", "aspect_ratio_correct", 0);
     INI_PutPreferenceLong("Video", "txt_fullscreen", 1);
 #else
-    INI_PutPreferenceLong("Video", "fullscreen", 0);
     INI_PutPreferenceLong("Video", "aspect_ratio_correct", 1);
     INI_PutPreferenceLong("Video", "txt_fullscreen", 0);
 #endif //__ANDROID__
