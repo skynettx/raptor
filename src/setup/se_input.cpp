@@ -148,6 +148,14 @@ static void KeySetCallback(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(variable))
     CheckKeyGroup(variable, controls);
 }
 
+static int GetConvertKey(int index, int key)
+{
+    if (key)
+        return index;
+    else
+        return -1;
+}
+
 void ConvertKey(TXT_UNCAST_ARG(widget), void* user_data)
 {
     int s;
@@ -159,38 +167,38 @@ void ConvertKey(TXT_UNCAST_ARG(widget), void* user_data)
     {
         if (scantokey[s] == key_up)
         {
-            keymoveup = s;
-            key_up_convert = s;
+            keymoveup = GetConvertKey(s, key_up);
+            key_up_convert = GetConvertKey(s, key_up);
         }
         if (scantokey[s] == key_down)
         {
-            keymovedown = s;
-            key_down_convert = s;
+            keymovedown = GetConvertKey(s, key_down);
+            key_down_convert = GetConvertKey(s, key_down);
         }
         if (scantokey[s] == key_left)
         {
-            keymoveleft = s;
-            key_left_convert = s;
+            keymoveleft = GetConvertKey(s, key_left);
+            key_left_convert = GetConvertKey(s, key_left);
         }
         if (scantokey[s] == key_right)
         {
-            keymoveright = s;
-            key_right_convert = s;
+            keymoveright = GetConvertKey(s, key_right);
+            key_right_convert = GetConvertKey(s, key_right);
         }
         if (scantokey[s] == key_fire)
         {
-            keyfire = s;
-            key_fire_convert = s;
+            keyfire = GetConvertKey(s, key_fire);
+            key_fire_convert = GetConvertKey(s, key_fire);
         }
         if (scantokey[s] == key_special)
         {
-            keyspecial = s;
-            key_special_convert = s;
+            keyspecial = GetConvertKey(s, key_special);
+            key_special_convert = GetConvertKey(s, key_special);
         }
         if (scantokey[s] == key_mega)
         {
-            keymega = s;
-            key_mega_convert = s;
+            keymega = GetConvertKey(s, key_mega);
+            key_mega_convert = GetConvertKey(s, key_mega);
         }
     }
 }
