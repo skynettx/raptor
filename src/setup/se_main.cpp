@@ -203,6 +203,16 @@ void GetSetupSettings(void)
 	savejoybchweapon = joybchweapon;
 	savejoybmega = joybmega;
 
+	ControllerType = 0;
+	CardType = 0;
+	BasePort = 0;
+	MidiPort = 0;
+	SoundCardType = 0;
+
+	writeflagkey = 0;
+	writeflagmouse = 0;
+	writeflagjoy = 0;
+
 	initflagkey = 1;
 	initflagjoyb = 1;
 }
