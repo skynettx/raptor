@@ -3,13 +3,13 @@
 #include <string.h>
 
 #include "textscreen.h"
-#include "main.h"
-#include "input.h"
+#include "se_main.h"
+#include "se_input.h"
 
 extern "C" {
-#include "txt_keyinput.h"
-#include "txt_mouseinput.h"
-#include "txt_joyinput.h"
+#include "se_txt_keyinput.h"
+#include "se_txt_mouseinput.h"
+#include "se_txt_joyinput.h"
 }
 
 int ControllerType;
@@ -21,8 +21,9 @@ int key_right = KEY_RIGHTARROW;
 int key_fire = KEY_RCTRL;
 int key_special = KEY_LALT;
 int key_mega = ' ';
-int convertflagkey;
+int initflagkey = 1;
 int writeflagkey;
+int restoreflagkey;
 int key_up_convert, key_down_convert, key_left_convert, key_right_convert, key_fire_convert, key_special_convert, key_mega_convert;
 static int* controls[] = { &key_up, &key_down, &key_left, &key_right, &key_fire, &key_special, &key_mega, NULL };
 
@@ -47,8 +48,9 @@ static const int scantokey[128] =
 };
 
 int mousebfire, mousebchweapon, mousebmega;
-int mousebfireout, mousebchweaponout, mousebmegaout;
+int savemousebfire, savemousebchweapon, savemousebmega;
 int writeflagmouse;
+int restoreflagmouseb;
 
 static int* all_mouse_buttons[] = {
     &mousebfire,
@@ -58,7 +60,10 @@ static int* all_mouse_buttons[] = {
 
 int joybfire, joybchweapon, joybmega, joybspeed;
 int joybfireout, joybchweaponout, joybmegaout;
-int writeflagjoy, writeflagjoybfire, writeflagjoybchweapon, writeflagjoybmega;
+int savejoybfire, savejoybchweapon, savejoybmega;
+int initflagjoyb = 1;
+int writeflagjoy;
+int restoreflagjoyb;
 
 txt_window_t* getcontrolkeyboardwindow;
 txt_window_t* getcontrolmousewindow;
@@ -143,66 +148,57 @@ static void KeySetCallback(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(variable))
     CheckKeyGroup(variable, controls);
 }
 
+static int GetConvertKey(int index, int key)
+{
+    if (key)
+        return index;
+    else
+        return -1;
+}
+
 void ConvertKey(TXT_UNCAST_ARG(widget), void* user_data)
 {
     int s;
 
     writeflagkey = 1;
+    restoreflagkey = 0;
 
     for (s = 0; s < 128; ++s)
     {
         if (scantokey[s] == key_up)
         {
-            key_up_convert = s;
-            break;
+            keymoveup = GetConvertKey(s, key_up);
+            key_up_convert = GetConvertKey(s, key_up);
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_down)
         {
-            key_down_convert = s;
-            break;
+            keymovedown = GetConvertKey(s, key_down);
+            key_down_convert = GetConvertKey(s, key_down);
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_left)
         {
-            key_left_convert = s;
-            break;
+            keymoveleft = GetConvertKey(s, key_left);
+            key_left_convert = GetConvertKey(s, key_left);
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_right)
         {
-            key_right_convert = s;
-            break;
+            keymoveright = GetConvertKey(s, key_right);
+            key_right_convert = GetConvertKey(s, key_right);
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_fire)
         {
-            key_fire_convert = s;
-            break;
+            keyfire = GetConvertKey(s, key_fire);
+            key_fire_convert = GetConvertKey(s, key_fire);
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_special)
         {
-            key_special_convert = s;
-            break;
+            keyspecial = GetConvertKey(s, key_special);
+            key_special_convert = GetConvertKey(s, key_special);
         }
-    }
-    for (s = 0; s < 128; ++s)
-    {
         if (scantokey[s] == key_mega)
         {
-            key_mega_convert = s;
-            break;
+            keymega = GetConvertKey(s, key_mega);
+            key_mega_convert = GetConvertKey(s, key_mega);
         }
     }
 }
@@ -246,7 +242,7 @@ void GetControlKeyboard(TXT_UNCAST_ARG(widget), void* user_data)
     txt_window_action_t* accept_button;
     txt_window_action_t* select_button;
 
-    if (!convertflagkey)
+    if (restoreflagkey || initflagkey)
     {
         key_up = scantokey[keymoveup];
         key_down = scantokey[keymovedown];
@@ -255,12 +251,15 @@ void GetControlKeyboard(TXT_UNCAST_ARG(widget), void* user_data)
         key_fire = scantokey[keyfire];
         key_special = scantokey[keyspecial];
         key_mega = scantokey[keymega];
-        convertflagkey = 1;
     }
+    restoreflagkey = 1;
+    initflagkey = 0;
 
     getcontrolkeyboardwindow = TXT_NewWindow("Keyboard Configuration           ");
     TXT_SetWindowPosition(getcontrolkeyboardwindow, TXT_HORIZ_CENTER, TXT_VERT_TOP, 39, 3);
     
+    TXT_SetWidgetFocusedColor(TXT_COLOR_BLUE, TXT_COLOR_GREY);
+
     TXT_AddWidget(getcontrolkeyboardwindow, TXT_TABLE_EMPTY);
     
     TXT_SetTableColumns(getcontrolkeyboardwindow, 2);
@@ -289,10 +288,12 @@ void GetControlKeyboard(TXT_UNCAST_ARG(widget), void* user_data)
     TXT_SetHelpLabel(select_button, " Press ENTER to Select");
 
     TXT_SignalConnect(close_button, "pressed", ClosePwnBox, getcontrolkeyboardwindow);
+    TXT_SignalConnect(close_button, "pressed", ResetWidgetFocusedColor, getcontrolkeyboardwindow);
     
     TXT_SignalConnect(select_button, "pressed", WindowSelect, getcontrolkeyboardwindow);
 
     TXT_SignalConnect(accept_button, "pressed", ClosePwnBox, getcontrolkeyboardwindow);
+    TXT_SignalConnect(accept_button, "pressed", ResetWidgetFocusedColor, getcontrolkeyboardwindow);
     TXT_SignalConnect(accept_button, "pressed", ConvertKey, NULL);
     
     TXT_SetWindowAction(getcontrolkeyboardwindow, TXT_HORIZ_LEFT, close_button);
@@ -359,11 +360,17 @@ void SaveMouseConfig(TXT_UNCAST_ARG(widget), void* user_data)
         TXT_SetWindowAction(window, TXT_HORIZ_CENTER, close_button);
        
         writeflagmouse = 0;
+        restoreflagmouseb = 1;
 
         return;
     }
     
     writeflagmouse = 1;
+    restoreflagmouseb = 0;
+
+    savemousebfire = mousebfire;
+    savemousebchweapon = mousebchweapon;
+    savemousebmega = mousebmega;
 }
 
 void GetControlMouse(TXT_UNCAST_ARG(widget), void* user_data)
@@ -372,8 +379,18 @@ void GetControlMouse(TXT_UNCAST_ARG(widget), void* user_data)
     txt_window_action_t* accept_button;
     txt_window_action_t* select_button;
 
+    if (restoreflagmouseb)
+    {
+        mousebfire = savemousebfire;
+        mousebchweapon = savemousebchweapon;
+        mousebmega = savemousebmega;
+    }
+    restoreflagmouseb = 1;
+
     getcontrolmousewindow = TXT_NewWindow("Mouse Configuration              ");
     TXT_SetWindowPosition(getcontrolmousewindow, TXT_HORIZ_CENTER, TXT_VERT_TOP, 40, 5);
+
+    TXT_SetWidgetFocusedColor(TXT_COLOR_BLUE, TXT_COLOR_GREY);
 
     TXT_AddWidget(getcontrolmousewindow, TXT_NewStrut(0, 1));
     
@@ -394,10 +411,12 @@ void GetControlMouse(TXT_UNCAST_ARG(widget), void* user_data)
     TXT_SetHelpLabel(select_button, " Press ENTER to Select");
     
     TXT_SignalConnect(close_button, "pressed", ClosePwnBox, getcontrolmousewindow);
+    TXT_SignalConnect(close_button, "pressed", ResetWidgetFocusedColor, getcontrolmousewindow);
     
     TXT_SignalConnect(select_button, "pressed", WindowSelect, getcontrolmousewindow);
 
     TXT_SignalConnect(accept_button, "pressed", ClosePwnBox, getcontrolmousewindow);
+    TXT_SignalConnect(accept_button, "pressed", ResetWidgetFocusedColor, getcontrolmousewindow);
     TXT_SignalConnect(accept_button, "pressed", SaveMouseConfig, NULL);
 
     TXT_SetWindowAction(getcontrolmousewindow, TXT_HORIZ_LEFT, close_button);
@@ -445,11 +464,17 @@ void SaveJoyConfig(TXT_UNCAST_ARG(widget), void* user_data)
         TXT_SetWindowAction(window, TXT_HORIZ_CENTER, close_button);
         
         writeflagjoy = 0;
+        restoreflagjoyb = 1;
 
         return;
     }
 
     writeflagjoy = 1;
+    restoreflagjoyb = 0;
+
+    savejoybfire = joybfireout;
+    savejoybchweapon = joybchweaponout;
+    savejoybmega = joybmegaout;
 }
 
 void GetControlJoystick(TXT_UNCAST_ARG(widget), void* user_data)
@@ -458,15 +483,26 @@ void GetControlJoystick(TXT_UNCAST_ARG(widget), void* user_data)
     txt_window_action_t* accept_button;
     txt_window_action_t* select_button;
 
-    if (!joybfireout)
-    joybfireout = joybfire;
-    if (!joybchweaponout)
-    joybchweaponout = joybchweapon;
-    if (!joybmegaout)
-    joybmegaout = joybmega;
+    if (restoreflagjoyb || initflagjoyb)
+    {
+        joybfire = savejoybfire;
+        joybfireout = joybfire;
+
+        joybchweapon = savejoybchweapon;
+        joybchweaponout = joybchweapon;
+
+        joybmega = savejoybmega;
+        joybmegaout = joybmega;
+
+        TXT_ResetJoystickPhysicalButtons(NUM_VIRTUAL_BUTTONS);
+    }
+    restoreflagjoyb = 1;
+    initflagjoyb = 0;
 
     getcontroljoystickwindow = TXT_NewWindow("Joystick/Gamepad Config          ");
     TXT_SetWindowPosition(getcontroljoystickwindow, TXT_HORIZ_CENTER, TXT_VERT_TOP, 39, 7);
+
+    TXT_SetWidgetFocusedColor(TXT_COLOR_BLUE, TXT_COLOR_GREY);
 
     TXT_AddWidget(getcontroljoystickwindow, TXT_NewStrut(0, 1));
     
@@ -487,10 +523,12 @@ void GetControlJoystick(TXT_UNCAST_ARG(widget), void* user_data)
     TXT_SetHelpLabel(select_button, " Press ENTER to Select");
 
     TXT_SignalConnect(close_button, "pressed", ClosePwnBox, getcontroljoystickwindow);
+    TXT_SignalConnect(close_button, "pressed", ResetWidgetFocusedColor, getcontroljoystickwindow);
     
     TXT_SignalConnect(select_button, "pressed", WindowSelect, getcontroljoystickwindow);
     
     TXT_SignalConnect(accept_button, "pressed", ClosePwnBox, getcontroljoystickwindow);
+    TXT_SignalConnect(accept_button, "pressed", ResetWidgetFocusedColor, getcontroljoystickwindow);
     TXT_SignalConnect(accept_button, "pressed", SaveJoyConfig, NULL);
 
     TXT_SetWindowAction(getcontroljoystickwindow, TXT_HORIZ_LEFT, close_button);

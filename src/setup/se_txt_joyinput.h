@@ -36,6 +36,8 @@ struct txt_joystick_input_s
 
 txt_joystick_input_t* TXT_NewJoystickInput(int* variable);
 
+void TXT_ResetJoystickPhysicalButtons(int num_buttons);
+
 extern int joystick_index;
 
 #endif /* #ifndef TXT_JOYB_INPUT_H */

@@ -788,16 +788,7 @@ RAP_LoadWin(
         SWD_Dialog(&dlg);
         I_GetNeedResize(false);
         
-        if (joy_ipt_MenuNew)
-        {
-            if (XButton)                                                                                                                        
-            {
-                JOY_IsKey(XButton);
-                dlg.keypress = SC_DELETE;
-            }
-        }
-        
-        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKeyMenu(Back) && joy_ipt_MenuNew) || (JOY_IsKeyMenu(BButton) && joy_ipt_MenuNew))                                      
+        if ((KBD_IsKey(SC_ESC)) || (JOY_IsKey(JOYBACK) && joy_ipt_MenuNew) || (JOY_IsKey(JOYB) && joy_ipt_MenuNew))
         {
             rval = 0;
             goto load_exit;
@@ -970,7 +961,10 @@ RAP_InitLoadSave(
             sprintf(g_setup_ini, "%s%s", g_setup_ini, "SETUP.INI");
         
         cdflag = 1;
+        
+        #ifndef __ANDROID__
         SDL_free(gethome);
+        #endif //__ANDROID__
     }
     else
     {
@@ -1062,6 +1056,7 @@ RAP_WriteDefaultSetup(
     INI_PutPreferenceLong("Setup", "alsa_output_client", 128);           
     INI_PutPreferenceLong("Setup", "alsa_output_port", 0);               
     INI_PutPreference("Setup", "SoundFont", "SoundFont.sf2");
+    INI_PutPreferenceLong("Setup", "setup_menu", 1);
     INI_PutPreferenceLong("Music", "Volume", 85);
 
 #if _WIN32 || __APPLE__
@@ -1095,12 +1090,11 @@ RAP_WriteDefaultSetup(
     INI_PutPreferenceLong("JoyStick", "FireSp", 1);
     INI_PutPreferenceLong("JoyStick", "ChangeSp", 2);
     INI_PutPreferenceLong("JoyStick", "MegaFire", 3);
-#if __ANDROID__
     INI_PutPreferenceLong("Video", "fullscreen", 1);
+#if __ANDROID__
     INI_PutPreferenceLong("Video", "aspect_ratio_correct", 0);
     INI_PutPreferenceLong("Video", "txt_fullscreen", 1);
 #else
-    INI_PutPreferenceLong("Video", "fullscreen", 0);
     INI_PutPreferenceLong("Video", "aspect_ratio_correct", 1);
     INI_PutPreferenceLong("Video", "txt_fullscreen", 0);
 #endif //__ANDROID__

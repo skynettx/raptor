@@ -34,6 +34,10 @@
 #include "fileids.h"
 #include "entypes.h"
 
+#ifdef BUILD_WITH_SETUP
+#include "setup/se_main.h"
+#endif // BUILD_WITH_SETUP
+
 #ifdef _WIN32
 #include <io.h>
 #endif // _WIN32
@@ -228,7 +232,7 @@ ShutDown(
     closewindow();                                   //Close Main Window
     I_LASTSCR(mem);                                  //Call to display ANSI Screen 
     GLB_FreeAll();
-    IPT_CloJoy();                                    //Close Joystick
+    IPT_CloJoy(1);                                   //Close Joystick
     SWD_End();
     SDL_Quit();
     
@@ -900,7 +904,7 @@ Do_Game(
             b3_flag = 0;
         }
         
-        if (KBD_IsKey(SC_P) || JOY_IsKeyInGameStart(Start))                                                                  
+        if (KBD_IsKey(SC_P) || JOY_IsKey(JOYSTART))
         {
             while (IMS_IsAck())
             {
@@ -1168,7 +1172,7 @@ Do_Game(
             b3_flag = 0;
         }
         
-        if (KBD_IsKey(SC_ESC) || JOY_IsKeyInGameBack(Back))                                                                       
+        if (KBD_IsKey(SC_ESC) || JOY_IsKey(JOYBACK))
         {
             if (godmode)
                 end_wave = 1;
@@ -1267,6 +1271,14 @@ main(
 {
     char *var1, *tptr, *pal;
     int loop, numfiles, ptrflag, item;
+
+#ifdef __ANDROID__
+    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+#endif //__ANDROID__
+
+#ifdef BUILD_WITH_SETUP
+    StartScreen();
+#endif // BUILD_WITH_SETUP
 
     var1 = getenv("S_HOST");
 

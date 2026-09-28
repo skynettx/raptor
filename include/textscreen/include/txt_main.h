@@ -122,6 +122,22 @@ typedef enum
     TXT_INPUT_TEXT,
 } txt_input_mode_t;
 
+// Gamecontroller axis and buttons.
+
+typedef enum
+{
+    TXT_JOY_STICKX,
+    TXT_JOY_STICKY,
+    TXT_JOY_UP,
+    TXT_JOY_DOWN,
+    TXT_JOY_LEFT,
+    TXT_JOY_RIGHT,
+    TXT_JOY_START,
+    TXT_JOY_BACK,
+    TXT_JOY_A,
+    TXT_JOY_B,
+    TXT_JOY_X
+} txt_joy_buttons;
 
 #ifdef __GNUC__
 
@@ -135,7 +151,7 @@ typedef enum
 
 // Initialize the screen
 // Returns 1 if successful, 0 if failed.
-int TXT_Init(void);
+int TXT_Init(int fullscreen, int resizable, int aspect_ratio_correct);
 
 // Shut down text mode emulation
 void TXT_Shutdown(void);
@@ -197,8 +213,11 @@ int TXT_vsnprintf(char *buf, size_t buf_len, const char *s, va_list args);
 // Safe version of snprintf().
 int TXT_snprintf(char *buf, size_t buf_len, const char *s, ...) PRINTF_ATTR(3, 4);
 
-// Set fullscreenmode
-void TXT_Fullscreen(int fullscreen);
+// Lock/Unlock complete input from joystick.
+void TXT_LockJoyInputAll(int flag);
+
+// Lock/Unlock specific input from joystick.
+void TXT_LockJoyInput(int buttonaxis, int flag);
 
 #endif /* #ifndef TXT_MAIN_H */
 

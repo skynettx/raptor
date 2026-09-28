@@ -16,15 +16,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "SDL_joystick.h"
+#include "SDL_gamecontroller.h"
 
 #include "doomkeys.h"
-#include "input.h"
-#include "prefapi.h"
-#include "main.h"
+#include "se_input.h"
+#include "../m_misc.h"
+#include "se_main.h"
 
 extern "C" {
-#include "txt_joyinput.h"
+#include "se_txt_joyinput.h"
 #include "txt_gui.h"
 #include "txt_io.h"
 #include "txt_label.h"
@@ -33,7 +33,7 @@ extern "C" {
 #include "txt_window.h"
 }
 
-#define JOYSTICK_INPUT_WIDTH 10
+#define JOYSTICK_INPUT_WIDTH 9
 
 int joystick_index;
 int joystick_physical_buttons[NUM_VIRTUAL_BUTTONS] = {
@@ -145,7 +145,7 @@ static int EventCallback(SDL_Event* event, TXT_UNCAST_ARG(joystick_input))
 
     // Got the joystick button press?
 
-    if (event->type == SDL_JOYBUTTONDOWN)
+    if (event->type == SDL_CONTROLLERBUTTONDOWN)
     {
         int vbutton, physbutton;
 
@@ -154,7 +154,7 @@ static int EventCallback(SDL_Event* event, TXT_UNCAST_ARG(joystick_input))
         CanonicalizeButtons();
 
         vbutton = VirtualButtonForVariable(joystick_input->variable);
-        physbutton = event->jbutton.button;
+        physbutton = event->cbutton.button;
 
         if (joystick_input->check_conflicts)
         {
@@ -168,17 +168,34 @@ static int EventCallback(SDL_Event* event, TXT_UNCAST_ARG(joystick_input))
         if (vbutton == 0)
         {
             joybfireout = physbutton;
-            writeflagjoybfire = 1;
+            
+            if (joybchweaponout == physbutton)
+                joybchweaponout = -1;
+            
+            if (joybmegaout == physbutton)
+                joybmegaout = -1;
         }
+        
         if (vbutton == 1)
         {
             joybchweaponout = physbutton;
-            writeflagjoybchweapon = 1;
+            
+            if (joybfireout == physbutton)
+                joybfireout = -1;
+            
+            if (joybmegaout == physbutton)
+                joybmegaout = -1;
         }
+        
         if (vbutton == 2)
         {
             joybmegaout = physbutton;
-            writeflagjoybmega = 1;
+            
+            if (joybchweaponout == physbutton)
+                joybchweaponout = -1;
+            
+            if (joybfireout == physbutton)
+                joybfireout = -1;
         }
 
         TXT_CloseWindow(joystick_input->prompt_window);
@@ -193,18 +210,22 @@ static int EventCallback(SDL_Event* event, TXT_UNCAST_ARG(joystick_input))
 
 static void PromptWindowClosed(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(joystick))
 {
-    TXT_CAST_ARG(SDL_Joystick, joystick);
+    TXT_CAST_ARG(SDL_GameController, joystick);
 
-    SDL_JoystickClose(joystick);
+    SDL_GameControllerClose(joystick);
     TXT_SDL_SetEventCallback(NULL, NULL);
-    SDL_JoystickEventState(SDL_DISABLE);
-    SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+    //SDL_JoystickEventState(SDL_DISABLE);
+    SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
+    
+    TXT_LockJoyInputAll(0);
 }
 
 static void OpenErrorWindow(void)
 {
     txt_window_t* window;
     txt_window_action_t* close_button;
+
+    TXT_LockJoyInputAll(0);
 
     window = TXT_CustomMessageBox(NULL, "Please connect a controller first!", TXT_COLOR_BRIGHT_WHITE, TXT_COLOR_RED, TXT_COLOR_RED, TXT_COLOR_BRIGHT_WHITE, TXT_COLOR_BRIGHT_WHITE, TXT_COLOR_BRIGHT_WHITE, TXT_COLOR_BRIGHT_WHITE);
     
@@ -223,20 +244,22 @@ static void OpenPromptWindow(txt_joystick_input_t* joystick_input)
 {
     txt_window_t* window;
     txt_window_action_t* close_button;
-    SDL_Joystick* joystick;
+    SDL_GameController* joystick;
+
+    TXT_LockJoyInputAll(1);
 
     // Silently update when the shift button is held down.
 
     joystick_input->check_conflicts = !TXT_GetModifierState(TXT_MOD_SHIFT);
 
-    if (SDL_Init(SDL_INIT_JOYSTICK) < 0)
+    if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0)
     {
         return;
     }
 
     // Check the current joystick is valid
 
-    joystick = SDL_JoystickOpen(joystick_index);
+    joystick = SDL_GameControllerOpen(joystick_index);
 
     if (joystick == NULL)
     {
@@ -259,7 +282,7 @@ static void OpenPromptWindow(txt_joystick_input_t* joystick_input)
     TXT_SignalConnect(window, "closed", PromptWindowClosed, joystick);
     joystick_input->prompt_window = window;
 
-    SDL_JoystickEventState(SDL_ENABLE);
+    SDL_GameControllerEventState(SDL_ENABLE);
     TXT_SetWidgetFocus(getcontroljoystickwindow, 1);
 
     TXT_SetWindowAction(window, TXT_HORIZ_CENTER, close_button);
@@ -290,7 +313,7 @@ static void TXT_JoystickInputDrawer(TXT_UNCAST_ARG(joystick_input))
 
     if (*joystick_input->variable < 0)
     {
-        M_StringCopy(buf, "(none)", sizeof(buf));
+        M_StringCopy(buf, "", sizeof(buf));
     }
     else
     {
@@ -357,6 +380,14 @@ txt_widget_class_t txt_joystick_input_class =
     TXT_JoystickInputMousePress,
     NULL,
 };
+
+void TXT_ResetJoystickPhysicalButtons(int num_buttons)
+{
+    for (int i = 0; i < num_buttons; i++)
+    {
+        joystick_physical_buttons[i] = i;
+    }
+}
 
 txt_joystick_input_t* TXT_NewJoystickInput(int* variable)
 {

@@ -9,35 +9,59 @@ echo *********************************************************************
 echo.
 echo Select build:
 echo.
-echo   1. Release build win32
-echo   2. Release build win64
-echo   3. Clean all
+echo   1. Release build MSVC win32
+echo   2. Release build MSVC win64
+echo   3. Release build Mingw win32
+echo   4. Release build Mingw win64
+echo   5. Clean all
 echo   0. Exit
 echo.
 
-set /P select=Select 0-3: 
+set /P select=Select 0-5: 
 
-if /i "%select%"== "1" goto:win32
-if /i "%select%"== "2" goto:win64
-if /i "%select%"== "3" goto:clean
+if /i "%select%"== "1" goto:msvcwin32
+if /i "%select%"== "2" goto:msvcwin64
+if /i "%select%"== "3" goto:mingwwin32
+if /i "%select%"== "4" goto:mingwwin64
+if /i "%select%"== "5" goto:clean
 if /i "%select%"== "0" goto:eof
 echo Incorrect entry
 goto:eof
 
-:win32:
-set arch="Release|x86"
+:msvcwin32:
+set compiler=msvc
+set cmakesettings=-G "Visual Studio 17" -DCMAKE_BUILD_TYPE=Release -A Win32
+set arch="Release|Win32"
 set archname=win32
 set buildfoldername=raptorx86
-set msvcfolder=msvc\Release
 set sdlfolder=include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x86\SDL2.dll
 goto:buildres
 
-:win64:
+:msvcwin64:
+set compiler=msvc
+set cmakesettings=-G "Visual Studio 17" -DCMAKE_BUILD_TYPE=Release -A x64
 set arch="Release|x64"
 set archname=win64
 set buildfoldername=raptorx64
-set msvcfolder=msvc\x64\Release
 set sdlfolder=include\SDL2-devel-2.28.2-VC\SDL2-2.28.2\lib\x64\SDL2.dll
+goto:buildres
+
+:mingwwin32:
+set compiler=mingw
+set cmakesettings=-G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+set arch="Release|Win32"
+set archname=win32
+set buildfoldername=raptorx86
+set sdlfolder=include\SDL2-devel-2.28.2-mingw\SDL2-2.28.2\i686-w64-mingw32\bin\SDL2.dll
+goto:buildres
+
+:mingwwin64:
+set compiler=mingw
+set cmakesettings=-G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+set arch="Release|x64"
+set archname=win64
+set buildfoldername=raptorx64
+set sdlfolder=include\SDL2-devel-2.28.2-mingw\SDL2-2.28.2\x86_64-w64-mingw32\bin\SDL2.dll
 goto:buildres
 
 :buildres
@@ -71,6 +95,11 @@ if not "%version:~3,-1%" == "." (
   echo Incorrect entry
   goto:buildres
 )
+(
+echo const char raptorwindowtitle[] = "Raptor %version%";
+echo const char setuptitle[] = "Raptor Setup ver %version%                                       (c) skynettx %date:~-4%";
+echo const char startver[] = "Raptor ver %version% (c) skynettx %date:~-4%";
+) > src/rapver.h
 (
 echo #define APSTUDIO_READONLY_SYMBOLS
 echo #include "winres.h"
@@ -107,52 +136,29 @@ echo         VALUE "Translation", 0x409, 1252
 echo     END
 echo END
 ) > rsrc\resource.rc
-(
-echo #define APSTUDIO_READONLY_SYMBOLS
-echo #include "winres.h"
-echo #undef APSTUDIO_READONLY_SYMBOLS
-echo.
-echo MAINICON ICON "raptorsetup.ico"
-echo.
-echo VS_VERSION_INFO VERSIONINFO
-echo     FILEVERSION %version:~0,-4%,%version:~2,-2%,%version:~4%,0
-echo     PRODUCTVERSION %version:~0,-4%,%version:~2,-2%,%version:~4%,0
-echo     FILEFLAGSMASK 0x3FL
-echo     FILEFLAGS 0x0L
-echo     FILEOS 0x4L
-echo     FILETYPE 0x1L
-echo     FILESUBTYPE 0x0L
-echo BEGIN
-echo     BLOCK "StringFileInfo"
-echo     BEGIN
-echo         BLOCK "040904E4"
-echo         BEGIN
-echo             VALUE "CompanyName", "skynettx"
-echo             VALUE "FileDescription", "Raptor %version% Setup"
-echo             VALUE "FileVersion", "%version%"
-echo             VALUE "InternalName", "raptorsetup"
-echo             VALUE "LegalCopyright", "GNU General Public License"
-echo             VALUE "OriginalFilename", "raptorsetup"
-echo             VALUE "ProductName", "Raptor Setup"
-echo             VALUE "ProductVersion", "%version%"
-echo         END
-echo     END
-echo     BLOCK "VarFileInfo"
-echo     BEGIN
-echo         VALUE "Translation", 0x409, 1252
-echo     END
-echo END
-) > rsrc\setup\resource.rc
 
 :build
-devenv msvc\raptor.sln /Build %arch%
+@RD /S /Q build
+mkdir build
+cd build
+cmake %cmakesettings% ..
+if "%compiler%" == "msvc" (
+  cd ..
+  devenv build\raptor.sln /Build %arch%
+) else (
+  make -j%NUMBER_OF_PROCESSORS%
+  cd ..
+)
 goto:buildfolder
 
 :buildfolder
 @RD /S /Q pkg\win32\%buildfoldername%
 mkdir pkg\win32\%buildfoldername%
-xcopy %msvcfolder%\raptor.exe pkg\win32\%buildfoldername%
-xcopy %msvcfolder%\raptorsetup\raptorsetup.exe pkg\win32\%buildfoldername%
+if "%compiler%" == "msvc" (
+  xcopy build\bin\Release\raptor.exe pkg\win32\%buildfoldername%
+) else (
+  xcopy build\bin\raptor.exe pkg\win32\%buildfoldername%
+)
 xcopy include\TinySoundFont\LICENSE pkg\win32\%buildfoldername%
 ren pkg\win32\%buildfoldername%\LICENSE LICENSETSF
 xcopy LICENSE pkg\win32\%buildfoldername%
@@ -162,12 +168,6 @@ if exist pkg\win32\%buildfoldername%\raptor.exe (
   echo raptor.exe PASS
 ) else (
   echo raptor.exe FAILED
-  goto:eof
-)
-if exist pkg\win32\%buildfoldername%\raptorsetup.exe (
-  echo raptorsetup.exe PASS
-) else (
-  echo raptorsetup.exe FAILED
   goto:eof
 )
 if exist pkg\win32\%buildfoldername%\LICENSETSF (
@@ -278,9 +278,6 @@ xcopy "%assetspath%\*.GLB" pkg\win32\%buildfoldername%
   echo   CreateDirectory "$SMPROGRAMS\Raptor"
   echo   CreateShortCut "$SMPROGRAMS\Raptor\Raptor.lnk" "$INSTDIR\raptor.exe"
   echo   CreateShortCut "$DESKTOP\Raptor.lnk" "$INSTDIR\raptor.exe"
-  echo   File "%buildfoldername%\raptorsetup.exe"
-  echo   CreateShortCut "$SMPROGRAMS\Raptor\Raptor Setup.lnk" "$INSTDIR\raptorsetup.exe"
-  echo   CreateShortCut "$DESKTOP\Raptor Setup.lnk" "$INSTDIR\raptorsetup.exe"
   echo   File "%buildfoldername%\SDL2.dll"
   echo SectionEnd
   echo.
@@ -312,7 +309,6 @@ xcopy "%assetspath%\*.GLB" pkg\win32\%buildfoldername%
   echo Section Uninstall
   echo   Delete "$INSTDIR\uninst.exe"
   echo   Delete "$INSTDIR\SDL2.dll"
-  echo   Delete "$INSTDIR\raptorsetup.exe"
   echo   Delete "$INSTDIR\raptor.exe"
   echo   Delete "$INSTDIR\LICENSETSF"
   echo   Delete "$INSTDIR\LICENSE"
@@ -322,8 +318,6 @@ xcopy "%assetspath%\*.GLB" pkg\win32\%buildfoldername%
   )
   echo.
   echo   Delete "$SMPROGRAMS\Raptor\Uninstall.lnk"
-  echo   Delete "$DESKTOP\Raptor Setup.lnk"
-  echo   Delete "$SMPROGRAMS\Raptor\Raptor Setup.lnk"
   echo   Delete "$DESKTOP\Raptor.lnk"
   echo   Delete "$SMPROGRAMS\Raptor\Raptor.lnk"
   echo.
@@ -341,9 +335,7 @@ del pkg\win32\raptor-%version%-%archname%.exe
 goto:eof
 
 :clean:
-@RD /S /Q msvc\.vs
-@RD /S /Q msvc\Release
-@RD /S /Q msvc\x64
+@RD /S /Q build
 @RD /S /Q pkg\win32
 del *.exe
 echo All cleaned

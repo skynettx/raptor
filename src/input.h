@@ -14,6 +14,7 @@ typedef enum
 #define BUT_4 ( buttons[3] )
 
 extern int buttons[4];
+extern int j_lookup[4];
 extern int control;
 extern int haptic;
 extern int joy_ipt_MenuNew;

@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdint.h>
 
+#include "SDL.h"
 #include "common.h"
 #include "opl3.h"
 #include "i_oplmusic.h"
@@ -1345,6 +1346,7 @@ void I_SetOPLDriverVer(opl_driver_ver_t ver)
 void I_OPL_Mix(int16_t *stream, int len)
 {
     OPL3_GenerateStream(&opl, stream, len);
+    SDL_MixAudioFormat((uint8_t*)stream, (uint8_t*)stream, AUDIO_S16SYS, len * 4, SDL_MIX_MAXVOLUME);
 }
 
 void ProgramChgEvent(unsigned int chan, unsigned int param){

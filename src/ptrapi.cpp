@@ -32,6 +32,7 @@ char *displaypic;
 char *cursorstart;
 int mouseb1, mouseb2, mouseb3;
 int mouse_b1_ack, mouse_b2_ack, mouse_b3_ack;
+int touchmode = 0;
 int touchmouseb1off = 0;
 int do_game = 0;
 
@@ -54,8 +55,8 @@ PTR_JoyHandler(
     
     lasttick += 1000 / 60;
 
-    cur_mx = StickX + old_joy_x;
-    cur_my = StickY + old_joy_y;
+    cur_mx = JOY_GetAxis(JOYSTICKX) + old_joy_x;
+    cur_my = JOY_GetAxis(JOYSTICKY) + old_joy_y;
     
     if (cur_mx < 0)
         cur_mx = 0;
@@ -122,6 +123,13 @@ I_HandleMouseEvent(
     SDL_Event *sdlevent
 )
 {
+    // When input is provided via touch, the button array is set to a fixed mapping based on the `touchmode` flag,
+    // overriding the mouse button mapping defined in the configuration file.
+    if (sdlevent->button.which == SDL_TOUCH_MOUSEID)
+        touchmode = 1;
+    else
+        touchmode = 0;
+    
     switch (sdlevent->type)
     {
     case SDL_MOUSEBUTTONDOWN:

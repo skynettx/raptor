@@ -8,10 +8,12 @@
 #endif // _WIN32
 #ifdef __GNUC__
 #include <unistd.h>
-char* ltoa(long i, char* s, int dummy_radix) {
+#ifndef _WIN32
+static char* ltoa(long i, char* s, int dummy_radix) {
     sprintf(s, "%ld", i);
     return s;
 }
+#endif // _WIN32
 #endif // __GNUC__
 
 static char ProfilePath[260];

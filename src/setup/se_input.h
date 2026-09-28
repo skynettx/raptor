@@ -10,14 +10,17 @@ extern txt_window_t* getcontroljoystickwindow;
 extern int ControllerType;
 extern int key_up_convert, key_down_convert, key_left_convert, key_right_convert, key_fire_convert, key_special_convert, key_mega_convert;
 extern int writeflagkey;
+extern int initflagkey;
 
 extern int mousebfire, mousebchweapon, mousebmega;
-extern int mousebfireout, mousebchweaponout, mousebmegaout;
+extern int savemousebfire, savemousebchweapon, savemousebmega;
 extern int writeflagmouse;
 
 extern int joybfire, joybchweapon, joybmega, joybspeed;
 extern int joybfireout, joybchweaponout, joybmegaout;
-extern int writeflagjoy, writeflagjoybfire, writeflagjoybchweapon, writeflagjoybmega;
+extern int savejoybfire, savejoybchweapon, savejoybmega;
+extern int writeflagjoy;
+extern int initflagjoyb;
 
 void GetControl(TXT_UNCAST_ARG(widget), void* user_data);
 void GetControlKeyboard(TXT_UNCAST_ARG(widget), void* user_data);

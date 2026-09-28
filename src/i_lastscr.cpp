@@ -19,14 +19,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "rap.h"
-#include "i_lastscr.h"
 #include "textscreen.h"
 #include "i_video.h"
-#include "joyapi.h"
-#include "kbdapi.h"
-#include "ptrapi.h"
-#include "imsapi.h"
+#include "rapver.h"
 
 #define LASTSCR_W 80
 #define LASTSCR_H 25
@@ -40,14 +35,12 @@ void I_LASTSCR(char* mem)
     unsigned char* screendata;
     int y;
     int indent;
-
-    TXT_Fullscreen(txt_fullscreen);
     
     // Set up text mode screen
 
-    TXT_Init();
+    TXT_Init(txt_fullscreen, 0, 0);
 
-    TXT_SetWindowTitle("Raptor");
+    TXT_SetWindowTitle(raptorwindowtitle);
     // SDL2-TODO I_InitWindowTitle();
     // SDL2-TODO I_InitWindowIcon();
 
@@ -65,18 +58,16 @@ void I_LASTSCR(char* mem)
     }
 
     // Wait for a keypress
-
-    IMS_StartAck();
-    I_Settextmode(true);
-
+    
     while (true)
     {
         TXT_UpdateScreen();
-        I_GetEvent();
-
-        if (joy_ack || kbd_ack || mouse_b1_ack || mouse_b2_ack || mouse_b3_ack)
+        
+        if (TXT_GetChar() > 0)
+        {
             break;
-
+        }
+        
         TXT_Sleep(0);
     }
 

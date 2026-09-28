@@ -15,7 +15,6 @@
 
 int g_joy_ascii;
 unsigned int fi_joy_count;
-bool fi_sec_field;
 
 int kbactive;
 int g_button_flag = 1;
@@ -584,41 +583,6 @@ SWD_DoButton(
     SFIELD *curfld         // INPUT : pointer to current field
 )
 {
-    // == CONTROLLER INPUT ==============================
-    
-    if (joy_ipt_MenuNew)                                                 
-    {
-        if (StickY > 0 || Down)                                                   
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_DOWN;
-        }
-        
-        if (StickY < 0 || Up)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_UP;
-        }
-        
-        if (StickX > 0 || Right)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_RIGHT;
-        }
-        
-        if (StickX < 0 || Left)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_LEFT;
-        }
-        
-        if (AButton)
-        {
-            JOY_IsKey(AButton);
-            g_key = SC_ENTER;
-        }
-    }
-    
     if (!g_button_flag)
         return;
     
@@ -695,9 +659,13 @@ SWD_FieldInput(
     FONT *fld_font;
     char *wrkbuf;
     int flag;
+    int joyinput;
+    int fieldmaxchars;
+    joyinput = 0;
     flag = 0;
     fld_font = (FONT*)GLB_GetItem(curfld->fontid);
     wrkbuf = (char*)curfld + LE_LONG(curfld->txtoff);
+    fieldmaxchars = LE_LONG(curfld->maxchars);
     
     curpos = strlen(wrkbuf);
     
@@ -708,29 +676,22 @@ SWD_FieldInput(
         
         // == INPUT CONTROLLER MAX FIELDINPUT ==============================
         
-        if (StickY || Down || Up || AButton || YButton || Start)            
+        if (JOY_GetAxis(JOYSTICKY) || JOY_GetButton(JOYDOWN) || JOY_GetButton(JOYUP) || JOY_GetButton(JOYA) || JOY_GetButton(JOYY) || JOY_GetButton(JOYSTART))
         {
-            if (curpos > 17)
+            joyinput = 1;
+
+            if (curpos + 1 >= fieldmaxchars)
             {
                 curpos--;
                 wrkbuf[curpos] = 0;
-            }
-            
-            if (fi_sec_field)
-            {
-                if (curpos > 10)
-                {
-                    curpos--;
-                    wrkbuf[curpos] = 0;
-                }
             }
         }
         
         // == INPUT CONTROLLER ASCII TABLE DOWN ==============================
 
-        if (StickY > 0 || Down)                                                    
+        if (JOY_GetAxis(JOYSTICKY) > 0 || JOY_GetButton(JOYDOWN))
         {
-            if (JOY_IsScroll(0) == 1)
+            if (g_key == SC_DOWN)
             {
                 if (fi_joy_count > 0)
                 {
@@ -757,9 +718,9 @@ SWD_FieldInput(
         
         // == INPUT CONTROLLER ASCII TABLE UP ==============================
 
-        if (StickY < 0 || Up)                                                    
+        if (JOY_GetAxis(JOYSTICKY) < 0 || JOY_GetButton(JOYUP))
         {
-            if (JOY_IsScroll(0) == 1)
+            if (g_key == SC_UP)
             {
                 if (fi_joy_count > 0)
                 {
@@ -784,32 +745,21 @@ SWD_FieldInput(
             }
         }
         
-        if (StickX > 0 || Right)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_RIGHT;
-        }
-        
-        if (StickX < 0 || Left)
-        {
-            if (JOY_IsScroll(0) == 1)
-                g_key = SC_LEFT;
-        }
-        
         // == INPUT CONTROLLER NEXT INPUT ==============================
 
-        if (AButton)                                                  
+        if (JOY_GetButton(JOYA))
         {
-            JOY_IsKey(AButton);
+            JOY_IsKey(JOYA);
+            g_key = SC_NONE;
             curpos++;
             fi_joy_count = 0;
         }
         
         // == INPUT CONTROLLER DELETE ==============================
 
-        if (XButton)                                                  
+        if (JOY_GetButton(JOYX))
         {
-            JOY_IsKey(XButton);
+            JOY_IsKey(JOYX);
             flag = 1;
             
             if (curpos > 0)
@@ -821,9 +771,9 @@ SWD_FieldInput(
         
         // == INPUT CONTROLLER SPACE ==============================
         
-        if (YButton)                                                  
+        if (JOY_GetButton(JOYY))
         {
-            JOY_IsKey(YButton);
+            JOY_IsKey(JOYY);
             wrkbuf[curpos + 1] = 0;
             g_joy_ascii = 0x20;
             wrkbuf[curpos] = g_joy_ascii;
@@ -832,11 +782,25 @@ SWD_FieldInput(
         
         // == INPUT CONTROLLER CONFIRM ==============================
 
-        if (Start)                                                   
+        if (JOY_GetButton(JOYSTART))
         {
-            JOY_IsKey(Start);
+            JOY_IsKey(JOYSTART);
             g_key = SC_ENTER;
             fi_joy_count = 0;
+        }
+
+        if (joyinput)
+        {
+            if (GFX_StrPixelLen(fld_font, wrkbuf, curpos + 1) >= LE_LONG(curfld->lx))
+                curpos--;
+
+            wrkbuf[curpos + 1] = 0;
+            joyinput = 0;
+
+            if (g_key == SC_ENTER)
+                flag = 0;
+            else
+                flag = 1;
         }
     }
     
@@ -859,11 +823,6 @@ SWD_FieldInput(
             else
                 cur_cmd = F_NEXT;
         }
-        
-        if (fi_sec_field == false)
-            fi_sec_field = true;
-        else
-            fi_sec_field = false;
         break;
     
     case SC_ENTER:
@@ -1514,8 +1473,8 @@ SWD_IsButtonDown(
     if (KBD_Key(SC_ENTER))
         return 1;
     
-    if ((mouseb1) || (AButton && !joy_ipt_MenuNew))                       
-         return 1;
+    if ((mouseb1) || JOY_GetButton(JOYA) || JOY_GetButton(JOYSTART))
+        return 1;
     
     return 0;
 }
@@ -1677,6 +1636,7 @@ SWD_InitWindow(
     old_field = -1;
     kbactive = 0;
     highlight_flag = 0;
+    fi_joy_count = 0;
     
     if (lastfld)
     {
@@ -2268,12 +2228,21 @@ SWD_Dialog(
 )
 {
     int update, loop, sy, sx;
+    int joyinput;
     SWIN *curwin;
     SFIELD *firstfld, *curfld;
     
     //__disable();
     I_GetEvent();
     g_key = lastscan;
+    
+    if (joy_ipt_MenuNew)
+    {
+        joyinput = JOY_MapsInput();
+        if (!lastscan && joyinput)
+            g_key = joyinput;
+    }
+    
     lastscan = SC_NONE;
     g_ascii = lastascii;
     lastascii = SC_NONE;
@@ -2335,7 +2304,7 @@ SWD_Dialog(
     if (active_field == -1)
         return;
 
-    if ((mouseb1 && !cur_act) || (AButton && !joy_ipt_MenuNew && !cur_act))                            
+    if ((mouseb1 && !cur_act) || (JOY_GetButton(JOYA) && !joy_ipt_MenuNew && !cur_act))
     {
         old_field = active_field;
         

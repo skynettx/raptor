@@ -63,7 +63,12 @@ static txt_input_mode_t input_mode = TXT_INPUT_NORMAL;
 // is the value that was passed to SDL_CreateWindow().
 static int screen_image_w, screen_image_h;
 
+static int window_width;
+static int window_height;
+
 static int fullscreenflag = 0;
+static int resizableflag = 0;
+static int aspect_ratio_correctflag = 0;
 static int retinaflag = 0;
 
 static TxtSDLEventCallbackFunc event_callback;
@@ -107,6 +112,71 @@ static const SDL_Color ega_colors[] =
     {0xfe, 0xfe, 0x54, 0xff},          // 14: Yellow
     {0xfe, 0xfe, 0xfe, 0xff},          // 15: Bright white
 };
+
+#define MAX_CONTROLLERS 4
+SDL_GameController* TXT_ControllerHandles[MAX_CONTROLLERS];
+static int MaxJoysticks;
+static int ControllerIndex;
+static int JoystickIndex;
+static int joy[MAX_CONTROLLERS][11];
+static int joyinputlock[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static int joyactive = 0;
+static unsigned int lastTime = 0;
+static int asciitable = 0;
+static int spaceflag = 0;
+static int updateascii = 0;
+
+static void ResetJoy(void)
+{
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
+    {
+        for (int i = 0; i < 11; i++)
+            joy[ControllerIndex][i] = 0;
+    }
+}
+
+static void CalJoy(void)
+{
+    if (SDL_Init(SDL_INIT_GAMECONTROLLER) < 0)
+    {
+        return;
+    }
+
+    MaxJoysticks = SDL_NumJoysticks();
+    ControllerIndex = 0;
+
+    for (JoystickIndex = 0; JoystickIndex < MaxJoysticks; ++JoystickIndex)
+    {
+        if (!SDL_IsGameController(JoystickIndex))
+        {
+            continue;
+        }
+        if (ControllerIndex >= MAX_CONTROLLERS)
+        {
+            break;
+        }
+
+        TXT_ControllerHandles[ControllerIndex] = SDL_GameControllerOpen(JoystickIndex);
+        ControllerIndex++;
+    }
+}
+
+static void CloJoy(int all)
+{
+    ResetJoy();
+    
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
+    {
+        if (TXT_ControllerHandles[ControllerIndex] && !SDL_GameControllerGetAttached(TXT_ControllerHandles[ControllerIndex]) && !all)
+        {
+            SDL_GameControllerClose(TXT_ControllerHandles[ControllerIndex]);
+        }
+        else if (TXT_ControllerHandles[ControllerIndex] && all)
+        {
+            SDL_GameControllerClose(TXT_ControllerHandles[ControllerIndex]);
+        }
+    }
+}
 
 #ifdef _WIN32
 
@@ -223,20 +293,13 @@ static void ChooseFont(void)
     }
 }
 
-//Set fullscreenmode
-
-void TXT_Fullscreen(int fullscreen)
-{
-    fullscreenflag = fullscreen;
-}
-
 //
 // Initialize text mode screen
 //
 // Returns 1 if successful, 0 if an error occurred
 //
 
-int TXT_Init(void)
+int TXT_Init(int fullscreen, int resizable, int aspect_ratio_correct)
 {
     int flags = 0;
 
@@ -245,10 +308,14 @@ int TXT_Init(void)
         return 0;
     }
 
+    CalJoy();
+
     ChooseFont();
 
     screen_image_w = TXT_SCREEN_W * font->w;
     screen_image_h = TXT_SCREEN_H * font->h;
+    window_width = screen_image_w;
+    window_height = screen_image_h;
 
     // If highdpi_font is selected, try to initialize high dpi rendering.
     if (font == &highdpi_font)
@@ -256,10 +323,16 @@ int TXT_Init(void)
         flags |= SDL_WINDOW_ALLOW_HIGHDPI;
     }
 
-    // If fullscreenflag is true, set window to full screen mode. 
-    if (fullscreenflag)
+    if (fullscreen)
     {
+        fullscreenflag = 1;
         flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
+
+    if (resizable)
+    {
+        resizableflag = 1;
+        flags |= SDL_WINDOW_RESIZABLE;
     }
 
     TXT_SDLWindow =
@@ -268,6 +341,8 @@ int TXT_Init(void)
 
     if (TXT_SDLWindow == NULL)
         return 0;
+
+    SDL_SetWindowMinimumSize(TXT_SDLWindow, screen_image_w, screen_image_h);
 
     renderer = SDL_CreateRenderer(TXT_SDLWindow, -1, SDL_RENDERER_PRESENTVSYNC);
 
@@ -324,12 +399,20 @@ int TXT_Init(void)
                                         TXT_SCREEN_H * font->h,
                                         8, 0, 0, 0, 0);
 
+    if (aspect_ratio_correct)
+    {
+        aspect_ratio_correctflag = 1;
+        SDL_RenderSetLogicalSize(renderer, screenbuffer->w, screenbuffer->h);
+    }
+
     SDL_LockSurface(screenbuffer);
     SDL_SetPaletteColors(screenbuffer->format->palette, ega_colors, 0, 16);
     SDL_UnlockSurface(screenbuffer);
 
     screendata = malloc(TXT_SCREEN_W * TXT_SCREEN_H * 2);
     memset(screendata, 0, TXT_SCREEN_W * TXT_SCREEN_H * 2);
+
+    TXT_SetInputMode(TXT_INPUT_NORMAL);
 
     return 1;
 }
@@ -340,6 +423,8 @@ void TXT_Shutdown(void)
     screendata = NULL;
     SDL_FreeSurface(screenbuffer);
     screenbuffer = NULL;
+    CloJoy(1);
+    SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
@@ -440,8 +525,8 @@ static void GetDestRect(SDL_Rect *rect)
     int w, h;
 
     SDL_GetRendererOutputSize(renderer, &w, &h);
-    rect->x = (w - screenbuffer->w) / 2;
-    rect->y = (h - screenbuffer->h) / 2;
+    rect->x = 0;
+    rect->y = 0;
     rect->w = screenbuffer->w;
     rect->h = screenbuffer->h;
 }
@@ -479,7 +564,12 @@ void TXT_UpdateScreenArea(int x, int y, int w, int h)
 
     SDL_RenderClear(renderer);
     GetDestRect(&rect);
-    SDL_RenderCopy(renderer, screentx, NULL, &rect);
+    
+    if (aspect_ratio_correctflag)
+        SDL_RenderCopy(renderer, screentx, NULL, &rect);
+    else
+        SDL_RenderCopy(renderer, screentx, NULL, NULL);
+    
     SDL_RenderPresent(renderer);
 
     SDL_DestroyTexture(screentx);
@@ -494,6 +584,7 @@ void TXT_GetMousePosition(int *x, int *y)
 {
     int window_w, window_h;
     int origin_x, origin_y;
+    float sx, sy;
 
     SDL_GetMouseState(x, y);
 
@@ -502,18 +593,27 @@ void TXT_GetMousePosition(int *x, int *y)
     // what SDL_GetWindowSize() returns; we must calculate and subtract the
     // origin position since we center the image within the window.
     SDL_GetWindowSize(TXT_SDLWindow, &window_w, &window_h);
-    
-    int multiplier = 1;
 
-    if (fullscreenflag && (strcmp(font->name, "large") == 0) && !retinaflag)
+    if (aspect_ratio_correctflag)
+        SDL_RenderGetScale(renderer, &sx, &sy);
+    else
     {
-        multiplier = 2;
+        sx = (float)window_w / screen_image_w;
+        sy = (float)window_h / screen_image_h;
     }
-
-    origin_x = (window_w - (screen_image_w * multiplier)) / 2;
-    origin_y = (window_h - (screen_image_h * multiplier)) / 2;
-    *x = ((*x - origin_x) * TXT_SCREEN_W) / (screen_image_w * multiplier);
-    *y = ((*y - origin_y) * TXT_SCREEN_H) / (screen_image_h * multiplier);
+    
+    if (screen_image_w != screenbuffer->w &&
+        screen_image_h != screenbuffer->h &&
+        aspect_ratio_correctflag)
+    {
+        sx *= (screenbuffer->w / screen_image_w);
+        sy *= (screenbuffer->h / screen_image_h);
+    }
+    
+    origin_x = (window_w - (screen_image_w * sx)) / 2;
+    origin_y = (window_h - (screen_image_h * sy)) / 2;
+    *x = ((*x - origin_x) * TXT_SCREEN_W) / (screen_image_w * sx);
+    *y = ((*y - origin_y) * TXT_SCREEN_H) / (screen_image_h * sy);
 
     if (*x < 0)
     {
@@ -557,6 +657,9 @@ static int TranslateScancode(SDL_Scancode scancode)
 
         case SDL_SCANCODE_RALT:
             return KEY_RALT;
+
+        case SDL_SCANCODE_AC_BACK:
+            return KEY_ESCAPE;
 
         default:
             if (scancode < arrlen(scancode_translate_table))
@@ -640,6 +743,280 @@ static int MouseHasMoved(void)
     }
 }
 
+static void AdjustWindowSize(void)
+{
+    if (aspect_ratio_correctflag)
+    {
+        if (window_width * screen_image_h <= window_height * screen_image_w)
+        {
+            // We round up window_height if the ratio is not exact; this leaves
+            // the result stable.
+            window_height = (window_width * screen_image_h + screen_image_w - 1) / screen_image_w;
+        }
+        else
+        {
+            window_width = window_height * screen_image_w / screen_image_h;
+        }
+    }
+}
+
+static int ToggleFullScreenKeyShortcut(SDL_Keysym* sym)
+{
+    Uint16 flags = (KMOD_LALT | KMOD_RALT);
+#if defined(__MACOSX__)
+    flags |= (KMOD_LGUI | KMOD_RGUI);
+#endif
+    return (sym->scancode == SDL_SCANCODE_RETURN ||
+        sym->scancode == SDL_SCANCODE_KP_ENTER) && (sym->mod & flags) != 0;
+}
+
+static void ToggleFullScreen(void)
+{
+    unsigned int flags = 0;
+
+    fullscreenflag = !fullscreenflag;
+
+    if (fullscreenflag)
+    {
+        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
+
+    SDL_SetWindowFullscreen(TXT_SDLWindow, flags);
+
+    if (!fullscreenflag)
+    {
+        AdjustWindowSize();
+        SDL_SetWindowSize(TXT_SDLWindow, window_width, window_height);
+    }
+}
+
+static void HandleWindowEvent(SDL_WindowEvent* event)
+{
+    int flags;
+
+    switch (event->event)
+    {
+        case SDL_WINDOWEVENT_RESIZED:
+            // When the window is resized (we're not in fullscreen mode),
+            // save the new window size.
+            flags = SDL_GetWindowFlags(TXT_SDLWindow);
+            if ((flags & SDL_WINDOW_FULLSCREEN_DESKTOP) == 0)
+            {
+                SDL_GetWindowSize(TXT_SDLWindow, &window_width, &window_height);
+                AdjustWindowSize();
+                SDL_SetWindowSize(TXT_SDLWindow, window_width, window_height);
+            }
+            TXT_UpdateScreen();
+            break;
+    }
+}
+
+void TXT_LockJoyInputAll(int flag)
+{
+    ResetJoy();
+    
+    for (int i = 0; i < 11; i++)
+        joyinputlock[i] = flag;
+}
+
+void TXT_LockJoyInput(int buttonaxis, int flag)
+{
+    ResetJoy();
+
+    joyinputlock[buttonaxis] = flag;
+}
+
+static void EvJoyButton(SDL_Event* sdlevent)
+{
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
+    {
+        if (TXT_ControllerHandles[ControllerIndex] != 0 && SDL_GameControllerGetAttached(TXT_ControllerHandles[ControllerIndex]))
+        {
+            if (!joyinputlock[TXT_JOY_UP])
+                joy[ControllerIndex][TXT_JOY_UP] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_UP);
+
+            if (!joyinputlock[TXT_JOY_DOWN])
+                joy[ControllerIndex][TXT_JOY_DOWN] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+
+            if (!joyinputlock[TXT_JOY_LEFT])
+                joy[ControllerIndex][TXT_JOY_LEFT] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+
+            if (!joyinputlock[TXT_JOY_RIGHT])
+                joy[ControllerIndex][TXT_JOY_RIGHT] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+
+            if (!joyinputlock[TXT_JOY_START])
+                joy[ControllerIndex][TXT_JOY_START] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_START);
+
+            if (!joyinputlock[TXT_JOY_BACK])
+                joy[ControllerIndex][TXT_JOY_BACK] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_BACK);
+
+            if (!joyinputlock[TXT_JOY_A])
+                joy[ControllerIndex][TXT_JOY_A] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_A);
+
+            if (!joyinputlock[TXT_JOY_B])
+                joy[ControllerIndex][TXT_JOY_B] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_B);
+
+            if (!joyinputlock[TXT_JOY_X])
+                joy[ControllerIndex][TXT_JOY_X] = SDL_GameControllerGetButton(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_BUTTON_X);
+        }
+    }
+}
+
+static int ConvJoyAxisValue(int AxisValue, int RangeDivison)
+{
+    int deadzone = 8000;
+    int result;
+
+    if (AxisValue == 0 ||
+        (AxisValue > 0 && AxisValue < deadzone) ||
+        (AxisValue < 0 && AxisValue > -deadzone))
+        return 0;
+
+    if (AxisValue > 0)
+        result = (AxisValue - deadzone) * RangeDivison / (32767 - deadzone);
+    else
+        result = (AxisValue + deadzone) * RangeDivison / (32768 - deadzone);
+
+    return result;
+}
+
+static void EvJoyAxis(SDL_Event* sdlevent)
+{
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ++ControllerIndex)
+    {
+        if (TXT_ControllerHandles[ControllerIndex] != 0 && SDL_GameControllerGetAttached(TXT_ControllerHandles[ControllerIndex]))
+        {
+            if (!joyinputlock[TXT_JOY_STICKX])
+                joy[ControllerIndex][TXT_JOY_STICKX] = ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTX), 6);
+
+            if (!joyinputlock[TXT_JOY_STICKY])
+                joy[ControllerIndex][TXT_JOY_STICKY] = ConvJoyAxisValue(SDL_GameControllerGetAxis(TXT_ControllerHandles[ControllerIndex], SDL_CONTROLLER_AXIS_LEFTY), 6);
+        }
+    }
+}
+
+static int MapJoyText(int index)
+{
+    if (joy[index][TXT_JOY_A])
+    {
+        spaceflag = 1;
+        asciitable = 0;
+        return 0x20;
+    }
+    
+    if (joy[index][TXT_JOY_X])
+    {
+        asciitable = 0;
+        return KEY_BACKSPACE;
+    }
+    
+    if (joy[index][TXT_JOY_B] || joy[index][TXT_JOY_BACK])
+    {
+        asciitable = 0;
+        return KEY_ESCAPE;
+    }
+    
+    if (joy[index][TXT_JOY_START])
+    {
+        asciitable = 0;
+        return KEY_ENTER;
+    }
+    
+    if (joy[index][TXT_JOY_STICKY] < 0 || joy[index][TXT_JOY_UP])
+    {
+        if (spaceflag)
+        {
+            spaceflag = 0;
+            asciitable = 0x40;
+        }
+        if (asciitable)
+            asciitable++;
+        else if (!asciitable)
+            asciitable = 0x41;
+        if (asciitable > 0x7e)
+            asciitable = 0x41;
+
+        updateascii = 1;
+        return KEY_BACKSPACE;
+    }
+
+    if (joy[index][TXT_JOY_STICKY] > 0 || joy[index][TXT_JOY_DOWN])
+    {
+        if (spaceflag)
+        {
+            spaceflag = 0;
+            asciitable = 0x42;
+        }
+        if (asciitable)
+            asciitable--;
+        else if (!asciitable)
+            asciitable = 0x41;
+        if (asciitable < 0x21)
+            asciitable = 0x41;
+
+        updateascii = 1;
+        return KEY_BACKSPACE;
+    }
+
+    return 0;
+}
+
+static int MapJoyKey(void)
+{
+    for (ControllerIndex = 0; ControllerIndex < MAX_CONTROLLERS; ControllerIndex++)
+    {
+        if (joy[ControllerIndex][TXT_JOY_STICKX] || joy[ControllerIndex][TXT_JOY_STICKY] ||
+            joy[ControllerIndex][TXT_JOY_UP] || joy[ControllerIndex][TXT_JOY_DOWN] ||
+            joy[ControllerIndex][TXT_JOY_LEFT] || joy[ControllerIndex][TXT_JOY_RIGHT] ||
+            joy[ControllerIndex][TXT_JOY_START] || joy[ControllerIndex][TXT_JOY_BACK] ||
+            joy[ControllerIndex][TXT_JOY_A] || joy[ControllerIndex][TXT_JOY_B] ||
+            joy[ControllerIndex][TXT_JOY_X])
+        {
+            unsigned int currentTime;
+            currentTime = SDL_GetTicks();
+            joyactive = 1;
+            
+            if (currentTime > lastTime + 200)
+            {
+                lastTime = currentTime;
+
+                if (input_mode == TXT_INPUT_TEXT)
+                    return MapJoyText(ControllerIndex);
+
+                if (joy[ControllerIndex][TXT_JOY_STICKX] > 0 || joy[ControllerIndex][TXT_JOY_RIGHT])
+                    return KEY_RIGHTARROW;
+                
+                if (joy[ControllerIndex][TXT_JOY_STICKX] < 0 || joy[ControllerIndex][TXT_JOY_LEFT])
+                    return KEY_LEFTARROW;
+                
+                if (joy[ControllerIndex][TXT_JOY_STICKY] > 0 || joy[ControllerIndex][TXT_JOY_DOWN])
+                    return KEY_DOWNARROW;
+                
+                if (joy[ControllerIndex][TXT_JOY_STICKY] < 0 || joy[ControllerIndex][TXT_JOY_UP])
+                    return KEY_UPARROW;
+                
+                if (joy[ControllerIndex][TXT_JOY_START])
+                    return KEY_ENTER;
+                
+                if (joy[ControllerIndex][TXT_JOY_BACK])
+                    return KEY_ESCAPE;
+                
+                if (joy[ControllerIndex][TXT_JOY_A])
+                    return KEY_ENTER;
+                
+                if (joy[ControllerIndex][TXT_JOY_B])
+                    return KEY_ESCAPE;
+                
+                if (joy[ControllerIndex][TXT_JOY_X])
+                    return KEY_F10;
+            }
+            return 0;
+        }
+    }
+    joyactive = 0;
+    return 0;
+}
+
 signed int TXT_GetChar(void)
 {
     SDL_Event ev;
@@ -661,6 +1038,30 @@ signed int TXT_GetChar(void)
 
         switch (ev.type)
         {
+            case SDL_WINDOWEVENT:
+                if (ev.window.windowID == SDL_GetWindowID(TXT_SDLWindow))
+                {
+                    HandleWindowEvent(&ev.window);
+                }
+                break;
+
+            case SDL_CONTROLLERDEVICEADDED:
+                CalJoy();
+                break;
+            
+            case SDL_CONTROLLERDEVICEREMOVED:
+                CloJoy(0);
+                break;
+
+            case SDL_CONTROLLERBUTTONUP:
+            case SDL_CONTROLLERBUTTONDOWN:
+                EvJoyButton(&ev);
+                break;
+
+            case SDL_CONTROLLERAXISMOTION:
+                EvJoyAxis(&ev);
+                break;
+
             case SDL_MOUSEBUTTONDOWN:
                 if (ev.button.button < TXT_MAX_MOUSE_BUTTONS)
                 {
@@ -672,6 +1073,11 @@ signed int TXT_GetChar(void)
                 return SDLWheelToTXTButton(&ev.wheel);
 
             case SDL_KEYDOWN:
+                if (ToggleFullScreenKeyShortcut(&ev.key.keysym))
+                {
+                    ToggleFullScreen();
+                    break;
+                }
                 switch (input_mode)
                 {
                     case TXT_INPUT_RAW:
@@ -683,7 +1089,8 @@ signed int TXT_GetChar(void)
                         // few special cases needed during text input:
                         if (ev.key.keysym.sym == SDLK_ESCAPE
                          || ev.key.keysym.sym == SDLK_BACKSPACE
-                         || ev.key.keysym.sym == SDLK_RETURN)
+                         || ev.key.keysym.sym == SDLK_RETURN
+                         || ev.key.keysym.sym == SDLK_AC_BACK)
                         {
                             return TranslateKeysym(&ev.key.keysym);
                         }
@@ -716,6 +1123,17 @@ signed int TXT_GetChar(void)
             default:
                 break;
         }
+    }
+
+    int joykey = MapJoyKey();
+    
+    if (joykey)
+        return joykey;
+
+    if (updateascii)
+    {
+        updateascii = 0;
+        return TXT_UNICODE_TO_KEY(asciitable);
     }
 
     return -1;
@@ -903,7 +1321,8 @@ void TXT_Sleep(int timeout)
     {
         // We can just wait forever until an event occurs
 
-        SDL_WaitEvent(NULL);
+        if (!joyactive)
+            SDL_WaitEvent(NULL);
     }
     else
     {

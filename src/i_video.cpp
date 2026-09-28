@@ -38,6 +38,7 @@
 #include "musapi.h"
 #include "prefapi.h"
 #include "joyapi.h"
+#include "rapver.h"
 
 // These are (1) the window (or the full screen) that our game is rendered to
 // and (2) the renderer that scales the texture (see below) into this window.
@@ -197,11 +198,8 @@ int usegamma = 0;
 // Joystick/gamepad hysteresis
 unsigned int joywait = 0;
 
-// Set to true if screen coordinates are in points rather than pixels
-int screencoordpoint = 0;
-
-// When textmode is true not update pointer cursor
-static bool textmode = false;
+// Becomes true when high-DPI display detected
+static bool highdpi = false;
 
 void VIDEO_LoadPrefs(void)
 {
@@ -444,7 +442,7 @@ void I_GetEvent(void)
                 IPT_CalJoy();
                 break;
             case SDL_CONTROLLERDEVICEREMOVED:          
-                IPT_CloJoy();
+                IPT_CloJoy(0);
                 break;
             case SDL_CONTROLLERBUTTONUP:
             case SDL_CONTROLLERBUTTONDOWN:
@@ -499,9 +497,7 @@ void I_GetEvent(void)
     if ((control != 2) || (control == 2 && joy_ipt_MenuNew))
         PTR_MouseHandler();
     
-    if (!textmode)
-        PTR_UpdateCursor();
-    
+    PTR_UpdateCursor();
     IPT_GetButtons();
 
     MUS_Poll();
@@ -926,7 +922,7 @@ void I_SetWindowTitle(const char *title)
 
 void I_InitWindowTitle(void)
 {
-    SDL_SetWindowTitle(screen, "Raptor");
+    SDL_SetWindowTitle(screen, raptorwindowtitle);
 #if 0
     char *buf;
 
@@ -1329,12 +1325,12 @@ static void SetVideoMode(void)
     // time this also defines the aspect ratio that is preserved while scaling
     // and stretching the texture into the window.
 
-    //if (aspect_ratio_correct || integer_scaling)
-    //{
+    if (aspect_ratio_correct || integer_scaling)
+    {
         SDL_RenderSetLogicalSize(renderer,
                                  SCREENWIDTH,
                                  actualheight);
-    //}
+    }
 
     // Force integer scales for resolution-independent rendering.
 
@@ -1413,6 +1409,7 @@ void I_InitGraphics(uint8_t *pal)
 {
     SDL_Event dummy;
     char *env;
+    int ww = 0, wh = 0;
     int rw = 0, rh = 0;
 
     // Pass through the XSCREENSAVER_WINDOW environment variable to
@@ -1507,11 +1504,15 @@ void I_InitGraphics(uint8_t *pal)
 
     // I_AtExit(I_ShutdownGraphics, true);
 
+    // If the window size differs from renderer output size,
+    // it is a high-DPI display.
+
+    SDL_GetWindowSize(screen, &ww, &wh);
     SDL_GetRendererOutputSize(renderer, &rw, &rh);
 
-    if (rw != window_width)
+    if (rw != ww)
     {
-        screencoordpoint = 1;
+        highdpi = true;
     }
 }
 
@@ -1545,17 +1546,24 @@ void I_GetMousePos(int *x, int *y)
 {
     SDL_Rect viewport;
     float sx, sy;
+    int rw, rh;
     SDL_GetMouseState(x, y);
     SDL_RenderGetViewport(renderer, &viewport);
-    SDL_RenderGetScale(renderer, &sx, &sy);
+    
+    if (aspect_ratio_correct)
+        SDL_RenderGetScale(renderer, &sx, &sy);
+    else
+    {
+        SDL_GetRendererOutputSize(renderer, &rw, &rh);
+        sx = (float)rw / SCREENWIDTH;
+        sy = (float)rh / actualheight;
+    }
 
-#ifndef __ANDROID__
-    if (screencoordpoint)
+    if (highdpi)
     {
         sx /= 2;
         sy /= 2;
     }
-#endif //__ANDROID__
 
     *x = (int)(*x / sx) - viewport.x;
     *y = (int)(((*y / sy - viewport.y) * (float)SCREENHEIGHT) / actualheight);
@@ -1565,16 +1573,23 @@ void I_SetMousePos(int x, int y)
 {
     SDL_Rect viewport;
     float sx, sy;
+    int rw, rh;
     SDL_RenderGetViewport(renderer, &viewport);
-    SDL_RenderGetScale(renderer, &sx, &sy);
+    
+    if (aspect_ratio_correct)
+        SDL_RenderGetScale(renderer, &sx, &sy);
+    else
+    {
+        SDL_GetRendererOutputSize(renderer, &rw, &rh);
+        sx = (float)rw / SCREENWIDTH;
+        sy = (float)rh / actualheight;
+    }
 
-#ifndef __ANDROID__
-    if (screencoordpoint)
+    if (highdpi)
     {
         sx /= 2;
         sy /= 2;
     }
-#endif //__ANDROID__
 
     x = (int)((x + viewport.x) * sx);
     y = (int)(((y * actualheight) / (float)SCREENHEIGHT + viewport.y) * sy);
@@ -1621,9 +1636,4 @@ bool I_GetNeedResize(bool setonlypos)
 
         return true;
     }
-}
-
-void I_Settextmode(bool flag)
-{
-    textmode = flag;
 }

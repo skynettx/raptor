@@ -17,12 +17,12 @@
 #include <string.h>
 
 #include "doomkeys.h"
-#include "prefapi.h"
-#include "input.h"
-#include "main.h"
+#include "../m_misc.h"
+#include "se_input.h"
+#include "se_main.h"
 
 extern "C" {
-#include "txt_mouseinput.h"
+#include "se_txt_mouseinput.h"
 #include "txt_gui.h"
 #include "txt_io.h"
 #include "txt_label.h"
@@ -31,7 +31,7 @@ extern "C" {
 }
 
 // eg. "BUTTON #10"
-#define MOUSE_INPUT_WIDTH 10
+#define MOUSE_INPUT_WIDTH 14
 
 static int MousePressCallback(txt_window_t* window,
     int x, int y, int b,
@@ -114,7 +114,7 @@ static void TXT_MouseInputDrawer(TXT_UNCAST_ARG(mouse_input))
 
     if (*mouse_input->variable < 0)
     {
-        M_StringCopy(buf, "(none)", sizeof(buf));
+        M_StringCopy(buf, "", sizeof(buf));
     }
     else
     {

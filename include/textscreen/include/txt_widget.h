@@ -174,6 +174,15 @@ int TXT_HoveringOverWidget(TXT_UNCAST_ARG(widget));
 void TXT_SetWidgetBG(TXT_UNCAST_ARG(widget));
 
 /**
+ * Set the foreground and background color for all focused widgets.
+ * 
+ * @param fgcolor      The foreground color.
+ * @param bgcolor      The background color.
+ */
+
+void TXT_SetWidgetFocusedColor(int fgcolor, int bgcolor);
+
+/**
  * Query whether the specified widget is contained within another
  * widget.
  *
