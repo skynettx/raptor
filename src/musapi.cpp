@@ -596,40 +596,62 @@ MUS_Mix(
     int len
 )
 {
-    int i;
-    
+    int n, k;
+
     if (!music_init || !music_device || !music_device->Mix)
         return;
-    
-    for (i = 0; i < len; i++)
+
+    // Synthesize in blocks that end exactly on the next sample where a
+    // service routine is due, so event timing matches mixing one sample
+    // at a time without paying the per-sample call overhead.
+    while (len > 0)
     {
-        music_device->Mix(stream, 1);
-        music_cnt += musrate;
-        
+        n = (fx_freq - music_cnt + musrate - 1) / musrate;
+
+        k = (fx_freq - music_cnt2 + musfaderate - 1) / musfaderate;
+        if (k < n)
+            n = k;
+
+        if (gsshack)
+        {
+            k = (fx_freq - music_cnt3 + gssrate - 1) / gssrate;
+            if (k < n)
+                n = k;
+        }
+
+        if (n < 1)
+            n = 1;
+        if (n > len)
+            n = len;
+
+        music_device->Mix(stream, n);
+        music_cnt += musrate * n;
+
         while (music_cnt >= fx_freq)
         {
             music_cnt -= fx_freq;
             MUS_Service();
         }
-        music_cnt2 += musfaderate;
-        
+        music_cnt2 += musfaderate * n;
+
         while (music_cnt2 >= fx_freq)
         {
             music_cnt2 -= fx_freq;
             MUS_Fader();
         }
-        
+
         if (gsshack)
         {
-            music_cnt3 += gssrate;
-            
+            music_cnt3 += gssrate * n;
+
             while (music_cnt3 >= fx_freq)
             {
                 music_cnt3 -= fx_freq;
                 GSS_Service();
             }
         }
-        stream += 2;
+        stream += 2 * n;
+        len -= n;
     }
 }
 

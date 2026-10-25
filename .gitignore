@@ -6,3 +6,4 @@ Makefile
 build
 .vscode
 **/.DS_Store
+build-*/

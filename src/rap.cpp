@@ -38,6 +38,9 @@
 #include "setup/se_main.h"
 #endif // BUILD_WITH_SETUP
 
+#ifdef __vita__
+#include <psp2/power.h>
+#endif // __vita__
 #ifdef _WIN32
 #include <io.h>
 #endif // _WIN32
@@ -1276,6 +1279,14 @@ main(
     SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
 #endif //__ANDROID__
 
+#ifdef __vita__
+    // Run at the full homebrew clocks for audio and frame-time headroom
+    scePowerSetArmClockFrequency(444);
+    scePowerSetBusClockFrequency(222);
+    scePowerSetGpuClockFrequency(222);
+    scePowerSetGpuXbarClockFrequency(166);
+#endif // __vita__
+
 #ifdef BUILD_WITH_SETUP
     StartScreen();
 #endif // BUILD_WITH_SETUP
@@ -1286,7 +1297,7 @@ main(
 
     RAP_InitLoadSave();
     
-#if _WIN32 || __linux__ || __APPLE__
+#if _WIN32 || __linux__ || __APPLE__ || __vita__
     if (access(RAP_SetupFilename(), 0))
     {
         INI_InitPreference(RAP_SetupFilename());
@@ -1300,7 +1311,7 @@ main(
             "Raptor", "** You must run SETUP first! **", NULL);
         exit(0);
     }
-#endif //_WIN32 || __linux__ || __APPLE__
+#endif //_WIN32 || __linux__ || __APPLE__ || __vita__
 
     godmode = 0;
 
@@ -1472,11 +1483,11 @@ main(
         fflush(stdout);
     }
     
-#if _WIN32 || __linux__ || __APPLE__
+#if _WIN32 || __linux__ || __APPLE__ || __vita__
     GLB_InitSystem(RAP_GetPath(), 6, 0);
 #else
     GLB_InitSystem(argv[0], 6, 0);
-#endif //_WIN32 || __linux__ || __APPLE__
+#endif //_WIN32 || __linux__ || __APPLE__ || __vita__
     
     if (reg_flag)
     {

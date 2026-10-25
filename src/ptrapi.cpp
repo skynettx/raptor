@@ -467,6 +467,12 @@ PTR_DrawCursor(
     int flag               // INPUT: TRUE/FALSE
 )
 {
+#ifdef __vita__
+    // Menus are driven by the D-pad, so the pointer is never needed
+    if (joy_ipt_MenuNew)
+        flag = 0;
+#endif // __vita__
+
     if (ptractive)
     {
         if (!flag && ptrerase == 1)

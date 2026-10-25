@@ -940,7 +940,7 @@ RAP_InitLoadSave(
     void
 )
 {
-#if _WIN32 || __linux__ || __APPLE__
+#if _WIN32 || __linux__ || __APPLE__ || __vita__
     char* gethome;
 
     #if __ANDROID__
@@ -1013,7 +1013,7 @@ RAP_InitLoadSave(
         strcpy(g_setup_ini, "SETUP.INI");
 
     return cdpath;
-#endif // _WIN32 || __linux__ || __APPLE__
+#endif // _WIN32 || __linux__ || __APPLE__ || __vita__
 }
 
 /***************************************************************************
@@ -1038,11 +1038,17 @@ RAP_WriteDefaultSetup(
     INI_PutPreferenceLong("Setup", "Detail", 1);
 #if __ANDROID__
     INI_PutPreferenceLong("Setup", "Control", 1);
+#elif __vita__
+    INI_PutPreferenceLong("Setup", "Control", 2);
 #else
     INI_PutPreferenceLong("Setup", "Control", 0);
 #endif //__ANDROID__
     INI_PutPreferenceLong("Setup", "Haptic", 1);                           
+#if __vita__
+    INI_PutPreferenceLong("Setup", "joy_ipt_MenuNew", 1);
+#else
     INI_PutPreferenceLong("Setup", "joy_ipt_MenuNew", 0);         
+#endif // __vita__
 
 #if _WIN32 || __APPLE__
     INI_PutPreferenceLong("Setup", "sys_midi", 1);

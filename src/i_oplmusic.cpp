@@ -24,7 +24,11 @@
 
 #include "SDL.h"
 #include "common.h"
+#ifdef USE_DBOPL
+#include "dbopl.h"
+#else
 #include "opl3.h"
+#endif // USE_DBOPL
 #include "i_oplmusic.h"
 #include "musapi.h"
 #include "fx.h"
@@ -60,7 +64,14 @@
 
 using byte = uint8_t;
 
+#ifdef USE_DBOPL
+// DOSBox's DBOPL is far cheaper than Nuked OPL3, which matters on slow CPUs
+static DBOPL::Handler opl(true);
+#define OPL_WriteReg(reg, val) opl.WriteReg((reg), (val))
+#else
 opl3_chip opl;
+#define OPL_WriteReg(reg, val) OPL3_WriteRegBuffered(&opl, (reg), (val))
+#endif // USE_DBOPL
 
 #pragma pack(push, 1)
 struct genmidi_op_t
@@ -455,11 +466,11 @@ static void LoadOperatorData(int _operator, genmidi_op_t *data,
 
     *volume = level;
 
-    OPL3_WriteRegBuffered(&opl, OPL_REGS_LEVEL + _operator, level);
-    OPL3_WriteRegBuffered(&opl, OPL_REGS_TREMOLO + _operator, data->tremolo);
-    OPL3_WriteRegBuffered(&opl, OPL_REGS_ATTACK + _operator, data->attack);
-    OPL3_WriteRegBuffered(&opl, OPL_REGS_SUSTAIN + _operator, data->sustain);
-    OPL3_WriteRegBuffered(&opl, OPL_REGS_WAVEFORM + _operator, data->waveform);
+    OPL_WriteReg(OPL_REGS_LEVEL + _operator, level);
+    OPL_WriteReg(OPL_REGS_TREMOLO + _operator, data->tremolo);
+    OPL_WriteReg(OPL_REGS_ATTACK + _operator, data->attack);
+    OPL_WriteReg(OPL_REGS_SUSTAIN + _operator, data->sustain);
+    OPL_WriteReg(OPL_REGS_WAVEFORM + _operator, data->waveform);
 }
 
 // Set the instrument for a particular voice.
@@ -502,7 +513,7 @@ static void SetVoiceInstrument(opl_voice_t *voice,
     // two operators.  Turn on bits in the upper nybble; I think this
     // is for OPL3, where it turns on channel A/B.
 
-    OPL3_WriteRegBuffered(&opl, (OPL_REGS_FEEDBACK + voice->index) | voice->array,
+    OPL_WriteReg((OPL_REGS_FEEDBACK + voice->index) | voice->array,
                       data->feedback | voice->reg_pan);
 
     // Calculate voice priority.
@@ -539,7 +550,7 @@ static void SetVoiceVolume(opl_voice_t *voice, unsigned int volume)
     {
         voice->car_volume = car_volume | (voice->car_volume & 0xc0);
 
-        OPL3_WriteRegBuffered(&opl, (OPL_REGS_LEVEL + voice->op2) | voice->array,
+        OPL_WriteReg((OPL_REGS_LEVEL + voice->op2) | voice->array,
                           voice->car_volume);
 
         // If we are using non-modulated feedback mode, we must set the
@@ -559,7 +570,7 @@ static void SetVoiceVolume(opl_voice_t *voice, unsigned int volume)
             if(mod_volume != voice->mod_volume)
             {
                 voice->mod_volume = mod_volume;
-                OPL3_WriteRegBuffered(&opl, (OPL_REGS_LEVEL + voice->op1) | voice->array,
+                OPL_WriteReg((OPL_REGS_LEVEL + voice->op1) | voice->array,
                                   mod_volume |
                                   (opl_voice->modulator.scale & 0xc0));
             }
@@ -574,7 +585,7 @@ static void SetVoicePan(opl_voice_t *voice, unsigned int pan)
     voice->reg_pan = pan;
     opl_voice = &voice->current_instr->voices[voice->current_instr_voice];;
 
-    OPL3_WriteRegBuffered(&opl, (OPL_REGS_FEEDBACK + voice->index) | voice->array,
+    OPL_WriteReg((OPL_REGS_FEEDBACK + voice->index) | voice->array,
                       opl_voice->feedback | pan);
 }
 
@@ -607,7 +618,7 @@ static void InitVoices(void)
 
 static void VoiceKeyOff(opl_voice_t *voice)
 {
-    OPL3_WriteRegBuffered(&opl, (OPL_REGS_FREQ_2 + voice->index) | voice->array,
+    OPL_WriteReg((OPL_REGS_FREQ_2 + voice->index) | voice->array,
                       voice->freq >> 8);
 }
 
@@ -814,9 +825,9 @@ static void UpdateVoiceFrequency(opl_voice_t *voice)
 
     if (voice->freq != freq)
     {
-        OPL3_WriteRegBuffered(&opl, (OPL_REGS_FREQ_1 + voice->index) | voice->array,
+        OPL_WriteReg((OPL_REGS_FREQ_1 + voice->index) | voice->array,
                           freq & 0xff);
-        OPL3_WriteRegBuffered(&opl, (OPL_REGS_FREQ_2 + voice->index) | voice->array,
+        OPL_WriteReg((OPL_REGS_FREQ_2 + voice->index) | voice->array,
                           (freq >> 8) | 0x20);
 
         voice->freq = freq;
@@ -1218,7 +1229,7 @@ static void OPL_InitRegisters(int opl3)
 
     for (r=OPL_REGS_LEVEL; r <= OPL_REGS_LEVEL + OPL_NUM_OPERATORS; ++r)
     {
-        OPL3_WriteRegBuffered(&opl, r, 0x3f);
+        OPL_WriteReg(r, 0x3f);
     }
 
     // Initialize other registers
@@ -1228,34 +1239,34 @@ static void OPL_InitRegisters(int opl3)
 
     for (r=OPL_REGS_ATTACK; r <= OPL_REGS_WAVEFORM + OPL_NUM_OPERATORS; ++r)
     {
-        OPL3_WriteRegBuffered(&opl, r, 0x00);
+        OPL_WriteReg(r, 0x00);
     }
 
     // More registers ...
 
     for (r=1; r < OPL_REGS_LEVEL; ++r)
     {
-        OPL3_WriteRegBuffered(&opl, r, 0x00);
+        OPL_WriteReg(r, 0x00);
     }
 
     // Re-initialize the low registers:
 
     // Reset both timers and enable interrupts:
-    OPL3_WriteRegBuffered(&opl, OPL_REG_TIMER_CTRL,      0x60);
-    OPL3_WriteRegBuffered(&opl, OPL_REG_TIMER_CTRL,      0x80);
+    OPL_WriteReg(OPL_REG_TIMER_CTRL,      0x60);
+    OPL_WriteReg(OPL_REG_TIMER_CTRL,      0x80);
 
     // "Allow FM chips to control the waveform of each operator":
-    OPL3_WriteRegBuffered(&opl, OPL_REG_WAVEFORM_ENABLE, 0x20);
+    OPL_WriteReg(OPL_REG_WAVEFORM_ENABLE, 0x20);
 
     if (opl3)
     {
-        OPL3_WriteRegBuffered(&opl, OPL_REG_NEW, 0x01);
+        OPL_WriteReg(OPL_REG_NEW, 0x01);
 
         // Initialize level registers
 
         for (r=OPL_REGS_LEVEL; r <= OPL_REGS_LEVEL + OPL_NUM_OPERATORS; ++r)
         {
-            OPL3_WriteRegBuffered(&opl, r | 0x100, 0x3f);
+            OPL_WriteReg(r | 0x100, 0x3f);
         }
 
         // Initialize other registers
@@ -1265,23 +1276,23 @@ static void OPL_InitRegisters(int opl3)
 
         for (r=OPL_REGS_ATTACK; r <= OPL_REGS_WAVEFORM + OPL_NUM_OPERATORS; ++r)
         {
-            OPL3_WriteRegBuffered(&opl, r | 0x100, 0x00);
+            OPL_WriteReg(r | 0x100, 0x00);
         }
 
         // More registers ...
 
         for (r=1; r < OPL_REGS_LEVEL; ++r)
         {
-            OPL3_WriteRegBuffered(&opl, r | 0x100, 0x00);
+            OPL_WriteReg(r | 0x100, 0x00);
         }
     }
 
     // Keyboard split point on (?)
-    OPL3_WriteRegBuffered(&opl, OPL_REG_FM_MODE,         0x40);
+    OPL_WriteReg(OPL_REG_FM_MODE,         0x40);
 
     if (opl3)
     {
-        OPL3_WriteRegBuffered(&opl, OPL_REG_NEW, 0x01);
+        OPL_WriteReg(OPL_REG_NEW, 0x01);
     }
 }
 
@@ -1319,7 +1330,11 @@ int I_OPL_InitMusic(int dummy)
     // into their correct orientation.
     opl_stereo_correct = strstr(dmxoption, "-reverse") != NULL;*/
 
+#ifdef USE_DBOPL
+    opl.Init(fx_freq);
+#else
     OPL3_Reset(&opl, fx_freq);
+#endif // USE_DBOPL
 
     // Initialize all registers.
 
@@ -1345,8 +1360,34 @@ void I_SetOPLDriverVer(opl_driver_ver_t ver)
 
 void I_OPL_Mix(int16_t *stream, int len)
 {
+#ifdef USE_DBOPL
+    static Bit32s buf[512 * 2];
+    int n, i, v;
+
+    while (len > 0)
+    {
+        n = len > 512 ? 512 : len;
+        opl.Generate(buf, n);
+
+        // Doubled with clipping to match the Nuked path's self-mix below.
+        // Before OPL3 mode is enabled the chip outputs mono samples.
+        for (i = 0; i < n * 2; i++)
+        {
+            v = (opl.chip.opl3Active ? buf[i] : buf[i >> 1]) * 2;
+            if (v > 32767)
+                v = 32767;
+            else if (v < -32768)
+                v = -32768;
+            stream[i] = v;
+        }
+
+        stream += n * 2;
+        len -= n;
+    }
+#else
     OPL3_GenerateStream(&opl, stream, len);
     SDL_MixAudioFormat((uint8_t*)stream, (uint8_t*)stream, AUDIO_S16SYS, len * 4, SDL_MIX_MAXVOLUME);
+#endif // USE_DBOPL
 }
 
 void ProgramChgEvent(unsigned int chan, unsigned int param){

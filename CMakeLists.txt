@@ -35,6 +35,10 @@ if(ANDROID)
     file(COPY ${CMAKE_SOURCE_DIR}/include/TinySoundFont/LICENSE DESTINATION ${CMAKE_SOURCE_DIR}/android/app/src/main/assets/licenses)
     file(RENAME ${CMAKE_SOURCE_DIR}/android/app/src/main/assets/licenses/LICENSE ${CMAKE_SOURCE_DIR}/android/app/src/main/assets/licenses/LICENSE.TSF)
     file(COPY ${CMAKE_SOURCE_DIR}/pkg/android/license/LICENSE DESTINATION ${CMAKE_SOURCE_DIR}/android/app/src/main/assets/licenses)
+elseif(VITA)
+    include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
+    find_package(SDL2 REQUIRED)
+    include_directories(${SDL2_INCLUDE_DIRS})
 elseif(WIN32)
     add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
     if(MSVC)
@@ -129,6 +133,34 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Android")
     target_link_libraries(raptor
         textscreen
         SDL2::SDL2
+        )
+
+elseif(VITA)
+    set(VITA_APP_NAME "Raptor")
+    set(VITA_TITLEID  "RAPT00001")
+    set(VITA_VERSION  "01.00")
+    add_executable( ${PROJECT_NAME} ${SOURCE_FILES} )
+    target_sources(raptor PRIVATE src/dbopl.cpp src/dbopl.h)
+    target_compile_definitions(raptor PRIVATE USE_DBOPL)
+    target_sources(raptor PRIVATE src/dbopl.cpp src/dbopl.h)
+    target_compile_definitions(raptor PRIVATE USE_DBOPL)
+    # vita_create_self expects the elf in the build directory
+    set_target_properties(raptor PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+    target_link_libraries(raptor
+        textscreen
+        SDL2::SDL2main
+        SDL2::SDL2
+        )
+    # vitashark (pulled in by SDL2) needs these after it on the link line
+    set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -lSceShaccCgExt -ltaihen_stub")
+    vita_create_self(${PROJECT_NAME}.self ${PROJECT_NAME})
+    vita_create_vpk(${PROJECT_NAME}.vpk ${VITA_TITLEID} ${PROJECT_NAME}.self
+        VERSION ${VITA_VERSION}
+        NAME ${VITA_APP_NAME}
+        FILE pkg/vita/sce_sys/icon0.png sce_sys/icon0.png
+        FILE pkg/vita/sce_sys/livearea/contents/bg.png sce_sys/livearea/contents/bg.png
+        FILE pkg/vita/sce_sys/livearea/contents/startup.png sce_sys/livearea/contents/startup.png
+        FILE pkg/vita/sce_sys/livearea/contents/template.xml sce_sys/livearea/contents/template.xml
         )
 
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

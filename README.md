@@ -1,6 +1,63 @@
 # Raptor
 Based on the reverse-engineered codebase from Raptor Call Of The Shadows by nukeykt
 
+## PS Vita
+This fork adds a PS Vita port.
+
+### Requirements
+- A PS Vita with HENkaku/Ensō and VitaShell
+- The original Raptor Call Of The Shadows game files (GLB files), shareware or full version 1.2 or higher
+
+### Installing
+1. Copy `raptor.vpk` to the Vita (VitaShell's FTP or USB mode works) and install it from VitaShell. It appears on the home screen as **Raptor**.
+2. Create the folder `ux0:data/Raptor/` and copy the game files into it:
+   - Shareware: `FILE0000.GLB`, `FILE0001.GLB`
+   - Full version: `FILE0000.GLB` to `FILE0004.GLB`
+3. Launch Raptor. On first run it creates `ux0:data/Raptor/SETUP.INI` with Vita defaults. Save files are stored in the same folder.
+
+If the game exits straight away, check that the GLB files are in `ux0:data/Raptor/`.
+
+### Controls
+Menus
+
+| Button | Action |
+|---|---|
+| D-pad / left stick | Move between menu items |
+| Cross / Start | Select |
+| Circle / Select | Back |
+| R | Help |
+| Triangle (main menu) | Play demo |
+
+Entering a pilot name
+
+| Button | Action |
+|---|---|
+| D-pad up / down | Change letter (A-Z, 0-9) |
+| Cross | Accept letter, move to the next |
+| Square | Delete |
+| Triangle | Space |
+| Start | Confirm name |
+
+In game
+
+| Button | Action |
+|---|---|
+| D-pad / left stick | Fly |
+| Cross | Fire |
+| Circle | Fire special weapon |
+| Square / L | Change special weapon |
+| Triangle / R | Mega bomb |
+| Start | Pause |
+| Select | Abort mission |
+
+### Building
+Install [VitaSDK](https://vitasdk.org) with its SDL2 package, then run:
+```
+cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake -DBUILD_WITH_SETUP=OFF -DCMAKE_BUILD_TYPE=Release
+cmake --build build-vita
+```
+The package is written to `build-vita/raptor.vpk`.
+
 ## Media
 Click on the thumbnail to watch some videos showing the project in action  
 

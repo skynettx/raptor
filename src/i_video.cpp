@@ -449,10 +449,14 @@ void I_GetEvent(void)
             case SDL_CONTROLLERAXISMOTION:
                 I_HandleJoystickEvent(&sdlevent);
                 break;
+#ifndef __vita__
+            // The Vita build is controller-only. A touch sets mouseb1 and
+            // finger-up never clears it, which hangs menu selections.
             case SDL_FINGERDOWN:
             case SDL_FINGERUP:
                 I_HandleTouchEvent(&sdlevent);
                 break;
+#endif // __vita__
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
             case SDL_MOUSEWHEEL:
@@ -1296,6 +1300,13 @@ static void SetVideoMode(void)
         texture_upscaled = NULL;
     }
 
+#ifdef __vita__
+    // The default GLES2 driver goes through vitaGL, which needs the
+    // libshacccg.suprx runtime shader compiler. The native GXM driver
+    // uses precompiled shaders and doesn't.
+    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "VITA gxm");
+#endif // __vita__
+
     renderer = SDL_CreateRenderer(screen, -1, renderer_flags);
 
     // If we could not find a matching render driver,
@@ -1430,6 +1441,10 @@ void I_InitGraphics(uint8_t *pal)
     }
 
     SetSDLVideoDriver();
+
+#ifdef __vita__
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+#endif // __vita__
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
